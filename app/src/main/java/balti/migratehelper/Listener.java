@@ -48,17 +48,5 @@ public class Listener extends BroadcastReceiver {
                 packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
             }
         }
-        else if (intent.getAction().equals(context.getString(R.string.actionSu)))
-            restoreSu(context);
-        else if (intent.getAction().equals(context.getString(R.string.actionTWRP)))
-            restoreTWRP(context);
-    }
-
-    public void restoreSu(Context context) {
-        context.startActivity(new Intent(context, MainActivity.class).setAction("rootRestore"));
-    }
-
-    public void restoreTWRP(Context context) {
-        context.startActivity(new Intent(context, MainActivity.class).setAction("twrpRestore"));
     }
 }

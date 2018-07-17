@@ -1,29 +1,21 @@
 <resources>
-    <string name="app_name">Permission fixer</string>
+    <string name="app_name">Migrate helper</string>
 
-    <string name="notifHeader">Apps restored!</string>
-    <string name="notifBody">Please fix permissions to avoid crashes!!</string>
-    <string name="notifSuOption">Using root</string>
-    <string name="notifTWRPOption">Using TWRP</string>
-    <string name="activitySuOption">Restore using root</string>
-    <string name="activityTWRPOption">Restore with TWRP</string>
+    <string name="notifHeader">Migrate package flashed!</string>
+    <string name="notifBody">Click to continue restoration!!</string>
+    <string name="restore">Restore all apps and data</string>
     <string name="uninstallOrDisable">Uninstall or disable</string>
 
-    <string name="rootDesc">Restoring with root requires your ROM to be rooted. This application will be automatically uninstalled.</string>
-    <string name="TWRPDesc">Restoring with TWRP needs you to boot into TWRP recovery and flash a zipfile. Ideal if you want to keep your device unrooted.</string>
-    <string name="disableDesc">Last button will forcefully delete this app (this requires root); or disable it from making annoying notifications (if not rooted)\n
-    Proceed with caution as you may never be able to restore permissions to backed up apps.
-    </string>
 
     <string name="sure">Are you sure?</string>
-    <string name="howToRestore">If you change your mind later,\n\nIf you are not rooted: Clear data of this app\n(Settings -> Apps -> Permission Fixer -> Storage -> Clear data)\nand reboot to get permission fix capabilities\n\n
+    <string name="howToRestore">If you change your mind later,\n\nIf you are not rooted: Clear data of this app\n(Settings -> Apps -> Migrate helper -> Storage -> Clear data)\nand reboot to get permission fix capabilities\n\n
     If you are rooted: reflash the backup zip file.
     </string>
     <string name="goAhead">Go ahead</string>
 
     <string name="permissionsFixed">Permissions fixed!</string>
-    <string name="notRooted">Your system is not rooted or root permission denied!! Try TWRP method.</string>
-    <string name="failed">There was some error! Try TWRP method.</string>
+    <string name="notRooted">Your system is not rooted or root permission denied!!.</string>
+    <string name="failed">There was some error!</string>
 
     <string name="zipMade">TWRP zip made!</string>
     <string name="zipLocation">Please flash zip at:</string>

@@ -20,8 +20,6 @@ import android.view.View;
 
 public class RestoreService extends Service {
 
-    int mode = 0;
-
 
     BroadcastReceiver progressReceiver, requestListener;
     IntentFilter progressReceiverIF, requestListenerIF;
@@ -60,10 +58,6 @@ public class RestoreService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        if (intent != null) {
-            mode = intent.getIntExtra("mode", 0);
-        }
-
         NotificationCompat.Builder dummy;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             dummy = new NotificationCompat.Builder(this, "PROGRESS");
@@ -73,16 +67,10 @@ public class RestoreService extends Service {
         }
         dummy.setSmallIcon(R.drawable.ic_fix);
 
-        if (mode == 10){
-            RootRestoreTask task = new RootRestoreTask(this);
-            task.execute();
-            startForeground(1, dummy.build());
-        }
-        else if (mode == 5){
-            TWRPRestoreTask task = new TWRPRestoreTask(this);
-            task.execute();
-            startForeground(2, dummy.build());
-        }
+        RootRestoreTask task = new RootRestoreTask(this);
+        task.execute();
+        startForeground(1, dummy.build());
+
 
         stopService(new Intent(this, StupidStartupService.class));
 

@@ -32,11 +32,11 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button rootRestoreButton, twrpRestoreButton, okOnFinish, disable;
+    Button rootRestoreButton, okOnFinish, disable;
     ProgressBar progressBar;
     TextView messageView;
 
-    LinearLayout descriptions, buttons;
+    LinearLayout buttons;
 
     BroadcastReceiver progressReceiver;
     IntentFilter progressReceiverIF;
@@ -49,10 +49,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String action = "";
-        action = getIntent().getAction();
-        if (action == null) action = "";
-
         main = getSharedPreferences("main", MODE_PRIVATE);
         editor = main.edit();
 
@@ -64,17 +60,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        twrpRestoreButton = (Button) findViewById(R.id.restoreTWRP);
-        twrpRestoreButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 5);
-            }
-        });
-
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         messageView = (TextView) findViewById(R.id.message);
-        descriptions = (LinearLayout) findViewById(R.id.descriptions);
         buttons = (LinearLayout) findViewById(R.id.buttons);
 
         okOnFinish = (Button) findViewById(R.id.okOnFinish);
@@ -82,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 buttons.setVisibility(View.VISIBLE);
-                descriptions.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
                 messageView.setVisibility(View.GONE);
                 okOnFinish.setVisibility(View.GONE);
@@ -102,19 +88,10 @@ public class MainActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 if (intent.getStringExtra("job").equals("rootOnProgress")){
                     buttons.setVisibility(View.GONE);
-                    descriptions.setVisibility(View.GONE);
                     progressBar.setVisibility(View.VISIBLE);
                     messageView.setVisibility(View.GONE);
                     okOnFinish.setVisibility(View.GONE);
                     progressBar.setProgress(intent.getIntExtra("c", 0)*100/intent.getIntExtra("n", 1));
-                }
-                else if (intent.getStringExtra("job").equals("twrpOnProgress")){
-                    buttons.setVisibility(View.GONE);
-                    descriptions.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.VISIBLE);
-                    messageView.setVisibility(View.GONE);
-                    okOnFinish.setVisibility(View.GONE);
-                    progressBar.setIndeterminate(true);
                 }
                 else if (intent.getStringExtra("job").equals("finished")){
                     onFinish(intent);
@@ -124,16 +101,6 @@ public class MainActivity extends AppCompatActivity {
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
         registerReceiver(progressReceiver, progressReceiverIF);
 
-        if (action.equals("twrpRestore")){
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 5);
-        }
-        else if (action.equals("rootRestore")){
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 10);
-        }
-        else if (action.equals("showNotificationMessage")){
-            onFinish(getIntent());
-        }
-        else sendBroadcast(new Intent("requestProgress"));
     }
 
     @Override
@@ -144,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
 
     void onFinish(Intent intent){
         buttons.setVisibility(View.GONE);
-        descriptions.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         messageView.setVisibility(View.VISIBLE);
         okOnFinish.setVisibility(View.VISIBLE);
@@ -163,10 +129,10 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(new Intent(this, RestoreService.class).putExtra("mode", requestCode));
+                    startForegroundService(new Intent(this, RestoreService.class));
                 }
                 else {
-                    startService(new Intent(this, RestoreService.class).putExtra("mode", requestCode));
+                    startService(new Intent(this, RestoreService.class));
                 }
             }
             else {
@@ -207,9 +173,9 @@ public class MainActivity extends AppCompatActivity {
         File tempScript = new File(getFilesDir() + "/tempScript.sh");
         BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
         String command = "#!/sbin/sh\n\n" +
-                "mount -o rw,remount /system/app/PermissionFixer\n" +
+                "mount -o rw,remount /system/app/MigrateHelper\n" +
                 "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                "rm -rf /system/app/PermissionFixer /data/data/balti.migratehelper\n";
+                "rm -rf /system/app/MigrateHelper /data/data/balti.migratehelper\n";
         writer.write(command);
         writer.close();
 

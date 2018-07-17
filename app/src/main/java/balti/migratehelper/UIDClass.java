@@ -73,12 +73,10 @@ public class UIDClass {
     }
 
     void generateSpecificUids(){
-        permissionListPath = Environment.getExternalStorageDirectory() + "/Migrate/";
+        File permissionListFile = new File(context.getFilesDir(), "permissionList");
+        permissionListPath = permissionListFile.getAbsolutePath();
         String line;
-        (new File(permissionListPath)).mkdirs();
-        permissionListPath = permissionListPath + "permissionList";
         try {
-            (new File(permissionListPath)).createNewFile();
             Process copy = Runtime.getRuntime().exec("su -c mv -f /cache/permissionList " + permissionListPath);
             copy.waitFor();
             Log.d("MigrateHelper", copy.exitValue() + "");

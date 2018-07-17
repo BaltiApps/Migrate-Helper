@@ -48,15 +48,8 @@ public class StupidStartupService extends Service {
                 .setContentTitle(context.getString(R.string.notifHeader))
                 .setContentText(context.getString(R.string.notifBody));
 
-        PendingIntent usingSu = PendingIntent.getBroadcast(context, 2, new Intent(getString(R.string.actionSu)), 0);
-        PendingIntent usingTWRP = PendingIntent.getBroadcast(context, 3, new Intent(getString(R.string.actionTWRP)), 0);
         PendingIntent view = PendingIntent.getActivity(context, 1, new Intent(context, MainActivity.class), 0);
 
-        NotificationCompat.Action suAction = new NotificationCompat.Action(0, context.getString(R.string.notifSuOption), usingSu);
-        NotificationCompat.Action twrpAction = new NotificationCompat.Action(0, context.getString(R.string.notifTWRPOption), usingTWRP);
-
-        notification.addAction(suAction);
-        notification.addAction(twrpAction);
         notification.setContentIntent(view);
 
         notification.setVisibility(Notification.VISIBILITY_PUBLIC)
