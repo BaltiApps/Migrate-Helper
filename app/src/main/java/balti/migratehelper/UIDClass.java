@@ -8,8 +8,10 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,17 +43,17 @@ public class UIDClass {
         for (int i = 0; i < appList.size(); i++){
             ApplicationInfo info = appList.get(i).applicationInfo;
             if (isPresent(specific, info.packageName)) {
-                String comm = "chown " + info.uid + ":" + info.uid + " -R /data/data/" + info.packageName + "\nrestorecon -RF /data/data/" + info.packageName + "\n";
+                String comm = "chown " + info.uid + ":" + info.uid + " -Rf /data/data/" + info.packageName + "\nrestorecon -RF /data/data/" + info.packageName + "\n";
                 if (isUserApplication(info)) {
                     String src = info.sourceDir;
                     src = src.substring(0, src.lastIndexOf('/'));
                     String srcName = src.substring(src.lastIndexOf('/') + 1);
-                    comm = comm + "chown " + info.uid + ":" + info.uid + " -R /data/app/" + srcName + "\nrestorecon -RF /data/app/" + srcName + "\n";
+                    comm = comm + "chown " + info.uid + ":" + info.uid + " -Rf /data/app/" + srcName + "\nrestorecon -RF /data/app/" + srcName + "\n";
                 }
                 else {
                     String src = info.sourceDir;
                     String srcName = src.substring(0, src.lastIndexOf('/'));
-                    comm = comm + "chown " +  info.uid + ":" + info.uid + " -R " + srcName + "\nrestorecon -RF " + srcName + "\n";
+                    comm = comm + "chown " +  info.uid + ":" + info.uid + " -Rf " + srcName + "\nrestorecon -RF " + srcName + "\n";
                 }
                 core.addElement(comm);
             }
@@ -73,16 +75,26 @@ public class UIDClass {
     }
 
     void generateSpecificUids(){
-        File permissionListFile = new File(context.getFilesDir(), "permissionList");
+        File permissionListFile = new File(context.getExternalCacheDir(), "permissionList");
         permissionListPath = permissionListFile.getAbsolutePath();
         String line;
         try {
-            Process copy = Runtime.getRuntime().exec("su -c mv -f /cache/permissionList " + permissionListPath);
+
+            File pListMoveScript = new File(context.getFilesDir(), "pListMove.sh");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(pListMoveScript));
+            bw.write("#!sbin/sh" + "\n\n" +
+                    "mv -f /cache/permissionList " + permissionListPath + "\n" +
+                    "rm " + pListMoveScript.getAbsolutePath() + "\n"
+
+            );
+            bw.close();
+
+            Process copy = Runtime.getRuntime().exec("su -c sh " + pListMoveScript.getAbsolutePath());
             copy.waitFor();
             Log.d("MigrateHelper", copy.exitValue() + "");
             if (copy.exitValue() == 0) {
                 Vector<String> packages = new Vector<>(1);
-                BufferedReader reader = new BufferedReader(new FileReader(new File(permissionListPath)));
+                BufferedReader reader = new BufferedReader(new FileReader(permissionListFile));
                 while ((line = reader.readLine()) != null){
                     packages.addElement(line);
                 }

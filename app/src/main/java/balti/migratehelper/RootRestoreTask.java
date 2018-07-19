@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -22,18 +23,18 @@ import java.io.InputStreamReader;
  * Created by sayantan on 23/10/17.
  */
 
-public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
+public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
 
-    Context context;
-    String errors;
-    NotificationManager notificationManager;
-    NotificationCompat.Builder progress;
-    int n;
-    int installN, restoreN;
-    Intent restoreIntent;
-    UIDClass uidClass;
+    private Context context;
+    private String errors;
+    private NotificationManager notificationManager;
+    private NotificationCompat.Builder progress;
+    private int n;
+    private int installN, restoreN;
+    private Intent restoreIntent;
+    private UIDClass uidClass;
 
-    public RootRestoreTask(Context context) {
+    RootRestoreTask(Context context) {
         this.context = context;
         errors = "";
         n = 0;
@@ -46,7 +47,6 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
     protected void onPreExecute() {
         super.onPreExecute();
         uidClass = new UIDClass(context);
-        notificationManager.cancel(5);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel progressChannel = new NotificationChannel("PROGRESS", "Permission restore progress", NotificationManager.IMPORTANCE_DEFAULT);
@@ -59,13 +59,11 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
             progress = new NotificationCompat.Builder(context, "PROGRESS");
         else progress = new NotificationCompat.Builder(context);
 
-        notificationManager.cancel(100);
-
-        progress.setContentTitle(context.getString(R.string.requestingRootPermission))
+        progress.setContentTitle(context.getString(R.string.requesting_root))
                 .setSmallIcon(R.drawable.ic_fix)
                 .setProgress(0, 0, false);
         progress.setContentIntent(PendingIntent.getActivity(context, 5, new Intent(context, MainActivity.class), 0));
-        notificationManager.notify(1, progress.build());
+        notificationManager.notify(100, progress.build());
     }
 
     private int restoreApp(Context context){
@@ -77,7 +75,8 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
 
             File script = new File(context.getFilesDir(), "app_script.sh");
             BufferedWriter tempWriter = new BufferedWriter(new FileWriter(script));
-            String cmd = "cd /data/balti.migrate\n" +
+            String cmd = "#!/sbin/sh" + "\n\n" +
+                    "cd /data/balti.migrate\n" +
                     "ls *-app.sh > " + appList.getAbsolutePath() + "\n" +
                     "chmod 777 " + appList.getAbsolutePath() + "\n";
             tempWriter.write(cmd);
@@ -90,16 +89,26 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
 
                 File appInstallScript = new File(context.getFilesDir(), "appInstallScript.sh");
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(appList));
+                BufferedReader bufferedReader2 = new BufferedReader(new FileReader(appList));
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(appInstallScript));
                 String line;
 
-                installN = 1;
+                installN = 0;
 
-                while ((line = bufferedReader.readLine()) != null){
-                    line = "sh /data/balti.migrate/" + line + "\n";
-                    line = line + "echo INSTALLING: " + installN;
-                    bufferedWriter.write(line + "\n", 0, line.length() + 1);
+                while (bufferedReader2.readLine() != null){
                     installN++;
+                }
+
+                int c = 0;
+                String appName;
+
+                bufferedWriter.write("#!sbin/sh\n\n");
+                while ((line = bufferedReader.readLine()) != null){
+                    appName = line.substring(0, line.indexOf('-'));
+                    c++;
+                    line = "sh /data/balti.migrate/" + line + "\n";
+                    line = line + "echo \"INSTALLING_APPS: " + appName + " (" + c + "/" + installN + ")\"";
+                    bufferedWriter.write(line + "\n", 0, line.length() + 1);
                 }
                 bufferedWriter.close();
                 appInstallScript.setExecutable(true);
@@ -108,15 +117,17 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
                 script.delete();
                 appList.delete();
 
+                Log.d("MigrateHelper", "pt1");
+
                 Process installProcess = Runtime.getRuntime().exec("su -c sh " + appInstallScript.getAbsolutePath());
                 BufferedReader err = new BufferedReader(new InputStreamReader(installProcess.getErrorStream()));
                 BufferedReader output = new BufferedReader(new InputStreamReader(installProcess.getInputStream()));
 
-                int c = 0;
+                c = 0;
                 while ((line = output.readLine()) != null){
-                    if (line.startsWith("INSTALLING:")){
+                    if (line.startsWith("INSTALLING_APPS:")){
                         c++;
-                        publishProgress(c, installN);
+                        publishProgress(c, installN, context.getString(R.string.installing_apps), line);
                     }
                 }
                 while ((line = err.readLine()) != null) {
@@ -124,6 +135,8 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
                 }
 
                 exitVal = installProcess.exitValue();
+
+                Log.d("MigrateHelper", "pt2 : " + errors + " eval: " + exitVal);
 
             }
 
@@ -134,6 +147,7 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
             e.printStackTrace();
             errors = errors + e.getMessage() + "\n";
             exitVal = -200;
+            Log.d("MigrateHelper", "pt3: " + e.getMessage());
         }
 
         return exitVal;
@@ -147,7 +161,8 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
 
             File script = new File(context.getFilesDir(), "data_script.sh");
             BufferedWriter tempWriter = new BufferedWriter(new FileWriter(script));
-            String cmd = "cd /data/balti.migrate\n" +
+            String cmd = "#!sbin/sh" + "\n\n" +
+                    "cd /data/balti.migrate\n" +
                     "ls *-data.sh > " + dataList.getAbsolutePath() + "\n" +
                     "chmod 777 " + dataList.getAbsolutePath() + "\n";
             tempWriter.write(cmd);
@@ -160,20 +175,32 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
 
                 File dataRestoreScript = new File(context.getFilesDir(), "dataRestoreScript.sh");
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(dataList));
+                BufferedReader bufferedReader2 = new BufferedReader(new FileReader(dataList));
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(dataRestoreScript));
                 String line;
 
                 restoreN = 1;
 
-                while ((line = bufferedReader.readLine()) != null){
-                    line = "sh /data/balti.migrate/" + line + "\n";
-                    line = line + "echo RESTORING: " + installN;
-                    bufferedWriter.write(line + "\n", 0, line.length() + 1);
+                while (bufferedReader2.readLine() != null){
                     restoreN++;
+                }
+
+                int c = 0;
+                String appDataName;
+
+                bufferedWriter.write("#!sbin/sh\n\n");
+                while ((line = bufferedReader.readLine()) != null){
+                    appDataName = line.substring(0, line.indexOf('-'));
+                    c++;
+                    line = "sh /data/balti.migrate/" + line + "\n";
+                    line = line + "echo \"RESTORING: " + appDataName + " (" + c + "/" + restoreN + ")\"";
+                    bufferedWriter.write(line + "\n", 0, line.length() + 1);
                 }
                 bufferedWriter.close();
                 dataRestoreScript.setExecutable(true);
                 dataRestoreScript.setReadable(true);
+
+                Log.d("MigrateHelper", "pt4");
 
                 script.delete();
                 dataList.delete();
@@ -182,18 +209,21 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
                 BufferedReader err = new BufferedReader(new InputStreamReader(restoreProcess.getErrorStream()));
                 BufferedReader output = new BufferedReader(new InputStreamReader(restoreProcess.getInputStream()));
 
-                int c = 0;
+                Log.d("MigrateHelper", "pt5");
+                c = 0;
                 while ((line = output.readLine()) != null){
                     if (line.startsWith("RESTORING:")){
                         c++;
-                        publishProgress(c, restoreN);
+                        publishProgress(c, restoreN, context.getString(R.string.restoring_data), line);
                     }
                 }
                 while ((line = err.readLine()) != null) {
-                    errors = errors + line + "\n";
+                    if (!line.startsWith("chmod"))
+                        errors = errors + line + "\n";
                 }
 
                 exitVal = restoreProcess.exitValue();
+                Log.d("MigrateHelper", "pt6 : " + errors + " eval: " + exitVal);
 
             }
 
@@ -212,6 +242,7 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
     private int restorePermission(Context context) {
         uidClass.generateSpecificUids();
         int exitVal;
+        String localErrors = "";
         File script = new File(context.getFilesDir().getAbsolutePath() + "/permissionFix.sh");
         try {
 
@@ -221,6 +252,7 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
             }
             else {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(script));
+                writer.write("#!sbin/sh\n\n");
                 n = uidClass.core.size();
                 for (int i = 0; i < n; i++) {
                     writer.write(uidClass.core.elementAt(i));
@@ -235,13 +267,15 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
                 while ((line = output.readLine()) != null){
                     if (line.startsWith("PERM:")){
                         c++;
-                        publishProgress(c, n);
+                        publishProgress(c, n, context.getString(R.string.fixing_perm), line);
                     }
                 }
                 while ((line = err.readLine()) != null) {
-                    errors = errors + line + "\n";
+                    localErrors = localErrors + line + "\n";
                 }
-                exitVal = fixProcess.exitValue();
+
+                if ((exitVal = fixProcess.exitValue()) != 0)
+                    errors = errors + localErrors + "\n";
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -252,46 +286,50 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
     }
 
     @Override
-    protected void onProgressUpdate(Integer... values) {
+    protected void onProgressUpdate(Object... values) {
         super.onProgressUpdate(values);
-        restoreIntent.putExtra("job", "rootOnProgress");
-        restoreIntent.putExtra("c", values[0]);
-        restoreIntent.putExtra("n", values[1]);
+        restoreIntent.putExtra("job", (String)values[2]);
+        restoreIntent.putExtra("c", (int)values[0]);
+        restoreIntent.putExtra("n", (int)values[1]);
+        restoreIntent.putExtra("message", (String)values[3]);
         context.sendBroadcast(restoreIntent);
-        progress.setProgress(values[1], values[0], false)
-                .setContentTitle(context.getString(R.string.onProgress));
-        notificationManager.notify(1, progress.build());
+        progress.setProgress((int)values[1], (int)values[0], false)
+                .setContentTitle((String)values[2]);
+        notificationManager.notify(100, progress.build());
     }
 
     @Override
     protected void onPostExecute(Integer o) {
+
         super.onPostExecute(o);
-        restoreIntent.putExtra("job", "finished");
         (new File(uidClass.permissionListPath)).delete();
-        if ( o == 0) {
-            Toast.makeText(context, context.getString(R.string.permissionsFixed), Toast.LENGTH_SHORT).show();
-            try {
-                uninstall();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            restoreIntent.putExtra("messages", context.getString(R.string.permissionsFixed));
-            restoreIntent.putExtra("wasError", false);
-            notificationManager.cancel(1);
+
+        if ( o == 0 && errors.equals("")) {
+
+            Toast.makeText(context, context.getString(R.string.finished), Toast.LENGTH_SHORT).show();
+
+            restoreIntent.putExtra("message", context.getString(R.string.uninstall_prompt));
+            restoreIntent.putExtra("job", context.getString(R.string.finished));
+
+            progress.setContentTitle(context.getString(R.string.finished))
+                    .setContentText("")
+                    .setProgress(0, 0, false);
+            notificationManager.notify(100, progress.build());
+
         } else if ( o == -100) {
             Toast.makeText(context, context.getString(R.string.notRooted), Toast.LENGTH_SHORT).show();
-            restoreIntent.putExtra("messages", context.getString(R.string.notRooted));
-            restoreIntent.putExtra("wasError", true);
-            progress.setContentIntent(PendingIntent.getActivity(context, 10, new Intent(context, MainActivity.class), 0))
+            restoreIntent.putExtra("message", context.getString(R.string.notRooted));
+            restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors));
+            progress.setContentIntent(PendingIntent.getActivity(context, 10, new Intent(context, ProgressActivity.class), 0))
                     .setContentTitle(context.getString(R.string.notRooted))
                     .setContentText("")
                     .setProgress(0, 0, false);
             notificationManager.notify(100, progress.build());
         } else {
             Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
-            restoreIntent.putExtra("messages", errors + "\n" + context.getString(R.string.failed));
-            restoreIntent.putExtra("wasError", true);
-            progress.setContentIntent(PendingIntent.getActivity(context, 20, new Intent(context, MainActivity.class).setAction("showNotificationMessage").putExtra("wasError", true).putExtra("messages", errors), 0))
+            restoreIntent.putExtra("message", errors + "\n" + context.getString(R.string.failed));
+            restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors));
+            progress.setContentIntent(PendingIntent.getActivity(context, 20, new Intent(context, ProgressActivity.class).putExtra("job", context.getString(R.string.finished_with_errors)).putExtra("message", errors), 0))
                     .setContentTitle(context.getString(R.string.failed))
                     .setContentText(errors)
                     .setProgress(0, 0, false);
@@ -304,12 +342,20 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
     protected Integer doInBackground(Void... params) {
         Process checkSu = null;
         try {
+            restoreIntent.putExtra("job", context.getString(R.string.requesting_root));
+            context.sendBroadcast(restoreIntent);
             checkSu = Runtime.getRuntime().exec("su -c echo");
+            int r;
             checkSu.waitFor();
             if (checkSu.exitValue() == 0) {
-                restoreApp(context);
-                restoreData(context);
-                return restorePermission(context);
+                r = restoreApp(context);
+                if (r == 0){
+                    r = restoreData(context);
+                    if (r == 0)
+                        return restorePermission(context);
+                    else return r;
+                }
+                else return r;
             }
             else return -100;
         } catch (IOException | InterruptedException e) {
@@ -318,16 +364,4 @@ public class RootRestoreTask extends AsyncTask<Void, Integer, Integer> {
         return -100;
     }
 
-
-    void uninstall() throws IOException {
-        File tempScript = new File(context.getFilesDir() + "/tempScript.sh");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
-        String command = "#!/sbin/sh\n\n" +
-                "mount -o rw,remount /system\n" +
-                "rm -rf /system/app/MigrateHelper /data/data/balti.migratehelper\n";
-        writer.write(command);
-        writer.close();
-
-        Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath());
-    }
 }

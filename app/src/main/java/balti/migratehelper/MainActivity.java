@@ -29,14 +29,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button rootRestoreButton, okOnFinish, disable;
-    ProgressBar progressBar;
-    TextView messageView;
-
-    LinearLayout buttons;
+    Button rootRestoreButton, disable;
 
     BroadcastReceiver progressReceiver;
     IntentFilter progressReceiverIF;
@@ -60,21 +57,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        messageView = (TextView) findViewById(R.id.message);
-        buttons = (LinearLayout) findViewById(R.id.buttons);
-
-        okOnFinish = (Button) findViewById(R.id.okOnFinish);
-        okOnFinish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                buttons.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-                messageView.setVisibility(View.GONE);
-                okOnFinish.setVisibility(View.GONE);
-            }
-        });
-
         disable = (Button) findViewById(R.id.disable);
         disable.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,20 +68,16 @@ public class MainActivity extends AppCompatActivity {
         progressReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getStringExtra("job").equals("rootOnProgress")){
-                    buttons.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.VISIBLE);
-                    messageView.setVisibility(View.GONE);
-                    okOnFinish.setVisibility(View.GONE);
-                    progressBar.setProgress(intent.getIntExtra("c", 0)*100/intent.getIntExtra("n", 1));
-                }
-                else if (intent.getStringExtra("job").equals("finished")){
-                    onFinish(intent);
-                }
+                Intent toSendIntent = new Intent(MainActivity.this, ProgressActivity.class);
+                toSendIntent.putExtras(Objects.requireNonNull(intent.getExtras()));
+                startActivity(toSendIntent);
+                finish();
             }
         };
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
         registerReceiver(progressReceiver, progressReceiverIF);
+
+        sendBroadcast(new Intent("requestProgress"));
 
     }
 
@@ -107,21 +85,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(progressReceiver);
-    }
-
-    void onFinish(Intent intent){
-        buttons.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
-        messageView.setVisibility(View.VISIBLE);
-        okOnFinish.setVisibility(View.VISIBLE);
-        messageView.setText(intent.getStringExtra("messages"));
-        if (intent.getBooleanExtra("wasError", false)){
-            messageView.setTextColor(Color.RED);
-        }
-        else {
-            messageView.setTextColor(Color.BLUE);
-        }
-        stopService(new Intent(this, RestoreService.class));
     }
 
     @Override
@@ -182,10 +145,4 @@ public class MainActivity extends AppCompatActivity {
         stopService(new Intent(this, StupidStartupService.class));
         Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath());
     }
-
-    /*void uninstall(){
-        Uri packageUri = Uri.parse("package:" + getPackageName());
-        Intent unistallIntent = new Intent(Intent.ACTION_DELETE, packageUri);
-        startActivity(unistallIntent);
-    }*/
 }

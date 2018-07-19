@@ -40,6 +40,9 @@ public class RestoreService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 returnIntent = intent;
+                if (intent.getStringExtra("job").equals(context.getString(R.string.finished)) || intent.getStringExtra("job").equals(context.getString(R.string.finished_with_errors))){
+                    stopSelf();
+                }
             }
         };
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
@@ -69,7 +72,7 @@ public class RestoreService extends Service {
 
         RootRestoreTask task = new RootRestoreTask(this);
         task.execute();
-        startForeground(1, dummy.build());
+        startForeground(100, dummy.build());
 
 
         stopService(new Intent(this, StupidStartupService.class));

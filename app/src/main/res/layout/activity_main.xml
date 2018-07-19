@@ -1,89 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="balti.migratehelper.MainActivity">
 
-    <ScrollView
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true"
+        android:layout_margin="10dp"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
         >
 
         <LinearLayout
+            android:id="@+id/buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:src="@drawable/fix"
-                android:layout_margin="20dp"
-                />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/buttons"
-                >
-
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/restore"
-                    android:id="@+id/restoreSu"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/root_scaled"
-                    />
-
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_delete"
-                    android:id="@+id/disable"
-                    android:text="@string/uninstallOrDisable"
-                    />
-
-            </LinearLayout>
-
-
-            <ProgressBar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp"
-                android:id="@+id/progressBar"
-                android:visibility="gone"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/message"
-                android:layout_margin="5dp"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:gravity="center"
-                android:visibility="gone"
-                />
 
             <Button
+                android:id="@+id/restoreSu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@android:string/ok"
-                android:id="@+id/okOnFinish"
-                android:visibility="gone"
-                />
+                android:drawableTop="@drawable/root_scaled"
+                android:text="@string/restore" />
+
+            <Button
+                android:id="@+id/disable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_delete"
+                android:text="@string/uninstallOrDisable" />
 
         </LinearLayout>
 
-    </ScrollView>
+
+    </LinearLayout>
 
 </RelativeLayout>

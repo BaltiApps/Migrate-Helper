@@ -6,20 +6,25 @@
     <string name="restore">Restore all apps and data</string>
     <string name="uninstallOrDisable">Uninstall or disable</string>
 
-
     <string name="sure">Are you sure?</string>
     <string name="howToRestore">If you change your mind later,\n\nIf you are not rooted: Clear data of this app\n(Settings -> Apps -> Migrate helper -> Storage -> Clear data)\nand reboot to get permission fix capabilities\n\n
     If you are rooted: reflash the backup zip file.
     </string>
     <string name="goAhead">Go ahead</string>
 
-    <string name="permissionsFixed">Permissions fixed!</string>
-    <string name="notRooted">Your system is not rooted or root permission denied!!.</string>
-    <string name="failed">There was some error!</string>
+    <string name="please_wait">Please wait</string>
+    <string name="requesting_root">Requesting root</string>
+    <string name="installing_apps">Installing apps (Step 1/3)</string>
+    <string name="restoring_data">Restoring data (Step 2/3)</string>
+    <string name="fixing_perm">Fixing permissions (Step 3/3)</string>
+    <string name="finished">Finished!</string>
+    <string name="finished_with_errors">Finished with errors!</string>
+    <string name="uninstall_prompt">Click OK to uninstall this app</string>
 
-    <string name="zipMade">TWRP zip made!</string>
-    <string name="zipLocation">Please flash zip at:</string>
-    <string name="twrpFailed">There was some error!</string>
+    <string name="notRooted">Your system is not rooted or root permission denied!!.</string>
+    <string name="failed">There were some errors!</string>
+
+    <string name="close">Close</string>
 
     <string name="requestingRootPermission">Requesting root</string>
     <string name="onProgress">Fixing permissions</string>
