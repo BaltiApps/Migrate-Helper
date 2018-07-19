@@ -179,7 +179,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(dataRestoreScript));
                 String line;
 
-                restoreN = 1;
+                restoreN = 0;
 
                 while (bufferedReader2.readLine() != null){
                     restoreN++;
