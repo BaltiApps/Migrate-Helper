@@ -276,6 +276,9 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
 
                 if ((exitVal = fixProcess.exitValue()) != 0)
                     errors = errors + localErrors + "\n";
+
+                if (errors.equals(""))
+                    Runtime.getRuntime().exec("su -c rm -r /data/balti.migrate");
             }
         } catch (IOException e) {
             e.printStackTrace();
