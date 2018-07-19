@@ -1,9 +1,11 @@
 package balti.migratehelper;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -61,7 +63,13 @@ public class ProgressActivity extends AppCompatActivity {
         okOnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                uninstallThisApp();
+                try {
+                    uninstall();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                disableApp();
+                finish();
             }
         });
 
@@ -117,23 +125,24 @@ public class ProgressActivity extends AppCompatActivity {
         }
     }
 
-    void uninstallThisApp(){
+    void uninstall() throws IOException {
+        File tempScript = new File(getFilesDir() + "/tempScript.sh");
+        BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
+        String command = "#!/sbin/sh\n\n" +
+                "mount -o rw,remount /system/app/MigrateHelper\n" +
+                "mount -o rw,remount /data/data/balti.migratehelper\n" +
+                "rm -rf /system/app/MigrateHelper /data/data/balti.migratehelper\n";
+        writer.write(command);
+        writer.close();
 
-        try {
+        stopService(new Intent(this, StupidStartupService.class));
+        Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath());
+    }
 
-            File tempScript = new File(getFilesDir() + "/tempScript.sh");
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
-            String command = "#!sbin/sh\n\n" +
-                    "mount -o rw,remount /system\n" +
-                    "rm -rf /system/app/MigrateHelper /data/data/balti.migratehelper\n";
-            writer.write(command);
-            writer.close();
-            Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    void disableApp(){
+        PackageManager packageManager = getPackageManager();
+        ComponentName componentName = new ComponentName(this, balti.migratehelper.MainActivity.class);
+        packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
     }
 
     @Override
