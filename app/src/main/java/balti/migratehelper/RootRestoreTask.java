@@ -29,7 +29,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     private String errors;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder progress;
-    private int n;
+    private int permN;
     private int installN, restoreN;
     private Intent restoreIntent;
     private UIDClass uidClass;
@@ -37,7 +37,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     RootRestoreTask(Context context) {
         this.context = context;
         errors = "";
-        n = 0;
+        permN = 0;
         installN = restoreN = 0;
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -253,8 +253,8 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             else {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(script));
                 writer.write("#!sbin/sh\n\n");
-                n = uidClass.core.size();
-                for (int i = 0; i < n; i++) {
+                permN = uidClass.core.size();
+                for (int i = 0; i < permN; i++) {
                     writer.write(uidClass.core.elementAt(i));
                     writer.write("echo PERM: " + i + "\n");
                 }
@@ -267,7 +267,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                 while ((line = output.readLine()) != null){
                     if (line.startsWith("PERM:")){
                         c++;
-                        publishProgress(c, n, context.getString(R.string.fixing_perm), line);
+                        publishProgress(c, permN, context.getString(R.string.fixing_perm), line);
                     }
                 }
                 while ((line = err.readLine()) != null) {

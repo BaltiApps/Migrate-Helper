@@ -125,7 +125,7 @@ public class ProgressActivity extends AppCompatActivity {
         }
     }
 
-    void uninstall() throws IOException {
+    void uninstall() throws IOException, InterruptedException {
         File tempScript = new File(getFilesDir() + "/tempScript.sh");
         BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
         String command = "#!/sbin/sh\n\n" +
@@ -136,7 +136,7 @@ public class ProgressActivity extends AppCompatActivity {
         writer.close();
 
         stopService(new Intent(this, StupidStartupService.class));
-        Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath());
+        Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath()).waitFor();
     }
 
     void disableApp(){

@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
     }
 
-    void uninstall() throws IOException {
+    void uninstall() throws IOException, InterruptedException {
         File tempScript = new File(getFilesDir() + "/tempScript.sh");
         BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
         String command = "#!/sbin/sh\n\n" +
@@ -143,6 +143,6 @@ public class MainActivity extends AppCompatActivity {
         writer.close();
 
         stopService(new Intent(this, StupidStartupService.class));
-        Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath());
+        Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath()).waitFor();
     }
 }
