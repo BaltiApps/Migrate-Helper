@@ -7,7 +7,7 @@
     <string name="uninstallOrDisable">Uninstall or disable</string>
 
     <string name="sure">Are you sure?</string>
-    <string name="howToRestore">If you change your mind later,\n\nIf you are not rooted: Clear data of this app\n(Settings -> Apps -> Migrate helper -> Storage -> Clear data)\nand reboot to get permission fix capabilities\n\n
+    <string name="howToRestore">If you change your mind later,\n\nIf you are not rooted: Clear data of this app\n(Settings -> Apps -> Migrate helper -> Storage -> Clear data)\nand reboot.\n\n
     If you are rooted: reflash the backup zip file.
     </string>
     <string name="goAhead">Go ahead</string>

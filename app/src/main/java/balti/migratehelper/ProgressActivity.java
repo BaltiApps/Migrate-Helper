@@ -5,11 +5,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -25,7 +28,7 @@ public class ProgressActivity extends AppCompatActivity {
 
     Button okOnFinish, close, cancel;
     ProgressBar progressBar;
-    TextView messageView, messageHead;
+    TextView messageView, messageHead, progressPercentage;
     ImageView icon;
 
     BroadcastReceiver progressReceiver;
@@ -42,9 +45,13 @@ public class ProgressActivity extends AppCompatActivity {
         messageHead = findViewById(R.id.messageHead);
         messageView = findViewById(R.id.messageView);
         progressBar = findViewById(R.id.progressBar);
+        progressPercentage = findViewById(R.id.progressPercentage);
         okOnFinish = findViewById(R.id.okOnFinish);
         cancel = findViewById(R.id.cancel);
         close = findViewById(R.id.close);
+
+        messageView.setGravity(Gravity.BOTTOM);
+        messageView.setMovementMethod(new ScrollingMovementMethod());
 
         action = "";
 
@@ -64,12 +71,12 @@ public class ProgressActivity extends AppCompatActivity {
         okOnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                disableApp();
                 try {
                     uninstall();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                disableApp();
                 finish();
             }
         });
@@ -104,6 +111,7 @@ public class ProgressActivity extends AppCompatActivity {
         if (action.equals(getString(R.string.requesting_root))) {
             cancel.setVisibility(View.VISIBLE);
             progressBar.setIndeterminate(true);
+            progressPercentage.setText("<-->");
         }
         else {
             cancel.setVisibility(View.GONE);
@@ -133,25 +141,35 @@ public class ProgressActivity extends AppCompatActivity {
         }
         else if (action.equals(getString(R.string.installing_apps))){
             icon.setImageDrawable(getDrawable(R.drawable.ic_installing_apps));
-            progressBar.setProgress(intent.getIntExtra("c", 0));
+            updateProgress(intent.getIntExtra("c", 0));
             messageView.append(intent.getStringExtra("message") + "\n");
         }
         else if (action.equals(getString(R.string.restoring_data))){
             icon.setImageDrawable(getDrawable(R.drawable.ic_restoring_data));
-            progressBar.setProgress(intent.getIntExtra("c", 0));
+            updateProgress(intent.getIntExtra("c", 0));
             messageView.append(intent.getStringExtra("message") + "\n");
         }
         else if (action.equals(getString(R.string.fixing_perm))){
             icon.setImageDrawable(getDrawable(R.drawable.ic_fixing_permissions));
-            progressBar.setProgress(intent.getIntExtra("c", 0));
+            updateProgress(intent.getIntExtra("c", 0));
             messageView.append(intent.getStringExtra("message") + "\n");
         }
+    }
+
+    void updateProgress(int c){
+        int n = progressBar.getMax();
+        if (n != 0)
+            progressPercentage.setText((int)(c/n)*100 + "%");
+        else progressPercentage.setText("");
+        progressBar.setProgress(c);
     }
 
     void uninstall() throws IOException, InterruptedException {
         File tempScript = new File(getFilesDir() + "/tempScript.sh");
         BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
         String command = "#!/sbin/sh\n\n" +
+                "mount -o rw,remount /system\n" +
+                "mount -o rw,remount /data\n" +
                 "mount -o rw,remount /system/app/MigrateHelper\n" +
                 "mount -o rw,remount /data/data/balti.migratehelper\n" +
                 "rm -rf /system/app/MigrateHelper /data/data/balti.migratehelper\n";
@@ -163,6 +181,11 @@ public class ProgressActivity extends AppCompatActivity {
     }
 
     void disableApp(){
+
+        SharedPreferences.Editor editor = getSharedPreferences("main", MODE_PRIVATE).edit();
+        editor.putBoolean("isDisabled", true);
+        editor.commit();
+
         PackageManager packageManager = getPackageManager();
         ComponentName componentName = new ComponentName(this, balti.migratehelper.MainActivity.class);
         packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
