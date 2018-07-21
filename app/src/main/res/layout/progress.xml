@@ -14,8 +14,8 @@
 
         <ImageView
             android:id="@+id/logoIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="50dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:tint="@color/colorAccent"
@@ -27,7 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"
             android:textColor="@color/colorPrimary"
             android:text="@string/please_wait"
             />
@@ -48,11 +49,9 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:id="@+id/buttonBar"
         >
@@ -64,14 +63,35 @@
             android:text="@string/close"
             android:visibility="invisible"/>
 
-        <Button
-            android:id="@+id/okOnFinish"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@android:string/ok"
-            android:visibility="invisible" />
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true"
+            >
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@android:string/cancel"
+                android:visibility="gone"
+                />
+
+            <Button
+                android:id="@+id/okOnFinish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@android:string/ok"
+                android:backgroundTint="@color/colorPrimary"
+                android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
+                android:visibility="invisible"
+                />
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
 
 
     <TextView

@@ -40,7 +40,7 @@ public class RestoreService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 returnIntent = intent;
-                if (intent.getStringExtra("job").equals(context.getString(R.string.finished)) || intent.getStringExtra("job").equals(context.getString(R.string.finished_with_errors))){
+                if (intent.getStringExtra("job").equals(context.getString(R.string.finished)) || intent.getStringExtra("job").equals(context.getString(R.string.finished_with_errors)) || intent.getStringExtra("job").equals(context.getString(R.string.cancelled))){
                     stopSelf();
                 }
             }

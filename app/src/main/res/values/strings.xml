@@ -20,6 +20,7 @@
     <string name="finished">Finished!</string>
     <string name="finished_with_errors">Finished with errors!</string>
     <string name="uninstall_prompt">Click OK to uninstall this app</string>
+    <string name="cancelled">Cancelled</string>
 
     <string name="notRooted">Your system is not rooted or root permission denied!!.</string>
     <string name="failed">There were some errors!</string>

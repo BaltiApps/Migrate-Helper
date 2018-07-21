@@ -3,12 +3,13 @@ package balti.migratehelper;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -29,10 +30,24 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     private String errors;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder progress;
-    private int permN;
-    private int installN, restoreN;
+
     private Intent restoreIntent;
     private UIDClass uidClass;
+
+    private Process checkSu;
+    private BroadcastReceiver cancelSuReceiver;
+
+    private int permN;
+    private int installN, restoreN;
+
+    private boolean suCancelled;
+
+    private int ERROR_CODE_NO_PERMISSION_LIST = -50;
+    private int ERROR_CODE_SCRIPT_EXECUTION = -80;
+    private int ERROR_CODE_EXECUTION = -200;
+    private int ERROR_CODE_SU_CHECK = -100;
+    private int ERROR_CODE_SU_CANCELLED = -300;
+    private int SUCCESS = 0;
 
     RootRestoreTask(Context context) {
         this.context = context;
@@ -41,12 +56,26 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
         installN = restoreN = 0;
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        cancelSuReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                try {
+                    suCancelled = true;
+                    checkSu.destroy();
+                }
+                catch (Exception ignored){}
+            }
+        };
+        context.registerReceiver(cancelSuReceiver, new IntentFilter("cancel_su_broadcast"));
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
         uidClass = new UIDClass(context);
+
+        suCancelled = false;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel progressChannel = new NotificationChannel("PROGRESS", "Permission restore progress", NotificationManager.IMPORTANCE_DEFAULT);
@@ -85,7 +114,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
 
             Process listProcess = Runtime.getRuntime().exec("su -c sh " + script.getAbsolutePath());
 
-            if (listProcess.waitFor() == 0){
+            if (listProcess.waitFor() == SUCCESS){
 
                 File appInstallScript = new File(context.getFilesDir(), "appInstallScript.sh");
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(appList));
@@ -117,8 +146,6 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                 script.delete();
                 appList.delete();
 
-                Log.d("MigrateHelper", "pt1");
-
                 Process installProcess = Runtime.getRuntime().exec("su -c sh " + appInstallScript.getAbsolutePath());
                 BufferedReader err = new BufferedReader(new InputStreamReader(installProcess.getErrorStream()));
                 BufferedReader output = new BufferedReader(new InputStreamReader(installProcess.getInputStream()));
@@ -136,18 +163,15 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
 
                 exitVal = installProcess.exitValue();
 
-                Log.d("MigrateHelper", "pt2 : " + errors + " eval: " + exitVal);
-
             }
 
-            else exitVal = -50;
+            else exitVal = ERROR_CODE_SCRIPT_EXECUTION;
 
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             errors = errors + e.getMessage() + "\n";
-            exitVal = -200;
-            Log.d("MigrateHelper", "pt3: " + e.getMessage());
+            exitVal = ERROR_CODE_EXECUTION;
         }
 
         return exitVal;
@@ -171,7 +195,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
 
             Process listProcess = Runtime.getRuntime().exec("su -c sh " + script.getAbsolutePath());
 
-            if (listProcess.waitFor() == 0){
+            if (listProcess.waitFor() == SUCCESS){
 
                 File dataRestoreScript = new File(context.getFilesDir(), "dataRestoreScript.sh");
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(dataList));
@@ -200,16 +224,12 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                 dataRestoreScript.setExecutable(true);
                 dataRestoreScript.setReadable(true);
 
-                Log.d("MigrateHelper", "pt4");
-
                 script.delete();
                 dataList.delete();
 
                 Process restoreProcess = Runtime.getRuntime().exec("su -c sh " + dataRestoreScript.getAbsolutePath());
                 BufferedReader err = new BufferedReader(new InputStreamReader(restoreProcess.getErrorStream()));
                 BufferedReader output = new BufferedReader(new InputStreamReader(restoreProcess.getInputStream()));
-
-                Log.d("MigrateHelper", "pt5");
                 c = 0;
                 while ((line = output.readLine()) != null){
                     if (line.startsWith("RESTORING:")){
@@ -223,17 +243,16 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                 }
 
                 exitVal = restoreProcess.exitValue();
-                Log.d("MigrateHelper", "pt6 : " + errors + " eval: " + exitVal);
 
             }
 
-            else exitVal = -50;
+            else exitVal = ERROR_CODE_SCRIPT_EXECUTION;
 
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             errors = errors + e.getMessage() + "\n";
-            exitVal = -200;
+            exitVal = ERROR_CODE_EXECUTION;
         }
 
         return exitVal;
@@ -247,7 +266,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
         try {
 
             if (uidClass.core.size() == 0) {
-                exitVal = -50;
+                exitVal = ERROR_CODE_NO_PERMISSION_LIST;
                 errors = errors + "No apps to fix!";
             }
             else {
@@ -274,7 +293,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                     localErrors = localErrors + line + "\n";
                 }
 
-                if ((exitVal = fixProcess.exitValue()) != 0)
+                if ((exitVal = fixProcess.exitValue()) != SUCCESS)
                     errors = errors + localErrors + "\n";
 
                 if (errors.equals(""))
@@ -283,7 +302,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
         } catch (IOException e) {
             e.printStackTrace();
             errors = errors + e.getMessage() + "\n";
-            exitVal = -200;
+            exitVal = ERROR_CODE_EXECUTION;
         }
         return exitVal;
     }
@@ -307,7 +326,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
         super.onPostExecute(o);
         (new File(uidClass.permissionListPath)).delete();
 
-        if ( o == 0 && errors.equals("")) {
+        if ( o == SUCCESS && errors.equals("")) {
 
             Toast.makeText(context, context.getString(R.string.finished), Toast.LENGTH_SHORT).show();
 
@@ -315,56 +334,64 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             restoreIntent.putExtra("job", context.getString(R.string.finished));
 
             progress.setContentTitle(context.getString(R.string.finished))
-                    .setContentText("")
                     .setProgress(0, 0, false);
-            notificationManager.notify(100, progress.build());
 
-        } else if ( o == -100) {
+        } else if ( o == ERROR_CODE_SU_CHECK) {
             Toast.makeText(context, context.getString(R.string.notRooted), Toast.LENGTH_SHORT).show();
             restoreIntent.putExtra("message", context.getString(R.string.notRooted));
             restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors));
             progress.setContentIntent(PendingIntent.getActivity(context, 10, new Intent(context, ProgressActivity.class), 0))
                     .setContentTitle(context.getString(R.string.notRooted))
-                    .setContentText("")
                     .setProgress(0, 0, false);
-            notificationManager.notify(100, progress.build());
-        } else {
+        }
+        else if (o == ERROR_CODE_SU_CANCELLED){
+            restoreIntent.putExtra("message", "");
+            restoreIntent.putExtra("job", context.getString(R.string.cancelled));
+            progress.setContentIntent(null)
+                    .setContentTitle(context.getString(R.string.cancelled))
+                    .setProgress(0, 0, false);
+        }
+        else {
             Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
-            restoreIntent.putExtra("message", errors + "\n" + context.getString(R.string.failed));
+            restoreIntent.putExtra("message", errors + "\n" + context.getString(R.string.failed) + " " + o);
             restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors));
             progress.setContentIntent(PendingIntent.getActivity(context, 20, new Intent(context, ProgressActivity.class).putExtra("job", context.getString(R.string.finished_with_errors)).putExtra("message", errors), 0))
                     .setContentTitle(context.getString(R.string.failed))
                     .setContentText(errors)
                     .setProgress(0, 0, false);
-            notificationManager.notify(100, progress.build());
         }
         context.sendBroadcast(restoreIntent);
+
+        notificationManager.notify(101, progress.build());
+
+        context.unregisterReceiver(cancelSuReceiver);
     }
 
     @Override
     protected Integer doInBackground(Void... params) {
-        Process checkSu = null;
         try {
             restoreIntent.putExtra("job", context.getString(R.string.requesting_root));
             context.sendBroadcast(restoreIntent);
             checkSu = Runtime.getRuntime().exec("su -c echo");
             int r;
             checkSu.waitFor();
-            if (checkSu.exitValue() == 0) {
+            if (checkSu.exitValue() == SUCCESS) {
                 r = restoreApp(context);
-                if (r == 0){
+                if (r == SUCCESS){
                     r = restoreData(context);
-                    if (r == 0)
+                    if (r == SUCCESS)
                         return restorePermission(context);
                     else return r;
                 }
                 else return r;
             }
-            else return -100;
+            else if (suCancelled)
+                return ERROR_CODE_SU_CANCELLED;
+            else return ERROR_CODE_SU_CHECK;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        return -100;
+        return ERROR_CODE_SU_CHECK;
     }
 
 }

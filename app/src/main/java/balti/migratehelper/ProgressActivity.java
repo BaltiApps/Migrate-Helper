@@ -23,7 +23,7 @@ import java.io.IOException;
 
 public class ProgressActivity extends AppCompatActivity {
 
-    Button okOnFinish, close;
+    Button okOnFinish, close, cancel;
     ProgressBar progressBar;
     TextView messageView, messageHead;
     ImageView icon;
@@ -43,6 +43,7 @@ public class ProgressActivity extends AppCompatActivity {
         messageView = findViewById(R.id.messageView);
         progressBar = findViewById(R.id.progressBar);
         okOnFinish = findViewById(R.id.okOnFinish);
+        cancel = findViewById(R.id.cancel);
         close = findViewById(R.id.close);
 
         action = "";
@@ -73,6 +74,13 @@ public class ProgressActivity extends AppCompatActivity {
             }
         });
 
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendBroadcast(new Intent("cancel_su_broadcast"));
+            }
+        });
+
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,7 +101,16 @@ public class ProgressActivity extends AppCompatActivity {
             progressBar.setMax(intent.getIntExtra("n", 0));
         }
 
-        if (intent.getStringExtra("job").equals(getString(R.string.requesting_root))){
+        if (action.equals(getString(R.string.requesting_root))) {
+            cancel.setVisibility(View.VISIBLE);
+            progressBar.setIndeterminate(true);
+        }
+        else {
+            cancel.setVisibility(View.GONE);
+            progressBar.setIndeterminate(false);
+        }
+
+        if (action.equals(getString(R.string.requesting_root))){
             icon.setImageDrawable(getDrawable(R.drawable.ic_requesting_root));
         }
         else if (action.equals(getString(R.string.finished_with_errors))){
@@ -107,6 +124,12 @@ public class ProgressActivity extends AppCompatActivity {
             messageView.setText("");
             messageView.setText(intent.getStringExtra("message"));
             okOnFinish.setVisibility(View.VISIBLE);
+        }
+        else if (action.equals(getString(R.string.cancelled))){
+            icon.setImageDrawable(getDrawable(R.drawable.ic_cancel));
+            messageView.setText("");
+            messageHead.setTextColor(Color.RED);
+            close.setVisibility(View.VISIBLE);
         }
         else if (action.equals(getString(R.string.installing_apps))){
             icon.setImageDrawable(getDrawable(R.drawable.ic_installing_apps));
