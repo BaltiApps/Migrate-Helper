@@ -119,7 +119,8 @@ public class MainActivity extends AppCompatActivity {
                 "mount -o rw,remount /data\n" +
                 "mount -o rw,remount /system/app/MigrateHelper\n" +
                 "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                "rm -rf /system/app/MigrateHelper /data/data/balti.migratehelper\n";
+                "rm -rf /system/app/MigrateHelper /data/data/balti.migratehelper\n" +
+                "mount -o ro,remount /system\n";
         writer.write(command);
         writer.close();
 

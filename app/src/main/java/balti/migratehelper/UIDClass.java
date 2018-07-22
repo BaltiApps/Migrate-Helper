@@ -43,18 +43,22 @@ public class UIDClass {
         for (int i = 0; i < appList.size(); i++){
             ApplicationInfo info = appList.get(i).applicationInfo;
             if (isPresent(specific, info.packageName)) {
-                String comm = "chown " + info.uid + ":" + info.uid + " -Rf /data/data/" + info.packageName + "\nrestorecon -RF /data/data/" + info.packageName + "\n";
+                String target = "/data/data/" + info.packageName;
+                String comm = "chown " + info.uid + ":" + info.uid + " -Rf " + target + "\nrestorecon -RF " + target + "\n";
                 if (isUserApplication(info)) {
                     String src = info.sourceDir;
                     src = src.substring(0, src.lastIndexOf('/'));
                     String srcName = src.substring(src.lastIndexOf('/') + 1);
-                    comm = comm + "chown " + info.uid + ":" + info.uid + " -Rf /data/app/" + srcName + "\nrestorecon -RF /data/app/" + srcName + "\n";
+                    target = "/data/app/" + srcName;
+                    comm = comm + "chown " + info.uid + ":" + info.uid + " -Rf " + target + "\nrestorecon -RF " + target + "\n";
                 }
                 else {
                     String src = info.sourceDir;
                     String srcName = src.substring(0, src.lastIndexOf('/'));
+                    target = srcName;
                     comm = comm + "chown " +  info.uid + ":" + info.uid + " -Rf " + srcName + "\nrestorecon -RF " + srcName + "\n";
                 }
+                comm = comm + "echo PERM: " + target + "\n";
                 core.addElement(comm);
             }
         }

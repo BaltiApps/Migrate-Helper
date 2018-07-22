@@ -19,6 +19,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 
 /**
  * Created by sayantan on 23/10/17.
@@ -62,6 +63,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             public void onReceive(Context context, Intent intent) {
                 try {
                     suCancelled = true;
+                    if (checkSu != null)
                     checkSu.destroy();
                 }
                 catch (Exception ignored){}
@@ -88,11 +90,8 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             progress = new NotificationCompat.Builder(context, "PROGRESS");
         else progress = new NotificationCompat.Builder(context);
 
-        progress.setContentTitle(context.getString(R.string.requesting_root))
-                .setSmallIcon(R.drawable.ic_fix)
-                .setProgress(0, 0, false);
-        progress.setContentIntent(PendingIntent.getActivity(context, 5, new Intent(context, MainActivity.class), 0));
-        notificationManager.notify(100, progress.build());
+        progress.setSmallIcon(R.drawable.ic_fix);
+        notificationManager.cancel(101);
     }
 
     private int restoreApp(Context context){
@@ -275,7 +274,6 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                 permN = uidClass.core.size();
                 for (int i = 0; i < permN; i++) {
                     writer.write(uidClass.core.elementAt(i));
-                    writer.write("echo PERM: " + i + "\n");
                 }
                 writer.close();
                 Process fixProcess = Runtime.getRuntime().exec("su -c sh " + script.getAbsolutePath());
@@ -333,19 +331,21 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             restoreIntent.putExtra("message", context.getString(R.string.uninstall_prompt));
             restoreIntent.putExtra("job", context.getString(R.string.finished));
 
-            progress.setContentTitle(context.getString(R.string.finished))
+            progress.setContentIntent(PendingIntent.getActivity(context, 1, new Intent(context, ProgressActivity.class).putExtra("job", context.getString(R.string.finished)), 0))
+                    .setContentTitle(context.getString(R.string.finished))
                     .setProgress(0, 0, false);
 
         } else if ( o == ERROR_CODE_SU_CHECK) {
             Toast.makeText(context, context.getString(R.string.notRooted), Toast.LENGTH_SHORT).show();
             restoreIntent.putExtra("message", context.getString(R.string.notRooted));
             restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors));
-            progress.setContentIntent(PendingIntent.getActivity(context, 10, new Intent(context, ProgressActivity.class), 0))
+            progress.setContentIntent(null)
                     .setContentTitle(context.getString(R.string.notRooted))
                     .setProgress(0, 0, false);
         }
         else if (o == ERROR_CODE_SU_CANCELLED){
-            restoreIntent.putExtra("message", "");
+
+            restoreIntent.putExtra("message", context.getString(R.string.su_cancelled));
             restoreIntent.putExtra("job", context.getString(R.string.cancelled));
             progress.setContentIntent(null)
                     .setContentTitle(context.getString(R.string.cancelled))
@@ -370,28 +370,50 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     @Override
     protected Integer doInBackground(Void... params) {
         try {
-            restoreIntent.putExtra("job", context.getString(R.string.requesting_root));
-            context.sendBroadcast(restoreIntent);
-            checkSu = Runtime.getRuntime().exec("su -c echo");
+            broadcastRequestingSu();
+            checkSu = Runtime.getRuntime().exec("su -c echo ROOT_OK");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(checkSu.getInputStream()));
             int r;
-            checkSu.waitFor();
-            if (checkSu.exitValue() == SUCCESS) {
+
+            String line = reader.readLine();
+
+            if (line == null) {
+                return ERROR_CODE_SU_CHECK;
+            } else if (line.equals("ROOT_OK") && !suCancelled) {
                 r = restoreApp(context);
-                if (r == SUCCESS){
+                if (r == SUCCESS) {
                     r = restoreData(context);
                     if (r == SUCCESS)
                         return restorePermission(context);
                     else return r;
-                }
-                else return r;
+                } else return r;
             }
-            else if (suCancelled)
+
+
+        }
+        catch (InterruptedIOException e){
+            if (suCancelled)
                 return ERROR_CODE_SU_CANCELLED;
-            else return ERROR_CODE_SU_CHECK;
-        } catch (IOException | InterruptedException e) {
+            else {
+                e.printStackTrace();
+                return ERROR_CODE_SU_CHECK;
+            }
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
-        return ERROR_CODE_SU_CHECK;
+        return ERROR_CODE_EXECUTION;
+    }
+
+    private void broadcastRequestingSu(){
+        restoreIntent.putExtra("job", context.getString(R.string.requesting_root));
+        restoreIntent.putExtra("message", context.getString(R.string.wait_su));
+        progress.setContentIntent(PendingIntent.getActivity(context, 5, new Intent(context, ProgressActivity.class), 0))
+                .setContentTitle(context.getString(R.string.requesting_root))
+                .setProgress(0, 0, false);
+
+        context.sendBroadcast(restoreIntent);
+        notificationManager.notify(100, progress.build());
     }
 
 }
