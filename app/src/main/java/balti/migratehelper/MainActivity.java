@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.io.BufferedWriter;
@@ -29,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     Button rootRestoreButton, disable;
 
+    ImageButton close;
+
     BroadcastReceiver progressReceiver;
     IntentFilter progressReceiverIF;
 
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        rootRestoreButton = (Button) findViewById(R.id.restoreSu);
+        rootRestoreButton = findViewById(R.id.restoreSu);
         rootRestoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        disable = (Button) findViewById(R.id.disable);
+        disable = findViewById(R.id.disable);
         disable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,6 +72,14 @@ public class MainActivity extends AppCompatActivity {
         };
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
         registerReceiver(progressReceiver, progressReceiverIF);
+
+        close = findViewById(R.id.close_button);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         sendBroadcast(new Intent("requestProgress"));
 

@@ -1,36 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:background="@drawable/log_bg_portrait"
+    >
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/topView"
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:paddingBottom="@dimen/large_padding_width"
+        android:paddingTop="@dimen/large_padding_width"
         >
 
+
         <ImageView
-            android:id="@+id/logoIcon"
-            android:layout_width="30dp"
-            android:layout_height="50dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:tint="@color/colorAccent"
+            android:layout_width="@dimen/small_icon_wh"
+            android:layout_height="@dimen/small_icon_wh"
             android:src="@drawable/ic_requesting_root"
+            android:layout_margin="@dimen/large_padding_width"
+            android:layout_marginEnd="@dimen/large_padding_width"
+            android:id="@+id/logoIcon"
+            android:tint="@color/colorAccent"
             />
 
         <TextView
-            android:id="@+id/messageHead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:lines="2"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textStyle="bold"
-            android:textColor="@color/colorPrimary"
-            android:text="@string/please_wait"
+            android:textColor="@color/colorAccent"
+            android:gravity="center_vertical"
+            android:id="@+id/messageHead"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding_width"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/messageView"
+            android:scrollbars="vertical"
+            android:fontFamily="monospace"
+            android:paddingTop="5dp"
+            android:background="@drawable/log_message"
             />
 
         <LinearLayout
@@ -62,65 +88,56 @@
 
         </LinearLayout>
 
-
-    </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/buttonBar"
-        >
-
-        <Button
-            android:id="@+id/close"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/close"
-            android:visibility="invisible"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_alignParentEnd="true"
+            android:id="@+id/buttonBar"
             >
 
             <Button
-                android:id="@+id/cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@android:string/cancel"
-                android:visibility="gone"
-                />
-
-            <Button
-                android:id="@+id/okOnFinish"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@android:string/ok"
-                android:backgroundTint="@color/colorPrimary"
-                android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
+                android:id="@+id/close"
+                android:layout_width="@dimen/log_button_width"
+                android:layout_height="@dimen/button_height"
+                android:text="@string/close"
                 android:visibility="invisible"
+                android:background="@drawable/log_action_button"
+                android:foreground="?android:attr/selectableItemBackground"
                 />
 
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_alignParentEnd="true"
+                >
+
+                <Button
+                    android:id="@+id/cancel"
+                    android:layout_width="@dimen/log_button_width"
+                    android:layout_height="@dimen/button_height"
+                    android:text="@android:string/cancel"
+                    android:background="@drawable/log_action_button"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:visibility="gone"
+                    />
+
+                <Button
+                    android:id="@+id/okOnFinish"
+                    android:layout_width="@dimen/log_button_width"
+                    android:layout_height="@dimen/button_height"
+                    android:text="@android:string/ok"
+                    android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
+                    android:background="@drawable/log_action_button"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:visibility="invisible"
+                    />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
 
-    </RelativeLayout>
 
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/messageView"
-        android:layout_below="@id/topView"
-        android:layout_above="@id/buttonBar"
-        android:scrollbars="vertical"
-        android:fontFamily="monospace"
-        android:paddingTop="5dp"
-        />
-
-
-
-</RelativeLayout>
+</LinearLayout>
