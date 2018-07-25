@@ -54,7 +54,8 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     private int SUCCESS = 0;
 
     private String TEMP_DIR_NAME = "/data/balti.migrate";
-    String tarBinaryFilePath = "";
+    private String tarBinaryFilePath = "";
+    private String initError = "";
 
     RootRestoreTask(Context context) {
         this.context = context;
@@ -368,11 +369,11 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                     .setProgress(0, 0, false);
 
         } else if ( o == ERROR_CODE_SU_CHECK) {
-            Toast.makeText(context, context.getString(R.string.notRooted), Toast.LENGTH_SHORT).show();
-            restoreIntent.putExtra("message", context.getString(R.string.notRooted));
+            Toast.makeText(context, context.getString(R.string.initError), Toast.LENGTH_SHORT).show();
+            restoreIntent.putExtra("message", context.getString(R.string.initError) + "\n\n" + initError);
             restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors));
             progress.setContentIntent(null)
-                    .setContentTitle(context.getString(R.string.notRooted))
+                    .setContentTitle(context.getString(R.string.initError))
                     .setProgress(0, 0, false);
         }
         else if (o == ERROR_CODE_SU_CANCELLED){
@@ -406,13 +407,17 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             String cmd = "su -c cp " + tarBinaryFilePath + " " + TEMP_DIR_NAME + "/tar && echo ROOT_OK";
             checkSu = Runtime.getRuntime().exec(cmd);
             BufferedReader reader = new BufferedReader(new InputStreamReader(checkSu.getInputStream()));
+            BufferedReader err = new BufferedReader(new InputStreamReader(checkSu.getErrorStream()));
             int r;
 
-            String line = reader.readLine();
+            String output = reader.readLine();
+            String errLine;
+            while ((errLine = err.readLine()) != null)
+                initError = initError + errLine + "\n";
 
-            if (line == null) {
+            if (output == null) {
                 return ERROR_CODE_SU_CHECK;
-            } else if (line.equals("ROOT_OK") && !suCancelled) {
+            } else if (output.equals("ROOT_OK") && !suCancelled) {
                 r = restoreApp(context);
                 if (r == SUCCESS) {
                     r = restoreData(context);

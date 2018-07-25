@@ -24,7 +24,12 @@
     <string name="cancelled">Cancelled</string>
     <string name="su_cancelled">Root request cancelled</string>
 
-    <string name="notRooted">Your system is not rooted or root permission denied!!.</string>
+    <string name="initError">Could not copy binaries. Make sure:\n
+        - Your system is rooted.\n
+        - Root permission is granted.\n
+        - You have flashed a valid Migrate flash package.\n
+        - Try flashing the Migrate zip file again.\n
+    </string>
     <string name="failed">There were some errors!</string>
 
     <string name="close">Close</string>
