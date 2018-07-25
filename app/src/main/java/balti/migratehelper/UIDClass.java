@@ -28,7 +28,9 @@ public class UIDClass {
     Vector<String> core = null;
     String permissionListPath = "";
 
-    public UIDClass(Context context) {
+    private String TEMP_DIR_NAME = "/data/balti.migrate";
+
+    UIDClass(Context context) {
         this.context = context;
         core = new Vector<>(1);
     }
@@ -87,7 +89,7 @@ public class UIDClass {
             File pListMoveScript = new File(context.getFilesDir(), "pListMove.sh");
             BufferedWriter bw = new BufferedWriter(new FileWriter(pListMoveScript));
             bw.write("#!sbin/sh" + "\n\n" +
-                    "mv -f /cache/permissionList " + permissionListPath + "\n" +
+                    "mv -f " + TEMP_DIR_NAME + "/permissionList " + permissionListPath + "\n" +
                     "rm " + pListMoveScript.getAbsolutePath() + "\n"
 
             );

@@ -100,7 +100,7 @@ public class ProgressActivity extends AppCompatActivity {
     void handleProgress(Intent intent){
 
         messageHead.setText(intent.getStringExtra("job"));
-        messageHead.setTextColor(getResources().getColor(R.color.colorPrimary));
+        messageHead.setTextColor(getResources().getColor(R.color.colorAccent));
 
         if (!intent.getStringExtra("job").equals(action)) {
             action = intent.getStringExtra("job");

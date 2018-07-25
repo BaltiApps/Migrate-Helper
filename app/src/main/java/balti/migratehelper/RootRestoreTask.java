@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
@@ -15,9 +16,11 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
 
@@ -49,6 +52,9 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     private int ERROR_CODE_SU_CHECK = -100;
     private int ERROR_CODE_SU_CANCELLED = -300;
     private int SUCCESS = 0;
+
+    private String TEMP_DIR_NAME = "/data/balti.migrate";
+    String tarBinaryFilePath = "";
 
     RootRestoreTask(Context context) {
         this.context = context;
@@ -92,6 +98,32 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
 
         progress.setSmallIcon(R.drawable.ic_fix);
         notificationManager.cancel(101);
+
+        unpackBinaries();
+    }
+
+    void unpackBinaries(){
+
+        AssetManager assetManager = context.getAssets();
+
+        File tarBinary = new File(context.getFilesDir(), "tar");
+
+        int read;
+        byte buffer[] = new byte[4096];
+        try {
+            InputStream inputStream = assetManager.open("tar");
+            FileOutputStream writer = new FileOutputStream(tarBinary);
+            while ((read = inputStream.read(buffer)) > 0) {
+                writer.write(buffer, 0, read);
+            }
+            writer.close();
+            tarBinary.setExecutable(true);
+            tarBinaryFilePath = tarBinary.getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();
+            tarBinaryFilePath = "";
+        }
+
     }
 
     private int restoreApp(Context context){
@@ -104,7 +136,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             File script = new File(context.getFilesDir(), "app_script.sh");
             BufferedWriter tempWriter = new BufferedWriter(new FileWriter(script));
             String cmd = "#!/sbin/sh" + "\n\n" +
-                    "cd /data/balti.migrate\n" +
+                    "cd " + TEMP_DIR_NAME + "\n" +
                     "ls *-app.sh > " + appList.getAbsolutePath() + "\n" +
                     "chmod 777 " + appList.getAbsolutePath() + "\n";
             tempWriter.write(cmd);
@@ -134,7 +166,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                 while ((line = bufferedReader.readLine()) != null){
                     appName = line.substring(0, line.indexOf('-'));
                     c++;
-                    line = "sh /data/balti.migrate/" + line + "\n";
+                    line = "sh " + TEMP_DIR_NAME + "/" + line + "\n";
                     line = line + "echo \"INSTALLING_APPS: " + appName + " (" + c + "/" + installN + ")\"";
                     bufferedWriter.write(line + "\n", 0, line.length() + 1);
                 }
@@ -185,7 +217,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             File script = new File(context.getFilesDir(), "data_script.sh");
             BufferedWriter tempWriter = new BufferedWriter(new FileWriter(script));
             String cmd = "#!sbin/sh" + "\n\n" +
-                    "cd /data/balti.migrate\n" +
+                    "cd " + TEMP_DIR_NAME + "\n" +
                     "ls *-data.sh > " + dataList.getAbsolutePath() + "\n" +
                     "chmod 777 " + dataList.getAbsolutePath() + "\n";
             tempWriter.write(cmd);
@@ -215,7 +247,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                 while ((line = bufferedReader.readLine()) != null){
                     appDataName = line.substring(0, line.indexOf('-'));
                     c++;
-                    line = "sh /data/balti.migrate/" + line + "\n";
+                    line = "sh " + TEMP_DIR_NAME + "/" + line + "\n";
                     line = line + "echo \"RESTORING: " + appDataName + " (" + c + "/" + restoreN + ")\"";
                     bufferedWriter.write(line + "\n", 0, line.length() + 1);
                 }
@@ -295,7 +327,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                     errors = errors + localErrors + "\n";
 
                 if (errors.equals(""))
-                    Runtime.getRuntime().exec("su -c rm -r /data/balti.migrate");
+                    Runtime.getRuntime().exec("su -c rm -r " + TEMP_DIR_NAME);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -371,7 +403,8 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     protected Integer doInBackground(Void... params) {
         try {
             broadcastRequestingSu();
-            checkSu = Runtime.getRuntime().exec("su -c echo ROOT_OK");
+            String cmd = "su -c cp " + tarBinaryFilePath + " " + TEMP_DIR_NAME + "/tar && echo ROOT_OK";
+            checkSu = Runtime.getRuntime().exec(cmd);
             BufferedReader reader = new BufferedReader(new InputStreamReader(checkSu.getInputStream()));
             int r;
 

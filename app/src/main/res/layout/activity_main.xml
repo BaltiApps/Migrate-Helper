@@ -43,13 +43,13 @@
         android:layout_height="match_parent"
         android:layout_margin="10dp"
         android:orientation="vertical"
-        android:gravity="center_vertical"
+        android:gravity="center"
         >
 
 
             <Button
                 android:id="@+id/restoreSu"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="90dp"
                 android:text="@string/restore"
                 android:background="@drawable/restore_button"
@@ -61,7 +61,7 @@
 
             <Button
                 android:id="@+id/disable"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="60dp"
                 android:text="@string/uninstallOrDisable"
                 android:background="@drawable/uninstall_button"

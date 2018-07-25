@@ -55,8 +55,9 @@
             android:id="@+id/messageView"
             android:scrollbars="vertical"
             android:fontFamily="monospace"
-            android:paddingTop="5dp"
+            android:padding="@dimen/large_padding_width"
             android:background="@drawable/log_message"
+            android:textColor="@android:color/white"
             />
 
         <LinearLayout
