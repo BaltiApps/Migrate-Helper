@@ -89,27 +89,12 @@
 
         </LinearLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonBar"
-            >
-
-            <Button
-                android:id="@+id/close"
-                android:layout_width="@dimen/log_button_width"
-                android:layout_height="@dimen/button_height"
-                android:text="@string/close"
-                android:visibility="invisible"
-                android:background="@drawable/log_action_button"
-                android:foreground="?android:attr/selectableItemBackground"
-                />
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/button_height"
                 android:orientation="horizontal"
-                android:layout_alignParentEnd="true"
+                android:layout_gravity="end"
                 >
 
                 <Button
@@ -117,6 +102,18 @@
                     android:layout_width="@dimen/log_button_width"
                     android:layout_height="@dimen/button_height"
                     android:text="@android:string/cancel"
+                    android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
+                    android:background="@drawable/log_action_button"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:visibility="gone"
+                    />
+
+                <Button
+                    android:id="@+id/close"
+                    android:layout_width="@dimen/log_button_width"
+                    android:layout_height="@dimen/button_height"
+                    android:text="@string/close"
+                    android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
                     android:background="@drawable/log_action_button"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:visibility="gone"
@@ -130,12 +127,12 @@
                     android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
                     android:background="@drawable/log_action_button"
                     android:foreground="?android:attr/selectableItemBackground"
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     />
+
 
             </LinearLayout>
 
-        </RelativeLayout>
 
     </LinearLayout>
 
