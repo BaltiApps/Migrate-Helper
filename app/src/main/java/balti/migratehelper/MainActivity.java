@@ -52,12 +52,25 @@ public class MainActivity extends AppCompatActivity {
         rootRestoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(new Intent(MainActivity.this, RestoreService.class));
-                }
-                else {
-                    startService(new Intent(MainActivity.this, RestoreService.class));
-                }
+
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(R.string.do_not_use)
+                        .setMessage(R.string.do_not_use_desc)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    startForegroundService(new Intent(MainActivity.this, RestoreService.class));
+                                }
+                                else {
+                                    startService(new Intent(MainActivity.this, RestoreService.class));
+                                }
+
+                            }
+                        })
+                        .setNegativeButton(R.string.later, null)
+                        .show();
             }
         });
 

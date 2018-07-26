@@ -61,6 +61,8 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     private long startMillis;
     private long endMillis;
 
+    static int ON_FINISH_NOTIFICATION_ID = 101;
+
     RootRestoreTask(Context context) {
         this.context = context;
         errors = "";
@@ -78,6 +80,10 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                     checkSu.destroy();
                 }
                 catch (Exception ignored){}
+                try {
+                    context.unregisterReceiver(cancelSuReceiver);
+                }catch (Exception ignored){}
+                cancel(true);
             }
         };
         context.registerReceiver(cancelSuReceiver, new IntentFilter("cancel_su_broadcast"));
@@ -105,7 +111,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
         else progress = new NotificationCompat.Builder(context);
 
         progress.setSmallIcon(R.drawable.ic_fix);
-        notificationManager.cancel(101);
+        notificationManager.cancel(ON_FINISH_NOTIFICATION_ID);
 
         unpackBinaries();
     }
@@ -355,7 +361,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
         context.sendBroadcast(restoreIntent);
         progress.setProgress((int)values[1], (int)values[0], false)
                 .setContentTitle((String)values[2]);
-        notificationManager.notify(100, progress.build());
+        notificationManager.notify(RestoreService.RESTORE_SERVICE_NOTIFICATION_ID, progress.build());
     }
 
     @Override
@@ -382,30 +388,24 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             Toast.makeText(context, context.getString(R.string.initError), Toast.LENGTH_SHORT).show();
             restoreIntent.putExtra("message", context.getString(R.string.initError) + "\n\n" + initError);
             restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors));
-            progress.setContentIntent(null)
-                    .setContentTitle(context.getString(R.string.initError))
+            progress.setContentIntent(PendingIntent.getActivity(context, 30, new Intent(context, ProgressActivity.class).putExtra("job", context.getString(R.string.finished_with_errors)).putExtra("message", context.getString(R.string.initError) + "\n\n" + initError), 0))
+                    .setContentTitle(context.getString(R.string.finished_with_errors))
+                    .setContentText(context.getString(R.string.initError))
                     .setProgress(0, 0, false);
         }
-        else if (o == ERROR_CODE_SU_CANCELLED){
-
-            restoreIntent.putExtra("message", context.getString(R.string.su_cancelled));
-            restoreIntent.putExtra("job", context.getString(R.string.cancelled) + "\n" + totalTime);
-            progress.setContentIntent(null)
-                    .setContentTitle(context.getString(R.string.cancelled))
-                    .setProgress(0, 0, false);
-        }
-        else {
+        else if (o != ERROR_CODE_SU_CANCELLED) {
             Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
             restoreIntent.putExtra("message", errors + "\n" + context.getString(R.string.failed) + " " + o);
             restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors) + "\n" + totalTime);
-            progress.setContentIntent(PendingIntent.getActivity(context, 20, new Intent(context, ProgressActivity.class).putExtra("job", context.getString(R.string.finished_with_errors)).putExtra("message", errors), 0))
+            progress.setContentIntent(PendingIntent.getActivity(context, 20, new Intent(context, ProgressActivity.class).putExtra("job", context.getString(R.string.finished_with_errors)).putExtra("message", errors + "\n" + context.getString(R.string.failed) + " " + o), 0))
                     .setContentTitle(context.getString(R.string.failed))
                     .setContentText(errors)
                     .setProgress(0, 0, false);
         }
         context.sendBroadcast(restoreIntent);
 
-        notificationManager.notify(101, progress.build());
+        if (o != ERROR_CODE_SU_CANCELLED)
+            notificationManager.notify(ON_FINISH_NOTIFICATION_ID, progress.build());
 
         context.unregisterReceiver(cancelSuReceiver);
     }
@@ -461,7 +461,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
                 .setProgress(0, 0, false);
 
         context.sendBroadcast(restoreIntent);
-        notificationManager.notify(100, progress.build());
+        notificationManager.notify(RestoreService.RESTORE_SERVICE_NOTIFICATION_ID, progress.build());
     }
 
 

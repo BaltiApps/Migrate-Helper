@@ -9,6 +9,10 @@
     <string name="too_fast">Whoa, too fast!!</string>
     <string name="too_fast_desc">The app has not been explicitly tested on Android version above Oreo (8.1).\n\nPlease submit your feedback on whether the app works or not.</string>
 
+    <string name="do_not_use">Do not use the device now</string>
+    <string name="do_not_use_desc">Using apps while restoration is going on will result in random crashes.\n\nPlease wait till the completion of all processes.</string>
+    <string name="later">Nevermind, I will restore later.</string>
+
     <string name="sure">Are you sure?</string>
     <string name="howToRestore">If you change your mind later,\n\nIf you are not rooted: Clear data of this app\n(Settings -> Apps -> Migrate helper -> Storage -> Clear data)\nand reboot.\n\n
     If you are rooted: reflash the backup zip file.

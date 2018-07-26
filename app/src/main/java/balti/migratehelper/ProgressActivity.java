@@ -1,5 +1,7 @@
 package balti.migratehelper;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,6 +12,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
@@ -23,6 +27,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
 
 public class ProgressActivity extends AppCompatActivity {
 
@@ -84,6 +89,18 @@ public class ProgressActivity extends AppCompatActivity {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                Intent fakeIntent = new Intent(getString(R.string.actionRestoreOnProgress));
+                fakeIntent.putExtra("job", getString(R.string.cancelled))
+                        .putExtra("message", "");
+                sendBroadcast(fakeIntent);
+
+                ((NotificationManager) Objects.requireNonNull(getSystemService(NOTIFICATION_SERVICE))).notify(RootRestoreTask.ON_FINISH_NOTIFICATION_ID, new NotificationCompat.Builder(ProgressActivity.this, "PROGRESS").setContentIntent(null)
+                        .setSmallIcon(R.drawable.ic_fix)
+                        .setContentTitle(getString(R.string.cancelled))
+                        .setProgress(0, 0, false)
+                        .build());
+
                 sendBroadcast(new Intent("cancel_su_broadcast"));
             }
         });

@@ -26,6 +26,8 @@ public class RestoreService extends Service {
 
     Intent returnIntent;
 
+    static int RESTORE_SERVICE_NOTIFICATION_ID = 100;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -72,7 +74,7 @@ public class RestoreService extends Service {
 
         RootRestoreTask task = new RootRestoreTask(this);
         task.execute();
-        startForeground(100, dummy.build());
+        startForeground(RESTORE_SERVICE_NOTIFICATION_ID, dummy.build());
 
 
         stopService(new Intent(this, StupidStartupService.class));
