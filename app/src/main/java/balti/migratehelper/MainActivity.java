@@ -40,6 +40,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O_MR1){
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.too_fast)
+                    .setMessage(R.string.too_fast_desc)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+        }
+
         rootRestoreButton = findViewById(R.id.restoreSu);
         rootRestoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
