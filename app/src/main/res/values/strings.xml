@@ -14,7 +14,6 @@
 
     <string name="please_wait">Please wait</string>
     <string name="requesting_root">Requesting root</string>
-    <string name="wait_su">Please wait. This may take 60-90 seconds when starting right after device boot up.\nThis depends on the root manager (Magisk, SuperSU etc.) and not on this app.</string>
     <string name="installing_apps">Installing apps (Step 1/3)</string>
     <string name="restoring_data">Restoring data (Step 2/3)</string>
     <string name="fixing_perm">Fixing permissions (Step 3/3)</string>
@@ -24,6 +23,10 @@
     <string name="cancelled">Cancelled</string>
     <string name="su_cancelled">Root request cancelled</string>
 
+    <string name="initMessage">This can take 2 to 3 minutes.\n\n
+        This happens because the root management utility (Magisk, SuperSu etc.) takes some time to initialise right after system boot up.\n
+        This is not something Migrate can help.\n\n
+        Please wait...</string>
     <string name="initError">Could not copy binaries. Make sure:\n
         - Your system is rooted.\n
         - Root permission is granted.\n

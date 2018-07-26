@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
+import java.util.Calendar;
 
 /**
  * Created by sayantan on 23/10/17.
@@ -57,6 +58,9 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     private String tarBinaryFilePath = "";
     private String initError = "";
 
+    private long startMillis;
+    private long endMillis;
+
     RootRestoreTask(Context context) {
         this.context = context;
         errors = "";
@@ -82,6 +86,9 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+
+        startMillis = timeInMillis();
+
         uidClass = new UIDClass(context);
 
         suCancelled = false;
@@ -354,6 +361,9 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     @Override
     protected void onPostExecute(Integer o) {
 
+        endMillis = timeInMillis();
+        String totalTime = "(" + calendarDifference(startMillis, endMillis) + ")";
+
         super.onPostExecute(o);
         (new File(uidClass.permissionListPath)).delete();
 
@@ -362,7 +372,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             Toast.makeText(context, context.getString(R.string.finished), Toast.LENGTH_SHORT).show();
 
             restoreIntent.putExtra("message", context.getString(R.string.uninstall_prompt));
-            restoreIntent.putExtra("job", context.getString(R.string.finished));
+            restoreIntent.putExtra("job", context.getString(R.string.finished) + "\n" + totalTime);
 
             progress.setContentIntent(PendingIntent.getActivity(context, 1, new Intent(context, ProgressActivity.class).putExtra("job", context.getString(R.string.finished)), 0))
                     .setContentTitle(context.getString(R.string.finished))
@@ -379,7 +389,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
         else if (o == ERROR_CODE_SU_CANCELLED){
 
             restoreIntent.putExtra("message", context.getString(R.string.su_cancelled));
-            restoreIntent.putExtra("job", context.getString(R.string.cancelled));
+            restoreIntent.putExtra("job", context.getString(R.string.cancelled) + "\n" + totalTime);
             progress.setContentIntent(null)
                     .setContentTitle(context.getString(R.string.cancelled))
                     .setProgress(0, 0, false);
@@ -387,7 +397,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
         else {
             Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
             restoreIntent.putExtra("message", errors + "\n" + context.getString(R.string.failed) + " " + o);
-            restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors));
+            restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors) + "\n" + totalTime);
             progress.setContentIntent(PendingIntent.getActivity(context, 20, new Intent(context, ProgressActivity.class).putExtra("job", context.getString(R.string.finished_with_errors)).putExtra("message", errors), 0))
                     .setContentTitle(context.getString(R.string.failed))
                     .setContentText(errors)
@@ -445,13 +455,48 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
 
     private void broadcastRequestingSu(){
         restoreIntent.putExtra("job", context.getString(R.string.requesting_root));
-        restoreIntent.putExtra("message", context.getString(R.string.wait_su));
+        restoreIntent.putExtra("message", context.getString(R.string.initMessage));
         progress.setContentIntent(PendingIntent.getActivity(context, 5, new Intent(context, ProgressActivity.class), 0))
                 .setContentTitle(context.getString(R.string.requesting_root))
                 .setProgress(0, 0, false);
 
         context.sendBroadcast(restoreIntent);
         notificationManager.notify(100, progress.build());
+    }
+
+
+    long timeInMillis(){
+        Calendar calendar = Calendar.getInstance();
+        return calendar.getTimeInMillis();
+    }
+
+    String calendarDifference(long start, long end){
+        String diff = "";
+
+        try {
+
+            long longDiff = end - start;
+            longDiff = longDiff / 1000;
+
+            long d = longDiff / (60 * 60 * 24);
+            if (d != 0) diff = diff + d + "days ";
+            longDiff = longDiff % (60 * 60 * 24);
+
+            long h = longDiff / (60 * 60);
+            if (h != 0) diff = diff + h + "hrs ";
+            longDiff = longDiff % (60 * 60);
+
+            long m = longDiff / 60;
+            if (m != 0) diff = diff + m + "mins ";
+            longDiff = longDiff % 60;
+
+            long s = longDiff;
+            diff = diff + s + "secs";
+
+        }
+        catch (Exception ignored){}
+
+        return diff;
     }
 
 }

@@ -120,16 +120,17 @@ public class ProgressActivity extends AppCompatActivity {
 
         if (action.equals(getString(R.string.requesting_root))){
             icon.setImageDrawable(getDrawable(R.drawable.ic_requesting_root));
+            messageView.setText("");
+            messageView.setText(intent.getStringExtra("message"));
         }
-        else if (action.equals(getString(R.string.finished_with_errors))){
+        else if (action.startsWith(getString(R.string.finished_with_errors))){
             icon.setImageDrawable(getDrawable(R.drawable.ic_error));
             messageView.setText(intent.getStringExtra("message"));
             messageHead.setTextColor(Color.RED);
             close.setVisibility(View.VISIBLE);
         }
-        else if (action.equals(getString(R.string.finished))){
+        else if (action.startsWith(getString(R.string.finished))){
             icon.setImageDrawable(getDrawable(R.drawable.ic_finished));
-            messageView.setText("");
             messageView.setText(intent.getStringExtra("message"));
             okOnFinish.setVisibility(View.VISIBLE);
         }
