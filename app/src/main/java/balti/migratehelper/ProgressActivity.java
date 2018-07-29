@@ -1,6 +1,5 @@
 package balti.migratehelper;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -13,7 +12,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
@@ -177,7 +175,7 @@ public class ProgressActivity extends AppCompatActivity {
     void updateProgress(int c){
         int n = progressBar.getMax();
         if (n != 0)
-            progressPercentage.setText((int)(c/n)*100 + "%");
+            progressPercentage.setText((int)(c*1.0/n)*100 + "%");
         else progressPercentage.setText("");
         progressBar.setProgress(c);
     }

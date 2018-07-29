@@ -55,7 +55,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     private int SUCCESS = 0;
 
     private String TEMP_DIR_NAME = "/data/balti.migrate";
-    private String tarBinaryFilePath = "";
+    private String busyboxBinaryFilePath = "";
     private String initError = "";
 
     private long startMillis;
@@ -120,22 +120,22 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
 
         AssetManager assetManager = context.getAssets();
 
-        File tarBinary = new File(context.getFilesDir(), "tar");
+        File busyboxBinary = new File(context.getFilesDir(), "busybox");
 
         int read;
         byte buffer[] = new byte[4096];
         try {
-            InputStream inputStream = assetManager.open("tar");
-            FileOutputStream writer = new FileOutputStream(tarBinary);
+            InputStream inputStream = assetManager.open("busybox");
+            FileOutputStream writer = new FileOutputStream(busyboxBinary);
             while ((read = inputStream.read(buffer)) > 0) {
                 writer.write(buffer, 0, read);
             }
             writer.close();
-            tarBinary.setExecutable(true);
-            tarBinaryFilePath = tarBinary.getAbsolutePath();
+            busyboxBinary.setExecutable(true);
+            busyboxBinaryFilePath = busyboxBinary.getAbsolutePath();
         } catch (IOException e) {
             e.printStackTrace();
-            tarBinaryFilePath = "";
+            busyboxBinaryFilePath = "";
         }
 
     }
@@ -414,7 +414,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
     protected Integer doInBackground(Void... params) {
         try {
             broadcastRequestingSu();
-            String cmd = "su -c cp " + tarBinaryFilePath + " " + TEMP_DIR_NAME + "/tar && echo ROOT_OK";
+            String cmd = "su -c cp " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME + "/busybox && echo ROOT_OK";
             checkSu = Runtime.getRuntime().exec(cmd);
             BufferedReader reader = new BufferedReader(new InputStreamReader(checkSu.getInputStream()));
             BufferedReader err = new BufferedReader(new InputStreamReader(checkSu.getErrorStream()));
