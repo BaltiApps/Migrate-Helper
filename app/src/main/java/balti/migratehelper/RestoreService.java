@@ -70,7 +70,7 @@ public class RestoreService extends Service {
         else {
             dummy = new NotificationCompat.Builder(this);
         }
-        dummy.setSmallIcon(R.drawable.ic_fix);
+        dummy.setSmallIcon(R.drawable.ic_notification_icon);
 
         RootRestoreTask task = new RootRestoreTask(this);
         task.execute();

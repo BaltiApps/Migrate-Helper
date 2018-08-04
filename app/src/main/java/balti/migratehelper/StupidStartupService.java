@@ -44,7 +44,7 @@ public class StupidStartupService extends Service {
             notification.setPriority(Notification.PRIORITY_MAX);
         }
 
-        notification.setSmallIcon(R.drawable.ic_fix)
+        notification.setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentTitle(context.getString(R.string.notifHeader))
                 .setContentText(context.getString(R.string.notifBody));
 

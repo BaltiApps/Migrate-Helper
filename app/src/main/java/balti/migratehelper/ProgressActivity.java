@@ -94,7 +94,7 @@ public class ProgressActivity extends AppCompatActivity {
                 sendBroadcast(fakeIntent);
 
                 ((NotificationManager) Objects.requireNonNull(getSystemService(NOTIFICATION_SERVICE))).notify(RootRestoreTask.ON_FINISH_NOTIFICATION_ID, new NotificationCompat.Builder(ProgressActivity.this, "PROGRESS").setContentIntent(null)
-                        .setSmallIcon(R.drawable.ic_fix)
+                        .setSmallIcon(R.drawable.ic_notification_icon)
                         .setContentTitle(getString(R.string.cancelled))
                         .setProgress(0, 0, false)
                         .build());

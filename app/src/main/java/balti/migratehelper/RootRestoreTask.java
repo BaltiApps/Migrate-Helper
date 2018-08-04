@@ -110,7 +110,7 @@ public class RootRestoreTask extends AsyncTask<Void, Object, Integer> {
             progress = new NotificationCompat.Builder(context, "PROGRESS");
         else progress = new NotificationCompat.Builder(context);
 
-        progress.setSmallIcon(R.drawable.ic_fix);
+        progress.setSmallIcon(R.drawable.ic_notification_icon);
         notificationManager.cancel(ON_FINISH_NOTIFICATION_ID);
 
         unpackBinaries();
