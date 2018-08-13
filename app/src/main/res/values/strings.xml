@@ -1,52 +1,58 @@
 <resources>
     <string name="app_name">Migrate helper</string>
 
-    <string name="notifHeader">Migrate package flashed!</string>
-    <string name="notifBody">Click to continue restoration!!</string>
-    <string name="restore">Restore all apps and data</string>
+    <!--activity_main.xml-->
+    <string name="restore_all">Restore all apps and data</string>
     <string name="uninstallOrDisable">Uninstall or disable</string>
 
+    <!--MainActivity.java-->
     <string name="too_fast">Whoa, too fast!!</string>
     <string name="too_fast_desc">The app has not been explicitly tested on Android version above Oreo (8.1).\n\nPlease submit your feedback on whether the app works or not.</string>
-
     <string name="do_not_use">Do not use the device now</string>
     <string name="do_not_use_desc">Using apps while restoration is going on will result in random crashes.\n\nPlease wait till the completion of all processes.</string>
     <string name="later">Nevermind, I will restore later.</string>
-
     <string name="sure">Are you sure?</string>
     <string name="howToRestore">If you change your mind later,\n\nIf you are not rooted: Clear data of this app\n(Settings -> Apps -> Migrate helper -> Storage -> Clear data)\nand reboot.\n\n
     If you are rooted: reflash the backup zip file.
     </string>
     <string name="goAhead">Go ahead</string>
 
+    <!--ProgressActivity.java-->
     <string name="please_wait">Please wait</string>
-    <string name="requesting_root">Requesting root</string>
-    <string name="installing_apps">Installing apps (Step 1/3)</string>
-    <string name="restoring_data">Restoring data (Step 2/3)</string>
-    <string name="fixing_perm">Fixing permissions (Step 3/3)</string>
+
+    <!--progress.xml-->
+    <string name="close">Close</string>
+
+    <!--RootRestoreTask.java-->
     <string name="finished">Finished!</string>
     <string name="finished_with_errors">Finished with errors!</string>
     <string name="uninstall_prompt">Click OK to uninstall this app</string>
-    <string name="cancelled">Cancelled</string>
-    <string name="su_cancelled">Root request cancelled</string>
 
-    <string name="initMessage">This can take 2 to 3 minutes.\n\n
-        This happens because the root management utility (Magisk, SuperSu etc.) takes some time to initialise right after system boot up.\n
-        This is not something Migrate can help.\n\n
-        Please wait...</string>
-    <string name="initError">Could not copy binaries. Make sure:\n
-        - Your system is rooted.\n
-        - Root permission is granted.\n
-        - You have flashed a valid Migrate flash package.\n
-        - Try flashing the Migrate zip file again.\n
-    </string>
-    <string name="failed">There were some errors!</string>
+    <!--app_selector.xml-->
+    <string name="select_apps">Select apps to restore</string>
+    <string name="restore">Restore</string>
+    <string name="app">App</string>
+    <string name="data">Data</string>
 
-    <string name="close">Close</string>
+    <!--AppSelector.java-->
+    <string name="requesting_root">Requesting root</string>
+    <string name="failed">Failed</string>
+    <string name="failed_desc">Please grant root permission.</string>
+    <string name="everything">Everything selected!</string>
+    <string name="reading_metadata">Reading metadata...</string>
+    <string name="initMessageShort">This can take a minute.</string>
+    <string name="are_you_rooted">Are you rooted?</string>
+    <string name="are_you_rooted_desc">Script error.\nMake sure to grant root.</string>
+    <string name="code_error">Code error!</string>
+    <string name="selecting_all">Selecting everything</string>
+    <string name="starting_restore">Starting restore</string>
+    <string name="nothing_to_restore">Nothing to restore</string>
+    <string name="no_metadata_found">No metadata found</string>
 
-    <string name="requestingRootPermission">Requesting root</string>
-    <string name="onProgress">Fixing permissions</string>
-    <string name="permissionDenied">Permission denied!</string>
+    <!--miscellaneous-->
+    <string name="notifHeader">Migrate package flashed!</string>
+    <string name="notifBody">Click to continue restoration!!</string>
+
 
     <!--Do not change!!-->
     <string name="actionSu" translatable="false">Migrate_helper_fix_SU</string>

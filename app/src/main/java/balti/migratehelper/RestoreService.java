@@ -14,6 +14,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 
+import java.io.File;
+
 /**
  * Created by sayantan on 27/10/17.
  */
@@ -25,6 +27,8 @@ public class RestoreService extends Service {
     IntentFilter progressReceiverIF, requestListenerIF;
 
     Intent returnIntent;
+
+    static RootRestoreTask ROOT_RESTORE_TASK;
 
     static int RESTORE_SERVICE_NOTIFICATION_ID = 100;
 
@@ -42,7 +46,7 @@ public class RestoreService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 returnIntent = intent;
-                if (intent.getStringExtra("job").startsWith(context.getString(R.string.finished)) || intent.getStringExtra("job").startsWith(context.getString(R.string.finished_with_errors)) || intent.getStringExtra("job").equals(context.getString(R.string.cancelled))){
+                if (intent.getStringExtra("job").startsWith(context.getString(R.string.finished)) || intent.getStringExtra("job").startsWith(context.getString(R.string.finished_with_errors))){
                     stopSelf();
                 }
             }
@@ -72,8 +76,6 @@ public class RestoreService extends Service {
         }
         dummy.setSmallIcon(R.drawable.ic_notification_icon);
 
-        RootRestoreTask task = new RootRestoreTask(this);
-        task.execute();
         startForeground(RESTORE_SERVICE_NOTIFICATION_ID, dummy.build());
 
 

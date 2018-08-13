@@ -25,21 +25,18 @@ import java.util.Vector;
 
 public class UIDClass {
     private Context context;
-    Vector<String> core = null;
-    String permissionListPath = "";
 
     private String TEMP_DIR_NAME = "/data/balti.migrate";
 
     UIDClass(Context context) {
         this.context = context;
-        core = new Vector<>(1);
     }
 
-    void generateAllUids(){
+    /*void generateAllUids(){
         generateUids(null);
-    }
+    }*/
 
-    private void generateUids(Vector<String> specific){
+    /*private void generateUids(Vector<String> specific){
         core.removeAllElements();
         List<PackageInfo> appList = context.getPackageManager().getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT);
         for (int i = 0; i < appList.size(); i++){
@@ -64,23 +61,30 @@ public class UIDClass {
                 core.addElement(comm);
             }
         }
-    }
+    }*/
 
-    private boolean isUserApplication(ApplicationInfo info){
+    /*private boolean isUserApplication(ApplicationInfo info){
         boolean isUser = true;
         if (info.sourceDir.startsWith("/system")) isUser = false;
         return isUser;
-    }
+    }*/
 
-    private boolean isPresent(Vector<String> specific, String pkg)
+    int getUid(String pkg)
     {
-        if (specific == null) return true;
-        for (String s : specific)
-            if (s.equals(pkg)) return true;
-        return false;
+        int uid = -1;
+        List<PackageInfo> appList = context.getPackageManager().getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT);
+        for (int i = 0; i < appList.size(); i++) {
+            PackageInfo info = appList.get(i);
+            if (pkg.equals(info.packageName))
+            {
+                uid = info.applicationInfo.uid;
+                break;
+            }
+        }
+        return uid;
     }
 
-    void generateSpecificUids(){
+    /*void generateSpecificUids(){
         File permissionListFile = new File(context.getExternalCacheDir(), "permissionList");
         permissionListPath = permissionListFile.getAbsolutePath();
         String line;
@@ -111,5 +115,5 @@ public class UIDClass {
             e.printStackTrace();
             core = new Vector<>(0);
         }
-    }
+    }*/
 }

@@ -10,11 +10,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:background="@color/colorPrimary"
         android:gravity="center_vertical"
-        android:paddingBottom="@dimen/large_padding_width"
-        android:paddingTop="@dimen/large_padding_width"
+        android:padding="@dimen/large_padding_width"
         >
 
 
@@ -28,37 +27,26 @@
             android:tint="@color/colorAccent"
             />
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lines="2"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textStyle="bold"
-            android:textColor="@color/colorAccent"
-            android:gravity="center_vertical"
-            android:id="@+id/messageHead"
-            />
+            android:orientation="horizontal"
+            >
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lines="2"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold"
+                android:textColor="@color/colorAccent"
+                android:gravity="center_vertical"
+                android:id="@+id/messageHead"
+                />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="@dimen/large_padding_width"
-        >
+        </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:id="@+id/messageView"
-            android:scrollbars="vertical"
-            android:fontFamily="monospace"
-            android:padding="@dimen/large_padding_width"
-            android:background="@drawable/log_message"
-            android:textColor="@android:color/white"
-            />
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -89,6 +77,27 @@
 
         </LinearLayout>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding_width"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/messageView"
+            android:scrollbars="vertical"
+            android:fontFamily="monospace"
+            android:padding="@dimen/large_padding_width"
+            android:background="@drawable/log_message"
+            android:textColor="@android:color/white"
+            />
+
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -96,17 +105,6 @@
                 android:orientation="horizontal"
                 android:layout_gravity="end"
                 >
-
-                <Button
-                    android:id="@+id/cancel"
-                    android:layout_width="@dimen/log_button_width"
-                    android:layout_height="@dimen/button_height"
-                    android:text="@android:string/cancel"
-                    android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
-                    android:background="@drawable/log_action_button"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:visibility="gone"
-                    />
 
                 <Button
                     android:id="@+id/close"

@@ -32,9 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
     ImageButton close;
 
-    BroadcastReceiver progressReceiver;
-    IntentFilter progressReceiverIF;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,14 +56,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    startForegroundService(new Intent(MainActivity.this, RestoreService.class));
-                                }
-                                else {
-                                    startService(new Intent(MainActivity.this, RestoreService.class));
-                                }
-
+                                startActivity(new Intent(MainActivity.this, AppSelector.class). putExtra("all?", true));
                             }
                         })
                         .setNegativeButton(R.string.later, null)
@@ -81,18 +71,6 @@ public class MainActivity extends AppCompatActivity {
                 disableAlert();
             }
         });
-
-        progressReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Intent toSendIntent = new Intent(MainActivity.this, ProgressActivity.class);
-                toSendIntent.putExtras(Objects.requireNonNull(intent.getExtras()));
-                startActivity(toSendIntent);
-                finish();
-            }
-        };
-        progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
-        registerReceiver(progressReceiver, progressReceiverIF);
 
         close = findViewById(R.id.close_button);
         close.setOnClickListener(new View.OnClickListener() {
@@ -109,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(progressReceiver);
     }
 
     void disableAlert(){

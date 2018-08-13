@@ -1,6 +1,5 @@
 package balti.migratehelper;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
@@ -25,11 +23,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Objects;
 
 public class ProgressActivity extends AppCompatActivity {
 
-    Button okOnFinish, close, cancel;
+    Button okOnFinish, close;
     ProgressBar progressBar;
     TextView messageView, messageHead, progressPercentage;
     ImageView icon;
@@ -38,6 +35,8 @@ public class ProgressActivity extends AppCompatActivity {
     IntentFilter progressReceiverIF;
 
     String action;
+
+    static String UNCHANGED_STATUS = "UNCHANGED_STATUS";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,7 +49,6 @@ public class ProgressActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         progressPercentage = findViewById(R.id.progressPercentage);
         okOnFinish = findViewById(R.id.okOnFinish);
-        cancel = findViewById(R.id.cancel);
         close = findViewById(R.id.close);
 
         messageView.setGravity(Gravity.BOTTOM);
@@ -84,25 +82,6 @@ public class ProgressActivity extends AppCompatActivity {
             }
         });
 
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent fakeIntent = new Intent(getString(R.string.actionRestoreOnProgress));
-                fakeIntent.putExtra("job", getString(R.string.cancelled))
-                        .putExtra("message", "");
-                sendBroadcast(fakeIntent);
-
-                ((NotificationManager) Objects.requireNonNull(getSystemService(NOTIFICATION_SERVICE))).notify(RootRestoreTask.ON_FINISH_NOTIFICATION_ID, new NotificationCompat.Builder(ProgressActivity.this, "PROGRESS").setContentIntent(null)
-                        .setSmallIcon(R.drawable.ic_notification_icon)
-                        .setContentTitle(getString(R.string.cancelled))
-                        .setProgress(0, 0, false)
-                        .build());
-
-                sendBroadcast(new Intent("cancel_su_broadcast"));
-            }
-        });
-
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -114,31 +93,10 @@ public class ProgressActivity extends AppCompatActivity {
 
     void handleProgress(Intent intent){
 
-        messageHead.setText(intent.getStringExtra("job"));
         messageHead.setTextColor(getResources().getColor(R.color.colorAccent));
 
-        if (!intent.getStringExtra("job").equals(action)) {
-            action = intent.getStringExtra("job");
-            messageView.setText("");
-            progressBar.setMax(intent.getIntExtra("n", 0));
-        }
-
-        if (action.equals(getString(R.string.requesting_root))) {
-            cancel.setVisibility(View.VISIBLE);
-            progressBar.setIndeterminate(true);
-            progressPercentage.setText("<-->");
-        }
-        else {
-            cancel.setVisibility(View.GONE);
-            progressBar.setIndeterminate(false);
-        }
-
-        if (action.equals(getString(R.string.requesting_root))){
-            icon.setImageDrawable(getDrawable(R.drawable.ic_requesting_root));
-            messageView.setText("");
-            messageView.setText(intent.getStringExtra("message"));
-        }
-        else if (action.startsWith(getString(R.string.finished_with_errors))){
+        action = intent.getStringExtra("job");
+        if (action.startsWith(getString(R.string.finished_with_errors))){
             icon.setImageDrawable(getDrawable(R.drawable.ic_error));
             messageView.setText(intent.getStringExtra("message"));
             messageHead.setTextColor(Color.RED);
@@ -149,25 +107,12 @@ public class ProgressActivity extends AppCompatActivity {
             messageView.setText(intent.getStringExtra("message"));
             okOnFinish.setVisibility(View.VISIBLE);
         }
-        else if (action.equals(getString(R.string.cancelled))){
-            icon.setImageDrawable(getDrawable(R.drawable.ic_cancel));
-            messageView.setText("");
-            messageHead.setTextColor(Color.RED);
-            close.setVisibility(View.VISIBLE);
-        }
-        else if (action.equals(getString(R.string.installing_apps))){
-            icon.setImageDrawable(getDrawable(R.drawable.ic_installing_apps));
-            updateProgress(intent.getIntExtra("c", 0));
-            messageView.append(intent.getStringExtra("message") + "\n");
-        }
-        else if (action.equals(getString(R.string.restoring_data))){
-            icon.setImageDrawable(getDrawable(R.drawable.ic_restoring_data));
-            updateProgress(intent.getIntExtra("c", 0));
-            messageView.append(intent.getStringExtra("message") + "\n");
-        }
-        else if (action.equals(getString(R.string.fixing_perm))){
-            icon.setImageDrawable(getDrawable(R.drawable.ic_fixing_permissions));
-            updateProgress(intent.getIntExtra("c", 0));
+        else {
+            if (!action.equals(UNCHANGED_STATUS)) {
+                progressBar.setMax(intent.getIntExtra("n", 0));
+                messageHead.setText(action);
+                updateProgress(intent.getIntExtra("c", 0));
+            }
             messageView.append(intent.getStringExtra("message") + "\n");
         }
     }
@@ -175,7 +120,7 @@ public class ProgressActivity extends AppCompatActivity {
     void updateProgress(int c){
         int n = progressBar.getMax();
         if (n != 0)
-            progressPercentage.setText((int)(c*1.0/n)*100 + "%");
+            progressPercentage.setText((int)((c*100.0)/n) + "%");
         else progressPercentage.setText("");
         progressBar.setProgress(c);
     }

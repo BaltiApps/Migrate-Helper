@@ -21,6 +21,10 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             />
+        <activity android:name=".AppSelector"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            />
         <receiver android:name=".Listener">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" android:priority="999"/>
