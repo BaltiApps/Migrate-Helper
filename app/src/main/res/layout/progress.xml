@@ -13,7 +13,7 @@
         android:orientation="vertical"
         android:background="@color/colorPrimary"
         android:gravity="center_vertical"
-        android:padding="@dimen/large_padding_width"
+        android:padding="20dp"
         >
 
 
@@ -21,32 +21,21 @@
             android:layout_width="@dimen/small_icon_wh"
             android:layout_height="@dimen/small_icon_wh"
             android:src="@drawable/ic_requesting_root"
-            android:layout_margin="@dimen/large_padding_width"
-            android:layout_marginEnd="@dimen/large_padding_width"
             android:id="@+id/logoIcon"
             android:tint="@color/colorAccent"
             />
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:lines="2"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textStyle="bold"
-                android:textColor="@color/colorAccent"
-                android:gravity="center_vertical"
-                android:id="@+id/messageHead"
-                />
-
-        </LinearLayout>
-
-
+            android:lines="2"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"
+            android:id="@+id/messageHead"
+            android:textColor="@color/colorAccent"
+            android:gravity="center_vertical"
+            android:text="@string/please_wait"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -104,6 +93,7 @@
                 android:layout_height="@dimen/button_height"
                 android:orientation="horizontal"
                 android:layout_gravity="end"
+                android:layout_marginTop="@dimen/large_padding_width"
                 >
 
                 <Button

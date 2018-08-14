@@ -2,7 +2,6 @@ package balti.migratehelper;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -22,6 +21,11 @@ public class GetJsonFromData extends AsyncTask<String, String, Vector<JSONObject
     private FileFilter fileFilter;
     private TextView statusDisplayView;
 
+    static String APP_CHECK = "APP_CHECK";
+    static String DATA_CHECK = "DATA_CHECK";
+
+    String error;
+
     GetJsonFromData(Context context, final String metadataExtension, TextView statusDisplayView){
         this.context = context;
         classContext = (OnConvertMetadataToJSON) context;
@@ -32,22 +36,31 @@ public class GetJsonFromData extends AsyncTask<String, String, Vector<JSONObject
             }
         };
         this.statusDisplayView = statusDisplayView;
+
+        error = "";
     }
 
     @Override
     protected Vector<JSONObject> doInBackground(String... directoryPath) {
 
-        File[] files = new File(directoryPath[0]).listFiles();
-
-        int n = files.length;
         Vector<JSONObject> jsonObjects = new Vector<>(0);
+        try {
 
-        for (int i = 0; i < n; i++) {
+            File[] files = new File(directoryPath[0]).listFiles();
 
-            JSONObject jsonObject = getJsonData(files[i]);
-            publishProgress((i+1) + " of " + n);
-            if (jsonObject != null)
-                jsonObjects.add(jsonObject);
+            int n = files.length;
+
+            for (int i = 0; i < n; i++) {
+
+                JSONObject jsonObject = getJsonData(files[i]);
+                publishProgress((i + 1) + " of " + n);
+                if (jsonObject != null)
+                    jsonObjects.add(jsonObject);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            error = error + e.getMessage() + "\n";
         }
 
         return jsonObjects;
@@ -62,7 +75,7 @@ public class GetJsonFromData extends AsyncTask<String, String, Vector<JSONObject
     @Override
     protected void onPostExecute(Vector<JSONObject> jsonObjects) {
         super.onPostExecute(jsonObjects);
-        classContext.onConvertMetadataToJSON(jsonObjects);
+        classContext.onConvertMetadataToJSON(jsonObjects, error);
 
 
     }
@@ -74,15 +87,16 @@ public class GetJsonFromData extends AsyncTask<String, String, Vector<JSONObject
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String l;
             while ((l = reader.readLine()) != null){
-                if (l.trim().toLowerCase().startsWith("icon"))
-                    continue;
                 fullFileText = fullFileText + l + "\n";
             }
             mainObject = new JSONObject(fullFileText);
             mainObject.put(RootRestoreTask.METADATA_FILE_FIELD, file.getAbsolutePath());
             mainObject.put(RootRestoreTask.METADATA_FILE_NAME, file.getName());
+            mainObject.put(APP_CHECK, true);
+            mainObject.put(DATA_CHECK, true);
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+            error = error + e.getMessage() + "\n";
         }
         return mainObject;
     }

@@ -4,6 +4,7 @@
     <!--activity_main.xml-->
     <string name="restore_all">Restore all apps and data</string>
     <string name="uninstallOrDisable">Uninstall or disable</string>
+    <string name="selective_restore">Choose what to restore</string>
 
     <!--MainActivity.java-->
     <string name="too_fast">Whoa, too fast!!</string>
@@ -21,7 +22,7 @@
     <string name="please_wait">Please wait</string>
 
     <!--progress.xml-->
-    <string name="close">Close</string>
+    <string name="close">CLOSE</string>
 
     <!--RootRestoreTask.java-->
     <string name="finished">Finished!</string>
@@ -29,7 +30,7 @@
     <string name="uninstall_prompt">Click OK to uninstall this app</string>
 
     <!--app_selector.xml-->
-    <string name="select_apps">Select apps to restore</string>
+    <string name="select_apps">Select what to restore</string>
     <string name="restore">Restore</string>
     <string name="app">App</string>
     <string name="data">Data</string>
@@ -47,7 +48,8 @@
     <string name="selecting_all">Selecting everything</string>
     <string name="starting_restore">Starting restore</string>
     <string name="nothing_to_restore">Nothing to restore</string>
-    <string name="no_metadata_found">No metadata found</string>
+    <string name="no_metadata_found">No metadata found\nFlash a Migrate package first</string>
+    <string name="null_adapter">Null adapter</string>
 
     <!--miscellaneous-->
     <string name="notifHeader">Migrate package flashed!</string>

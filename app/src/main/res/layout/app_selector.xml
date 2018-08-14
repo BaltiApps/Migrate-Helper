@@ -38,6 +38,9 @@
         android:layout_height="?android:attr/actionBarSize"
         android:gravity="end"
         android:background="@color/colorPrimary"
+        android:id="@+id/checkbox_bar"
+        android:paddingEnd="@dimen/large_padding_width"
+        android:paddingStart="@dimen/large_padding_width"
         >
 
             <RelativeLayout
@@ -139,17 +142,17 @@
                 android:layout_below="@id/just_a_progress"
                 />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/initMessageShort"
+                android:layout_below="@id/waiting_status_text"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/waiting_messages"
+                />
 
         </RelativeLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/initMessageShort"
-            android:layout_below="@id/waiting_layout"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/waiting_messages"
-            />
 
         <ListView
             android:layout_width="match_parent"
@@ -175,10 +178,8 @@
             android:layout_width="@dimen/button_width"
             android:layout_height="@dimen/button_height"
             android:layout_alignParentEnd="true"
-            android:text="@string/restore"
             android:padding="@dimen/large_padding_width"
             android:background="@drawable/ic_normal_button"
-            android:drawableEnd="@drawable/ic_next"
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"

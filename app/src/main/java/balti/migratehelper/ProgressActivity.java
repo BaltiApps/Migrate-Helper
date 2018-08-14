@@ -7,7 +7,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +42,44 @@ public class ProgressActivity extends AppCompatActivity {
     String action;
 
     static String UNCHANGED_STATUS = "UNCHANGED_STATUS";
+
+
+    class SetAppIcon extends AsyncTask<String, Void, Drawable> {
+
+
+        @Override
+        protected Drawable doInBackground(String... strings) {
+
+            Bitmap bmp = null;
+            Drawable drawable = null;
+            String[] bytes = strings[0].split("_");
+
+            try {
+                byte imageData[] = new byte[bytes.length];
+                for (int i = 0; i < bytes.length; i++) {
+                    imageData[i] = Byte.parseByte(bytes[i]);
+                }
+                bmp = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+                drawable = new BitmapDrawable(getResources(), bmp);
+                //Log.d("migrate", "icon: " + bmp);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            return drawable;
+        }
+
+        @Override
+        protected void onPostExecute(Drawable drawable) {
+            super.onPostExecute(drawable);
+            if (drawable != null) {
+                messageHead.setCompoundDrawables(drawable, null, null, null);
+            }
+            else {
+                messageHead.setCompoundDrawables(null, null, null, null);
+            }
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,23 +140,31 @@ public class ProgressActivity extends AppCompatActivity {
 
         action = intent.getStringExtra("job");
         if (action.startsWith(getString(R.string.finished_with_errors))){
+            messageHead.setText(action);
             icon.setImageDrawable(getDrawable(R.drawable.ic_error));
-            messageView.setText(intent.getStringExtra("message"));
+            messageView.append("\n\n" + intent.getStringExtra("message"));
             messageHead.setTextColor(Color.RED);
             close.setVisibility(View.VISIBLE);
         }
         else if (action.startsWith(getString(R.string.finished))){
+            messageHead.setText(action);
             icon.setImageDrawable(getDrawable(R.drawable.ic_finished));
-            messageView.setText(intent.getStringExtra("message"));
+            messageView.append("\n\n" + intent.getStringExtra("message"));
             okOnFinish.setVisibility(View.VISIBLE);
         }
         else {
+            String msg = intent.getStringExtra("message");
             if (!action.equals(UNCHANGED_STATUS)) {
+                String d[] = action.split(" ");
+                String status = d[0];
+                String icon = d[1];
+                messageHead.setText(status);
+                new SetAppIcon().execute(icon.trim());
                 progressBar.setMax(intent.getIntExtra("n", 0));
-                messageHead.setText(action);
                 updateProgress(intent.getIntExtra("c", 0));
             }
-            messageView.append(intent.getStringExtra("message") + "\n");
+            if (!msg.equals(""))
+                messageView.append(intent.getStringExtra("message") + "\n");
         }
     }
 
@@ -133,7 +184,7 @@ public class ProgressActivity extends AppCompatActivity {
                 "mount -o rw,remount /data\n" +
                 "mount -o rw,remount /system/app/MigrateHelper\n" +
                 "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                "rm -rf /system/app/MigrateHelper /data/data/balti.migratehelper\n" +
+                "rm -rf " + getApplicationInfo().sourceDir + " " + getApplicationInfo().dataDir + "\n" +
                 "mount -o ro,remount /system\n";
         writer.write(command);
         writer.close();

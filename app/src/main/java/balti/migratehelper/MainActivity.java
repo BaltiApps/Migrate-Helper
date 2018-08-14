@@ -1,6 +1,5 @@
 package balti.migratehelper;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,15 +9,12 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,9 +24,12 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button rootRestoreButton, disable;
+    Button rootRestoreButton, disable, selectiveRestore;
 
     ImageButton close;
+
+    BroadcastReceiver progressReceiver;
+    IntentFilter progressReceiverIF;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +63,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        selectiveRestore = findViewById(R.id.selective_restore);
+        selectiveRestore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, AppSelector.class). putExtra("all?", false));
+            }
+        });
+
+        progressReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Intent toSendIntent = new Intent(MainActivity.this, ProgressActivity.class);
+                toSendIntent.putExtras(Objects.requireNonNull(intent.getExtras()));
+                startActivity(toSendIntent);
+                finish();
+            }
+        };
+        progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
+        registerReceiver(progressReceiver, progressReceiverIF);
+
         disable = findViewById(R.id.disable);
         disable.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         sendBroadcast(new Intent("requestProgress"));
-
     }
 
     @Override
@@ -128,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 "mount -o rw,remount /data\n" +
                 "mount -o rw,remount /system/app/MigrateHelper\n" +
                 "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                "rm -rf /system/app/MigrateHelper /data/data/balti.migratehelper\n" +
+                "rm -rf " + getApplicationInfo().sourceDir + " " + getApplicationInfo().dataDir + "\n" +
                 "mount -o ro,remount /system\n";
         writer.write(command);
         writer.close();

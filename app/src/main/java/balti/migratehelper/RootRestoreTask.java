@@ -3,15 +3,11 @@ package balti.migratehelper;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -19,22 +15,15 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
 import java.io.OutputStreamWriter;
-import java.io.StringReader;
 import java.util.Calendar;
 import java.util.Vector;
 
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
+import static balti.migratehelper.GetJsonFromData.APP_CHECK;
+import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
+import static balti.migratehelper.ProgressActivity.UNCHANGED_STATUS;
 
 /**
  * Created by sayantan on 23/10/17.
@@ -114,9 +103,16 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
                     c++;
                     status = line.substring(statusHead.length());
                     String apkName = jsonObjects.get(totalCount).getString("apk");
-                    if (!apkName.equals("NULL"))
-                        line = "Installing: " + apkName;
-                    else line = "Skipping installation: " + status;
+                    boolean appCheck = jsonObjects.get(totalCount).getBoolean(APP_CHECK);
+                    if (appCheck) {
+                        if (!apkName.equals("NULL"))
+                            line = "Installing: " + apkName;
+                        else line = "Skipping installation: " + status;
+                    }
+                    else {
+                        status = UNCHANGED_STATUS;
+                        line = "";
+                    }
                 }
                 else if (line.startsWith(installedStatusHead)){
 
@@ -124,7 +120,8 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
                     String packageName = jsonObjects.get(totalCount).getString("package_name");
                     int uid = uidClass.getUid(packageName);
 
-                    if (!data.equals("NULL") && uid != -1) {
+                    boolean dataCheck = jsonObjects.get(totalCount).getBoolean(DATA_CHECK);
+                    if (!data.equals("NULL") && uid != -1 && dataCheck) {
                         inputWriter.write("echo \"" + restoreDataHead + data + "\"\n");
                         inputWriter.write("sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + data + " " + packageName + " " + uid + "\n");
                         inputWriter.flush();
@@ -150,7 +147,7 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
                     line = line + "\n\n";
                 }
                 else {
-                    status = ProgressActivity.UNCHANGED_STATUS;
+                    status = UNCHANGED_STATUS;
                 }
 
                 publishProgress(c, numberOfJobs, status, line);
@@ -250,10 +247,12 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
         String appName = jsonObject.getString("app_name");
         String packageName = jsonObject.getString("package_name");
         String apkName = jsonObject.getString("apk");
+        String icon = jsonObject.getString("icon");
 
-        String command = "echo \"" + statusHead + appName + "\"\n";
+        String command = "echo \"" + statusHead + appName + " " + icon + "\"\n";
 
-        if (!apkName.equals("NULL"))
+        boolean appCheck = jsonObject.getBoolean(APP_CHECK);
+        if (!apkName.equals("NULL") && appCheck)
             command += "sh " + installScriptPath + " " + TEMP_DIR_NAME + " " + apkName + "\n";
 
         command += "echo \"" + installedStatusHead + packageName + "\"\n";
