@@ -294,22 +294,22 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
     private void unpackBinaries(){
 
-        busyboxBinaryFilePath = unpackAssetToInternal("busybox");
-        installScriptPath = unpackAssetToInternal("installScript.sh");
-        restoreDataScriptPath = unpackAssetToInternal("restoreDataScript.sh");
+        busyboxBinaryFilePath = unpackAssetToInternal("busybox", "busybox");
+        installScriptPath = unpackAssetToInternal("installScript.sh", "installScript.sh");
+        restoreDataScriptPath = unpackAssetToInternal("restoreDataScript.sh", "restoreDataScript.sh");
 
     }
 
-    private String unpackAssetToInternal(String filename){
+    private String unpackAssetToInternal(String assetFileName, String targetFileName){
 
         AssetManager assetManager = getAssets();
-        File unpackFile = new File(getFilesDir(), filename);
+        File unpackFile = new File(getFilesDir(), targetFileName);
         String path = "";
 
         int read;
         byte buffer[] = new byte[4096];
         try {
-            InputStream inputStream = assetManager.open(filename);
+            InputStream inputStream = assetManager.open(assetFileName);
             FileOutputStream writer = new FileOutputStream(unpackFile);
             while ((read = inputStream.read(buffer)) > 0) {
                 writer.write(buffer, 0, read);
