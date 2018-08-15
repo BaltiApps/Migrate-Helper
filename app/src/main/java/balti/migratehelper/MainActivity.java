@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -139,20 +140,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void uninstall() throws IOException, InterruptedException {
-        File tempScript = new File(getFilesDir() + "/tempScript.sh");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
-        String command = "#!/sbin/sh\n\n" +
-                "mount -o rw,remount /system\n" +
-                "mount -o rw,remount /data\n" +
-                "mount -o rw,remount /system/app/MigrateHelper\n" +
-                "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                "rm -rf " + getApplicationInfo().sourceDir + " " + getApplicationInfo().dataDir + "\n" +
-                "mount -o ro,remount /system\n";
-        writer.write(command);
-        writer.close();
 
-        stopService(new Intent(this, StupidStartupService.class));
-        Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath()).waitFor();
+        String sourceDir = getApplicationInfo().sourceDir;
+
+        if (sourceDir.startsWith("/system")) {
+            File tempScript = new File(getFilesDir() + "/tempScript.sh");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
+            String command = "#!/sbin/sh\n\n" +
+                    "mount -o rw,remount /system\n" +
+                    "mount -o rw,remount /data\n" +
+                    "mount -o rw,remount /system/app/MigrateHelper\n" +
+                    "mount -o rw,remount /data/data/balti.migratehelper\n" +
+                    "rm -rf " + getApplicationInfo().dataDir + " " + sourceDir + "\n" +
+                    "mount -o ro,remount /system\n";
+            writer.write(command);
+            writer.close();
+
+            stopService(new Intent(this, StupidStartupService.class));
+            Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath()).waitFor();
+        }
+        else {
+            Intent uninstallIntent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, Uri.parse("package:" + getPackageName()));
+            startActivity(uninstallIntent);
+        }
 
     }
 }

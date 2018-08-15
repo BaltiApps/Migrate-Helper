@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -137,23 +138,27 @@ public class ProgressActivity extends AppCompatActivity {
     void handleProgress(Intent intent){
 
         messageHead.setTextColor(getResources().getColor(R.color.colorAccent));
+        String msg = "";
+        try {
+            msg = intent.getStringExtra("message");
+            action = intent.getStringExtra("job");
+        }
+        catch (Exception e){ e.printStackTrace(); }
 
-        action = intent.getStringExtra("job");
         if (action.startsWith(getString(R.string.finished_with_errors))){
             messageHead.setText(action);
             icon.setImageDrawable(getDrawable(R.drawable.ic_error));
-            messageView.append("\n\n" + intent.getStringExtra("message"));
+            messageView.append("\n\n" + msg);
             messageHead.setTextColor(Color.RED);
             close.setVisibility(View.VISIBLE);
         }
         else if (action.startsWith(getString(R.string.finished))){
             messageHead.setText(action);
             icon.setImageDrawable(getDrawable(R.drawable.ic_finished));
-            messageView.append("\n\n" + intent.getStringExtra("message"));
+            messageView.append("\n\n" + msg);
             okOnFinish.setVisibility(View.VISIBLE);
         }
         else {
-            String msg = intent.getStringExtra("message");
             if (!action.equals(UNCHANGED_STATUS)) {
                 String d[] = action.split(" ");
                 String status = d[0];
@@ -164,7 +169,7 @@ public class ProgressActivity extends AppCompatActivity {
                 updateProgress(intent.getIntExtra("c", 0));
             }
             if (!msg.equals(""))
-                messageView.append(intent.getStringExtra("message") + "\n");
+                messageView.append(msg + "\n");
         }
     }
 
@@ -176,21 +181,32 @@ public class ProgressActivity extends AppCompatActivity {
         progressBar.setProgress(c);
     }
 
-    void uninstall() throws IOException, InterruptedException {
-        File tempScript = new File(getFilesDir() + "/tempScript.sh");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
-        String command = "#!/sbin/sh\n\n" +
-                "mount -o rw,remount /system\n" +
-                "mount -o rw,remount /data\n" +
-                "mount -o rw,remount /system/app/MigrateHelper\n" +
-                "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                "rm -rf " + getApplicationInfo().sourceDir + " " + getApplicationInfo().dataDir + "\n" +
-                "mount -o ro,remount /system\n";
-        writer.write(command);
-        writer.close();
 
-        stopService(new Intent(this, StupidStartupService.class));
-        Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath()).waitFor();
+    void uninstall() throws IOException, InterruptedException {
+
+        String sourceDir = getApplicationInfo().sourceDir;
+
+        if (sourceDir.startsWith("/system")) {
+            File tempScript = new File(getFilesDir() + "/tempScript.sh");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
+            String command = "#!/sbin/sh\n\n" +
+                    "mount -o rw,remount /system\n" +
+                    "mount -o rw,remount /data\n" +
+                    "mount -o rw,remount /system/app/MigrateHelper\n" +
+                    "mount -o rw,remount /data/data/balti.migratehelper\n" +
+                    "rm -rf " + getApplicationInfo().dataDir + " " + sourceDir + "\n" +
+                    "mount -o ro,remount /system\n";
+            writer.write(command);
+            writer.close();
+
+            stopService(new Intent(this, StupidStartupService.class));
+            Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath()).waitFor();
+        }
+        else {
+            Intent uninstallIntent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, Uri.parse("package:" + getPackageName()));
+            startActivity(uninstallIntent);
+        }
+
     }
 
     void disableApp(){

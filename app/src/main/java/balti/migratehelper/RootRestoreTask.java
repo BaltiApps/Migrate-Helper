@@ -125,7 +125,9 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
                         inputWriter.write("echo \"" + restoreDataHead + data + "\"\n");
                         inputWriter.write("sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + data + " " + packageName + " " + uid + "\n");
                         inputWriter.flush();
+                        line = "";
                     }
+                    else line = "\n";
 
                     inputWriter.write("rm " + jsonObjects.get(totalCount).getString(METADATA_FILE_FIELD) + "\n");
                     inputWriter.write("rm " + TEMP_DIR_NAME + "/" + jsonObjects.get(totalCount).getString(METADATA_FILE_NAME) + "\n");
@@ -140,8 +142,6 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
                         inputWriter.write("exit\n");
                         inputWriter.flush();
                     }
-
-                    line = "";
                 }
                 else if (line.startsWith(restoreDataHead)){
                     line = line + "\n\n";

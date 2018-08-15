@@ -77,7 +77,8 @@ public class AppListAdapter extends BaseAdapter {
 
         TextView appName = view.findViewById(R.id.appName);
         try {
-            appName.setText(appList.get(i).getString("app_name"));
+            String label = appList.get(i).getString("app_name") + " [" + appList.get(i).getString("version") + "]";
+            appName.setText(label);
         } catch (JSONException e) {
             e.printStackTrace();
         }

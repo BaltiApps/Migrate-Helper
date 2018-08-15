@@ -1,6 +1,5 @@
 package balti.migratehelper;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,13 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import android.view.View;
-
-import java.io.File;
 
 /**
  * Created by sayantan on 27/10/17.
@@ -46,9 +40,11 @@ public class RestoreService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 returnIntent = intent;
-                if (intent.getStringExtra("job").startsWith(context.getString(R.string.finished)) || intent.getStringExtra("job").startsWith(context.getString(R.string.finished_with_errors))){
-                    stopSelf();
-                }
+                try {
+                    if (intent.getStringExtra("job").startsWith(context.getString(R.string.finished)) || intent.getStringExtra("job").startsWith(context.getString(R.string.finished_with_errors))) {
+                        stopSelf();
+                    }
+                } catch (Exception e){ e.printStackTrace();}
             }
         };
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));

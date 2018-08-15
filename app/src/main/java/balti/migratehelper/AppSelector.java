@@ -171,7 +171,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
                 actionButton.setText(R.string.restore);
                 actionButton.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_next, 0);
-                actionButton.setBackground(getResources().getDrawable(R.drawable.ic_normal_button));
+                actionButton.setBackground(getResources().getDrawable(R.drawable.next));
                 actionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -451,7 +451,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         waitingStatusMessage.setText(mainMessage);
         waitingMessageDesc.setText(description);
         actionButton.setText(R.string.close);
-        actionButton.setBackground(getDrawable(R.drawable.ic_normal_button));
+        actionButton.setBackground(getDrawable(R.drawable.next));
         actionButton.setVisibility(View.VISIBLE);
 
         disableBatchActions();
