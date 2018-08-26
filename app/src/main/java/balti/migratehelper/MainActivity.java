@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -78,11 +79,14 @@ public class MainActivity extends AppCompatActivity {
                 Intent toSendIntent = new Intent(MainActivity.this, ProgressActivity.class);
                 toSendIntent.putExtras(Objects.requireNonNull(intent.getExtras()));
                 startActivity(toSendIntent);
+                try {
+                    LocalBroadcastManager.getInstance(MainActivity.this).unregisterReceiver(progressReceiver);
+                }catch (Exception ignored){}
                 finish();
             }
         };
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
-        registerReceiver(progressReceiver, progressReceiverIF);
+        LocalBroadcastManager.getInstance(this).registerReceiver(progressReceiver, progressReceiverIF);
 
         disable = findViewById(R.id.disable);
         disable.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        try {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
+        }catch (Exception ignored){}
         super.onDestroy();
     }
 

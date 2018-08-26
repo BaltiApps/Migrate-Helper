@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 
 /**
  * Created by sayantan on 27/10/17.
@@ -48,7 +49,7 @@ public class RestoreService extends Service {
             }
         };
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
-        registerReceiver(progressReceiver, progressReceiverIF);
+        LocalBroadcastManager.getInstance(this).registerReceiver(progressReceiver, progressReceiverIF);
 
         requestListener = new BroadcastReceiver() {
             @Override
@@ -57,7 +58,7 @@ public class RestoreService extends Service {
             }
         };
         requestListenerIF = new IntentFilter("requestProgress");
-        registerReceiver(requestListener, requestListenerIF);
+        LocalBroadcastManager.getInstance(this).registerReceiver(requestListener, requestListenerIF);
     }
 
     @Override
@@ -83,7 +84,7 @@ public class RestoreService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(requestListener);
-        unregisterReceiver(progressReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(requestListener);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
     }
 }

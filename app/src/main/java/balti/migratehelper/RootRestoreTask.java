@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -202,7 +203,7 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
         restoreIntent.putExtra("c", (int)values[0]);
         restoreIntent.putExtra("n", (int)values[1]);
         restoreIntent.putExtra("message", (String)values[3]);
-        context.sendBroadcast(restoreIntent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);
         progress.setProgress((int)values[1], (int)values[0], false)
                 .setContentTitle((String)values[2]);
         notificationManager.notify(RestoreService.RESTORE_SERVICE_NOTIFICATION_ID, progress.build());
@@ -236,7 +237,7 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
                     .setContentText(errors)
                     .setProgress(0, 0, false);
         }
-        context.sendBroadcast(restoreIntent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);
 
         notificationManager.notify(ON_FINISH_NOTIFICATION_ID, progress.build());
     }

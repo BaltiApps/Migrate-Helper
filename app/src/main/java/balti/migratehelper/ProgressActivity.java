@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
@@ -111,7 +112,7 @@ public class ProgressActivity extends AppCompatActivity {
             }
         };
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
-        registerReceiver(progressReceiver, progressReceiverIF);
+        LocalBroadcastManager.getInstance(this).registerReceiver(progressReceiver, progressReceiverIF);
 
         okOnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -223,7 +224,7 @@ public class ProgressActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(progressReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
     }
 }
 
