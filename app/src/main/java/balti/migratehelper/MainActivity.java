@@ -1,5 +1,6 @@
 package balti.migratehelper;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -24,6 +25,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
 
+import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
+
 public class MainActivity extends AppCompatActivity {
 
     Button rootRestoreButton, disable, selectiveRestore;
@@ -33,16 +36,29 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver progressReceiver;
     IntentFilter progressReceiverIF;
 
+    SharedPreferences main;
+    SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O_MR1){
+        main = getSharedPreferences("main", MODE_PRIVATE);
+        editor = main.edit();
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O_MR1 && !main.getBoolean("android_version_warning", false)){
             new AlertDialog.Builder(this)
                     .setTitle(R.string.too_fast)
                     .setMessage(R.string.too_fast_desc)
                     .setPositiveButton(android.R.string.ok, null)
+                    .setNegativeButton(R.string.dont_show_again, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            editor.putBoolean("android_version_warning", true);
+                            editor.commit();
+                        }
+                    })
                     .show();
         }
 
@@ -122,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.goAhead, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        disableApp();
                         try {
                             uninstall();
                         } catch (Exception e) {
@@ -136,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void disableApp(){
+
+        ((NotificationManager) Objects.requireNonNull(getSystemService(NOTIFICATION_SERVICE))).cancelAll();
 
         SharedPreferences.Editor editor = getSharedPreferences("main", MODE_PRIVATE).edit();
         editor.putBoolean("isDisabled", true);
@@ -151,6 +168,9 @@ public class MainActivity extends AppCompatActivity {
         String sourceDir = getApplicationInfo().sourceDir;
 
         if (sourceDir.startsWith("/system")) {
+
+            disableApp();
+
             File tempScript = new File(getFilesDir() + "/tempScript.sh");
             BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
             String command = "#!/sbin/sh\n\n" +
@@ -158,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                     "mount -o rw,remount /data\n" +
                     "mount -o rw,remount /system/app/MigrateHelper\n" +
                     "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                    "rm -rf " + getApplicationInfo().dataDir + " " + sourceDir + "\n" +
+                    "rm -rf " + getApplicationInfo().dataDir + " " + sourceDir + " " + TEMP_DIR_NAME + "\n" +
                     "mount -o ro,remount /system\n";
             writer.write(command);
             writer.close();

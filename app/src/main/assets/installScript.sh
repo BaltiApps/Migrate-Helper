@@ -4,5 +4,5 @@
 
 cd $1
 pm install -r $2
-rm $2
+rm -rf $2
 

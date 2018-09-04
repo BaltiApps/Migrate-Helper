@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_list_bg"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/colorPrimary"
+        android:padding="@dimen/large_padding_width"
+        android:layout_marginBottom="@dimen/small_padding_width"
+        >
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/please_wait"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/extra_backup_progress_title"
+            android:padding="@dimen/large_padding_width"
+            />
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_margin="@dimen/large_padding_width"
+            android:id="@+id/extra_backup_progress_head_progress"
+            />
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_padding_width"
+                android:background="@color/listItem"
+                android:gravity="center_vertical"
+                android:id="@+id/extra_backup_progress_item_contacts"
+                android:padding="@dimen/small_padding_width"
+                android:visibility="gone"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_contact_icon"
+                    android:padding="15dp"
+                    />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contacts"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_margin="@dimen/large_padding_width"
+                    />
+
+                <ImageView
+                    android:layout_width="@dimen/extra_item_done_wh"
+                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:src="@drawable/ic_item_done"
+                    android:id="@+id/extra_backup_progress_item_contacts_done"
+                    />
+
+                <ProgressBar
+                    android:layout_width="@dimen/extra_item_done_wh"
+                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:id="@+id/extra_backup_progress_item_contacts_progress"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_padding_width"
+                android:background="@color/listItem"
+                android:gravity="center_vertical"
+                android:id="@+id/extra_backup_progress_item_applications"
+                android:padding="@dimen/small_padding_width"
+                android:visibility="gone"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_app"
+                    android:padding="15dp"
+                    />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="@string/applications"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_margin="@dimen/large_padding_width"
+                    />
+
+                <ProgressBar
+                    android:layout_width="@dimen/extra_item_done_wh"
+                    android:layout_height="@dimen/extra_item_done_wh" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+
+</LinearLayout>

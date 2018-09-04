@@ -26,7 +26,6 @@ public class SetAppIcon extends AsyncTask<String, Void, Bitmap> {
                 imageData[i] = Byte.parseByte(bytes[i]);
             }
             bmp = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
-            //Log.d("migrate", "icon: " + bmp);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -38,6 +37,7 @@ public class SetAppIcon extends AsyncTask<String, Void, Bitmap> {
     protected void onPostExecute(Bitmap bitmap) {
         super.onPostExecute(bitmap);
         if (bitmap != null) {
+            iconHolder.setImageDrawable(null);
             iconHolder.setImageBitmap(bitmap);
         }
     }

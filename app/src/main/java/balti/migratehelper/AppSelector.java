@@ -8,15 +8,20 @@ import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -25,15 +30,13 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.util.Calendar;
-import java.util.Objects;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
@@ -50,12 +53,15 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     ImageButton clearAll;
     ImageButton selectAll;
     TextView actionButton;
+    ScrollView restoreContent;
+    LinearLayout appCheckboxBar;
     ListView appList;
+    LinearLayout extrasBar;
+    CheckBox extrasSelect;
 
     ProgressBar justAProgress;
     ImageView errorIcon;
 
-    FileFilter mtdFilter;
     AppListAdapter adapter;
 
     private String busyboxBinaryFilePath = "";
@@ -71,15 +77,18 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     private static int CODE_ERROR = 1;
     private static int SCRIPT_ERROR = 2;
 
+    int numberOfApps = 0;
     boolean intentSelectAll = false;
-
-    BroadcastReceiver progressReceiver;
-    IntentFilter progressReceiverIF;
+    boolean anyAppSelected = true;
 
     RootCopyTask rootCopyTask;
     GetJsonFromData getJsonFromData;
     AppUpdate appUpdateTask;
 
+    GetJsonFromDataPackets mainGetJsonFromDataPackets = null;
+    boolean extraSelectBoolean = true;
+
+    BroadcastReceiver extraBackupsProgressReadyReceiver;
 
     class RootCopyTask extends AsyncTask{
 
@@ -103,7 +112,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             });
             actionButton.setVisibility(View.VISIBLE);
 
-            disableBatchActions();
+            restoreContent.setVisibility(View.GONE);
         }
 
         @Override
@@ -118,8 +127,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
-
-            enableBatchActions();
 
             if (rootCopyResult == SUCCESS){
                 waitingStatusMessage.setText(R.string.reading_metadata);
@@ -140,23 +147,22 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
     class AppUpdate extends AsyncTask{
 
-        Vector<JSONObject> appData;
+        GetJsonFromDataPackets getJsonFromDataPackets;
 
-        AppUpdate(Vector<JSONObject> appData){
-            this.appData = appData;
+        AppUpdate(GetJsonFromDataPackets getJsonFromDataPackets){
+            this.getJsonFromDataPackets = getJsonFromDataPackets;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             waitingLayout.setVisibility(View.VISIBLE);
-            appList.setVisibility(View.GONE);
-            disableBatchActions();
+            restoreContent.setVisibility(View.GONE);
         }
 
         @Override
         protected Object doInBackground(Object[] objects) {
-            adapter = new AppListAdapter(AppSelector.this, appData);
+            adapter = new AppListAdapter(AppSelector.this, getJsonFromDataPackets.jsonAppPackets);
             return adapter;
         }
 
@@ -164,10 +170,39 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
 
+            mainGetJsonFromDataPackets = getJsonFromDataPackets;
+
             if (o != null){
                 waitingLayout.setVisibility(View.GONE);
-                appList.setVisibility(View.VISIBLE);
+                restoreContent.setVisibility(View.VISIBLE);
+
+                if (mainGetJsonFromDataPackets.jsonAppPackets.size() > 0)
                 appList.setAdapter(adapter);
+
+                if (mainGetJsonFromDataPackets.contactPackets.length != 0){
+                    extrasBar.setVisibility(View.VISIBLE);
+                    extrasSelect.setChecked(true);
+                    extrasBar.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            new ExtrasUpdate(mainGetJsonFromDataPackets).execute();
+                        }
+                    });
+                }
+                else {
+                    extrasBar.setVisibility(View.GONE);
+                }
+
+                if (mainGetJsonFromDataPackets.jsonAppPackets.size() != 0){
+                    appCheckboxBar.setVisibility(View.VISIBLE);
+                    appList.setVisibility(View.VISIBLE);
+                }
+                else {
+                    appCheckboxBar.setVisibility(View.GONE);
+                    appList.setVisibility(View.GONE);
+                }
+
+                onCheck(mainGetJsonFromDataPackets.jsonAppPackets);
 
                 actionButton.setText(R.string.restore);
                 actionButton.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_next, 0);
@@ -175,28 +210,138 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 actionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        waitingStatusMessage.setText(R.string.please_wait);
-                        actionButton.setVisibility(View.INVISIBLE);
+                        if (anyAppSelected || extrasSelect.isChecked()) {
+                            waitingStatusMessage.setText(R.string.please_wait);
+                            actionButton.setVisibility(View.INVISIBLE);
 
-                        waitingLayout.setVisibility(View.VISIBLE);
-                        appList.setVisibility(View.GONE);
+                            waitingLayout.setVisibility(View.VISIBLE);
+                            restoreContent.setVisibility(View.GONE);
 
-                        disableBatchActions();
+                            extraSelectBoolean = extrasSelect.isChecked();
 
-                        startService(new Intent(AppSelector.this, RestoreService.class));
-
-                        RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(AppSelector.this, timeInMillis(), appData.size(), installScriptPath, restoreDataScriptPath);
-                        RestoreService.ROOT_RESTORE_TASK.execute(appData);
+                            startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
+                        }
                     }
                 });
 
-                enableBatchActions();
-
-                onCheck(appData);
             }
             else {
                 showError(getString(R.string.code_error), getString(R.string.null_adapter));
             }
+        }
+    }
+
+    class ExtrasUpdate extends AsyncTask{
+
+        AlertDialog ad;
+        View masterView;
+        LinearLayout holder;
+        ProgressBar progressBar;
+
+        GetJsonFromDataPackets getJsonFromDataPackets;
+        ContactsPacket[] contactsPackets;
+
+        public ExtrasUpdate(GetJsonFromDataPackets getJsonFromDataPackets) {
+            this.getJsonFromDataPackets = getJsonFromDataPackets;
+            contactsPackets = getJsonFromDataPackets.contactPackets;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            masterView = View.inflate(AppSelector.this, R.layout.extras_picker, null);
+            holder = masterView.findViewById(R.id.extras_picker_item_holder);
+            progressBar = masterView.findViewById(R.id.extra_picker_round_progress);
+
+            ad = new AlertDialog.Builder(AppSelector.this)
+                    .setView(masterView)
+                    .create();
+
+            ad.show();
+
+            holder.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+
+            ContactsPacket[] tempContactPackets = new ContactsPacket[contactsPackets.length];
+            ArrayList<View> items = new ArrayList<>(0);
+
+            for (int j = 0; j < contactsPackets.length; j++){
+                tempContactPackets[j] = new ContactsPacket(contactsPackets[j].vcfFile, contactsPackets[j].selected);
+            }
+
+            for (final ContactsPacket packet : tempContactPackets){
+                View cView = View.inflate(AppSelector.this, R.layout.extra_item, null);
+                ImageView icon = cView.findViewById(R.id.extra_item_icon);
+                icon.setImageResource(R.drawable.ic_contact_icon);
+
+                TextView tv = cView.findViewById(R.id.extra_item_name);
+                tv.setText(packet.vcfFile.getName());
+
+                CheckBox cb = cView.findViewById(R.id.extras_item_select);
+                cb.setChecked(packet.selected);
+
+                cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        packet.selected = b;
+                    }
+                });
+
+                items.add(cView);
+            }
+
+            return new Object[]{tempContactPackets, items};
+        }
+
+        @Override
+        protected void onPostExecute(final Object o) {
+            super.onPostExecute(o);
+
+            if (holder.getChildCount() > 0)
+                holder.removeAllViews();
+
+            Object received[] = (Object[])o;
+
+            final ContactsPacket[] tempContactPackets = (ContactsPacket[])received[0];
+            for (View v : (ArrayList<View>)received[1])
+                holder.addView(v);
+
+            holder.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+
+            Button ok = masterView.findViewById(R.id.extras_picker_ok);
+            Button cancel = masterView.findViewById(R.id.extras_picker_cancel);
+
+            ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if (contactsPackets.length == 0)
+                        return;
+
+                    boolean anyContact = tempContactPackets[0].selected;
+
+                    for (int j = 0; j < contactsPackets.length; j++) {
+                        contactsPackets[j].selected = tempContactPackets[j].selected;
+                        contactsPackets[j].vcfFile = tempContactPackets[j].vcfFile;
+                        anyContact = anyContact || contactsPackets[j].selected;
+                    }
+
+                    extrasSelect.setChecked(anyContact);
+                    ad.dismiss();
+                }
+            });
+
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ad.dismiss();
+                }
+            });
         }
     }
 
@@ -223,20 +368,18 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         actionButton = findViewById(R.id.restore_selected);
 
+        restoreContent = findViewById(R.id.restore_content);
+        appCheckboxBar = findViewById(R.id.app_checkbox_bar);
         appList = findViewById(R.id.app_list);
+        extrasBar = findViewById(R.id.extras_bar);
+        extrasSelect = findViewById(R.id.extras_select);
 
         mtdDirName = new File(getExternalCacheDir(), "metadataFiles").getAbsolutePath() + "/";
-        mtdFilter = new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.getName().endsWith(".json");
-            }
-        };
 
         if (getIntent().getExtras() != null && getIntent().getExtras().getBoolean("all?", true)){
             title.setText(R.string.everything);
             intentSelectAll = true;
-            (findViewById(R.id.checkbox_bar)).setVisibility(View.GONE);
+            restoreContent.setVisibility(View.GONE);
             clearAll.setVisibility(View.INVISIBLE);
             selectAll.setVisibility(View.INVISIBLE);
         }
@@ -268,17 +411,15 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             }
         });
 
-        progressReceiver = new BroadcastReceiver() {
+        extraBackupsProgressReadyReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Intent toSendIntent = new Intent(AppSelector.this, ProgressActivity.class);
-                toSendIntent.putExtras(Objects.requireNonNull(intent.getExtras()));
-                startActivity(toSendIntent);
+                ExtraBackupsProgress.setData(mainGetJsonFromDataPackets, numberOfApps, installScriptPath, restoreDataScriptPath, extraSelectBoolean);
+                LocalBroadcastManager.getInstance(AppSelector.this).sendBroadcast(new Intent("startRestoreFromExtraBackups"));
                 finish();
             }
         };
-        progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
-        registerReceiver(progressReceiver, progressReceiverIF);
+        LocalBroadcastManager.getInstance(this).registerReceiver(extraBackupsProgressReadyReceiver, new IntentFilter("extraBackupsProgressReady"));
 
         if (RestoreService.ROOT_RESTORE_TASK != null && RestoreService.ROOT_RESTORE_TASK.getStatus() == AsyncTask.Status.RUNNING){
             Intent toSendIntent = new Intent(AppSelector.this, ProgressActivity.class);
@@ -338,7 +479,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "mv -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME + "/busybox\n" +
                 "rm -rf " + mtdDirName + "\n" +
                 "mkdir -p " + mtdDirName + "\n" +
-                "cp " + TEMP_DIR_NAME + "/*.json " + mtdDirName + " > /dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/*.json " + mtdDirName + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/*.vcf " + mtdDirName + " 2>/dev/null\n" +
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
 
@@ -385,14 +527,17 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     }
 
     @Override
-    public void onConvertMetadataToJSON(Vector<JSONObject> appData, String error) {
+    public void onConvertMetadataToJSON(GetJsonFromDataPackets getJsonFromDataPackets, String error) {
 
         if (!error.startsWith("")){
             showError(getString(R.string.code_error), error);
             return;
         }
 
-        if (appData.size() == 0){
+        Vector<JSONObject> appData = getJsonFromDataPackets.jsonAppPackets;
+        ContactsPacket[] contactsPackets = getJsonFromDataPackets.contactPackets;
+
+        if (contactsPackets.length == 0 && appData.size() == 0){
             showError(getString(R.string.nothing_to_restore), getString(R.string.no_metadata_found));
             return;
         }
@@ -401,30 +546,25 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             waitingStatusMessage.setText(R.string.selecting_all);
             actionButton.setVisibility(View.INVISIBLE);
 
-            startService(new Intent(this, RestoreService.class));
+            numberOfApps = appData.size();
+            mainGetJsonFromDataPackets = getJsonFromDataPackets;
+            extraSelectBoolean = true;
 
-            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(this, timeInMillis(), appData.size(), installScriptPath, restoreDataScriptPath);
-            RestoreService.ROOT_RESTORE_TASK.execute(appData);
+            startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
         }
         else {
-            appUpdateTask = new AppUpdate(appData);
+            appUpdateTask = new AppUpdate(getJsonFromDataPackets);
             appUpdateTask.execute();
         }
     }
 
 
-    long timeInMillis(){
-        Calendar calendar = Calendar.getInstance();
-        return calendar.getTimeInMillis();
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         try {
-            unregisterReceiver(progressReceiver);
-        }
-        catch (Exception ignored){}
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(extraBackupsProgressReadyReceiver);
+        }catch (Exception ignored){}
         cancelAllProcesses();
     }
 
@@ -454,27 +594,17 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         actionButton.setBackground(getDrawable(R.drawable.next));
         actionButton.setVisibility(View.VISIBLE);
 
-        disableBatchActions();
-    }
-
-    void disableBatchActions(){
-        appAllSelect.setEnabled(false);
-        dataAllSelect.setEnabled(false);
-        selectAll.setEnabled(false);
-        clearAll.setEnabled(false);
-    }
-
-    void enableBatchActions(){
-        appAllSelect.setEnabled(true);
-        dataAllSelect.setEnabled(true);
-        selectAll.setEnabled(true);
-        clearAll.setEnabled(true);
+        restoreContent.setVisibility(View.GONE);
     }
 
     @Override
     public void onCheck(Vector<JSONObject> appList) {
         boolean app, data;
+        boolean thisEnable;
         boolean enable = false;
+
+        numberOfApps = 0;
+
         if (appList.size() > 0)
             app = data = true;
         else app = data = false;
@@ -482,13 +612,15 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             try {
                 app = app && appList.elementAt(i).getBoolean(APP_CHECK);
                 data = data && appList.elementAt(i).getBoolean(DATA_CHECK);
-                enable = enable || appList.elementAt(i).getBoolean(APP_CHECK) || appList.elementAt(i).getBoolean(DATA_CHECK);
+                thisEnable = appList.elementAt(i).getBoolean(APP_CHECK) || appList.elementAt(i).getBoolean(DATA_CHECK);
+                enable = enable || thisEnable;
+                if (thisEnable) numberOfApps++;
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
 
-        actionButton.setEnabled(enable);
+        anyAppSelected = enable;
 
         dataAllSelect.setOnCheckedChangeListener(null);
         dataAllSelect.setChecked(data);
@@ -522,6 +654,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             adapter.notifyDataSetChanged();
         }
 
-        actionButton.setEnabled(dataAllSelect.isChecked() || appAllSelect.isChecked());
+        onCheck(adapter.appList);
     }
+
 }

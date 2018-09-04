@@ -22,7 +22,7 @@
             android:layout_height="@dimen/small_icon_wh"
             android:src="@drawable/ic_requesting_root"
             android:id="@+id/logoIcon"
-            android:tint="@color/colorAccent"
+            android:layout_marginBottom="10dp"
             />
 
         <TextView

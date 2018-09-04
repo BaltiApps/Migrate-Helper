@@ -1,5 +1,6 @@
 package balti.migratehelper;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,11 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,6 +27,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
+
+import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
 
 public class ProgressActivity extends AppCompatActivity {
 
@@ -43,45 +43,7 @@ public class ProgressActivity extends AppCompatActivity {
 
     String action;
 
-    static String UNCHANGED_STATUS = "UNCHANGED_STATUS";
-
-
-    class SetAppIcon extends AsyncTask<String, Void, Drawable> {
-
-
-        @Override
-        protected Drawable doInBackground(String... strings) {
-
-            Bitmap bmp = null;
-            Drawable drawable = null;
-            String[] bytes = strings[0].split("_");
-
-            try {
-                byte imageData[] = new byte[bytes.length];
-                for (int i = 0; i < bytes.length; i++) {
-                    imageData[i] = Byte.parseByte(bytes[i]);
-                }
-                bmp = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
-                drawable = new BitmapDrawable(getResources(), bmp);
-                //Log.d("migrate", "icon: " + bmp);
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-            return drawable;
-        }
-
-        @Override
-        protected void onPostExecute(Drawable drawable) {
-            super.onPostExecute(drawable);
-            if (drawable != null) {
-                messageHead.setCompoundDrawables(drawable, null, null, null);
-            }
-            else {
-                messageHead.setCompoundDrawables(null, null, null, null);
-            }
-        }
-    }
+    String lastMsg = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -117,7 +79,6 @@ public class ProgressActivity extends AppCompatActivity {
         okOnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                disableApp();
                 try {
                     uninstall();
                 } catch (Exception e) {
@@ -147,30 +108,37 @@ public class ProgressActivity extends AppCompatActivity {
         catch (Exception e){ e.printStackTrace(); }
 
         if (action.startsWith(getString(R.string.finished_with_errors))){
+            icon.setImageResource(R.drawable.ic_error);
             messageHead.setText(action);
-            icon.setImageDrawable(getDrawable(R.drawable.ic_error));
-            messageView.append("\n\n" + msg);
+            if (!lastMsg.equals(msg)) {
+                lastMsg = msg;
+                messageView.append("\n\n" + lastMsg);
+            }
             messageHead.setTextColor(Color.RED);
             close.setVisibility(View.VISIBLE);
         }
         else if (action.startsWith(getString(R.string.finished))){
+            icon.setImageResource(R.drawable.ic_finished);
             messageHead.setText(action);
-            icon.setImageDrawable(getDrawable(R.drawable.ic_finished));
-            messageView.append("\n\n" + msg);
+            if (!lastMsg.equals(msg)) {
+                lastMsg = msg;
+                messageView.append("\n\n" + lastMsg);
+            }
             okOnFinish.setVisibility(View.VISIBLE);
         }
         else {
-            if (!action.equals(UNCHANGED_STATUS)) {
-                String d[] = action.split(" ");
-                String status = d[0];
-                String icon = d[1];
-                messageHead.setText(status);
-                new SetAppIcon().execute(icon.trim());
-                progressBar.setMax(intent.getIntExtra("n", 0));
-                updateProgress(intent.getIntExtra("c", 0));
-            }
-            if (!msg.equals(""))
+            String d[] = action.split(" ");
+            String status = d[0];
+            String icon = d[1];
+            messageHead.setText(status);
+            new SetAppIcon(this.icon).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, icon.trim());
+            progressBar.setMax(intent.getIntExtra("n", 0));
+            updateProgress(intent.getIntExtra("c", 0));
+
+            if (!msg.equals("") && !lastMsg.equals(msg)) {
+                lastMsg = msg;
                 messageView.append(msg + "\n");
+            }
         }
     }
 
@@ -188,6 +156,9 @@ public class ProgressActivity extends AppCompatActivity {
         String sourceDir = getApplicationInfo().sourceDir;
 
         if (sourceDir.startsWith("/system")) {
+
+            disableApp();
+
             File tempScript = new File(getFilesDir() + "/tempScript.sh");
             BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
             String command = "#!/sbin/sh\n\n" +
@@ -195,7 +166,7 @@ public class ProgressActivity extends AppCompatActivity {
                     "mount -o rw,remount /data\n" +
                     "mount -o rw,remount /system/app/MigrateHelper\n" +
                     "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                    "rm -rf " + getApplicationInfo().dataDir + " " + sourceDir + "\n" +
+                    "rm -rf " + getApplicationInfo().dataDir + " " + sourceDir + " " + TEMP_DIR_NAME + "\n" +
                     "mount -o ro,remount /system\n";
             writer.write(command);
             writer.close();
@@ -211,6 +182,8 @@ public class ProgressActivity extends AppCompatActivity {
     }
 
     void disableApp(){
+
+        ((NotificationManager) Objects.requireNonNull(getSystemService(NOTIFICATION_SERVICE))).cancelAll();
 
         SharedPreferences.Editor editor = getSharedPreferences("main", MODE_PRIVATE).edit();
         editor.putBoolean("isDisabled", true);

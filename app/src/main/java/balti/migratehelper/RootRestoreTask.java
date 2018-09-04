@@ -24,13 +24,14 @@ import java.util.Vector;
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
-import static balti.migratehelper.ProgressActivity.UNCHANGED_STATUS;
+
+;
 
 /**
  * Created by sayantan on 23/10/17.
  */
 
-public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integer> {
+public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, Integer> {
 
     private Context context;
     private String errors;
@@ -39,7 +40,7 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
 
     private Intent restoreIntent;
 
-    private int numberOfJobs;
+    int numberOfAppJobs;
 
     private int SUCCESS = 0;
     private int CODE_ERROR = 990;
@@ -48,6 +49,7 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
     private long startMillis;
     private long endMillis;
     private String installScriptPath, restoreDataScriptPath;
+    private boolean restoreExtras = true;
 
     static int totalCount = 0;
     private String statusHead = "helper status: ";
@@ -56,17 +58,15 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
     static String METADATA_FILE_FIELD = "metadata_file";
     static String METADATA_FILE_NAME = "metadata_file_name";
 
-    //private File restoreScript;
-
     static int ON_FINISH_NOTIFICATION_ID = 101;
     UIDClass uidClass;
 
-    RootRestoreTask(Context context, long startMillis, int numberOfJobs, String installScriptPath, String restoreDataScriptPath) {
+    RootRestoreTask(Context context, long startMillis, String installScriptPath, String restoreDataScriptPath, boolean restoreExtras) {
         this.context = context;
         this.startMillis = startMillis;
-        this.numberOfJobs = numberOfJobs;
         this.installScriptPath = installScriptPath;
         this.restoreDataScriptPath = restoreDataScriptPath;
+        this.restoreExtras = restoreExtras;
         errors = "";
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -74,106 +74,106 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
         uidClass = new UIDClass(context);
     }
 
+    public void setNumberOfAppJobs(int numberOfAppJobs) {
+        this.numberOfAppJobs = numberOfAppJobs;
+    }
+
     @Override
-    protected Integer doInBackground(Vector<JSONObject>... jsonData) {
+    protected Integer doInBackground(GetJsonFromDataPackets... getJsonFromDataPackets) {
 
-        Vector<JSONObject> jsonObjects = jsonData[0];
+        int processResult = SUCCESS;
 
-        Process restoreProcess;
-
-        try {
-            restoreProcess = Runtime.getRuntime().exec("su");
-            BufferedWriter inputWriter = new BufferedWriter(new OutputStreamWriter(restoreProcess.getOutputStream()));
-            BufferedReader outputReader = new BufferedReader(new InputStreamReader(restoreProcess.getInputStream()));
-            BufferedReader errorReader = new BufferedReader(new InputStreamReader(restoreProcess.getErrorStream()));
-
-            String line;
-
-            int c = 0;
-            String status = "";
+        Vector<JSONObject> jsonObjects = getJsonFromDataPackets[0].jsonAppPackets;
 
 
-            String command = getNextCommand(jsonObjects);
+        if (getJsonFromDataPackets[0].jsonAppPackets.size() > 0) {
+            Process restoreProcess;
 
-            inputWriter.write(command);
-            inputWriter.flush();
+            try {
+                restoreProcess = Runtime.getRuntime().exec("su");
+                BufferedWriter inputWriter = new BufferedWriter(new OutputStreamWriter(restoreProcess.getOutputStream()));
+                BufferedReader outputReader = new BufferedReader(new InputStreamReader(restoreProcess.getInputStream()));
+                BufferedReader errorReader = new BufferedReader(new InputStreamReader(restoreProcess.getErrorStream()));
+
+                String line;
+
+                int c = 0;
+                String status = "";
 
 
-            while ((line = outputReader.readLine()) != null){
-                if (line.startsWith(statusHead)) {
-                    c++;
-                    status = line.substring(statusHead.length());
-                    String apkName = jsonObjects.get(totalCount).getString("apk");
-                    boolean appCheck = jsonObjects.get(totalCount).getBoolean(APP_CHECK);
-                    if (appCheck) {
-                        if (!apkName.equals("NULL"))
-                            line = "Installing: " + apkName;
-                        else line = "Skipping installation: " + status;
-                    }
-                    else {
-                        status = UNCHANGED_STATUS;
-                        line = "";
-                    }
-                }
-                else if (line.startsWith(installedStatusHead)){
+                String command = getNextCommand(jsonObjects);
 
-                    String data = jsonObjects.get(totalCount).getString("data");
-                    String packageName = jsonObjects.get(totalCount).getString("package_name");
-                    int uid = uidClass.getUid(packageName);
+                inputWriter.write(command);
+                inputWriter.flush();
 
-                    boolean dataCheck = jsonObjects.get(totalCount).getBoolean(DATA_CHECK);
-                    if (!data.equals("NULL") && uid != -1 && dataCheck) {
-                        inputWriter.write("echo \"" + restoreDataHead + data + "\"\n");
-                        inputWriter.write("sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + data + " " + packageName + " " + uid + "\n");
+
+                while ((line = outputReader.readLine()) != null) {
+                    if (line.startsWith(statusHead)) {
+                        c++;
+                        status = line.substring(statusHead.length());
+                        String apkName = jsonObjects.get(totalCount).getString("apk");
+                        boolean appCheck = jsonObjects.get(totalCount).getBoolean(APP_CHECK);
+                        if (appCheck) {
+                            if (!apkName.equals("NULL"))
+                                line = "Installing: " + apkName;
+                            else line = "Skipping installation: " + status;
+
+                            publishProgress(c, numberOfAppJobs, status, line);
+                        }
+                    } else if (line.startsWith(installedStatusHead)) {
+
+                        String data = jsonObjects.get(totalCount).getString("data");
+                        String packageName = jsonObjects.get(totalCount).getString("package_name");
+                        int uid = uidClass.getUid(packageName);
+
+                        boolean dataCheck = jsonObjects.get(totalCount).getBoolean(DATA_CHECK);
+                        if (!data.equals("NULL") && uid != -1 && dataCheck) {
+                            inputWriter.write("echo \"" + restoreDataHead + data + "\"\n");
+                            inputWriter.write("sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + data + " " + packageName + " " + uid + "\n");
+                            inputWriter.flush();
+                            line = "";
+                        } else line = "\n";
+
+                        inputWriter.write("rm " + jsonObjects.get(totalCount).getString(METADATA_FILE_FIELD) + "\n");
+                        inputWriter.write("rm " + TEMP_DIR_NAME + "/" + jsonObjects.get(totalCount).getString(METADATA_FILE_NAME) + "\n");
                         inputWriter.flush();
-                        line = "";
+
+                        if (totalCount < numberOfAppJobs - 1) {
+                            totalCount++;
+                            inputWriter.write(getNextCommand(jsonObjects));
+                            inputWriter.flush();
+                        } else {
+                            inputWriter.write("exit\n");
+                            inputWriter.flush();
+                        }
+
+                        publishProgress(c, numberOfAppJobs, status, line);
+                    } else if (line.startsWith(restoreDataHead)) {
+                        line = line + "\n\n";
+                        publishProgress(c, numberOfAppJobs, status, line);
                     }
-                    else line = "\n";
 
-                    inputWriter.write("rm " + jsonObjects.get(totalCount).getString(METADATA_FILE_FIELD) + "\n");
-                    inputWriter.write("rm " + TEMP_DIR_NAME + "/" + jsonObjects.get(totalCount).getString(METADATA_FILE_NAME) + "\n");
-                    inputWriter.flush();
-
-                    if (totalCount < numberOfJobs - 1) {
-                        totalCount++;
-                        inputWriter.write(getNextCommand(jsonObjects));
-                        inputWriter.flush();
-                    }
-                    else {
-                        inputWriter.write("exit\n");
-                        inputWriter.flush();
-                    }
                 }
-                else if (line.startsWith(restoreDataHead)){
-                    line = line + "\n\n";
-                }
-                else {
-                    status = UNCHANGED_STATUS;
+                while ((line = errorReader.readLine()) != null) {
+                    String lowerLine = line.toLowerCase().trim();
+                    if (lowerLine.startsWith("selinux"))
+                        continue;
+                    errors = errors + line + "\n";
                 }
 
-                publishProgress(c, numberOfJobs, status, line);
-
+            } catch (Exception e) {
+                e.printStackTrace();
+                processResult = CODE_ERROR;
             }
-            while ((line = errorReader.readLine())!= null){
-                String lowerLine = line.toLowerCase().trim();
-                if (lowerLine.startsWith("selinux"))
-                    continue;
-                errors = errors + line + "\n";
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return CODE_ERROR;
         }
 
         if (errors.equals("")) {
-            try {
-                Runtime.getRuntime().exec("su -c rm -r " + TEMP_DIR_NAME);
-            } catch (Exception ignored) {}
-
-            return SUCCESS;
+            processResult = SUCCESS;
         }
-        else return EXECUTION_ERROR;
+        else if (processResult != CODE_ERROR)
+            processResult = EXECUTION_ERROR;
+
+        return processResult;
     }
 
     @Override
@@ -204,8 +204,12 @@ public class RootRestoreTask extends AsyncTask<Vector<JSONObject>, Object, Integ
         restoreIntent.putExtra("n", (int)values[1]);
         restoreIntent.putExtra("message", (String)values[3]);
         LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);
+
+        String status = (String)values[2];
+        if (status.contains(" "))
+            status = status.substring(0, status.lastIndexOf(' '));
         progress.setProgress((int)values[1], (int)values[0], false)
-                .setContentTitle((String)values[2]);
+                .setContentTitle(status);
         notificationManager.notify(RestoreService.RESTORE_SERVICE_NOTIFICATION_ID, progress.build());
     }
 

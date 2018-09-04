@@ -14,7 +14,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Vector;
 
-public class GetJsonFromData extends AsyncTask<String, String, Vector<JSONObject>> {
+public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPackets> {
 
     private OnConvertMetadataToJSON classContext;
     private Context context;
@@ -23,6 +23,8 @@ public class GetJsonFromData extends AsyncTask<String, String, Vector<JSONObject
 
     static String APP_CHECK = "APP_CHECK";
     static String DATA_CHECK = "DATA_CHECK";
+
+    FileFilter jsonFilter, vcfFilter;
 
     String error;
 
@@ -38,15 +40,29 @@ public class GetJsonFromData extends AsyncTask<String, String, Vector<JSONObject
         this.statusDisplayView = statusDisplayView;
 
         error = "";
+
+        jsonFilter = new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.getName().endsWith(".json");
+            }
+        };
+
+        vcfFilter = new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.getName().endsWith(".vcf");
+            }
+        };
     }
 
     @Override
-    protected Vector<JSONObject> doInBackground(String... directoryPath) {
+    protected GetJsonFromDataPackets doInBackground(String... directoryPath) {
 
         Vector<JSONObject> jsonObjects = new Vector<>(0);
         try {
 
-            File[] files = new File(directoryPath[0]).listFiles();
+            File[] files = new File(directoryPath[0]).listFiles(jsonFilter);
 
             int n = files.length;
 
@@ -63,7 +79,16 @@ public class GetJsonFromData extends AsyncTask<String, String, Vector<JSONObject
             error = error + e.getMessage() + "\n";
         }
 
-        return jsonObjects;
+        File[] vcfFiles = new File[0];
+        try {
+            vcfFiles = new File(directoryPath[0]).listFiles(vcfFilter);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            error = error + e.getMessage() + "\n";
+        }
+
+        return new GetJsonFromDataPackets(jsonObjects, vcfFiles);
     }
 
     @Override
@@ -73,11 +98,9 @@ public class GetJsonFromData extends AsyncTask<String, String, Vector<JSONObject
     }
 
     @Override
-    protected void onPostExecute(Vector<JSONObject> jsonObjects) {
-        super.onPostExecute(jsonObjects);
-        classContext.onConvertMetadataToJSON(jsonObjects, error);
-
-
+    protected void onPostExecute(GetJsonFromDataPackets dataPackets) {
+        super.onPostExecute(dataPackets);
+        classContext.onConvertMetadataToJSON(dataPackets, error);
     }
 
     private JSONObject getJsonData(File file){

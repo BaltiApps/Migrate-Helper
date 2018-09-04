@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
-        android:padding="10dp"
+        android:padding="@dimen/large_padding_width"
         android:gravity="center_vertical"
         >
 
@@ -32,69 +32,6 @@
             android:paddingStart="10dp"
             android:id="@+id/app_selector_title"
             />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
-        android:gravity="end"
-        android:background="@color/colorPrimary"
-        android:id="@+id/checkbox_bar"
-        android:paddingEnd="@dimen/large_padding_width"
-        android:paddingStart="@dimen/large_padding_width"
-        >
-
-            <RelativeLayout
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/appCheckboxView"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    />
-
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/appAllSelect"
-                    android:gravity="bottom"
-                    android:layout_centerHorizontal="true"
-                    android:layout_alignParentTop="true"
-                    />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/dataCheckboxView"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/data"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    />
-
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/dataAllSelect"
-                    android:gravity="bottom"
-                    android:layout_centerHorizontal="true"
-                    android:layout_alignParentTop="true"
-                    />
-
-            </RelativeLayout>
-
 
     </LinearLayout>
 
@@ -155,15 +92,151 @@
 
         </RelativeLayout>
 
-
-        <ListView
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/app_list"
+            android:layout_height="match_parent"
+            android:id="@+id/restore_content"
+            android:fillViewport="true"
             android:visibility="gone"
             >
 
-        </ListView>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/actionBarSize"
+                    android:background="@color/colorPrimary"
+                    android:paddingEnd="@dimen/large_padding_width"
+                    android:paddingStart="@dimen/large_padding_width"
+                    android:id="@+id/extras_bar"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/extras"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_edit"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        />
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/extras_select"
+                        android:padding="@dimen/small_padding_width"
+                        />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/actionBarSize"
+                    android:background="@color/colorPrimary"
+                    android:id="@+id/app_checkbox_bar"
+                    android:paddingEnd="@dimen/large_padding_width"
+                    android:paddingStart="@dimen/large_padding_width"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/apps"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        />
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/appCheckboxView"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:paddingEnd="@dimen/large_padding_width"
+                        android:paddingStart="@dimen/large_padding_width"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/app"
+                            />
+
+                        <CheckBox
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/appAllSelect"
+                            android:gravity="bottom"
+                            />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/dataCheckboxView"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:paddingEnd="@dimen/large_padding_width"
+                        android:paddingStart="@dimen/large_padding_width"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/data"
+                            />
+
+                        <CheckBox
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/dataAllSelect"
+                            android:gravity="bottom"
+                            />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/app_list"
+                    >
+
+                </ListView>
+
+            </LinearLayout>
+
+        </ScrollView>
+
 
     </RelativeLayout>
 

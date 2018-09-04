@@ -25,6 +25,10 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             />
+        <activity android:name=".ExtraBackupsProgress"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            />
         <receiver android:name=".Listener">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" android:priority="999"/>
@@ -35,11 +39,19 @@
             android:exported="false"/>
         <service android:name=".RestoreService"
             android:exported="false"/>
+        
+        <provider
+            android:authorities="migrate.helper.provider"
+            android:name="android.support.v4.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
     </application>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission-sdk-23 android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
 </manifest>
