@@ -414,6 +414,9 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         extraBackupsProgressReadyReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                try {
+                    Runtime.getRuntime().exec("su -c rm -rf " + TEMP_DIR_NAME + "/*.vcf");
+                } catch (IOException ignored) {}
                 ExtraBackupsProgress.setData(mainGetJsonFromDataPackets, numberOfApps, installScriptPath, restoreDataScriptPath, extraSelectBoolean);
                 LocalBroadcastManager.getInstance(AppSelector.this).sendBroadcast(new Intent("startRestoreFromExtraBackups"));
                 finish();
