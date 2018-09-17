@@ -32,6 +32,16 @@
             android:id="@+id/extra_backup_progress_head_progress"
             />
 
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/do_not_close"
+            android:padding="@dimen/large_padding_width"
+            android:drawableStart="@drawable/ic_warning"
+            android:drawablePadding="@dimen/large_padding_width"
+            />
+
     </LinearLayout>
 
     <ScrollView
@@ -81,10 +91,89 @@
                     android:id="@+id/extra_backup_progress_item_contacts_done"
                     />
 
+                <ImageView
+                    android:layout_width="@dimen/extra_item_done_wh"
+                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:src="@drawable/ic_item_cancel"
+                    android:id="@+id/extra_backup_progress_item_contacts_cancel"
+                    />
+
                 <ProgressBar
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
                     android:id="@+id/extra_backup_progress_item_contacts_progress"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="@dimen/small_padding_width"
+                android:background="@color/listItem"
+                android:id="@+id/extra_backup_progress_item_sms"
+                android:padding="@dimen/small_padding_width"
+                android:visibility="gone"
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    >
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_sms_icon"
+                        android:padding="15dp"
+                        />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sms"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:layout_margin="@dimen/large_padding_width"
+                        />
+
+                    <ImageView
+                        android:layout_width="@dimen/extra_item_done_wh"
+                        android:layout_height="@dimen/extra_item_done_wh"
+                        android:src="@drawable/ic_item_done"
+                        android:id="@+id/extra_backup_progress_item_sms_done"
+                        />
+
+
+                    <ImageView
+                        android:layout_width="@dimen/extra_item_done_wh"
+                        android:layout_height="@dimen/extra_item_done_wh"
+                        android:src="@drawable/ic_item_cancel"
+                        android:id="@+id/extra_backup_progress_item_sms_cancel"
+                        />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:layout_gravity="end"
+                    android:paddingStart="@dimen/large_padding_width"
+                    android:paddingEnd="@dimen/large_padding_width"
+                    android:textColor="@color/colorAccent"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:id="@+id/extra_backup_progress_item_sms_progress_in_words"
+                    />
+
+                <ProgressBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:id="@+id/extra_backup_progress_item_sms_progress"
                     />
 
             </LinearLayout>

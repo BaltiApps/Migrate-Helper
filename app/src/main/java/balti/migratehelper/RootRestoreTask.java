@@ -19,6 +19,7 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.Vector;
 
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
@@ -39,6 +40,7 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
     private NotificationCompat.Builder progress;
 
     private Intent restoreIntent;
+    private Intent activityIntent;
 
     int numberOfAppJobs;
 
@@ -49,7 +51,6 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
     private long startMillis;
     private long endMillis;
     private String installScriptPath, restoreDataScriptPath;
-    private boolean restoreExtras = true;
 
     static int totalCount = 0;
     private String statusHead = "helper status: ";
@@ -61,14 +62,14 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
     static int ON_FINISH_NOTIFICATION_ID = 101;
     UIDClass uidClass;
 
-    RootRestoreTask(Context context, long startMillis, String installScriptPath, String restoreDataScriptPath, boolean restoreExtras) {
+    RootRestoreTask(Context context, long startMillis, String installScriptPath, String restoreDataScriptPath) {
         this.context = context;
         this.startMillis = startMillis;
         this.installScriptPath = installScriptPath;
         this.restoreDataScriptPath = restoreDataScriptPath;
-        this.restoreExtras = restoreExtras;
         errors = "";
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
+        activityIntent = new Intent(context, ProgressActivity.class);
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         uidClass = new UIDClass(context);
@@ -84,7 +85,6 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
         int processResult = SUCCESS;
 
         Vector<JSONObject> jsonObjects = getJsonFromDataPackets[0].jsonAppPackets;
-
 
         if (getJsonFromDataPackets[0].jsonAppPackets.size() > 0) {
             Process restoreProcess;
@@ -191,7 +191,10 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
             progress = new NotificationCompat.Builder(context, "PROGRESS");
         else progress = new NotificationCompat.Builder(context);
 
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 101, activityIntent, 0);
+
         progress.setSmallIcon(R.drawable.ic_notification_icon);
+        progress.setContentIntent(pendingIntent);
         notificationManager.cancel(ON_FINISH_NOTIFICATION_ID);
     }
 
@@ -203,6 +206,9 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
         restoreIntent.putExtra("c", (int)values[0]);
         restoreIntent.putExtra("n", (int)values[1]);
         restoreIntent.putExtra("message", (String)values[3]);
+
+        activityIntent.putExtras(Objects.requireNonNull(restoreIntent.getExtras()));
+
         LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);
 
         String status = (String)values[2];
@@ -241,6 +247,9 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
                     .setContentText(errors)
                     .setProgress(0, 0, false);
         }
+
+        activityIntent.putExtras(Objects.requireNonNull(restoreIntent.getExtras()));
+
         LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);
 
         notificationManager.notify(ON_FINISH_NOTIFICATION_ID, progress.build());

@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#222222</color>
     <color name="colorAccent">#2c9d94</color>
     <color name="listItem">#9b222222</color>
+    <color name="cancelRed">#d50000</color>
 </resources>

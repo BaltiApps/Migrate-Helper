@@ -56,8 +56,24 @@
     <string name="restore_contacts_dialog_header">Restore contacts</string>
     <string name="proceed">Proceed</string>
 
+    <!--ExtraBackupsProgress.java-->
+    <string name="do_not_close">Please do not press back/home/recents or close this app.</string>
+    <string name="smsPermission">Sms permission needed</string>
+    <string name="smsPermission_desc">Please allow this app to be default sms app temporarily.\n<b>You will be prompted to change to the original sms app after restoration</b></string>
+
+    <!--RestoreA_DB.java-->
+    <string name="done">Done!</string>
+
+    <!--SmsBroadcastReceiver.java-->
+    <!--MmsBroadcastReceiver.java-->
+    <string name="new_sms_received">New sms received! Please change to your default messaging app.</string>
+
+    <!--ComposeSmsActivity.java-->
+    <string name="please_change_sms_app">\"Migrate helper\" is not meant to be used as an sms app. Please change the default sms app</string>
+
     <!--extra_backups_progress.xml-->
     <string name="contacts">Contacts</string>
+    <string name="sms">SMS messages</string>
     <string name="applications">Applications</string>
 
     <!--contacts_dialog_view.xml-->

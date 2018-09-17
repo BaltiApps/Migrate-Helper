@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
@@ -17,17 +19,25 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Objects;
 
-public class ExtraBackupsProgress extends AppCompatActivity {
+public class ExtraBackupsProgress extends AppCompatActivity implements OnDBRestoreComplete {
 
     TextView headTitle;
     ProgressBar headProgressBar;
 
-    LinearLayout contacts;
-    ImageView contactsDone;
+    LinearLayout contactsView;
+    ImageView contactsDone, contactsCancel;
     ProgressBar contactsProgress;
+
+    LinearLayout smsView;
+    ImageView smsDone, smsCancel;
+    ProgressBar smsProgress;
+    TextView smsStatusText;
 
     LinearLayout applications;
 
@@ -43,6 +53,7 @@ public class ExtraBackupsProgress extends AppCompatActivity {
     static boolean extraSelectBoolean;
 
     static boolean isShowContacts = false;
+    static boolean isShowSms = false;
 
     BroadcastReceiver startRestoreFromExtraBackups;
 
@@ -51,6 +62,13 @@ public class ExtraBackupsProgress extends AppCompatActivity {
 
     ContactsPacket contactsPackets[];
     int contactCount = 0;
+
+    SmsPacket smsPacket[];
+    AlertDialog smsPermissionDialog;
+    String actualDefaultSmsAppName = "";
+    int SET_THIS_AS_DEFAULT_SMS_APP = 2;
+    int SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP = 3;
+    int SMS_RESTORE_JOB = 20;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,9 +79,16 @@ public class ExtraBackupsProgress extends AppCompatActivity {
         headTitle = findViewById(R.id.extra_backup_progress_title);
         headProgressBar = findViewById(R.id.extra_backup_progress_head_progress);
 
-        contacts = findViewById(R.id.extra_backup_progress_item_contacts);
+        contactsView = findViewById(R.id.extra_backup_progress_item_contacts);
         contactsProgress = findViewById(R.id.extra_backup_progress_item_contacts_progress);
         contactsDone = findViewById(R.id.extra_backup_progress_item_contacts_done);
+        contactsCancel = findViewById(R.id.extra_backup_progress_item_contacts_cancel);
+
+        smsView = findViewById(R.id.extra_backup_progress_item_sms);
+        smsProgress = findViewById(R.id.extra_backup_progress_item_sms_progress);
+        smsStatusText = findViewById(R.id.extra_backup_progress_item_sms_progress_in_words);
+        smsDone = findViewById(R.id.extra_backup_progress_item_sms_done);
+        smsCancel = findViewById(R.id.extra_backup_progress_item_sms_cancel);
 
         applications = findViewById(R.id.extra_backup_progress_item_applications);
 
@@ -106,9 +131,17 @@ public class ExtraBackupsProgress extends AppCompatActivity {
                     break;
                 }
             }
+
+            for (SmsPacket sp : getJsonFromDataPackets.smsPackets) {
+                if (isShowSms = sp.selected) {
+                    totalTasks++;
+                    break;
+                }
+            }
         }
         else {
             isShowContacts = false;
+            isShowSms = false;
         }
 
         if (numberOfApps > 0) totalTasks++;
@@ -124,7 +157,7 @@ public class ExtraBackupsProgress extends AppCompatActivity {
 
         startService(new Intent(this, RestoreService.class));
 
-        RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(this, timeInMillis(), installScriptPath, restoreDataScriptPath, extraSelectBoolean);
+        RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(this, timeInMillis(), installScriptPath, restoreDataScriptPath);
         RestoreService.ROOT_RESTORE_TASK.setNumberOfAppJobs(numberOfApps);
         RestoreService.ROOT_RESTORE_TASK.execute(getJsonFromDataPackets);
     }
@@ -134,13 +167,16 @@ public class ExtraBackupsProgress extends AppCompatActivity {
         try {
 
             headProgressBar.setMax(totalTasks);
+
             contactsPackets = getJsonFromDataPackets.contactPackets;
+            smsPacket = getJsonFromDataPackets.smsPackets;
 
             if (numberOfApps > 0) applications.setVisibility(View.VISIBLE);
 
             if (extraSelectBoolean) {
 
-                if (isShowContacts) contacts.setVisibility(View.VISIBLE);
+                if (isShowContacts) contactsView.setVisibility(View.VISIBLE);
+                if (isShowSms) smsView.setVisibility(View.VISIBLE);
 
                 restoreContacts();
             }
@@ -153,15 +189,6 @@ public class ExtraBackupsProgress extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == CONTACTS_RESTORE){
-            nextContact();
-        }
-    }
-
     private void restoreContacts() {
 
         if (isShowContacts) {
@@ -171,6 +198,7 @@ public class ExtraBackupsProgress extends AppCompatActivity {
 
             contactsProgress.setVisibility(View.VISIBLE);
             contactsDone.setVisibility(View.GONE);
+            contactsCancel.setVisibility(View.GONE);
 
             View contactsView = View.inflate(this, R.layout.contacts_dialog_view, null);
             LinearLayout holder = contactsView.findViewById(R.id.contact_files_display_holder);
@@ -194,16 +222,23 @@ public class ExtraBackupsProgress extends AppCompatActivity {
                     .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            // next process
+                            // next process 0
 
                             contactsProgress.setVisibility(View.GONE);
-                            contactsDone.setVisibility(View.VISIBLE);
+                            contactsDone.setVisibility(View.GONE);
+                            contactsCancel.setVisibility(View.VISIBLE);
 
-                            triggerRootRestoreTask();
+                            restoreSms();
                         }
                     })
                     .setCancelable(false)
                     .show();
+        }
+        else {
+
+            // next process 0
+
+            restoreSms();
         }
     }
 
@@ -222,13 +257,141 @@ public class ExtraBackupsProgress extends AppCompatActivity {
         }
         if (j >= contactsPackets.length){
 
-            // next process
+            // next process 0
 
             contactsProgress.setVisibility(View.GONE);
             contactsDone.setVisibility(View.VISIBLE);
+            contactsCancel.setVisibility(View.GONE);
+
+            restoreSms();
+        }
+    }
+
+    private void restoreSms(){
+
+        if (isShowSms){
+
+            headProgressBar.setProgress(++intProgressTask);
+            headTitle.setText(R.string.sms);
+
+            smsProgress.setVisibility(View.VISIBLE);
+            smsDone.setVisibility(View.GONE);
+            smsCancel.setVisibility(View.GONE);
+
+            smsPermissionDialog = new AlertDialog.Builder(this)
+                    .setTitle(R.string.smsPermission)
+                    .setMessage(getText(R.string.smsPermission_desc))
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (!Telephony.Sms.getDefaultSmsPackage(ExtraBackupsProgress.this).equals(getPackageName())){
+                                actualDefaultSmsAppName = Telephony.Sms.getDefaultSmsPackage(ExtraBackupsProgress.this);
+                                setDefaultSms(getPackageName(), SET_THIS_AS_DEFAULT_SMS_APP);
+                            }
+                            else {
+                                nextSms();
+                            }
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // next process 1
+
+                            smsProgress.setVisibility(View.GONE);
+                            smsDone.setVisibility(View.GONE);
+                            smsCancel.setVisibility(View.VISIBLE);
+
+                            triggerRootRestoreTask();
+
+                        }
+                    })
+                    .setCancelable(false)
+                    .create();
+
+
+            if (!Telephony.Sms.getDefaultSmsPackage(this).equals(getPackageName()))
+                smsPermissionDialog.show();
+            else nextSms();
+        }
+        else {
+
+            // next process 1
 
             triggerRootRestoreTask();
+
         }
+
+    }
+
+    private void setDefaultSms(String packageName, int requestCode){
+        Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
+        intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName);
+        startActivityForResult(intent, requestCode);
+    }
+
+    private void nextSms(){
+
+        int j;
+        List<File> acceptedFiles = new ArrayList<>(0);
+
+        if (!Telephony.Sms.getDefaultSmsPackage(ExtraBackupsProgress.this).equals(getPackageName())) {
+            smsPermissionDialog.show();
+            return;
+        }
+
+        for (j = 0; j < smsPacket.length; j++) {
+            SmsPacket packet = smsPacket[j];
+            if (packet.selected) {
+                acceptedFiles.add(packet.smsDBFile);
+            }
+        }
+
+        String projection[] = new String[]{
+                "smsAddress",
+                "smsBody",
+                "smsType",
+                "smsDate",
+                "smsDateSent",
+                "smsCreator",
+                "smsPerson",
+                "smsProtocol",
+                "smsSeen",
+                "smsServiceCenter",
+                "smsStatus",
+                "smsSubject",
+                "smsThreadId",
+                "smsError",
+                "smsRead",
+                "smsLocked",
+                "smsReplyPathPresent"
+        };
+
+        String mirror[][] = new String[][]{
+                {Telephony.Sms.ADDRESS, "s"},
+                {Telephony.Sms.BODY, "s"},
+                {Telephony.Sms.TYPE, "s"},
+                {Telephony.Sms.DATE, "s"},
+                {Telephony.Sms.DATE_SENT, "s"},
+                {Telephony.Sms.CREATOR, "s"},
+                {Telephony.Sms.PERSON, "s"},
+                {Telephony.Sms.PROTOCOL, "s"},
+                {Telephony.Sms.SEEN, "s"},
+                {Telephony.Sms.SERVICE_CENTER, "s"},
+                {Telephony.Sms.STATUS, "s"},
+                {Telephony.Sms.SUBJECT, "s"},
+
+                {Telephony.Sms.ERROR_CODE, "i"},
+                {Telephony.Sms.READ, "i"},
+                {Telephony.Sms.LOCKED, "i"},
+                {Telephony.Sms.REPLY_PATH_PRESENT, "i"}
+        };
+
+        String tableName = "sms";
+        Uri uri = Telephony.Sms.CONTENT_URI;
+
+        RestoreA_DB restoreA_DB = new RestoreA_DB(acceptedFiles, projection, mirror, smsProgress, smsStatusText, tableName, uri, this, SMS_RESTORE_JOB);
+        restoreA_DB.execute();
     }
 
     long timeInMillis(){
@@ -246,5 +409,35 @@ public class ExtraBackupsProgress extends AppCompatActivity {
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(startRestoreFromExtraBackups);
         }catch (Exception ignored){}
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CONTACTS_RESTORE){
+            nextContact();
+        }
+        else if (requestCode == SET_THIS_AS_DEFAULT_SMS_APP){
+            nextSms();
+        }
+        else if (requestCode == SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP) {
+            triggerRootRestoreTask();
+        }
+    }
+
+
+    @Override
+    public void onDBRestoreComplete(int code) {
+        if (code == SMS_RESTORE_JOB){
+            // next process 1
+
+            setDefaultSms(actualDefaultSmsAppName, SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP);
+
+            smsProgress.setVisibility(View.GONE);
+            smsDone.setVisibility(View.VISIBLE);
+            smsCancel.setVisibility(View.GONE);
+        }
     }
 }

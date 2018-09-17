@@ -179,7 +179,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 if (mainGetJsonFromDataPackets.jsonAppPackets.size() > 0)
                 appList.setAdapter(adapter);
 
-                if (mainGetJsonFromDataPackets.contactPackets.length != 0){
+                if (mainGetJsonFromDataPackets.contactPackets.length != 0 || mainGetJsonFromDataPackets.smsPackets.length != 0){
                     extrasBar.setVisibility(View.VISIBLE);
                     extrasSelect.setChecked(true);
                     extrasBar.setOnClickListener(new View.OnClickListener() {
@@ -240,10 +240,12 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         GetJsonFromDataPackets getJsonFromDataPackets;
         ContactsPacket[] contactsPackets;
+        SmsPacket[] smsPackets;
 
         public ExtrasUpdate(GetJsonFromDataPackets getJsonFromDataPackets) {
             this.getJsonFromDataPackets = getJsonFromDataPackets;
             contactsPackets = getJsonFromDataPackets.contactPackets;
+            smsPackets = getJsonFromDataPackets.smsPackets;
         }
 
         @Override
@@ -267,7 +269,10 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         protected Object doInBackground(Object[] objects) {
 
             ContactsPacket[] tempContactPackets = new ContactsPacket[contactsPackets.length];
-            ArrayList<View> items = new ArrayList<>(0);
+            ArrayList<View> contactsViewItems = new ArrayList<>(0);
+
+            SmsPacket[] tempSmsPackets = new SmsPacket[smsPackets.length];
+            ArrayList<View> smsViewItems = new ArrayList<>(0);
 
             for (int j = 0; j < contactsPackets.length; j++){
                 tempContactPackets[j] = new ContactsPacket(contactsPackets[j].vcfFile, contactsPackets[j].selected);
@@ -281,20 +286,25 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 TextView tv = cView.findViewById(R.id.extra_item_name);
                 tv.setText(packet.vcfFile.getName());
 
-                CheckBox cb = cView.findViewById(R.id.extras_item_select);
-                cb.setChecked(packet.selected);
-
-                cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        packet.selected = b;
-                    }
-                });
-
-                items.add(cView);
+                contactsViewItems.add(cView);
             }
 
-            return new Object[]{tempContactPackets, items};
+            for (int j = 0; j < smsPackets.length; j++){
+                tempSmsPackets[j] = new SmsPacket(smsPackets[j].smsDBFile, smsPackets[j].selected);
+            }
+
+            for (final SmsPacket packet : tempSmsPackets){
+                View sView = View.inflate(AppSelector.this, R.layout.extra_item, null);
+                ImageView icon = sView.findViewById(R.id.extra_item_icon);
+                icon.setImageResource(R.drawable.ic_sms_icon);
+
+                TextView tv = sView.findViewById(R.id.extra_item_name);
+                tv.setText(packet.smsDBFile.getName());
+
+                smsViewItems.add(sView);
+            }
+
+            return new Object[]{tempContactPackets, contactsViewItems, tempSmsPackets, smsViewItems};
         }
 
         @Override
@@ -307,8 +317,42 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             Object received[] = (Object[])o;
 
             final ContactsPacket[] tempContactPackets = (ContactsPacket[])received[0];
-            for (View v : (ArrayList<View>)received[1])
+            ArrayList<View> contactViews = (ArrayList<View>)received[1];
+            for (int i = 0; i < contactViews.size(); i++) {
+                View v = contactViews.get(i);
+
+                CheckBox cb = v.findViewById(R.id.extras_item_select);
+                cb.setChecked(tempContactPackets[i].selected);
+
+                final int finalI = i;
+                cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        tempContactPackets[finalI].selected = b;
+                    }
+                });
+
                 holder.addView(v);
+            }
+
+            final SmsPacket[] tempSmsPackets = (SmsPacket[])received[2];
+            ArrayList<View> smsViews = (ArrayList<View>)received[3];
+            for (int i = 0; i < smsViews.size(); i++) {
+                View v = smsViews.get(i);
+
+                CheckBox cb = v.findViewById(R.id.extras_item_select);
+                cb.setChecked(tempSmsPackets[i].selected);
+
+                final int finalI = i;
+                cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        tempSmsPackets[finalI].selected = b;
+                    }
+                });
+
+                holder.addView(v);
+            }
 
             holder.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
@@ -320,18 +364,37 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 @Override
                 public void onClick(View view) {
 
-                    if (contactsPackets.length == 0)
+                    if (contactsPackets.length == 0 && smsPackets.length == 0)
                         return;
 
-                    boolean anyContact = tempContactPackets[0].selected;
+                    boolean anyContact;
+                    boolean anySms;
 
-                    for (int j = 0; j < contactsPackets.length; j++) {
-                        contactsPackets[j].selected = tempContactPackets[j].selected;
-                        contactsPackets[j].vcfFile = tempContactPackets[j].vcfFile;
-                        anyContact = anyContact || contactsPackets[j].selected;
+                    if (tempContactPackets.length > 0) {
+                         anyContact= tempContactPackets[0].selected;
+                        for (int j = 0; j < contactsPackets.length; j++) {
+                            contactsPackets[j].selected = tempContactPackets[j].selected;
+                            contactsPackets[j].vcfFile = tempContactPackets[j].vcfFile;
+                            anyContact = anyContact || contactsPackets[j].selected;
+                        }
+                    }
+                    else {
+                        anyContact = false;
                     }
 
-                    extrasSelect.setChecked(anyContact);
+                    if (tempSmsPackets.length > 0) {
+                        anySms= tempSmsPackets[0].selected;
+                        for (int j = 0; j < smsPackets.length; j++) {
+                            smsPackets[j].selected = tempSmsPackets[j].selected;
+                            smsPackets[j].smsDBFile = tempSmsPackets[j].smsDBFile;
+                            anySms = anySms || smsPackets[j].selected;
+                        }
+                    }
+                    else {
+                        anySms = false;
+                    }
+
+                    extrasSelect.setChecked(anyContact || anySms);
                     ad.dismiss();
                 }
             });
@@ -415,7 +478,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             @Override
             public void onReceive(Context context, Intent intent) {
                 try {
-                    Runtime.getRuntime().exec("su -c rm -rf " + TEMP_DIR_NAME + "/*.vcf");
+                    Runtime.getRuntime().exec("su -c rm -rf " + TEMP_DIR_NAME + "/*.vcf" + " " + TEMP_DIR_NAME + "/*.sms.db");
                 } catch (IOException ignored) {}
                 ExtraBackupsProgress.setData(mainGetJsonFromDataPackets, numberOfApps, installScriptPath, restoreDataScriptPath, extraSelectBoolean);
                 LocalBroadcastManager.getInstance(AppSelector.this).sendBroadcast(new Intent("startRestoreFromExtraBackups"));
@@ -484,6 +547,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "mkdir -p " + mtdDirName + "\n" +
                 "cp " + TEMP_DIR_NAME + "/*.json " + mtdDirName + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/*.vcf " + mtdDirName + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/*.sms.db " + mtdDirName + " 2>/dev/null\n" +
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
 
@@ -538,9 +602,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         }
 
         Vector<JSONObject> appData = getJsonFromDataPackets.jsonAppPackets;
-        ContactsPacket[] contactsPackets = getJsonFromDataPackets.contactPackets;
 
-        if (contactsPackets.length == 0 && appData.size() == 0){
+        if (getJsonFromDataPackets.contactPackets.length == 0 && getJsonFromDataPackets.smsPackets.length == 0 && appData.size() == 0){
             showError(getString(R.string.nothing_to_restore), getString(R.string.no_metadata_found));
             return;
         }
