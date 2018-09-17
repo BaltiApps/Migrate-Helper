@@ -59,7 +59,9 @@
     <!--ExtraBackupsProgress.java-->
     <string name="do_not_close">Please do not press back/home/recents or close this app.</string>
     <string name="smsPermission">Sms permission needed</string>
-    <string name="smsPermission_desc">Please allow this app to be default sms app temporarily.\n<b>You will be prompted to change to the original sms app after restoration</b></string>
+    <string name="smsPermission_desc">Please allow this app to be default sms app temporarily.\n<b>You will be prompted to change to the original sms app after restoration</b>
+    \n\nAfter opening Messages app, <b><u>please wait for a few seconds</u></b> for the app to read all restored the messages.
+    </string>
 
     <!--RestoreA_DB.java-->
     <string name="done">Done!</string>

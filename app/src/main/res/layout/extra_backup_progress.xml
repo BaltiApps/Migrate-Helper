@@ -89,6 +89,7 @@
                     android:layout_height="@dimen/extra_item_done_wh"
                     android:src="@drawable/ic_item_done"
                     android:id="@+id/extra_backup_progress_item_contacts_done"
+                    android:visibility="gone"
                     />
 
                 <ImageView
@@ -96,12 +97,14 @@
                     android:layout_height="@dimen/extra_item_done_wh"
                     android:src="@drawable/ic_item_cancel"
                     android:id="@+id/extra_backup_progress_item_contacts_cancel"
+                    android:visibility="gone"
                     />
 
                 <ProgressBar
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
                     android:id="@+id/extra_backup_progress_item_contacts_progress"
+                    android:visibility="gone"
                     />
 
             </LinearLayout>
@@ -145,6 +148,7 @@
                         android:layout_height="@dimen/extra_item_done_wh"
                         android:src="@drawable/ic_item_done"
                         android:id="@+id/extra_backup_progress_item_sms_done"
+                        android:visibility="gone"
                         />
 
 
@@ -153,6 +157,7 @@
                         android:layout_height="@dimen/extra_item_done_wh"
                         android:src="@drawable/ic_item_cancel"
                         android:id="@+id/extra_backup_progress_item_sms_cancel"
+                        android:visibility="gone"
                         />
 
                 </LinearLayout>
@@ -208,7 +213,9 @@
 
                 <ProgressBar
                     android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh" />
+                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:visibility="gone"
+                    />
 
             </LinearLayout>
 
