@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -75,6 +76,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.extra_backup_progress);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         headTitle = findViewById(R.id.extra_backup_progress_title);
         headProgressBar = findViewById(R.id.extra_backup_progress_head_progress);
