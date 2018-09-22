@@ -157,7 +157,7 @@ public class AppListAdapter extends BaseAdapter {
                         app.setEnabled(false);
                     }
                     else {
-                        app.setEnabled(true);
+                        if (!apkName.equals("NULL")) app.setEnabled(true);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

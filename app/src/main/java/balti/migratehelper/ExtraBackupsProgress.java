@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.provider.Telephony;
@@ -26,11 +27,18 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
+import java.util.Vector;
+
+import static balti.migratehelper.GetJsonFromData.APP_CHECK;
+import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
 
 public class ExtraBackupsProgress extends AppCompatActivity implements OnDBRestoreComplete {
 
@@ -52,6 +60,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     TextView callsStatusText;
 
     LinearLayout applications;
+    ImageView appsDone;
+    ProgressBar appsProgress;
+    TextView appsStatusText;
 
     static int totalTasks = 0;
     static int intProgressTask = 0;
@@ -117,6 +128,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         callsCancel = findViewById(R.id.extra_backup_progress_item_calls_cancel);
 
         applications = findViewById(R.id.extra_backup_progress_item_applications);
+        appsProgress = findViewById(R.id.extra_backup_progress_item_app_progress);
+        appsStatusText = findViewById(R.id.extra_backup_progress_item_app_progress_in_words);
+        appsDone = findViewById(R.id.extra_backup_progress_item_app_done);
 
         progressReceiver = new BroadcastReceiver() {
             @Override
@@ -184,16 +198,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
     void triggerRootRestoreTask(){
 
-        if (numberOfApps > 0) {
-            headTitle.setText(R.string.applications);
-            headProgressBar.setProgress(++intProgressTask);
-        }
+        new FilterAcceptedApps().execute();
 
-        startService(new Intent(this, RestoreService.class));
-
-        RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(this, timeInMillis(), installScriptPath, restoreDataScriptPath);
-        RestoreService.ROOT_RESTORE_TASK.setNumberOfAppJobs(numberOfApps);
-        RestoreService.ROOT_RESTORE_TASK.execute(getJsonFromDataPackets);
     }
 
     void triggerRestoreProcessStart(){
@@ -590,6 +596,79 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             triggerRootRestoreTask();
 
+        }
+    }
+
+    class FilterAcceptedApps extends AsyncTask{
+
+        int n = 0;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            appsProgress.setIndeterminate(true);
+
+            n = getJsonFromDataPackets.jsonAppPackets.size();
+
+            if (n > 0) {
+                headTitle.setText(R.string.applications);
+                headProgressBar.setProgress(++intProgressTask);
+
+                appsProgress.setVisibility(View.VISIBLE);
+                appsStatusText.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+
+            if (n == 0)
+                return null;
+            else
+                appsProgress.setIndeterminate(false);
+
+            Vector<JSONObject> jsonObjects = getJsonFromDataPackets.jsonAppPackets;
+
+            appsProgress.setMax(jsonObjects.size());
+
+            for (int j = 0, c = 1; j < jsonObjects.size(); j++, c++){
+                JSONObject jsonObject = jsonObjects.get(j);
+                try {
+                    if (!(jsonObject.getBoolean(APP_CHECK) || jsonObject.getBoolean(DATA_CHECK))){
+                        jsonObjects.remove(jsonObject);
+                        j--;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                publishProgress(c);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Object[] values) {
+            super.onProgressUpdate(values);
+            appsProgress.setProgress((int)values[0]);
+            appsStatusText.setText(getString(R.string.filtering) + " " + (int)values[0] + "/" + n);
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            if (n > 0){
+                appsDone.setVisibility(View.VISIBLE);
+                appsStatusText.setText(R.string.done);
+            }
+
+            startService(new Intent(ExtraBackupsProgress.this, RestoreService.class));
+
+            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, timeInMillis(), installScriptPath, restoreDataScriptPath);
+            RestoreService.ROOT_RESTORE_TASK.setNumberOfAppJobs(numberOfApps);
+            RestoreService.ROOT_RESTORE_TASK.execute(getJsonFromDataPackets);
         }
     }
 }

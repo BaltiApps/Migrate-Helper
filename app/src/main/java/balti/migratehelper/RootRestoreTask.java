@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Calendar;
@@ -226,6 +227,12 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
         String totalTime = "(" + calendarDifference(startMillis, endMillis) + ")";
 
         super.onPostExecute(o);
+
+        try {
+            Runtime.getRuntime().exec("su -c rm -rf " + TEMP_DIR_NAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         if ( o == SUCCESS) {
 
