@@ -24,9 +24,9 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
     static String APP_CHECK = "APP_CHECK";
     static String DATA_CHECK = "DATA_CHECK";
 
-    FileFilter jsonFilter, vcfFilter, smsDBFilter;
+    private FileFilter jsonFilter, vcfFilter, smsDBFilter, callsDBFilter;
 
-    String error;
+    private String error;
 
     GetJsonFromData(Context context, final String metadataExtension, TextView statusDisplayView){
         this.context = context;
@@ -59,6 +59,13 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
             @Override
             public boolean accept(File file) {
                 return file.getName().endsWith(".sms.db");
+            }
+        };
+
+        callsDBFilter = new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.getName().endsWith(".calls.db");
             }
         };
     }
@@ -104,7 +111,16 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
             error = error + e.getMessage() + "\n";
         }
 
-        return new GetJsonFromDataPackets(jsonObjects, vcfFiles, smsFiles);
+        File[] callsFiles = new File[0];
+        try {
+            callsFiles = new File(directoryPath[0]).listFiles(callsDBFilter);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            error = error + e.getMessage() + "\n";
+        }
+
+        return new GetJsonFromDataPackets(jsonObjects, vcfFiles, smsFiles, callsFiles);
     }
 
     @Override

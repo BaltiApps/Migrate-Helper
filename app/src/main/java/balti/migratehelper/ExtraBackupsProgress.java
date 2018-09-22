@@ -1,14 +1,20 @@
 package balti.migratehelper;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CallLog;
 import android.provider.Telephony;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -40,6 +46,11 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     ProgressBar smsProgress;
     TextView smsStatusText;
 
+    LinearLayout callsView;
+    ImageView callsDone, callsCancel;
+    ProgressBar callsProgress;
+    TextView callsStatusText;
+
     LinearLayout applications;
 
     static int totalTasks = 0;
@@ -55,6 +66,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
     static boolean isShowContacts = false;
     static boolean isShowSms = false;
+    static boolean isShowCalls = false;
 
     BroadcastReceiver startRestoreFromExtraBackups;
 
@@ -70,6 +82,11 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     int SET_THIS_AS_DEFAULT_SMS_APP = 2;
     int SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP = 3;
     int SMS_RESTORE_JOB = 20;
+
+    CallsPacket callsPackets[];
+    AlertDialog callsPermissionDialog;
+    int CALLS_PERMISSION_REQUEST = 4;
+    int CALLS_RESTORE_JOB = 40;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,6 +109,12 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         smsStatusText = findViewById(R.id.extra_backup_progress_item_sms_progress_in_words);
         smsDone = findViewById(R.id.extra_backup_progress_item_sms_done);
         smsCancel = findViewById(R.id.extra_backup_progress_item_sms_cancel);
+
+        callsView = findViewById(R.id.extra_backup_progress_item_calls);
+        callsProgress = findViewById(R.id.extra_backup_progress_item_calls_progress);
+        callsStatusText = findViewById(R.id.extra_backup_progress_item_calls_progress_in_words);
+        callsDone = findViewById(R.id.extra_backup_progress_item_calls_done);
+        callsCancel = findViewById(R.id.extra_backup_progress_item_calls_cancel);
 
         applications = findViewById(R.id.extra_backup_progress_item_applications);
 
@@ -141,10 +164,18 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     break;
                 }
             }
+
+            for (CallsPacket clp : getJsonFromDataPackets.callsPackets){
+                if (isShowCalls = clp.selected) {
+                    totalTasks++;
+                    break;
+                }
+            }
         }
         else {
             isShowContacts = false;
             isShowSms = false;
+            isShowCalls = false;
         }
 
         if (numberOfApps > 0) totalTasks++;
@@ -173,6 +204,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             contactsPackets = getJsonFromDataPackets.contactPackets;
             smsPacket = getJsonFromDataPackets.smsPackets;
+            callsPackets = getJsonFromDataPackets.callsPackets;
 
             if (numberOfApps > 0) applications.setVisibility(View.VISIBLE);
 
@@ -180,6 +212,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                 if (isShowContacts) contactsView.setVisibility(View.VISIBLE);
                 if (isShowSms) smsView.setVisibility(View.VISIBLE);
+                if (isShowCalls) callsView.setVisibility(View.VISIBLE);
 
                 restoreContacts();
             }
@@ -200,8 +233,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             headTitle.setText(R.string.contacts);
 
             contactsProgress.setVisibility(View.VISIBLE);
-            contactsDone.setVisibility(View.GONE);
-            contactsCancel.setVisibility(View.GONE);
 
             View contactsView = View.inflate(this, R.layout.contacts_dialog_view, null);
             LinearLayout holder = contactsView.findViewById(R.id.contact_files_display_holder);
@@ -277,10 +308,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             headProgressBar.setProgress(++intProgressTask);
             headTitle.setText(R.string.sms);
 
-            smsProgress.setVisibility(View.VISIBLE);
-            smsDone.setVisibility(View.GONE);
-            smsCancel.setVisibility(View.GONE);
-
             smsPermissionDialog = new AlertDialog.Builder(this)
                     .setTitle(R.string.smsPermission)
                     .setMessage(getText(R.string.smsPermission_desc))
@@ -301,11 +328,10 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                         public void onClick(DialogInterface dialogInterface, int i) {
                             // next process 1
 
-                            smsProgress.setVisibility(View.GONE);
                             smsDone.setVisibility(View.GONE);
                             smsCancel.setVisibility(View.VISIBLE);
 
-                            triggerRootRestoreTask();
+                            restoreCalls();
 
                         }
                     })
@@ -321,7 +347,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             // next process 1
 
-            triggerRootRestoreTask();
+            restoreCalls();
 
         }
 
@@ -397,6 +423,113 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         restoreA_DB.execute();
     }
 
+    private void restoreCalls(){
+
+        if (isShowCalls) {
+
+            headProgressBar.setProgress(++intProgressTask);
+            headTitle.setText(R.string.calls);
+
+            callsPermissionDialog = new AlertDialog.Builder(this)
+                    .setTitle(R.string.callsPermission)
+                    .setMessage(getText(R.string.callsPermission_desc))
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (ContextCompat.checkSelfPermission(ExtraBackupsProgress.this, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED){
+                                ActivityCompat.requestPermissions(ExtraBackupsProgress.this, new String[]{Manifest.permission.WRITE_CALL_LOG}, CALLS_PERMISSION_REQUEST);
+                            }
+                            else {
+                                nextCalls();
+                            }
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // next process 2
+
+                            callsDone.setVisibility(View.GONE);
+                            callsCancel.setVisibility(View.VISIBLE);
+
+                            triggerRootRestoreTask();
+
+                        }
+                    })
+                    .setCancelable(false)
+                    .create();
+
+            if (ContextCompat.checkSelfPermission(ExtraBackupsProgress.this, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED)
+                callsPermissionDialog.show();
+            else nextCalls();
+        }
+        else {
+
+            // next process 2
+
+            triggerRootRestoreTask();
+
+        }
+
+    }
+
+    private void nextCalls(){
+
+        int j;
+        List<File> acceptedFiles = new ArrayList<>(0);
+
+        if (ContextCompat.checkSelfPermission(ExtraBackupsProgress.this, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+            callsPermissionDialog.show();
+            return;
+        }
+
+        for (j = 0; j < callsPackets.length; j++) {
+            CallsPacket packet = callsPackets[j];
+            if (packet.selected) {
+                acceptedFiles.add(packet.callsDBFile);
+            }
+        }
+
+        String projection[] = new String[]{
+                "callsCountryIso",
+                "callsDataUsage",
+                "callsFeatures",
+                "callsGeocodedLocation",
+                "callsIsRead",
+                "callsNumber",
+                "callsNumberPresentation",
+                "callsPhoneAccountComponentName",
+                "callsType",
+                "callsVoicemailUri",
+                "callsDate",
+                "callsDuration",
+                "callsNew"
+        };
+
+        String mirror[][] = new String[][]{
+                {CallLog.Calls.COUNTRY_ISO, "s"},
+                {CallLog.Calls.DATA_USAGE, "s"},
+                {CallLog.Calls.FEATURES, "s"},
+                {CallLog.Calls.GEOCODED_LOCATION, "s"},
+                {CallLog.Calls.IS_READ, "s"},
+                {CallLog.Calls.NUMBER, "s"},
+                {CallLog.Calls.NUMBER_PRESENTATION, "s"},
+                {CallLog.Calls.PHONE_ACCOUNT_COMPONENT_NAME, "s"},
+                {CallLog.Calls.TYPE, "s"},
+                {CallLog.Calls.VOICEMAIL_URI, "s"},
+
+                {CallLog.Calls.DATE, "l"},
+                {CallLog.Calls.DURATION, "l"},
+                {CallLog.Calls.NEW, "i"}
+        };
+
+        String tableName = "calls";
+        Uri uri = CallLog.Calls.CONTENT_URI;
+
+        RestoreA_DB restoreA_DB = new RestoreA_DB(acceptedFiles, projection, mirror, callsProgress, callsStatusText, tableName, uri, this, CALLS_RESTORE_JOB);
+        restoreA_DB.execute();
+    }
+
     long timeInMillis(){
         Calendar calendar = Calendar.getInstance();
         return calendar.getTimeInMillis();
@@ -414,6 +547,13 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         }catch (Exception ignored){}
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CALLS_PERMISSION_REQUEST){
+            nextCalls();
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -426,7 +566,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             nextSms();
         }
         else if (requestCode == SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP) {
-            triggerRootRestoreTask();
+            restoreCalls();
         }
     }
 
@@ -436,11 +576,20 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         if (code == SMS_RESTORE_JOB){
             // next process 1
 
-            setDefaultSms(actualDefaultSmsAppName, SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP);
-
-            smsProgress.setVisibility(View.GONE);
             smsDone.setVisibility(View.VISIBLE);
             smsCancel.setVisibility(View.GONE);
+
+            setDefaultSms(actualDefaultSmsAppName, SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP);
+
+        }
+        else if (code == CALLS_RESTORE_JOB){
+            // next process 2
+
+            callsDone.setVisibility(View.VISIBLE);
+            callsCancel.setVisibility(View.GONE);
+
+            triggerRootRestoreTask();
+
         }
     }
 }

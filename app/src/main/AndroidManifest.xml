@@ -103,5 +103,6 @@
     <uses-permission-sdk-23 android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.WRITE_SMS"/>
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG"/>
 
 </manifest>
