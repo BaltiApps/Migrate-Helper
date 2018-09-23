@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -553,9 +554,13 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
     private void unpackBinaries(){
 
-        busyboxBinaryFilePath = unpackAssetToInternal("busybox", "busybox");
-        installScriptPath = unpackAssetToInternal("installScript.sh", "installScript.sh");
-        restoreDataScriptPath = unpackAssetToInternal("restoreDataScript.sh", "restoreDataScript.sh");
+        final String cpu_abi = Build.SUPPORTED_ABIS[0];
+
+        if (cpu_abi.equals("armeabi-v7a")) {
+            busyboxBinaryFilePath = unpackAssetToInternal("busybox", "busybox");
+            installScriptPath = unpackAssetToInternal("installScript.sh", "installScript.sh");
+            restoreDataScriptPath = unpackAssetToInternal("restoreDataScript.sh", "restoreDataScript.sh");
+        }
 
     }
 

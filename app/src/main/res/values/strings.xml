@@ -18,6 +18,11 @@
     If you are rooted: reflash the backup zip file.
     </string>
     <string name="goAhead">Go ahead</string>
+    <string name="unsupported_device">Unsupported device.</string>
+    <string name="cpu_arch_is">Your CPU arch is:</string>
+    <string name="currently_supported_cpu">Only <b>armeabi-v7a</b> CPU architectures are currently supported. Please contact via mail to help support your device.</string>
+    <string name="select_mail">Select mailing app, example Gmail.</string>
+    <string name="contact">Contact by email</string>
 
     <!--ProgressActivity.java-->
     <string name="please_wait">Please wait</string>
