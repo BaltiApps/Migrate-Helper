@@ -29,6 +29,7 @@
 
     <!--progress.xml-->
     <string name="close">CLOSE</string>
+    <string name="minimize">Minimize</string>
 
     <!--RootRestoreTask.java-->
     <string name="finished">Finished!</string>

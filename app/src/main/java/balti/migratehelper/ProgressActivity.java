@@ -121,7 +121,8 @@ public class ProgressActivity extends AppCompatActivity {
                 messageView.append("\n\n" + lastMsg);
             }
             messageHead.setTextColor(Color.RED);
-            close.setVisibility(View.VISIBLE);
+
+            close.setText(R.string.close);
         }
         else if (action.startsWith(getString(R.string.finished))){
 
@@ -133,7 +134,9 @@ public class ProgressActivity extends AppCompatActivity {
                 lastMsg = msg;
                 messageView.append("\n\n" + lastMsg);
             }
+
             okOnFinish.setVisibility(View.VISIBLE);
+            close.setVisibility(View.GONE);
         }
         else {
             String d[] = action.split(" ");
