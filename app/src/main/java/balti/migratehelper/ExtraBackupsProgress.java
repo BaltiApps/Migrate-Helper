@@ -99,6 +99,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     int CALLS_PERMISSION_REQUEST = 4;
     int CALLS_RESTORE_JOB = 40;
 
+    long startTime = 0;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,6 +207,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     void triggerRestoreProcessStart(){
 
         try {
+
+            startTime = timeInMillis();
 
             headProgressBar.setMax(totalTasks);
 
@@ -666,7 +670,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             startService(new Intent(ExtraBackupsProgress.this, RestoreService.class));
 
-            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, timeInMillis(), installScriptPath, restoreDataScriptPath);
+            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, startTime, installScriptPath, restoreDataScriptPath);
             RestoreService.ROOT_RESTORE_TASK.setNumberOfAppJobs(numberOfApps);
             RestoreService.ROOT_RESTORE_TASK.execute(getJsonFromDataPackets);
         }

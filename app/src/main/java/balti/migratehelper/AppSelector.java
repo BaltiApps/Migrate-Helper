@@ -103,7 +103,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             waitingMessageDesc.setText(R.string.initMessageShort);
 
             actionButton.setText(android.R.string.cancel);
-            actionButton.setBackground(getDrawable(R.drawable.ic_cancel_button));
+            actionButton.setBackground(getDrawable(R.drawable.cancel_root_request));
             actionButton.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,0);
             actionButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -556,7 +556,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         final String cpu_abi = Build.SUPPORTED_ABIS[0];
 
-        if (cpu_abi.equals("armeabi-v7a")) {
+        if (cpu_abi.equals("armeabi-v7a") || cpu_abi.equals("arm64-v8a")) {
             busyboxBinaryFilePath = unpackAssetToInternal("busybox", "busybox");
             installScriptPath = unpackAssetToInternal("installScript.sh", "installScript.sh");
             restoreDataScriptPath = unpackAssetToInternal("restoreDataScript.sh", "restoreDataScript.sh");

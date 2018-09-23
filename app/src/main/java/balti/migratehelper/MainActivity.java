@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
         final String cpu_abi = Build.SUPPORTED_ABIS[0];
 
-        if (!(cpu_abi.equals("armeabi-v7a"))){
+        if (!(cpu_abi.equals("armeabi-v7a") || cpu_abi.equals("arm64-v8a"))){
 
 
             new AlertDialog.Builder(this)

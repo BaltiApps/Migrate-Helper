@@ -111,6 +111,9 @@ public class ProgressActivity extends AppCompatActivity {
         catch (Exception e){ e.printStackTrace(); }
 
         if (action.startsWith(getString(R.string.finished_with_errors))){
+
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
             icon.setImageResource(R.drawable.ic_error);
             messageHead.setText(action);
             if (!lastMsg.equals(msg)) {
@@ -121,6 +124,9 @@ public class ProgressActivity extends AppCompatActivity {
             close.setVisibility(View.VISIBLE);
         }
         else if (action.startsWith(getString(R.string.finished))){
+
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
             icon.setImageResource(R.drawable.ic_finished);
             messageHead.setText(action);
             if (!lastMsg.equals(msg)) {

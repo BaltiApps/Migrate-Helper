@@ -254,7 +254,7 @@
             android:layout_height="@dimen/button_height"
             android:layout_alignParentEnd="true"
             android:padding="@dimen/large_padding_width"
-            android:background="@drawable/next"
+            android:background="@drawable/cancel_root_request"
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"
