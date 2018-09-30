@@ -35,6 +35,7 @@
     <string name="finished">Finished!</string>
     <string name="finished_with_errors">Finished with errors!</string>
     <string name="uninstall_prompt">Click OK to uninstall this app</string>
+    <string name="making_script">Making script</string>
 
     <!--app_selector.xml-->
     <string name="select_apps">Select what to restore</string>

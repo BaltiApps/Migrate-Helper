@@ -261,6 +261,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:id="@+id/restore_selected"
             android:textColor="@android:color/white"
+            android:textAllCaps="true"
             />
 
         <ImageButton

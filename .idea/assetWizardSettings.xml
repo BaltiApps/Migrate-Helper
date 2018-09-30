@@ -111,7 +111,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/home/sayantan/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/notification/ic_phone_in_talk_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/home/sayantan/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_description_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -122,11 +122,9 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="2c9d94" />
-                            <entry key="height" value="40" />
-                            <entry key="outputName" value="ic_call_log_icon" />
+                            <entry key="outputName" value="ic_making_script" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="$PROJECT_DIR$/app/src/main/res/drawable-nodpi/normal_button.svg" />
-                            <entry key="width" value="40" />
                           </map>
                         </option>
                       </PersistentState>

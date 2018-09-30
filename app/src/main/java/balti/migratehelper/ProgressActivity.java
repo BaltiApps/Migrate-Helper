@@ -46,6 +46,8 @@ public class ProgressActivity extends AppCompatActivity {
 
     String lastMsg = "";
 
+    SetAppIcon setAppIcon;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,53 +105,79 @@ public class ProgressActivity extends AppCompatActivity {
     void handleProgress(Intent intent){
 
         messageHead.setTextColor(getResources().getColor(R.color.colorAccent));
-        String msg = "";
         try {
-            msg = intent.getStringExtra("message");
-            action = intent.getStringExtra("job");
+            action = intent.getStringExtra("type");
         }
         catch (Exception e){ e.printStackTrace(); }
 
-        if (action.startsWith(getString(R.string.finished_with_errors))){
+        if (action.equals("finishedErrors")){
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+            try {
+                setAppIcon.cancel(true);
+            } catch (Exception ignored){}
+
             icon.setImageResource(R.drawable.ic_error);
-            messageHead.setText(action);
-            if (!lastMsg.equals(msg)) {
-                lastMsg = msg;
-                messageView.append("\n\n" + lastMsg);
-            }
+            messageHead.setText(intent.getStringExtra("head"));
+
+            if (intent.hasExtra("total_time"))
+                messageHead.append("\n(" + intent.getStringExtra("total_time") + ")");
+
             messageHead.setTextColor(Color.RED);
+
+            appendLog("log", intent);
 
             close.setText(R.string.close);
         }
-        else if (action.startsWith(getString(R.string.finished))){
+        else if (action.equals("finishedOk")){
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+            try {
+                setAppIcon.cancel(true);
+            } catch (Exception ignored){}
+
             icon.setImageResource(R.drawable.ic_finished);
-            messageHead.setText(action);
-            if (!lastMsg.equals(msg)) {
-                lastMsg = msg;
-                messageView.append("\n\n" + lastMsg);
-            }
+            messageHead.setText(intent.getStringExtra("head"));
+
+            if (intent.hasExtra("total_time"))
+                messageHead.append("\n(" + intent.getStringExtra("total_time") + ")");
+
+            appendLog("log", intent);
 
             okOnFinish.setVisibility(View.VISIBLE);
             close.setVisibility(View.GONE);
-        }
-        else {
-            String d[] = action.split(" ");
-            String status = d[0];
-            String icon = d[1];
-            messageHead.setText(status);
-            new SetAppIcon(this.icon).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, icon.trim());
-            progressBar.setMax(intent.getIntExtra("n", 0));
-            updateProgress(intent.getIntExtra("c", 0));
 
-            if (!msg.equals("") && !lastMsg.equals(msg)) {
+            updateProgress(progressBar.getMax());
+        }
+        else if (action.equals("restoring_app")) {
+
+            String head = intent.getStringExtra("head");
+            String icon = intent.getStringExtra("icon");
+            messageHead.setText(head);
+            progressBar.setMax(intent.getIntExtra("n", 0));
+            updateProgress(intent.getIntExtra("p", 0));
+
+            appendLog("log", intent);
+
+            try {
+                setAppIcon.cancel(true);
+            } catch (Exception ignored){}
+            setAppIcon = new SetAppIcon(this.icon);
+            setAppIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, icon.trim());
+        }
+    }
+
+    void appendLog(String key, Intent intent){
+
+        if (intent.hasExtra(key)) {
+            String msg = intent.getStringExtra(key);
+            if (!lastMsg.equals(msg)) {
                 lastMsg = msg;
-                messageView.append(msg + "\n");
+                if (lastMsg.equals(getString(R.string.uninstall_prompt)))
+                    messageView.append("\n\n" + lastMsg + "\n");
+                else messageView.append(lastMsg + "\n");
             }
         }
     }

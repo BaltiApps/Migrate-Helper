@@ -30,15 +30,21 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 
+import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
+import static balti.migratehelper.RootRestoreTask.DISPLAY_HEAD;
+import static balti.migratehelper.RootRestoreTask.INSTALLING_HEAD;
+import static balti.migratehelper.RootRestoreTask.RESTORE_DATA_HEAD;
 
 public class ExtraBackupsProgress extends AppCompatActivity implements OnDBRestoreComplete {
 
@@ -606,6 +612,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     class FilterAcceptedApps extends AsyncTask{
 
         int n = 0;
+        UIDClass uidClass;
 
         @Override
         protected void onPreExecute() {
@@ -622,6 +629,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 appsProgress.setVisibility(View.VISIBLE);
                 appsStatusText.setVisibility(View.VISIBLE);
             }
+
+            uidClass = new UIDClass(ExtraBackupsProgress.this);
         }
 
         @Override
@@ -636,43 +645,94 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             appsProgress.setMax(jsonObjects.size());
 
-            for (int j = 0, c = 1; j < jsonObjects.size(); j++, c++){
+            for (int j = 0, c = 1; j < jsonObjects.size(); j++, c++) {
                 JSONObject jsonObject = jsonObjects.get(j);
                 try {
-                    if (!(jsonObject.getBoolean(APP_CHECK) || jsonObject.getBoolean(DATA_CHECK))){
+                    if (!(jsonObject.getBoolean(APP_CHECK) || jsonObject.getBoolean(DATA_CHECK))) {
                         jsonObjects.remove(jsonObject);
                         j--;
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                publishProgress(c);
+                publishProgress(getString(R.string.filtering), c, n);
             }
 
-            return null;
+            File restoreScript = new File(getFilesDir(), "restoreAppScript.sh");
+
+            BufferedWriter scriptWriter = null;
+
+            try {
+                scriptWriter = new BufferedWriter(new FileWriter(restoreScript));
+
+                for (int i = 0; i < jsonObjects.size(); i++) {
+
+                    JSONObject jsonObject = jsonObjects.get(i);
+
+                    publishProgress(getString(R.string.making_script), i, numberOfApps);
+
+                    String appName = jsonObject.getString("app_name");
+                    String apkName = jsonObject.getString("apk");
+                    String dataName = jsonObject.getString("data");
+                    String packageName = jsonObject.getString("package_name");
+                    String icon = jsonObject.getString("icon");
+
+                    boolean isApp = jsonObject.getBoolean(APP_CHECK) && !apkName.equals("NULL");
+                    boolean isData = jsonObject.getBoolean(DATA_CHECK) && !dataName.equals("NULL");
+
+                    String command = "";
+
+                    if (!isApp && !isData)
+                        continue;
+
+                    command += "echo " + DISPLAY_HEAD + appName + " " + icon + "\n";
+
+                    if (isApp) {
+                        command += "echo " + INSTALLING_HEAD + apkName + "\n";
+                        command += "sh " + installScriptPath + " " + TEMP_DIR_NAME + " " + apkName + "\n";
+                    }
+                    if (isData) {
+                        command += "echo " + RESTORE_DATA_HEAD + apkName + "\n";
+                        command += "sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + dataName + " " + packageName + " " + uidClass.getUid(packageName) + "\n";
+                    }
+
+                    command += "echo  " + "\n";
+
+                    scriptWriter.write(command);
+                }
+
+                scriptWriter.close();
+                restoreScript.setExecutable(true);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return restoreScript;
         }
 
         @Override
         protected void onProgressUpdate(Object[] values) {
             super.onProgressUpdate(values);
-            appsProgress.setProgress((int)values[0]);
-            appsStatusText.setText(getString(R.string.filtering) + " " + (int)values[0] + "/" + n);
+            appsProgress.setProgress((int)values[1]);
+            appsProgress.setProgress((int)values[2]);
+            appsStatusText.setText(values[0] + " " + values[1] + "/" + values[2]);
         }
 
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
 
-            if (n > 0){
+            if (n > 0) {
                 appsDone.setVisibility(View.VISIBLE);
-                appsStatusText.setText(R.string.done);
+                appsStatusText.setText(R.string.please_wait);
+                appsProgress.setIndeterminate(true);
             }
 
             startService(new Intent(ExtraBackupsProgress.this, RestoreService.class));
 
-            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, startTime, installScriptPath, restoreDataScriptPath);
-            RestoreService.ROOT_RESTORE_TASK.setNumberOfAppJobs(numberOfApps);
-            RestoreService.ROOT_RESTORE_TASK.execute(getJsonFromDataPackets);
+            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, startTime, installScriptPath, restoreDataScriptPath, numberOfApps);
+            RestoreService.ROOT_RESTORE_TASK.execute((File)o);
         }
     }
 }

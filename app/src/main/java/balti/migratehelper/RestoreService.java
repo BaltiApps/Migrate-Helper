@@ -42,7 +42,7 @@ public class RestoreService extends Service {
             public void onReceive(Context context, Intent intent) {
                 returnIntent = intent;
                 try {
-                    if (intent.getStringExtra("job").startsWith(context.getString(R.string.finished)) || intent.getStringExtra("job").startsWith(context.getString(R.string.finished_with_errors))) {
+                    if (intent.getStringExtra("type").equals("finishedOk") || intent.getStringExtra("type").equals("finishedErrors")) {
                         stopSelf();
                     }
                 } catch (Exception e){ e.printStackTrace();}

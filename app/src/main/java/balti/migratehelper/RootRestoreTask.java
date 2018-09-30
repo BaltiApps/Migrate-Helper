@@ -11,21 +11,14 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Calendar;
 import java.util.Objects;
-import java.util.Vector;
 
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
-import static balti.migratehelper.GetJsonFromData.APP_CHECK;
-import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
 
 ;
 
@@ -33,7 +26,7 @@ import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
  * Created by sayantan on 23/10/17.
  */
 
-public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, Integer> {
+public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
     private Context context;
     private String errors;
@@ -53,21 +46,22 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
     private long endMillis;
     private String installScriptPath, restoreDataScriptPath;
 
-    static int totalCount = 0;
-    private String statusHead = "helper status: ";
-    private String installedStatusHead = "installed status: ";
-    private String restoreDataHead = "Restoring data: ";
     static String METADATA_FILE_FIELD = "metadata_file";
     static String METADATA_FILE_NAME = "metadata_file_name";
 
     static int ON_FINISH_NOTIFICATION_ID = 101;
     UIDClass uidClass;
 
-    RootRestoreTask(Context context, long startMillis, String installScriptPath, String restoreDataScriptPath) {
+    static String DISPLAY_HEAD = "display head: ";
+    static String INSTALLING_HEAD = "Installing app: ";
+    static String RESTORE_DATA_HEAD = "Restoring data: ";
+
+    RootRestoreTask(Context context, long startMillis, String installScriptPath, String restoreDataScriptPath, int numberOfAppJobs) {
         this.context = context;
         this.startMillis = startMillis;
         this.installScriptPath = installScriptPath;
         this.restoreDataScriptPath = restoreDataScriptPath;
+        this.numberOfAppJobs = numberOfAppJobs;
         errors = "";
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
         activityIntent = new Intent(context, ProgressActivity.class);
@@ -76,105 +70,52 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
         uidClass = new UIDClass(context);
     }
 
-    public void setNumberOfAppJobs(int numberOfAppJobs) {
-        this.numberOfAppJobs = numberOfAppJobs;
-    }
 
     @Override
-    protected Integer doInBackground(GetJsonFromDataPackets... getJsonFromDataPackets) {
+    protected Integer doInBackground(File... files) {
 
-        int processResult = SUCCESS;
+        File restoreScript = files[0];
 
-        Vector<JSONObject> jsonObjects = getJsonFromDataPackets[0].jsonAppPackets;
+        try {
+            Process restoreProcess = Runtime.getRuntime().exec("su -c sh " + restoreScript.getAbsolutePath());
+            BufferedReader outputReader = new BufferedReader(new InputStreamReader(restoreProcess.getInputStream()));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(restoreProcess.getErrorStream()));
 
-        if (getJsonFromDataPackets[0].jsonAppPackets.size() > 0) {
-            Process restoreProcess;
-
-            try {
-                restoreProcess = Runtime.getRuntime().exec("su");
-                BufferedWriter inputWriter = new BufferedWriter(new OutputStreamWriter(restoreProcess.getOutputStream()));
-                BufferedReader outputReader = new BufferedReader(new InputStreamReader(restoreProcess.getInputStream()));
-                BufferedReader errorReader = new BufferedReader(new InputStreamReader(restoreProcess.getErrorStream()));
-
-                String line;
-
-                int c = 0;
-                String status = "";
-
-
-                String command = getNextCommand(jsonObjects);
-
-                inputWriter.write(command);
-                inputWriter.flush();
-
-
-                while ((line = outputReader.readLine()) != null) {
-                    if (line.startsWith(statusHead)) {
-                        c++;
-                        status = line.substring(statusHead.length());
-                        String apkName = jsonObjects.get(totalCount).getString("apk");
-                        boolean appCheck = jsonObjects.get(totalCount).getBoolean(APP_CHECK);
-                        if (appCheck) {
-                            if (!apkName.equals("NULL"))
-                                line = "Installing: " + apkName;
-                            else line = "Skipping installation: " + status;
-
-                            publishProgress(c, numberOfAppJobs, status, line);
-                        }
-                    } else if (line.startsWith(installedStatusHead)) {
-
-                        String data = jsonObjects.get(totalCount).getString("data");
-                        String packageName = jsonObjects.get(totalCount).getString("package_name");
-                        int uid = uidClass.getUid(packageName);
-
-                        boolean dataCheck = jsonObjects.get(totalCount).getBoolean(DATA_CHECK);
-                        if (!data.equals("NULL") && uid != -1 && dataCheck) {
-                            inputWriter.write("echo \"" + restoreDataHead + data + "\"\n");
-                            inputWriter.write("sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + data + " " + packageName + " " + uid + "\n");
-                            inputWriter.flush();
-                            line = "";
-                        } else line = "\n";
-
-                        inputWriter.write("rm " + jsonObjects.get(totalCount).getString(METADATA_FILE_FIELD) + "\n");
-                        inputWriter.write("rm " + TEMP_DIR_NAME + "/" + jsonObjects.get(totalCount).getString(METADATA_FILE_NAME) + "\n");
-                        inputWriter.flush();
-
-                        if (totalCount < numberOfAppJobs - 1) {
-                            totalCount++;
-                            inputWriter.write(getNextCommand(jsonObjects));
-                            inputWriter.flush();
-                        } else {
-                            inputWriter.write("exit\n");
-                            inputWriter.flush();
-                        }
-
-                        publishProgress(c, numberOfAppJobs, status, line);
-                    } else if (line.startsWith(restoreDataHead)) {
-                        line = line + "\n\n";
-                        publishProgress(c, numberOfAppJobs, status, line);
+            String line;
+            int c = -1;
+            String head = "", icon = "";
+            while ((line = outputReader.readLine()) != null) {
+                if (line.startsWith(DISPLAY_HEAD)) {
+                    c++;
+                    head = line.substring(DISPLAY_HEAD.length()).trim();
+                    if (head.contains(" ")) {
+                        icon = head.split(" ")[1];
+                        head = head.split(" ")[0];
                     }
-
                 }
-                while ((line = errorReader.readLine()) != null) {
-                    String lowerLine = line.toLowerCase().trim();
-                    if (lowerLine.startsWith("selinux"))
-                        continue;
-                    errors = errors + line + "\n";
+                else {
+                    publishProgress("restoring_app", c, numberOfAppJobs, head, line, icon);
                 }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                processResult = CODE_ERROR;
             }
+
+            while ((line = errorReader.readLine()) != null) {
+                String lowerLine = line.toLowerCase().trim();
+                if (lowerLine.startsWith("selinux"))
+                    continue;
+                errors = errors + line + "\n";
+            }
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            errors = errors + e.getMessage() + "\n";
+            return CODE_ERROR;
         }
 
-        if (errors.equals("")) {
-            processResult = SUCCESS;
-        }
-        else if (processResult != CODE_ERROR)
-            processResult = EXECUTION_ERROR;
+        if (errors.equals(""))
+            return SUCCESS;
+        else return EXECUTION_ERROR;
 
-        return processResult;
     }
 
     @Override
@@ -192,39 +133,43 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
             progress = new NotificationCompat.Builder(context, "PROGRESS");
         else progress = new NotificationCompat.Builder(context);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 101, activityIntent, 0);
-
         progress.setSmallIcon(R.drawable.ic_notification_icon);
-        progress.setContentIntent(pendingIntent);
+        progress.setContentIntent(PendingIntent.getActivity(context, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT));
         notificationManager.cancel(ON_FINISH_NOTIFICATION_ID);
+
     }
 
 
     @Override
     protected void onProgressUpdate(Object... values) {
         super.onProgressUpdate(values);
-        restoreIntent.putExtra("job", (String)values[2]);
-        restoreIntent.putExtra("c", (int)values[0]);
-        restoreIntent.putExtra("n", (int)values[1]);
-        restoreIntent.putExtra("message", (String)values[3]);
+
+        int p, max;
+        String head;
+
+        restoreIntent.putExtra("type", (String) values[0]);
+        restoreIntent.putExtra("p", p = (int) values[1]);
+        restoreIntent.putExtra("n", max = (int) values[2]);
+        restoreIntent.putExtra("head", head = (String) values[3]);
+        restoreIntent.putExtra("log", (String) values[4]);
+        restoreIntent.putExtra("icon", (String) values[5]);
 
         activityIntent.putExtras(Objects.requireNonNull(restoreIntent.getExtras()));
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);
 
-        String status = (String)values[2];
-        if (status.contains(" "))
-            status = status.substring(0, status.lastIndexOf(' '));
-        progress.setProgress((int)values[1], (int)values[0], false)
-                .setContentTitle(status);
+        progress.setProgress(max, p, false)
+                .setContentIntent(PendingIntent.getActivity(context, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContentTitle(head);
         notificationManager.notify(RestoreService.RESTORE_SERVICE_NOTIFICATION_ID, progress.build());
+
     }
 
     @Override
     protected void onPostExecute(Integer o) {
 
         endMillis = timeInMillis();
-        String totalTime = "(" + calendarDifference(startMillis, endMillis) + ")";
+        String totalTime = calendarDifference(startMillis, endMillis);
 
         super.onPostExecute(o);
 
@@ -238,37 +183,47 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
 
             Toast.makeText(context, context.getString(R.string.finished), Toast.LENGTH_SHORT).show();
 
-            restoreIntent.putExtra("message", context.getString(R.string.uninstall_prompt));
-            restoreIntent.putExtra("job", context.getString(R.string.finished) + "\n" + totalTime);
+            restoreIntent.putExtra("type", "finishedOk");
+            restoreIntent.putExtra("log", context.getString(R.string.uninstall_prompt));
+            restoreIntent.putExtra("head", context.getString(R.string.finished) );
+            restoreIntent.putExtra("total_time", totalTime);
 
-            progress.setContentIntent(PendingIntent.getActivity(context, 1, new Intent(context, ProgressActivity.class).putExtra("job", context.getString(R.string.finished)), 0))
+            activityIntent.putExtras(restoreIntent);
+
+            progress.setContentIntent(PendingIntent.getActivity(context, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                     .setContentTitle(context.getString(R.string.finished))
                     .setProgress(0, 0, false);
         }
         else {
             Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
-            restoreIntent.putExtra("message", errors + "\n" + context.getString(R.string.failed) + " " + o);
-            restoreIntent.putExtra("job", context.getString(R.string.finished_with_errors) + "\n" + totalTime);
-            progress.setContentIntent(PendingIntent.getActivity(context, 20, new Intent(context, ProgressActivity.class).putExtra("job", context.getString(R.string.finished_with_errors)).putExtra("message", errors + "\n" + context.getString(R.string.failed) + " " + o), 0))
-                    .setContentTitle(context.getString(R.string.failed))
+
+            restoreIntent.putExtra("type", "finishedErrors");
+            restoreIntent.putExtra("log", errors + "\n" + context.getString(R.string.failed) + " " + o);
+            restoreIntent.putExtra("head", context.getString(R.string.finished_with_errors));
+            restoreIntent.putExtra("total_time", totalTime);
+
+            activityIntent.putExtras(restoreIntent);
+
+            progress.setContentIntent(PendingIntent.getActivity(context, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentTitle(context.getString(R.string.finished_with_errors))
                     .setContentText(errors)
                     .setProgress(0, 0, false);
         }
-
-        activityIntent.putExtras(Objects.requireNonNull(restoreIntent.getExtras()));
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);
 
         notificationManager.notify(ON_FINISH_NOTIFICATION_ID, progress.build());
     }
 
-    String getNextCommand(Vector<JSONObject> jsonObjects) throws JSONException {
+    /*String getNextCommand(Vector<JSONObject> jsonObjects) throws JSONException {
 
         JSONObject jsonObject = jsonObjects.get(totalCount);
         String appName = jsonObject.getString("app_name");
         String packageName = jsonObject.getString("package_name");
         String apkName = jsonObject.getString("apk");
         String icon = jsonObject.getString("icon");
+
+        Log.d("migrate_helper", jsonObject.getString("app_name") + " " + jsonObject.getBoolean(APP_CHECK) + " " + jsonObject.getBoolean(DATA_CHECK));
 
         String command = "echo \"" + statusHead + appName + " " + icon + "\"\n";
 
@@ -279,7 +234,7 @@ public class RootRestoreTask extends AsyncTask<GetJsonFromDataPackets, Object, I
         command += "echo \"" + installedStatusHead + packageName + "\"\n";
 
         return command;
-    }
+    }*/
 
     long timeInMillis(){
         Calendar calendar = Calendar.getInstance();
