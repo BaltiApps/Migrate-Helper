@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.Objects;
 
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
+import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 
 ;
 
@@ -123,14 +124,14 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         super.onPreExecute();
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel progressChannel = new NotificationChannel("PROGRESS", "Permission restore progress", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel progressChannel = new NotificationChannel(PROGRESS_CHANNEL, PROGRESS_CHANNEL, NotificationManager.IMPORTANCE_LOW);
             progressChannel.setSound(null, null);
             assert notificationManager != null;
             notificationManager.createNotificationChannel(progressChannel);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            progress = new NotificationCompat.Builder(context, "PROGRESS");
+            progress = new NotificationCompat.Builder(context, PROGRESS_CHANNEL);
         else progress = new NotificationCompat.Builder(context);
 
         progress.setSmallIcon(R.drawable.ic_notification_icon);

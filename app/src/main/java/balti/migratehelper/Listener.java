@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.widget.Toast;
 
 /**
  * Created by sayantan on 21/10/17.
@@ -17,13 +16,16 @@ import android.widget.Toast;
 
 public class Listener extends BroadcastReceiver {
 
+    static String PROGRESS_CHANNEL = "App restore progress";
+    static String INIT_CHANNEL = "Initial progress";
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            NotificationChannel initialNotifChannel = new NotificationChannel("FIXER", "App restored notification", NotificationManager.IMPORTANCE_HIGH);
-            NotificationChannel progressChannel = new NotificationChannel("PROGRESS", "Permission restore progress", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel initialNotifChannel = new NotificationChannel(INIT_CHANNEL, INIT_CHANNEL, NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel progressChannel = new NotificationChannel(PROGRESS_CHANNEL, PROGRESS_CHANNEL, NotificationManager.IMPORTANCE_LOW);
             progressChannel.setSound(null, null);
             assert notificationManager != null;
             notificationManager.createNotificationChannel(initialNotifChannel);

@@ -11,6 +11,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
+import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
+
 /**
  * Created by sayantan on 27/10/17.
  */
@@ -66,7 +68,7 @@ public class RestoreService extends Service {
 
         NotificationCompat.Builder dummy;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            dummy = new NotificationCompat.Builder(this, "PROGRESS");
+            dummy = new NotificationCompat.Builder(this, PROGRESS_CHANNEL);
         }
         else {
             dummy = new NotificationCompat.Builder(this);

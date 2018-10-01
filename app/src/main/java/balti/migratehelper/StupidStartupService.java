@@ -11,6 +11,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
+import static balti.migratehelper.Listener.INIT_CHANNEL;
+
 /**
  * Created by sayantan on 23/10/17.
  */
@@ -34,10 +36,10 @@ public class StupidStartupService extends Service {
 
         NotificationCompat.Builder notification;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel initialNotifChannel = new NotificationChannel("FIXER", "App restored notification", NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel initialNotifChannel = new NotificationChannel(INIT_CHANNEL, INIT_CHANNEL, NotificationManager.IMPORTANCE_HIGH);
             assert notificationManager != null;
             notificationManager.createNotificationChannel(initialNotifChannel);
-            notification = new NotificationCompat.Builder(context, "FIXER");
+            notification = new NotificationCompat.Builder(context, INIT_CHANNEL);
         }
         else {
             notification = new NotificationCompat.Builder(context);
