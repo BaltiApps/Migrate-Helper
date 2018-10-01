@@ -612,7 +612,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     class FilterAcceptedApps extends AsyncTask{
 
         int n = 0;
-        UIDClass uidClass;
 
         @Override
         protected void onPreExecute() {
@@ -629,8 +628,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 appsProgress.setVisibility(View.VISIBLE);
                 appsStatusText.setVisibility(View.VISIBLE);
             }
-
-            uidClass = new UIDClass(ExtraBackupsProgress.this);
         }
 
         @Override
@@ -693,7 +690,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     }
                     if (isData) {
                         command += "echo " + RESTORE_DATA_HEAD + apkName + "\n";
-                        command += "sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + dataName + " " + packageName + " " + uidClass.getUid(packageName) + "\n";
+                        command += "sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + dataName + " " + packageName + "\n";
                     }
 
                     command += "echo  " + "\n";

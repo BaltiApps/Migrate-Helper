@@ -51,7 +51,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     static String METADATA_FILE_NAME = "metadata_file_name";
 
     static int ON_FINISH_NOTIFICATION_ID = 101;
-    UIDClass uidClass;
 
     static String DISPLAY_HEAD = "display head: ";
     static String INSTALLING_HEAD = "Installing app: ";
@@ -67,8 +66,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
         activityIntent = new Intent(context, ProgressActivity.class);
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        uidClass = new UIDClass(context);
     }
 
 
