@@ -34,7 +34,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
@@ -104,8 +103,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     AlertDialog callsPermissionDialog;
     int CALLS_PERMISSION_REQUEST = 4;
     int CALLS_RESTORE_JOB = 40;
-
-    long startTime = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -214,8 +211,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
         try {
 
-            startTime = timeInMillis();
-
             headProgressBar.setMax(totalTasks);
 
             contactsPackets = getJsonFromDataPackets.contactPackets;
@@ -295,13 +290,20 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     private void nextContact(){
         int j;
         for (j = contactCount; j < contactsPackets.length; j++) {
+
             ContactsPacket packet = contactsPackets[j];
             if (packet.selected) {
                 contactCount = j+1;
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setDataAndType(FileProvider.getUriForFile(ExtraBackupsProgress.this, "migrate.helper.provider", packet.vcfFile), "text/x-vcard");
-                i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivityForResult(i, CONTACTS_RESTORE);
+                try {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setDataAndType(FileProvider.getUriForFile(ExtraBackupsProgress.this, "migrate.helper.provider", packet.vcfFile), "text/x-vcard");
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivityForResult(i, CONTACTS_RESTORE);
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+
                 return;
             }
         }
@@ -546,11 +548,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         restoreA_DB.execute();
     }
 
-    long timeInMillis(){
-        Calendar calendar = Calendar.getInstance();
-        return calendar.getTimeInMillis();
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -576,6 +573,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == CONTACTS_RESTORE){
+
             nextContact();
         }
         else if (requestCode == SET_THIS_AS_DEFAULT_SMS_APP){
@@ -612,6 +610,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     class FilterAcceptedApps extends AsyncTask{
 
         int n = 0;
+        boolean isContactAppPresent = false;
 
         @Override
         protected void onPreExecute() {
@@ -657,7 +656,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             File restoreScript = new File(getFilesDir(), "restoreAppScript.sh");
 
-            BufferedWriter scriptWriter = null;
+            BufferedWriter scriptWriter;
 
             try {
                 scriptWriter = new BufferedWriter(new FileWriter(restoreScript));
@@ -679,8 +678,12 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                     String command = "";
 
+
                     if (!isApp && !isData)
                         continue;
+
+                    if (packageName.equals("com.google.android.contacts") || packageName.equals("com.android.contacts"))
+                        isContactAppPresent = true;
 
                     command += "echo " + DISPLAY_HEAD + appName + " " + icon + "\n";
 
@@ -728,7 +731,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             startService(new Intent(ExtraBackupsProgress.this, RestoreService.class));
 
-            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, startTime, installScriptPath, restoreDataScriptPath, numberOfApps);
+            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, numberOfApps, isContactAppPresent);
             RestoreService.ROOT_RESTORE_TASK.execute((File)o);
         }
     }

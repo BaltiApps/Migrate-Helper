@@ -12,16 +12,18 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Calendar;
 import java.util.Objects;
 
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
 import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 
-;
+
 
 /**
  * Created by sayantan on 23/10/17.
@@ -45,7 +47,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
     private long startMillis;
     private long endMillis;
-    private String installScriptPath, restoreDataScriptPath;
 
     static String METADATA_FILE_FIELD = "metadata_file";
     static String METADATA_FILE_NAME = "metadata_file_name";
@@ -56,23 +57,95 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     static String INSTALLING_HEAD = "Installing app: ";
     static String RESTORE_DATA_HEAD = "Restoring data: ";
 
-    RootRestoreTask(Context context, long startMillis, String installScriptPath, String restoreDataScriptPath, int numberOfAppJobs) {
+    private boolean isContactAppPresent;
+
+    private Process suProcessForVcfCheck;
+    private BufferedWriter suProcessForVcfCheckWriter;
+    private BufferedReader suProcessForVcfCheckReader;
+
+    RootRestoreTask(Context context, int numberOfAppJobs, boolean isContactAppPresent) {
+
         this.context = context;
-        this.startMillis = startMillis;
-        this.installScriptPath = installScriptPath;
-        this.restoreDataScriptPath = restoreDataScriptPath;
         this.numberOfAppJobs = numberOfAppJobs;
+        this.isContactAppPresent = isContactAppPresent;
+
         errors = "";
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
         activityIntent = new Intent(context, ProgressActivity.class);
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        try {
+            suProcessForVcfCheck = Runtime.getRuntime().exec("su");
+            suProcessForVcfCheckWriter = new BufferedWriter(new OutputStreamWriter(suProcessForVcfCheck.getOutputStream()));
+            suProcessForVcfCheckReader = new BufferedReader(new InputStreamReader(suProcessForVcfCheck.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    boolean isVcfBeingRead(){
+
+        if (suProcessForVcfCheck == null) return false;
+
+        String command1 = "dumpsys activity services | grep com.google.android.contacts/com.google.android.apps.contacts.vcard.VCardService\n";
+        String command2 = "dumpsys activity services | grep com.android.contacts/.vcard.VCardService\n";
+
+        try {
+            suProcessForVcfCheckWriter.write(command1);
+            suProcessForVcfCheckWriter.write(command2);
+            suProcessForVcfCheckWriter.write("echo DONE\n");
+            suProcessForVcfCheckWriter.flush();
+
+            String output = "", line;
+            while ((line = suProcessForVcfCheckReader.readLine()) != null){
+                output = output + line + "\n";
+                if (line.trim().equals("DONE")) break;
+            }
+
+            return !output.trim().equals("DONE");
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 
     @Override
-    protected Integer doInBackground(File... files) {
+    protected Integer doInBackground(final File... files) {
+
+
+        if (isContactAppPresent) {
+
+            boolean isRunning = false;
+
+            while (isVcfBeingRead()) {
+                isRunning = true;
+                publishProgress("waiting_for_contacts", 0, 0, context.getString(R.string.waiting_for_contacts), "", "");
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (isRunning) {
+                try {
+                    suProcessForVcfCheckWriter.write("exit\n");
+                    suProcessForVcfCheckWriter.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
 
         File restoreScript = files[0];
+
+        startMillis = timeInMillis();
 
         try {
             Process restoreProcess = Runtime.getRuntime().exec("su -c sh " + restoreScript.getAbsolutePath());
@@ -113,6 +186,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         if (errors.equals(""))
             return SUCCESS;
         else return EXECUTION_ERROR;
+
 
     }
 
@@ -156,7 +230,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);
 
-        progress.setProgress(max, p, false)
+        progress.setProgress(max, p, max == 0)
                 .setContentIntent(PendingIntent.getActivity(context, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentTitle(head);
         notificationManager.notify(RestoreService.RESTORE_SERVICE_NOTIFICATION_ID, progress.build());
@@ -212,27 +286,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
         notificationManager.notify(ON_FINISH_NOTIFICATION_ID, progress.build());
     }
-
-    /*String getNextCommand(Vector<JSONObject> jsonObjects) throws JSONException {
-
-        JSONObject jsonObject = jsonObjects.get(totalCount);
-        String appName = jsonObject.getString("app_name");
-        String packageName = jsonObject.getString("package_name");
-        String apkName = jsonObject.getString("apk");
-        String icon = jsonObject.getString("icon");
-
-        Log.d("migrate_helper", jsonObject.getString("app_name") + " " + jsonObject.getBoolean(APP_CHECK) + " " + jsonObject.getBoolean(DATA_CHECK));
-
-        String command = "echo \"" + statusHead + appName + " " + icon + "\"\n";
-
-        boolean appCheck = jsonObject.getBoolean(APP_CHECK);
-        if (!apkName.equals("NULL") && appCheck)
-            command += "sh " + installScriptPath + " " + TEMP_DIR_NAME + " " + apkName + "\n";
-
-        command += "echo \"" + installedStatusHead + packageName + "\"\n";
-
-        return command;
-    }*/
 
     long timeInMillis(){
         Calendar calendar = Calendar.getInstance();

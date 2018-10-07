@@ -42,7 +42,8 @@ public class ProgressActivity extends AppCompatActivity {
     BroadcastReceiver progressReceiver;
     IntentFilter progressReceiverIF;
 
-    String action;
+    String type;
+    boolean wasContactBeingRestored = false;
 
     String lastMsg = "";
 
@@ -66,7 +67,7 @@ public class ProgressActivity extends AppCompatActivity {
         messageView.setGravity(Gravity.BOTTOM);
         messageView.setMovementMethod(new ScrollingMovementMethod());
 
-        action = "";
+        type = "";
 
         if (getIntent().getExtras() != null){
             handleProgress(getIntent());
@@ -106,11 +107,16 @@ public class ProgressActivity extends AppCompatActivity {
 
         messageHead.setTextColor(getResources().getColor(R.color.colorAccent));
         try {
-            action = intent.getStringExtra("type");
+            type = intent.getStringExtra("type");
         }
         catch (Exception e){ e.printStackTrace(); }
 
-        if (action.equals("finishedErrors")){
+        if (wasContactBeingRestored && !type.equals("waiting_for_contacts")) {
+            messageView.setText("");
+            wasContactBeingRestored = false;
+        }
+
+        if (type.equals("finishedErrors")){
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -130,7 +136,7 @@ public class ProgressActivity extends AppCompatActivity {
 
             close.setText(R.string.close);
         }
-        else if (action.equals("finishedOk")){
+        else if (type.equals("finishedOk")){
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -151,7 +157,7 @@ public class ProgressActivity extends AppCompatActivity {
 
             updateProgress(progressBar.getMax());
         }
-        else if (action.equals("restoring_app")) {
+        else if (type.equals("restoring_app")) {
 
             String head = intent.getStringExtra("head");
             String icon = intent.getStringExtra("icon");
@@ -166,6 +172,18 @@ public class ProgressActivity extends AppCompatActivity {
             } catch (Exception ignored){}
             setAppIcon = new SetAppIcon(this.icon);
             setAppIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, icon.trim());
+        }
+        else if (type.equals("waiting_for_contacts")) {
+
+            wasContactBeingRestored = true;
+
+            messageHead.setText(R.string.waiting_for_contacts);
+            messageView.setText(R.string.waiting_for_contacts_desc);
+
+            progressBar.setIndeterminate(true);
+
+            icon.setImageResource(R.drawable.ic_waiting);
+
         }
     }
 
@@ -184,6 +202,7 @@ public class ProgressActivity extends AppCompatActivity {
 
     void updateProgress(int c){
         int n = progressBar.getMax();
+        progressBar.setIndeterminate(false);
         if (n != 0)
             progressPercentage.setText((int)((c*100.0)/n) + "%");
         else progressPercentage.setText("");

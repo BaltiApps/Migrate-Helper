@@ -20,7 +20,7 @@
         <ImageView
             android:layout_width="@dimen/small_icon_wh"
             android:layout_height="@dimen/small_icon_wh"
-            android:src="@drawable/ic_requesting_root"
+            android:src="@drawable/ic_waiting"
             android:id="@+id/logoIcon"
             android:layout_marginBottom="10dp"
             />
@@ -54,7 +54,7 @@
             <TextView
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:text="50%"
+                android:text="--"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textStyle="bold"
                 android:textColor="@color/colorAccent"

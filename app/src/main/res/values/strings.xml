@@ -26,6 +26,10 @@
 
     <!--ProgressActivity.java-->
     <string name="please_wait">Please wait</string>
+    <string name="waiting_for_contacts">Waiting for contacts restore</string>
+    <string name="waiting_for_contacts_desc">Migrate helper has detected that you have chosen to restore contact handling apps which may conflict with currently running contact restore operation.\n\n
+    App restore will continue after contacts are restored.
+    </string>
 
     <!--progress.xml-->
     <string name="close">CLOSE</string>

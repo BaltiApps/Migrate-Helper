@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,10 +30,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -556,37 +553,14 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         final String cpu_abi = Build.SUPPORTED_ABIS[0];
 
+        CommonTools commonTools = new CommonTools(this);
+
         if (cpu_abi.equals("armeabi-v7a") || cpu_abi.equals("arm64-v8a")) {
-            busyboxBinaryFilePath = unpackAssetToInternal("busybox", "busybox");
-            installScriptPath = unpackAssetToInternal("installScript.sh", "installScript.sh");
-            restoreDataScriptPath = unpackAssetToInternal("restoreDataScript.sh", "restoreDataScript.sh");
+            busyboxBinaryFilePath = commonTools.unpackAssetToInternal("busybox", "busybox");
+            installScriptPath = commonTools.unpackAssetToInternal("installScript.sh", "installScript.sh");
+            restoreDataScriptPath = commonTools.unpackAssetToInternal("restoreDataScript.sh", "restoreDataScript.sh");
         }
 
-    }
-
-    private String unpackAssetToInternal(String assetFileName, String targetFileName){
-
-        AssetManager assetManager = getAssets();
-        File unpackFile = new File(getFilesDir(), targetFileName);
-        String path = "";
-
-        int read;
-        byte buffer[] = new byte[4096];
-        try {
-            InputStream inputStream = assetManager.open(assetFileName);
-            FileOutputStream writer = new FileOutputStream(unpackFile);
-            while ((read = inputStream.read(buffer)) > 0) {
-                writer.write(buffer, 0, read);
-            }
-            writer.close();
-            unpackFile.setExecutable(true);
-            path = unpackFile.getAbsolutePath();
-        } catch (IOException e) {
-            e.printStackTrace();
-            path = "";
-        }
-
-        return path;
     }
 
     int rootCopy(){
@@ -599,6 +573,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         File initSu = new File(getFilesDir(), "initSu.sh");
 
         String moveCommand = "#!sbin/sh\n\n" +
+                "pm grant balti.migratehelper android.permission.DUMP\n" +
+                "pm grant balti.migratehelper android.permission.PACKAGE_USAGE_STATS\n" +
                 "mv -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME + "/busybox\n" +
                 "rm -rf " + mtdDirName + "\n" +
                 "mkdir -p " + mtdDirName + "\n" +
