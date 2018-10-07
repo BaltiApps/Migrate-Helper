@@ -84,8 +84,16 @@
             android:fontFamily="monospace"
             android:padding="@dimen/large_padding_width"
             android:background="@drawable/log_message"
-            android:textColor="@android:color/white"
-            />
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/errorLogTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:paddingTop="@dimen/small_padding_width"
+            android:scrollbars="vertical"
+            android:textColor="@android:color/holo_red_dark" />
 
 
             <LinearLayout

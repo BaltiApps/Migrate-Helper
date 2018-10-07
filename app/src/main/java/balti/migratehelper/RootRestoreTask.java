@@ -270,7 +270,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
             Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
 
             restoreIntent.putExtra("type", "finishedErrors");
-            restoreIntent.putExtra("log", errors + "\n" + context.getString(R.string.failed) + " " + o);
+            restoreIntent.putExtra("errors", errors + "\n" + context.getString(R.string.failed) + " " + o);
             restoreIntent.putExtra("head", context.getString(R.string.finished_with_errors));
             restoreIntent.putExtra("total_time", totalTime);
 

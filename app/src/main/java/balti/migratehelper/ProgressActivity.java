@@ -37,6 +37,7 @@ public class ProgressActivity extends AppCompatActivity {
     Button okOnFinish, close;
     ProgressBar progressBar;
     TextView messageView, messageHead, progressPercentage;
+    TextView errorView;
     ImageView icon;
 
     BroadcastReceiver progressReceiver;
@@ -59,6 +60,7 @@ public class ProgressActivity extends AppCompatActivity {
         icon = findViewById(R.id.logoIcon);
         messageHead = findViewById(R.id.messageHead);
         messageView = findViewById(R.id.messageView);
+        errorView = findViewById(R.id.errorLogTextView);
         progressBar = findViewById(R.id.progressBar);
         progressPercentage = findViewById(R.id.progressPercentage);
         okOnFinish = findViewById(R.id.okOnFinish);
@@ -132,7 +134,8 @@ public class ProgressActivity extends AppCompatActivity {
 
             messageHead.setTextColor(Color.RED);
 
-            appendLog("log", intent);
+            if (intent.hasExtra("errors"))
+                errorView.setText(intent.getStringExtra("errors"));
 
             close.setText(R.string.close);
         }
