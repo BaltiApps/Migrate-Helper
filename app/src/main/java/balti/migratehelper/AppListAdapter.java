@@ -20,6 +20,7 @@ import java.util.Vector;
 
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
+import static balti.migratehelper.GetJsonFromData.PERM_CHECK;
 
 
 /**
@@ -32,8 +33,9 @@ public class AppListAdapter extends BaseAdapter {
     Context context;
 
 
-    String apkName;
-    String dataName;
+    /*String apkName;
+    String dataName;*/
+    //boolean perm;
 
     OnCheck onCheck;
 
@@ -90,8 +92,7 @@ public class AppListAdapter extends BaseAdapter {
             e.printStackTrace();
         }
 
-        final CheckBox app, data;
-
+        final CheckBox app, data, permissions;
 
         app = view.findViewById(R.id.appCheckbox);
         try {
@@ -100,11 +101,57 @@ public class AppListAdapter extends BaseAdapter {
             e.printStackTrace();
         }
 
-        app.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        data = view.findViewById(R.id.dataCheckbox);
+        try {
+            data.setChecked(appList.get(i).getBoolean(DATA_CHECK));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        permissions = view.findViewById(R.id.permissionsCheckbox);
+        try {
+            permissions.setChecked(appList.get(i).getBoolean(PERM_CHECK));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final String apkName[] = new String[]{"NULL"};
+        final String dataName[] = new String[]{"NULL"};
+        final boolean perm[] = new boolean[]{false};
+
+        try {
+            perm[0] = appList.get(i).getBoolean("permissions");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            apkName[0] = appList.get(i).getString("apk");
+            dataName[0]  = appList.get(i).getString("data");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if (apkName[0].equals("NULL")){
+            app.setChecked(false);
+            app.setEnabled(false);
+        }
+        if (dataName[0].equals("NULL")){
+            data.setChecked(false);
+            data.setEnabled(false);
+        }
+
+        if (data.isChecked() && !apkName[0].equals("NULL")) {
+            app.setChecked(true);
+            app.setEnabled(false);
+        }
+        else if (!apkName[0].equals("NULL")) app.setEnabled(true);
+
+        permissions.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 try {
-                    appList.get(i).put(APP_CHECK, b);
+                    appList.get(i).put(PERM_CHECK, isChecked);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -113,52 +160,55 @@ public class AppListAdapter extends BaseAdapter {
             }
         });
 
-
-        data = view.findViewById(R.id.dataCheckbox);
         try {
-            data.setChecked(appList.get(i).getBoolean(DATA_CHECK));
-        } catch (JSONException e) {
+            if (!perm[0] || !(app.isChecked() || data.isChecked())) {
+                permissions.setChecked(false);
+                permissions.setEnabled(false);
+            }
+            else if (perm[0]) permissions.setEnabled(true);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        apkName = "NULL";
-        dataName = "NULL";
+        app.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                try {
+                    appList.get(i).put(APP_CHECK, b);
 
-        try {
-            apkName = appList.get(i).getString("apk");
-            dataName  = appList.get(i).getString("data");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+                    if (perm[0]) {
+                        permissions.setEnabled(b || data.isChecked());
+                        if (!(b || data.isChecked()))
+                            permissions.setChecked(false);
+                    }
 
-        if (apkName.equals("NULL")){
-            app.setChecked(false);
-            app.setEnabled(false);
-        }
-        if (dataName.equals("NULL")){
-            data.setChecked(false);
-            data.setEnabled(false);
-        }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-        if (data.isChecked()) {
-            app.setChecked(true);
-            app.setEnabled(false);
-        }
-        else app.setEnabled(true);
+                onCheck.onCheck(appList);
+            }
+        });
 
         data.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 try {
                     appList.get(i).put(DATA_CHECK, b);
-                    if (b)
-                    {
+
+                    if (perm[0]) {
+                        permissions.setEnabled(b || app.isChecked());
+                        if (!(b || app.isChecked()))
+                            permissions.setChecked(false);
+                    }
+
+                    if (b && !apkName[0].equals("NULL")) {
                         app.setChecked(true);
                         app.setEnabled(false);
+                    } else if (!apkName[0].equals("NULL")) {
+                        app.setEnabled(true);
                     }
-                    else {
-                        if (!apkName.equals("NULL")) app.setEnabled(true);
-                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -171,17 +221,23 @@ public class AppListAdapter extends BaseAdapter {
             public void onClick(View v) {
 
                 try {
-                    if (appList.get(i).getBoolean(APP_CHECK) && appList.get(i).getBoolean(DATA_CHECK)){
+                    if (appList.get(i).getBoolean(APP_CHECK) && appList.get(i).getBoolean(DATA_CHECK) && appList.get(i).getBoolean(PERM_CHECK)){
                             data.setChecked(false);
                             app.setChecked(false);
+                            permissions.setChecked(false);
+                            permissions.setEnabled(false);
                     }
                     else {
 
-                        if (!apkName.equals("NULL")) {
+                        if (!apkName[0].equals("NULL")) {
                             app.setChecked(true);
                         }
-                        if (!dataName.equals("NULL")) {
+                        if (!dataName[0].equals("NULL")) {
                             data.setChecked(true);
+                        }
+                        if (perm[0] && (app.isChecked() || data.isChecked())) {
+                            permissions.setEnabled(true);
+                            permissions.setChecked(true);
                         }
                     }
                 } catch (JSONException e) {
@@ -190,7 +246,7 @@ public class AppListAdapter extends BaseAdapter {
             }
         });
 
-        if (apkName.equals("NULL"))
+        if (apkName[0].equals("NULL"))
             appName.setTextColor(Color.RED);
 
         return view;
@@ -217,6 +273,22 @@ public class AppListAdapter extends BaseAdapter {
             try {
                 if (!appList.get(i).getString("data").equals("NULL")) {
                     appList.get(i).put(DATA_CHECK, check);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    void checkAllPermissions(boolean check)
+    {
+        for (int i = 0; i < appList.size(); i++)
+        {
+            try {
+                if (appList.get(i).getBoolean("permissions")) {
+                    if (check && (appList.get(i).getBoolean(DATA_CHECK) || appList.get(i).getBoolean(APP_CHECK)))
+                        appList.get(i).put(PERM_CHECK, true);
+                    else appList.get(i).put(PERM_CHECK, false);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

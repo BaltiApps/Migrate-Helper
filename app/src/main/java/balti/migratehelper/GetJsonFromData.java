@@ -23,6 +23,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
 
     static String APP_CHECK = "APP_CHECK";
     static String DATA_CHECK = "DATA_CHECK";
+    static String PERM_CHECK = "PERM_CHECK";
 
     private FileFilter jsonFilter, vcfFilter, smsDBFilter, callsDBFilter;
 
@@ -147,8 +148,11 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
             mainObject = new JSONObject(fullFileText);
             mainObject.put(RootRestoreTask.METADATA_FILE_FIELD, file.getAbsolutePath());
             mainObject.put(RootRestoreTask.METADATA_FILE_NAME, file.getName());
-            mainObject.put(APP_CHECK, true);
-            mainObject.put(DATA_CHECK, true);
+            mainObject.put(APP_CHECK, !mainObject.getString("apk").equals("NULL"));
+            mainObject.put(DATA_CHECK, !mainObject.getString("data").equals("NULL"));
+
+            mainObject.put(PERM_CHECK, mainObject.getBoolean("permissions"));
+
         } catch (IOException | JSONException e) {
             e.printStackTrace();
             error = error + e.getMessage() + "\n";

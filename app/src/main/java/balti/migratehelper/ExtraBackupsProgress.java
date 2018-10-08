@@ -30,8 +30,10 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,7 @@ import java.util.Vector;
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
+import static balti.migratehelper.GetJsonFromData.PERM_CHECK;
 import static balti.migratehelper.RootRestoreTask.DISPLAY_HEAD;
 import static balti.migratehelper.RootRestoreTask.INSTALLING_HEAD;
 import static balti.migratehelper.RootRestoreTask.RESTORE_DATA_HEAD;
@@ -79,6 +82,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     static String installScriptPath;
     static String restoreDataScriptPath;
     static boolean extraSelectBoolean;
+    static String mtdDirName;
 
     static boolean isShowContacts = false;
     static boolean isShowSms = false;
@@ -160,13 +164,14 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("extraBackupsProgressReady"));
     }
 
-    static void setData(GetJsonFromDataPackets getJsonFromDataPackets, int numberOfApps, String installScriptPath, String restoreDataScriptPath, boolean extraSelectBoolean){
+    static void setData(GetJsonFromDataPackets getJsonFromDataPackets, int numberOfApps, String installScriptPath, String restoreDataScriptPath, boolean extraSelectBoolean, String mtdDirName){
 
         ExtraBackupsProgress.getJsonFromDataPackets = getJsonFromDataPackets;
         ExtraBackupsProgress.numberOfApps = numberOfApps;
         ExtraBackupsProgress.installScriptPath = installScriptPath;
         ExtraBackupsProgress.restoreDataScriptPath = restoreDataScriptPath;
         ExtraBackupsProgress.extraSelectBoolean = extraSelectBoolean;
+        ExtraBackupsProgress.mtdDirName = mtdDirName;
 
         if (extraSelectBoolean) {
 
@@ -644,7 +649,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             for (int j = 0, c = 1; j < jsonObjects.size(); j++, c++) {
                 JSONObject jsonObject = jsonObjects.get(j);
                 try {
-                    if (!(jsonObject.getBoolean(APP_CHECK) || jsonObject.getBoolean(DATA_CHECK))) {
+                    if (!(jsonObject.getBoolean(APP_CHECK) || jsonObject.getBoolean(DATA_CHECK) || jsonObject.getBoolean(PERM_CHECK))) {
                         jsonObjects.remove(jsonObject);
                         j--;
                     }
@@ -675,9 +680,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                     boolean isApp = jsonObject.getBoolean(APP_CHECK) && !apkName.equals("NULL");
                     boolean isData = jsonObject.getBoolean(DATA_CHECK) && !dataName.equals("NULL");
+                    boolean isPermissions = jsonObject.getBoolean(PERM_CHECK);
 
                     String command = "";
-
 
                     if (!isApp && !isData)
                         continue;
@@ -696,9 +701,21 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                         command += "sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + dataName + " " + packageName + "\n";
                     }
 
-                    command += "echo  " + "\n";
-
                     scriptWriter.write(command);
+
+                    File permFile = new File(mtdDirName + "/" + packageName + ".perm");
+                    if (isPermissions && permFile.exists()) {
+
+                        BufferedReader permReader = new BufferedReader(new FileReader(permFile));
+                        String pLine;
+
+                        while ((pLine = permReader.readLine()) != null){
+                            pLine = pLine.substring(0, pLine.indexOf(':')).trim();
+                            scriptWriter.write("pm grant " + packageName + " " + pLine + " 2>/dev/null\n");
+                        }
+                    }
+
+                    scriptWriter.write("echo  " + "\n");
                 }
 
                 scriptWriter.close();

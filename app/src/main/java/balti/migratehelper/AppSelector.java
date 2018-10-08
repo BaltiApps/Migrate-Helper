@@ -39,12 +39,13 @@ import java.util.Vector;
 
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
+import static balti.migratehelper.GetJsonFromData.PERM_CHECK;
 
 public class AppSelector extends AppCompatActivity implements OnConvertMetadataToJSON, OnCheck, CompoundButton.OnCheckedChangeListener {
 
     ImageButton back;
     TextView title;
-    CheckBox appAllSelect, dataAllSelect;
+    CheckBox appAllSelect, dataAllSelect, permissionsAllSelect;
     RelativeLayout waitingLayout;
     TextView waitingStatusMessage;
     TextView waitingMessageDesc;
@@ -468,6 +469,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         appAllSelect = findViewById(R.id.appAllSelect);
         dataAllSelect = findViewById(R.id.dataAllSelect);
+        permissionsAllSelect = findViewById(R.id.permissionsAllSelect);
 
         waitingLayout = findViewById(R.id.waiting_layout);
         waitingStatusMessage = findViewById(R.id.waiting_status_text);
@@ -509,6 +511,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             public void onClick(View view) {
                 if (adapter != null && dataAllSelect.isEnabled()) {
                     dataAllSelect.setChecked(true);
+                    permissionsAllSelect.setChecked(true);
                 }
             }
         });
@@ -520,6 +523,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                     dataAllSelect.setChecked(true);
                     dataAllSelect.setChecked(false);
                     appAllSelect.setChecked(false);
+                    permissionsAllSelect.setChecked(false);
                 }
             }
         });
@@ -530,7 +534,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 try {
                     Runtime.getRuntime().exec("su -c rm -rf " + TEMP_DIR_NAME + "/*.vcf" + " " + TEMP_DIR_NAME + "/*.sms.db" + " " + TEMP_DIR_NAME + "/*.calls.db");
                 } catch (IOException ignored) {}
-                ExtraBackupsProgress.setData(mainGetJsonFromDataPackets, numberOfApps, installScriptPath, restoreDataScriptPath, extraSelectBoolean);
+                ExtraBackupsProgress.setData(mainGetJsonFromDataPackets, numberOfApps, installScriptPath, restoreDataScriptPath, extraSelectBoolean, mtdDirName);
                 LocalBroadcastManager.getInstance(AppSelector.this).sendBroadcast(new Intent("startRestoreFromExtraBackups"));
                 finish();
             }
@@ -582,6 +586,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "cp " + TEMP_DIR_NAME + "/*.vcf " + mtdDirName + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/*.sms.db " + mtdDirName + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/*.calls.db " + mtdDirName + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/*.perm " + mtdDirName + " 2>/dev/null\n" +
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
 
@@ -699,20 +704,28 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
     @Override
     public void onCheck(Vector<JSONObject> appList) {
-        boolean app, data;
+        boolean app, data, permissions;
         boolean thisEnable;
         boolean enable = false;
+
+        boolean isAppAllowed, isDataAllowed, isPermAllowed;
 
         numberOfApps = 0;
 
         if (appList.size() > 0)
-            app = data = true;
-        else app = data = false;
+            app = data = permissions = true;
+        else app = data = permissions = false;
         for (int i = 0; i < appList.size(); i++) {
             try {
-                app = app && appList.elementAt(i).getBoolean(APP_CHECK);
-                data = data && appList.elementAt(i).getBoolean(DATA_CHECK);
-                thisEnable = appList.elementAt(i).getBoolean(APP_CHECK) || appList.elementAt(i).getBoolean(DATA_CHECK);
+
+                isAppAllowed = !appList.elementAt(i).getString("apk").equals("NULL");
+                isDataAllowed = !appList.elementAt(i).getString("data").equals("NULL");
+                isPermAllowed = appList.elementAt(i).getBoolean("permissions");
+
+                if (isAppAllowed) app = app && appList.elementAt(i).getBoolean(APP_CHECK);
+                if (isDataAllowed) data = data && appList.elementAt(i).getBoolean(DATA_CHECK);
+                if (isPermAllowed) permissions = permissions && appList.elementAt(i).getBoolean(PERM_CHECK);
+                thisEnable = appList.elementAt(i).getBoolean(APP_CHECK) || appList.elementAt(i).getBoolean(DATA_CHECK) || appList.elementAt(i).getBoolean(PERM_CHECK);
                 enable = enable || thisEnable;
                 if (thisEnable) numberOfApps++;
             } catch (JSONException e) {
@@ -734,12 +747,31 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         else appAllSelect.setEnabled(true);
 
         appAllSelect.setOnCheckedChangeListener(this);
+
+        permissionsAllSelect.setEnabled(app || data);
+
+        permissionsAllSelect.setOnCheckedChangeListener(null);
+        permissionsAllSelect.setChecked(permissions);
+        permissionsAllSelect.setOnCheckedChangeListener(this);
+
     }
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
-        if (compoundButton == appAllSelect) {
+        if (appAllSelect.isChecked() || dataAllSelect.isChecked()){
+            permissionsAllSelect.setEnabled(true);
+        }
+        else {
+            permissionsAllSelect.setChecked(false);
+            permissionsAllSelect.setEnabled(false);
+        }
+
+        if (compoundButton == permissionsAllSelect && permissionsAllSelect.isEnabled()){
+            adapter.checkAllPermissions(b);
+            adapter.notifyDataSetChanged();
+        }
+        else if (compoundButton == appAllSelect) {
             adapter.checkAllApp(b);
             adapter.notifyDataSetChanged();
         } else if (compoundButton == dataAllSelect) {

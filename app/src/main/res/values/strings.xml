@@ -46,6 +46,7 @@
     <string name="restore">Restore</string>
     <string name="app">App</string>
     <string name="data">Data</string>
+    <string name="perm">Perm</string>
     <string name="extras">Extras</string>
     <string name="apps">Applications</string>
 

@@ -41,5 +41,11 @@
         android:padding="@dimen/large_padding_width"
         />
 
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/permissionsCheckbox"
+        android:padding="@dimen/large_padding_width"
+        />
 
 </LinearLayout>
