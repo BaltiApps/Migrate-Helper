@@ -559,10 +559,14 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         CommonTools commonTools = new CommonTools(this);
 
+        installScriptPath = commonTools.unpackAssetToInternal("installScript.sh", "installScript.sh");
+        restoreDataScriptPath = commonTools.unpackAssetToInternal("restoreDataScript.sh", "restoreDataScript.sh");
+
         if (cpu_abi.equals("armeabi-v7a") || cpu_abi.equals("arm64-v8a")) {
             busyboxBinaryFilePath = commonTools.unpackAssetToInternal("busybox", "busybox");
-            installScriptPath = commonTools.unpackAssetToInternal("installScript.sh", "installScript.sh");
-            restoreDataScriptPath = commonTools.unpackAssetToInternal("restoreDataScript.sh", "restoreDataScript.sh");
+        }
+        else if (cpu_abi.equals("x86") || cpu_abi.equals("x86_64")) {
+            busyboxBinaryFilePath = commonTools.unpackAssetToInternal("busybox-x86", "busybox");
         }
 
     }
