@@ -24,6 +24,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
     static String APP_CHECK = "APP_CHECK";
     static String DATA_CHECK = "DATA_CHECK";
     static String PERM_CHECK = "PERM_CHECK";
+    static String IS_PERMISSIBLE = "IS_PERMISSIBLE";
 
     private FileFilter jsonFilter, vcfFilter, smsDBFilter, callsDBFilter;
 
@@ -152,6 +153,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
             mainObject.put(DATA_CHECK, !mainObject.getString("data").equals("NULL"));
 
             mainObject.put(PERM_CHECK, mainObject.getBoolean("permissions"));
+            mainObject.put(IS_PERMISSIBLE, mainObject.getBoolean("permissions"));
 
         } catch (IOException | JSONException e) {
             e.printStackTrace();

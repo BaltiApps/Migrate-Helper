@@ -39,6 +39,7 @@ import java.util.Vector;
 
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
+import static balti.migratehelper.GetJsonFromData.IS_PERMISSIBLE;
 import static balti.migratehelper.GetJsonFromData.PERM_CHECK;
 
 public class AppSelector extends AppCompatActivity implements OnConvertMetadataToJSON, OnCheck, CompoundButton.OnCheckedChangeListener {
@@ -708,7 +709,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
     @Override
     public void onCheck(Vector<JSONObject> appList) {
-        boolean app, data, permissions;
+        boolean app, data, permissions = false, isPermissible = false;
         boolean thisEnable;
         boolean enable = false;
 
@@ -716,8 +717,10 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         numberOfApps = 0;
 
-        if (appList.size() > 0)
+        if (appList.size() > 0) {
             app = data = permissions = true;
+            try { isPermissible = appList.get(0).getBoolean(IS_PERMISSIBLE); } catch (JSONException e) { e.printStackTrace(); }
+        }
         else app = data = permissions = false;
         for (int i = 0; i < appList.size(); i++) {
             try {
@@ -726,12 +729,18 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 isDataAllowed = !appList.elementAt(i).getString("data").equals("NULL");
                 isPermAllowed = appList.elementAt(i).getBoolean("permissions");
 
+                isPermissible = isPermissible || (isPermAllowed && appList.elementAt(i).getBoolean(IS_PERMISSIBLE));
+
                 if (isAppAllowed) app = app && appList.elementAt(i).getBoolean(APP_CHECK);
                 if (isDataAllowed) data = data && appList.elementAt(i).getBoolean(DATA_CHECK);
-                if (isPermAllowed) permissions = permissions && appList.elementAt(i).getBoolean(PERM_CHECK);
+                if (isPermAllowed && appList.elementAt(i).getBoolean(IS_PERMISSIBLE)) {
+                    permissions = permissions && appList.elementAt(i).getBoolean(PERM_CHECK);
+                }
+
                 thisEnable = appList.elementAt(i).getBoolean(APP_CHECK) || appList.elementAt(i).getBoolean(DATA_CHECK) || appList.elementAt(i).getBoolean(PERM_CHECK);
                 enable = enable || thisEnable;
                 if (thisEnable) numberOfApps++;
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -752,7 +761,9 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         appAllSelect.setOnCheckedChangeListener(this);
 
-        permissionsAllSelect.setEnabled(app || data);
+        permissions = permissions && isPermissible;
+
+        permissionsAllSelect.setEnabled(isPermissible);
 
         permissionsAllSelect.setOnCheckedChangeListener(null);
         permissionsAllSelect.setChecked(permissions);
@@ -763,15 +774,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
-        if (appAllSelect.isChecked() || dataAllSelect.isChecked()){
-            permissionsAllSelect.setEnabled(true);
-        }
-        else {
-            permissionsAllSelect.setChecked(false);
-            permissionsAllSelect.setEnabled(false);
-        }
-
-        if (compoundButton == permissionsAllSelect && permissionsAllSelect.isEnabled()){
+        if (compoundButton == permissionsAllSelect){
             adapter.checkAllPermissions(b);
             adapter.notifyDataSetChanged();
         }
@@ -789,8 +792,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             adapter.checkAllData(b);
             adapter.notifyDataSetChanged();
         }
-
-        onCheck(adapter.appList);
     }
 
 }

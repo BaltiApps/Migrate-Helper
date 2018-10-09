@@ -20,6 +20,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -672,6 +673,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                     publishProgress(getString(R.string.making_script), i, numberOfApps);
 
+                    Log.d("migrate_helper", jsonObject.toString());
+
                     String appName = jsonObject.getString("app_name");
                     String apkName = jsonObject.getString("apk");
                     String dataName = jsonObject.getString("data");
@@ -697,7 +700,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                         command += "sh " + installScriptPath + " " + TEMP_DIR_NAME + " " + apkName + "\n";
                     }
                     if (isData) {
-                        command += "echo " + RESTORE_DATA_HEAD + apkName + "\n";
+                        command += "echo " + RESTORE_DATA_HEAD + dataName + "\n";
                         command += "sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + dataName + " " + packageName + "\n";
                     }
 
@@ -711,11 +714,11 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                         while ((pLine = permReader.readLine()) != null){
                             pLine = pLine.substring(0, pLine.indexOf(':')).trim();
-                            scriptWriter.write("pm grant " + packageName + " " + pLine + " 2>/dev/null\n");
+                            if (pLine.startsWith("android.permission")) scriptWriter.write("pm grant " + packageName + " " + pLine + " 2>/dev/null\n");
                         }
                     }
 
-                    scriptWriter.write("echo  " + "\n");
+                    scriptWriter.write("echo  \n");
                 }
 
                 scriptWriter.close();

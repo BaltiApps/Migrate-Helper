@@ -56,6 +56,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     static String DISPLAY_HEAD = "display head: ";
     static String INSTALLING_HEAD = "Installing app: ";
     static String RESTORE_DATA_HEAD = "Restoring data: ";
+    static String RESTORING_PERMS = "Restoring permissions: ";
 
     private boolean isContactAppPresent;
 
