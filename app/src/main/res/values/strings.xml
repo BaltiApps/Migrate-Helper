@@ -74,9 +74,16 @@
     <string name="smsPermission_desc">Please allow this app to be default sms app temporarily.\n<b>You will be prompted to change to the original sms app after restoration</b>
     \n\nAfter opening Messages app, <b><u>please wait for a few seconds</u></b> for the app to read all restored the messages.
     </string>
+    <string name="you_will_not_be_able_to_receive_sms">
+        Migrate helper cannot be set as an SMS app.\n\n
+        You will not be able to receive new SMS messages if you do not change the default messaging app.
+    </string>
+    <string name="change">Change</string>
+    <string name="leave_as_it_is">Leave it as it is</string>
     <string name="callsPermission">Call logs permission needed</string>
     <string name="callsPermission_desc">Please allow to write call logs.</string>
     <string name="filtering">Filtering\n</string>
+    <string name="please_do_not_press_back_button">Please do not press back button.</string>
 
     <!--RestoreA_DB.java-->
     <string name="done">Done!</string>

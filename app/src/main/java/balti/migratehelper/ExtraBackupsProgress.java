@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -586,7 +587,27 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             nextSms();
         }
         else if (requestCode == SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP) {
-            restoreCalls();
+
+            if (Telephony.Sms.getDefaultSmsPackage(this).equals(getPackageName())){
+                new AlertDialog.Builder(this)
+                        .setMessage(R.string.you_will_not_be_able_to_receive_sms)
+                        .setPositiveButton(R.string.change, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                setDefaultSms(actualDefaultSmsAppName, SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP);
+                            }
+                        })
+                        .setNegativeButton(R.string.leave_as_it_is, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                restoreCalls();
+                            }
+                        })
+                        .show();
+            }
+            else {
+                restoreCalls();
+            }
         }
     }
 
@@ -754,5 +775,10 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, numberOfApps, isContactAppPresent);
             RestoreService.ROOT_RESTORE_TASK.execute((File)o);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(this, R.string.please_do_not_press_back_button, Toast.LENGTH_SHORT).show();
     }
 }
