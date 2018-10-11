@@ -48,6 +48,8 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     private long startMillis;
     private long endMillis;
 
+    private int dpiValue = 0;
+
     static String METADATA_FILE_FIELD = "metadata_file";
     static String METADATA_FILE_NAME = "metadata_file_name";
 
@@ -56,7 +58,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     static String DISPLAY_HEAD = "display head: ";
     static String INSTALLING_HEAD = "Installing app: ";
     static String RESTORE_DATA_HEAD = "Restoring data: ";
-    static String RESTORING_PERMS = "Restoring permissions: ";
 
     private boolean isContactAppPresent;
 
@@ -64,11 +65,12 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     private BufferedWriter suProcessForVcfCheckWriter;
     private BufferedReader suProcessForVcfCheckReader;
 
-    RootRestoreTask(Context context, int numberOfAppJobs, boolean isContactAppPresent) {
+    RootRestoreTask(Context context, int numberOfAppJobs, boolean isContactAppPresent, int dpiValue) {
 
         this.context = context;
         this.numberOfAppJobs = numberOfAppJobs;
         this.isContactAppPresent = isContactAppPresent;
+        this.dpiValue = dpiValue;
 
         errors = "";
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
@@ -246,6 +248,9 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
         super.onPostExecute(o);
 
+        restoreIntent.putExtra("total_time", totalTime);
+        restoreIntent.putExtra("dpiValue", dpiValue);
+
         try {
             Runtime.getRuntime().exec("su -c rm -rf " + TEMP_DIR_NAME);
         } catch (IOException e) {
@@ -256,10 +261,11 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
             Toast.makeText(context, context.getString(R.string.finished), Toast.LENGTH_SHORT).show();
 
+            String log = (dpiValue > 0)? context.getString(R.string.change_dpi_and_uninstall_prompt) : context.getString(R.string.uninstall_prompt);
+
             restoreIntent.putExtra("type", "finishedOk");
-            restoreIntent.putExtra("log", context.getString(R.string.uninstall_prompt));
+            restoreIntent.putExtra("log", log);
             restoreIntent.putExtra("head", context.getString(R.string.finished) );
-            restoreIntent.putExtra("total_time", totalTime);
 
             activityIntent.putExtras(restoreIntent);
 
@@ -273,7 +279,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
             restoreIntent.putExtra("type", "finishedErrors");
             restoreIntent.putExtra("errors", errors + "\n" + context.getString(R.string.failed) + " " + o);
             restoreIntent.putExtra("head", context.getString(R.string.finished_with_errors));
-            restoreIntent.putExtra("total_time", totalTime);
 
             activityIntent.putExtras(restoreIntent);
 
@@ -284,6 +289,15 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);
+
+        progress.setOngoing(true);
+
+        String uninstallTitle = (dpiValue > 0)? context.getString(R.string.change_dpi_and_uninstall) : context.getString(R.string.uninstall);
+        PendingIntent uninstallPendingIntent = PendingIntent.getService(context, 79,
+                new Intent(context, UninstallService.class).putExtra("dpiValue", dpiValue), 0);
+        NotificationCompat.Action uninstallAction = new NotificationCompat.Action(0, uninstallTitle, uninstallPendingIntent);
+
+        progress.addAction(uninstallAction);
 
         notificationManager.notify(ON_FINISH_NOTIFICATION_ID, progress.build());
     }

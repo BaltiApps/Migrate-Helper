@@ -130,7 +130,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             if (rootCopyResult == SUCCESS){
                 waitingStatusMessage.setText(R.string.reading_metadata);
                 waitingMessageDesc.setText("");
-                getJsonFromData = new GetJsonFromData(AppSelector.this, ".json", waitingMessageDesc);
+                getJsonFromData = new GetJsonFromData(AppSelector.this, waitingMessageDesc);
                 getJsonFromData.execute(mtdDirName);
             }
             else if (rootCopyResult == SCRIPT_ERROR){
@@ -178,7 +178,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 if (mainGetJsonFromDataPackets.jsonAppPackets.size() > 0)
                 appList.setAdapter(adapter);
 
-                if (mainGetJsonFromDataPackets.contactPackets.length != 0 || mainGetJsonFromDataPackets.smsPackets.length != 0 || mainGetJsonFromDataPackets.callsPackets.length != 0){
+                if (mainGetJsonFromDataPackets.contactPackets.length != 0 || mainGetJsonFromDataPackets.smsPackets.length != 0
+                        || mainGetJsonFromDataPackets.callsPackets.length != 0 || mainGetJsonFromDataPackets.dpiPacket.dpiFile != null){
                     extrasBar.setVisibility(View.VISIBLE);
                     extrasSelect.setChecked(true);
                     extrasBar.setOnClickListener(new View.OnClickListener() {
@@ -241,12 +242,14 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         ContactsPacket[] contactsPackets;
         SmsPacket[] smsPackets;
         CallsPacket[] callsPackets;
+        DpiPacket dpiPacket;
 
         public ExtrasUpdate(GetJsonFromDataPackets getJsonFromDataPackets) {
             this.getJsonFromDataPackets = getJsonFromDataPackets;
             contactsPackets = getJsonFromDataPackets.contactPackets;
             smsPackets = getJsonFromDataPackets.smsPackets;
             callsPackets = getJsonFromDataPackets.callsPackets;
+            dpiPacket = getJsonFromDataPackets.dpiPacket;
         }
 
         @Override
@@ -323,7 +326,19 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 callsViewItems.add(clView);
             }
 
-            return new Object[]{tempContactPackets, contactsViewItems, tempSmsPackets, smsViewItems, tempCallsPackets, callsViewItems};
+            View dpiViewItem = null;
+            if (dpiPacket.dpiFile != null) {
+                dpiViewItem = View.inflate(AppSelector.this, R.layout.extra_item, null);
+                ImageView icon = dpiViewItem.findViewById(R.id.extra_item_icon);
+                icon.setImageResource(R.drawable.ic_dpi_icon);
+
+                TextView tv = dpiViewItem.findViewById(R.id.extra_item_name);
+                tv.setText(R.string.dpi);
+            }
+
+            DpiPacket tempDpiPacket = new DpiPacket(dpiPacket.dpiFile, dpiPacket.selected);
+
+            return new Object[]{tempContactPackets, contactsViewItems, tempSmsPackets, smsViewItems, tempCallsPackets, callsViewItems, tempDpiPacket, dpiViewItem};
         }
 
         @Override
@@ -392,6 +407,27 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 holder.addView(v);
             }
 
+            final DpiPacket tempDpiPacket[] = new DpiPacket[]{null};
+
+
+            if (received[7] != null) {
+                tempDpiPacket[0] = (DpiPacket) received[6];
+                View dpiViewItem = (View)received[7];
+
+                CheckBox dpi_cb = dpiViewItem.findViewById(R.id.extras_item_select);
+                dpi_cb.setChecked(tempDpiPacket[0].selected);
+
+                dpi_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        tempDpiPacket[0].selected = b;
+                    }
+                });
+
+                holder.addView(dpiViewItem);
+            }
+
+
             holder.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
 
@@ -402,12 +438,14 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 @Override
                 public void onClick(View view) {
 
-                    if (contactsPackets.length == 0 && smsPackets.length == 0 && callsPackets.length == 0)
+                    if (contactsPackets.length == 0 && smsPackets.length == 0
+                            && callsPackets.length == 0 && dpiPacket.dpiFile == null)
                         return;
 
                     boolean anyContact;
                     boolean anySms;
                     boolean anyCalls;
+                    boolean isDpi;
 
                     if (tempContactPackets.length > 0) {
                          anyContact= tempContactPackets[0].selected;
@@ -445,7 +483,16 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                         anyCalls = false;
                     }
 
-                    extrasSelect.setChecked(anyContact || anySms || anyCalls);
+                    if (tempDpiPacket[0] != null){
+                        isDpi = tempDpiPacket[0].selected;
+                        dpiPacket.dpiFile = tempDpiPacket[0].dpiFile;
+                        dpiPacket.selected = tempDpiPacket[0].selected;
+                    }
+                    else {
+                        isDpi = false;
+                    }
+
+                    extrasSelect.setChecked(anyContact || anySms || anyCalls || isDpi);
                     ad.dismiss();
                 }
             });
@@ -531,7 +578,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         extraBackupsProgressReadyReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                ExtraBackupsProgress.setData(mainGetJsonFromDataPackets, numberOfApps, installScriptPath, restoreDataScriptPath, extraSelectBoolean, mtdDirName);
+                ExtraBackupsProgress.setData(mainGetJsonFromDataPackets, numberOfApps,
+                        installScriptPath, restoreDataScriptPath, extraSelectBoolean, mtdDirName);
                 LocalBroadcastManager.getInstance(AppSelector.this).sendBroadcast(new Intent("startRestoreFromExtraBackups"));
                 finish();
             }
@@ -552,7 +600,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
     private void unpackBinaries(){
 
-        final String cpu_abi = Build.SUPPORTED_ABIS[0];
+        String cpu_abi = Build.SUPPORTED_ABIS[0];
 
         CommonTools commonTools = new CommonTools(this);
 
@@ -588,6 +636,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "cp " + TEMP_DIR_NAME + "/*.sms.db " + mtdDirName + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/*.calls.db " + mtdDirName + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/*.perm " + mtdDirName + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/screen.dpi " + mtdDirName + " 2>/dev/null\n" +
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
 

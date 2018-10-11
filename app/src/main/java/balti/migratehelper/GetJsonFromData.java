@@ -18,7 +18,6 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
 
     private OnConvertMetadataToJSON classContext;
     private Context context;
-    private FileFilter fileFilter;
     private TextView statusDisplayView;
 
     static String APP_CHECK = "APP_CHECK";
@@ -30,15 +29,9 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
 
     private String error;
 
-    GetJsonFromData(Context context, final String metadataExtension, TextView statusDisplayView){
+    GetJsonFromData(Context context, TextView statusDisplayView){
         this.context = context;
         classContext = (OnConvertMetadataToJSON) context;
-        fileFilter = new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.getName().endsWith(metadataExtension);
-            }
-        };
         this.statusDisplayView = statusDisplayView;
 
         error = "";
@@ -122,7 +115,11 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
             error = error + e.getMessage() + "\n";
         }
 
-        return new GetJsonFromDataPackets(jsonObjects, vcfFiles, smsFiles, callsFiles);
+        File screenDpi = new File(directoryPath[0], "screen.dpi");
+        if (!screenDpi.exists())
+            screenDpi = null;
+
+        return new GetJsonFromDataPackets(jsonObjects, vcfFiles, smsFiles, callsFiles, screenDpi);
     }
 
     @Override

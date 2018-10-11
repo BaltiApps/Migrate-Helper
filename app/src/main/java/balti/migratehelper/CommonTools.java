@@ -13,6 +13,9 @@ public class CommonTools {
 
     Context context;
 
+    static String UNINSTALL_INTENT_FILTER = "migrate_helper_uninstall_broadcast";
+    static String DEBUG_TAG = "migrate_helper_tag";
+
     public CommonTools(Context context) {
         this.context = context;
     }

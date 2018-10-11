@@ -69,6 +69,13 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     ProgressBar callsProgress;
     TextView callsStatusText;
 
+    LinearLayout dpiView;
+    ImageView dpiDone, dpiCancel;
+    ProgressBar dpiProgress;
+    TextView dpiStatusText;
+
+    private int dpiValue = 0;
+
     LinearLayout applications;
     ImageView appsDone;
     ProgressBar appsProgress;
@@ -89,6 +96,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     static boolean isShowContacts = false;
     static boolean isShowSms = false;
     static boolean isShowCalls = false;
+    static boolean isShowDpi = false;
 
     BroadcastReceiver startRestoreFromExtraBackups;
 
@@ -107,6 +115,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
     CallsPacket callsPackets[];
     AlertDialog callsPermissionDialog;
+    AlertDialog dpiDialog;
     int CALLS_PERMISSION_REQUEST = 4;
     int CALLS_RESTORE_JOB = 40;
 
@@ -137,6 +146,12 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         callsStatusText = findViewById(R.id.extra_backup_progress_item_calls_progress_in_words);
         callsDone = findViewById(R.id.extra_backup_progress_item_calls_done);
         callsCancel = findViewById(R.id.extra_backup_progress_item_calls_cancel);
+
+        dpiView = findViewById(R.id.extra_backup_progress_item_dpi);
+        dpiProgress = findViewById(R.id.extra_backup_progress_item_dpi_progress);
+        dpiStatusText = findViewById(R.id.extra_backup_progress_item_dpi_progress_in_words);
+        dpiDone = findViewById(R.id.extra_backup_progress_item_dpi_done);
+        dpiCancel = findViewById(R.id.extra_backup_progress_item_dpi_cancel);
 
         applications = findViewById(R.id.extra_backup_progress_item_applications);
         appsProgress = findViewById(R.id.extra_backup_progress_item_app_progress);
@@ -197,6 +212,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     break;
                 }
             }
+            if (isShowDpi = getJsonFromDataPackets.dpiPacket.selected){
+                totalTasks++;
+            }
         }
         else {
             isShowContacts = false;
@@ -231,6 +249,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 if (isShowContacts) contactsView.setVisibility(View.VISIBLE);
                 if (isShowSms) smsView.setVisibility(View.VISIBLE);
                 if (isShowCalls) callsView.setVisibility(View.VISIBLE);
+                if (isShowDpi) dpiView.setVisibility(View.VISIBLE);
 
                 restoreContacts();
             }
@@ -477,7 +496,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                             callsDone.setVisibility(View.GONE);
                             callsCancel.setVisibility(View.VISIBLE);
 
-                            triggerRootRestoreTask();
+                            restoreDpi();
 
                         }
                     })
@@ -492,7 +511,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             // next process 2
 
-            triggerRootRestoreTask();
+            restoreDpi();
 
         }
 
@@ -555,6 +574,26 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         restoreA_DB.execute();
     }
 
+    private void restoreDpi(){
+
+        if (isShowDpi) {
+
+            headProgressBar.setProgress(++intProgressTask);
+            headTitle.setText(R.string.dpi);
+
+            new GetDpiValueTask().execute();
+
+        }
+        else {
+
+            // next process 3
+
+            triggerRootRestoreTask();
+
+        }
+
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -600,12 +639,16 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                         .setNegativeButton(R.string.leave_as_it_is, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                // next process 1
+
                                 restoreCalls();
                             }
                         })
                         .show();
             }
             else {
+                // next process 1
+
                 restoreCalls();
             }
         }
@@ -615,8 +658,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     @Override
     public void onDBRestoreComplete(int code) {
         if (code == SMS_RESTORE_JOB){
-            // next process 1
-
             smsDone.setVisibility(View.VISIBLE);
             smsCancel.setVisibility(View.GONE);
 
@@ -629,7 +670,104 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             callsDone.setVisibility(View.VISIBLE);
             callsCancel.setVisibility(View.GONE);
 
-            triggerRootRestoreTask();
+            restoreDpi();
+
+        }
+    }
+
+    class GetDpiValueTask extends AsyncTask{
+
+        String err;
+        int pDensity, oDensity;
+        int dpiV;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dpiStatusText.setVisibility(View.VISIBLE);
+            dpiProgress.setVisibility(View.VISIBLE);
+            dpiStatusText.setText(R.string.scanning);
+            pDensity = oDensity = dpiV = dpiValue = 0;
+            err = "";
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+
+            if (getJsonFromDataPackets.dpiPacket.dpiFile == null) {
+                err = getString(R.string.dpi_null);
+            }
+            else {
+                try {
+                    BufferedReader reader = new BufferedReader(new FileReader(getJsonFromDataPackets.dpiPacket.dpiFile));
+                    String line;
+                    while ((line = reader.readLine()) != null){
+
+                        line = line.trim();
+
+                        if (line.startsWith("Physical density:")){
+                            pDensity = Integer.parseInt(line.substring(line.lastIndexOf(' ')).trim());
+                        }
+                        else if (line.startsWith("Override density:")){
+                            oDensity = Integer.parseInt(line.substring(line.lastIndexOf(' ')).trim());
+                        }
+                    }
+
+                    if (oDensity > 0){
+                        dpiV = oDensity;
+                    }
+                    else if (pDensity > 0){
+                        dpiV = pDensity;
+                    }
+                }
+                catch (Exception e){
+                    err = e.getMessage();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            dpiProgress.setVisibility(View.GONE);
+
+            if (dpiV == 0){
+                dpiStatusText.setText(R.string.dpi_value_not_found);
+
+                // next process 3
+
+                triggerRootRestoreTask();
+            }
+            else if (!err.equals("")){
+                dpiStatusText.setText(err);
+
+                // next process 3
+
+                triggerRootRestoreTask();
+            }
+            else {
+                dpiValue = dpiV;
+                dpiStatusText.setText("");
+
+                dpiDialog = new AlertDialog.Builder(ExtraBackupsProgress.this)
+                        .setTitle(R.string.dpi_will_be_restored_in_the_end)
+                        .setMessage(R.string.dpi_will_be_restored_in_the_end_desc)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                // next process 3
+
+                                triggerRootRestoreTask();
+                            }
+                        })
+                        .setCancelable(false)
+                        .create();
+
+                dpiDialog.show();
+            }
 
         }
     }
@@ -772,7 +910,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             startService(new Intent(ExtraBackupsProgress.this, RestoreService.class));
 
-            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, numberOfApps, isContactAppPresent);
+            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, numberOfApps, isContactAppPresent, dpiValue);
             RestoreService.ROOT_RESTORE_TASK.execute((File)o);
         }
     }

@@ -39,7 +39,10 @@
     <string name="finished">Finished!</string>
     <string name="finished_with_errors">Finished with errors!</string>
     <string name="uninstall_prompt">Click OK to uninstall this app</string>
+    <string name="change_dpi_and_uninstall_prompt">Click OK to change DPI and uninstall this app</string>
     <string name="making_script">Making script</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="change_dpi_and_uninstall">Change DPI and uninstall</string>
 
     <!--app_selector.xml-->
     <string name="select_apps">Select what to restore</string>
@@ -82,8 +85,16 @@
     <string name="leave_as_it_is">Leave it as it is</string>
     <string name="callsPermission">Call logs permission needed</string>
     <string name="callsPermission_desc">Please allow to write call logs.</string>
+    <string name="scanning">Scanning</string>
+    <string name="dpi_null">DPI file is null</string>
+    <string name="dpi_value_not_found">DPI value not found</string>
+    <string name="dpi_will_be_restored_in_the_end">DPI will be restored in the end</string>
+    <string name="dpi_will_be_restored_in_the_end_desc">The screen DPI value from the backup will be restored once you press OK/UNINSTALL button after the backup is completed.</string>
     <string name="filtering">Filtering\n</string>
     <string name="please_do_not_press_back_button">Please do not press back button.</string>
+
+    <!--UninstallService.java-->
+    <string name="uninstalling">Uninstalling</string>
 
     <!--RestoreA_DB.java-->
     <string name="done">Done!</string>
@@ -99,6 +110,7 @@
     <string name="contacts">Contacts</string>
     <string name="sms">SMS messages</string>
     <string name="calls">Call logs</string>
+    <string name="dpi">Screen DPI</string>
     <string name="applications">Applications</string>
 
     <!--contacts_dialog_view.xml-->
