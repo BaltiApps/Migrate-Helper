@@ -31,7 +31,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -532,9 +531,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         extraBackupsProgressReadyReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                try {
-                    Runtime.getRuntime().exec("su -c rm -rf " + TEMP_DIR_NAME + "/*.vcf" + " " + TEMP_DIR_NAME + "/*.sms.db" + " " + TEMP_DIR_NAME + "/*.calls.db");
-                } catch (IOException ignored) {}
                 ExtraBackupsProgress.setData(mainGetJsonFromDataPackets, numberOfApps, installScriptPath, restoreDataScriptPath, extraSelectBoolean, mtdDirName);
                 LocalBroadcastManager.getInstance(AppSelector.this).sendBroadcast(new Intent("startRestoreFromExtraBackups"));
                 finish();
