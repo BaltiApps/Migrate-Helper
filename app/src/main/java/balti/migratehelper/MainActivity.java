@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(MainActivity.this, AppSelector.class). putExtra("all?", true));
                             }
                         })
+                        .setCancelable(false)
                         .setNegativeButton(R.string.later, null)
                         .show();
             }

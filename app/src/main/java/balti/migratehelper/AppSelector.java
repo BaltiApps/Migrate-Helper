@@ -2,6 +2,7 @@ package balti.migratehelper;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
@@ -219,7 +220,24 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
                             extraSelectBoolean = extrasSelect.isChecked();
 
-                            startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
+                            new AlertDialog.Builder(AppSelector.this)
+                                    .setTitle(R.string.do_not_use)
+                                    .setMessage(R.string.do_not_use_desc)
+                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
+                                        }
+                                    })
+                                    .setNegativeButton(R.string.later, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            finish();
+                                        }
+                                    })
+                                    .setCancelable(false)
+                                    .show();
+
                         }
                     }
                 });
