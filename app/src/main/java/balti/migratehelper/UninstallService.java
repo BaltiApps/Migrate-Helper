@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
@@ -30,13 +29,8 @@ public class UninstallService extends Service {
         try {
 
             ((NotificationManager) Objects.requireNonNull(getSystemService(NOTIFICATION_SERVICE))).cancelAll();
+            uninstall(this, dpiValue);
 
-            if (dpiValue > 0)
-                Runtime.getRuntime().exec("su -c wm density " + dpiValue).waitFor();
-
-            Toast.makeText(this, getString(R.string.uninstalling), Toast.LENGTH_SHORT).show();
-
-            uninstall(this);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -45,35 +39,36 @@ public class UninstallService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    void uninstall(Context context) throws IOException, InterruptedException {
+    void uninstall(Context context, int dpiValue) throws IOException, InterruptedException {
 
         String sourceDir = context.getApplicationInfo().sourceDir;
 
-        if (sourceDir.startsWith("/system")) {
-
+        if (sourceDir.startsWith("/system"))
             disableApp(context);
 
 
-            File tempScript = new File(context.getFilesDir() + "/tempScript.sh");
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
-            String command = "#!/sbin/sh\n\n" +
-                    "mount -o rw,remount /system\n" +
-                    "mount -o rw,remount /data\n" +
-                    "mount -o rw,remount /system/app/MigrateHelper\n" +
-                    "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                    "rm -rf " + context.getApplicationInfo().dataDir + " " + sourceDir + " " + TEMP_DIR_NAME + "\n" +
-                    "mount -o ro,remount /system\n";
-            writer.write(command);
-            writer.close();
+        if (dpiValue > 0) {
+            Runtime.getRuntime().exec("su -c wm density " + dpiValue).waitFor();
+        }
 
-            context.stopService(new Intent(context, StupidStartupService.class));
-            Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath()).waitFor();
-        }
-        else {
-            Intent uninstallIntent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, Uri.parse("package:" + context.getPackageName()));
-            uninstallIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(uninstallIntent);
-        }
+        File tempScript = new File(context.getFilesDir() + "/tempScript.sh");
+        BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
+        String command = "#!/sbin/sh\n\n" +
+                "mount -o rw,remount /system\n" +
+                "mount -o rw,remount /data\n" +
+                "mount -o rw,remount /system/app/MigrateHelper\n" +
+                "mount -o rw,remount /data/data/balti.migratehelper\n" +
+                "rm -rf " + context.getApplicationInfo().dataDir + " " + sourceDir + " " + TEMP_DIR_NAME + "\n" +
+                "mount -o ro,remount /system\n";
+
+        if (dpiValue > 0)
+            command = command + "reboot\n";
+
+        writer.write(command);
+        writer.close();
+
+        context.stopService(new Intent(context, StupidStartupService.class));
+        Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath()).waitFor();
 
         stopSelf();
 

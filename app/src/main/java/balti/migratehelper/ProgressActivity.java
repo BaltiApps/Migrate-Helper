@@ -2,6 +2,7 @@ package balti.migratehelper;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
@@ -76,7 +78,7 @@ public class ProgressActivity extends AppCompatActivity {
         okOnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startService(new Intent(ProgressActivity.this, UninstallService.class).putExtra("dpiValue", dpiValue));
+                startService(new Intent(ProgressActivity.this, UninstallService.class));
                 finish();
             }
         });
@@ -117,6 +119,8 @@ public class ProgressActivity extends AppCompatActivity {
             if (intent.hasExtra("total_time"))
                 messageHead.append("\n(" + intent.getStringExtra("total_time") + ")");
 
+            appendLog("log", intent);
+
             messageHead.setTextColor(Color.RED);
 
             if (intent.hasExtra("errors"))
@@ -124,8 +128,26 @@ public class ProgressActivity extends AppCompatActivity {
 
             dpiValue = intent.getIntExtra("dpiValue", 0);
 
-            okOnFinish.setText(R.string.uninstall);
-            okOnFinish.setVisibility(View.VISIBLE);
+            if (dpiValue > 0) {
+                okOnFinish.setVisibility(View.INVISIBLE);
+
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.change_dpi_and_reboot)
+                        .setMessage(R.string.change_dpi_and_reboot_desc)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startService(new Intent(ProgressActivity.this, UninstallService.class).putExtra("dpiValue", dpiValue));
+                            }
+                        })
+                        .setCancelable(false)
+                        .show();
+            }
+            else {
+                okOnFinish.setText(R.string.uninstall);
+                okOnFinish.setVisibility(View.VISIBLE);
+            }
+
             close.setVisibility(View.GONE);
         }
         else if (type.equals("finishedOk")){
@@ -146,7 +168,26 @@ public class ProgressActivity extends AppCompatActivity {
 
             dpiValue = intent.getIntExtra("dpiValue", 0);
 
-            okOnFinish.setVisibility(View.VISIBLE);
+            if (dpiValue > 0) {
+                okOnFinish.setVisibility(View.INVISIBLE);
+
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.change_dpi_and_reboot)
+                        .setMessage(R.string.change_dpi_and_reboot_desc)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startService(new Intent(ProgressActivity.this, UninstallService.class).putExtra("dpiValue", dpiValue));
+                            }
+                        })
+                        .setCancelable(false)
+                        .show();
+            }
+            else {
+                okOnFinish.setText(R.string.uninstall);
+                okOnFinish.setVisibility(View.VISIBLE);
+            }
+
             close.setVisibility(View.GONE);
 
             updateProgress(progressBar.getMax());

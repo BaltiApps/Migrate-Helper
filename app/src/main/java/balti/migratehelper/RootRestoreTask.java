@@ -261,7 +261,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
             Toast.makeText(context, context.getString(R.string.finished), Toast.LENGTH_SHORT).show();
 
-            String log = (dpiValue > 0)? context.getString(R.string.change_dpi_and_uninstall_prompt) : context.getString(R.string.uninstall_prompt);
+            String log = (dpiValue > 0)? context.getString(R.string.change_dpi_and_reboot_prompt) : context.getString(R.string.uninstall_prompt);
 
             restoreIntent.putExtra("type", "finishedOk");
             restoreIntent.putExtra("log", log);
@@ -276,7 +276,10 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         else {
             Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
 
+            String log = (dpiValue > 0)? context.getString(R.string.change_dpi_and_reboot_prompt) : context.getString(R.string.uninstall_prompt);
+
             restoreIntent.putExtra("type", "finishedErrors");
+            restoreIntent.putExtra("log", log);
             restoreIntent.putExtra("errors", errors + "\n" + context.getString(R.string.failed) + " " + o);
             restoreIntent.putExtra("head", context.getString(R.string.finished_with_errors));
 
@@ -292,7 +295,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
         progress.setOngoing(true);
 
-        String uninstallTitle = (dpiValue > 0)? context.getString(R.string.change_dpi_and_uninstall) : context.getString(R.string.uninstall);
+        String uninstallTitle = (dpiValue > 0)? context.getString(R.string.change_dpi_and_reboot) : context.getString(R.string.uninstall);
         PendingIntent uninstallPendingIntent = PendingIntent.getService(context, 79,
                 new Intent(context, UninstallService.class).putExtra("dpiValue", dpiValue), 0);
         NotificationCompat.Action uninstallAction = new NotificationCompat.Action(0, uninstallTitle, uninstallPendingIntent);

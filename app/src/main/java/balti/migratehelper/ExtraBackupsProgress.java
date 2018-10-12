@@ -686,6 +686,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             super.onPreExecute();
             dpiStatusText.setVisibility(View.VISIBLE);
             dpiProgress.setVisibility(View.VISIBLE);
+            dpiCancel.setVisibility(View.GONE);
+            dpiDone.setVisibility(View.GONE);
+
             dpiStatusText.setText(R.string.scanning);
             pDensity = oDensity = dpiV = dpiValue = 0;
             err = "";
@@ -696,6 +699,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             if (getJsonFromDataPackets.dpiPacket.dpiFile == null) {
                 err = getString(R.string.dpi_null);
+                dpiCancel.setVisibility(View.VISIBLE);
+                dpiDone.setVisibility(View.GONE);
             }
             else {
                 try {
@@ -736,12 +741,18 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             if (dpiV == 0){
                 dpiStatusText.setText(R.string.dpi_value_not_found);
 
+                dpiCancel.setVisibility(View.VISIBLE);
+                dpiDone.setVisibility(View.GONE);
+
                 // next process 3
 
                 triggerRootRestoreTask();
             }
             else if (!err.equals("")){
                 dpiStatusText.setText(err);
+
+                dpiCancel.setVisibility(View.VISIBLE);
+                dpiDone.setVisibility(View.GONE);
 
                 // next process 3
 
@@ -757,6 +768,23 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+
+                                dpiCancel.setVisibility(View.GONE);
+                                dpiDone.setVisibility(View.VISIBLE);
+
+                                // next process 3
+
+                                triggerRootRestoreTask();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                dpiCancel.setVisibility(View.VISIBLE);
+                                dpiDone.setVisibility(View.GONE);
+
+                                dpiValue = 0;
 
                                 // next process 3
 
