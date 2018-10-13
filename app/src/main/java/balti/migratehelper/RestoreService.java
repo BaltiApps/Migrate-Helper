@@ -11,6 +11,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 
 /**
@@ -29,6 +34,9 @@ public class RestoreService extends Service {
 
     static int RESTORE_SERVICE_NOTIFICATION_ID = 100;
 
+    BufferedWriter progressWriter, errorWriter;
+    String lastProgressLog = "";
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -39,17 +47,71 @@ public class RestoreService extends Service {
     public void onCreate() {
         super.onCreate();
 
+        try {
+
+            progressWriter = new BufferedWriter(new FileWriter(new File(getExternalCacheDir(), "progressLog")));
+            errorWriter = new BufferedWriter(new FileWriter(new File(getExternalCacheDir(), "errorLog")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         progressReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 returnIntent = intent;
-                try {
-                    if (intent.getStringExtra("type").equals("finishedOk") || intent.getStringExtra("type").equals("finishedErrors")) {
+                if (intent.hasExtra("type")) {
+
+                    if (intent.getStringExtra("type").equals("finishedErrors")) {
+
+                        try {
+
+                            if (intent.hasExtra("errors"))
+                                errorWriter.write(intent.getStringExtra("errors") + "\n");
+
+
+                            if (intent.hasExtra("log"))
+                                progressWriter.write("\n\n" + intent.getStringExtra("log") + "\n");
+
+                            progressWriter.close();
+                            errorWriter.close();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                         stopSelf();
+
+                    } else if (intent.getStringExtra("type").equals("finishedOk")) {
+
+                        try {
+
+                            if (intent.hasExtra("log"))
+                                progressWriter.write("\n\n" + intent.getStringExtra("log") + "\n");
+
+                            progressWriter.close();
+                            errorWriter.close();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        stopSelf();
+
+                    } else if (intent.getStringExtra("type").equals("restoring_app") && intent.hasExtra("log")
+                            && !intent.getStringExtra("log").equals(lastProgressLog)) {
+
+                        try {
+                            progressWriter.write((lastProgressLog = intent.getStringExtra("log")) + "\n");
+                        } catch (IOException ignored) {
+                        }
+
                     }
-                } catch (Exception e){ e.printStackTrace();}
+
+                }
             }
         };
+
+
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
         LocalBroadcastManager.getInstance(this).registerReceiver(progressReceiver, progressReceiverIF);
 
@@ -86,7 +148,18 @@ public class RestoreService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(requestListener);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
+        try {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(requestListener);
+        }catch (Exception ignored){}
+        try {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
+        }catch (Exception ignored){}
+
+        try {
+            progressWriter.close();
+        }catch (Exception ignored){}
+        try {
+            errorWriter.close();
+        }catch (Exception ignored){}
     }
 }

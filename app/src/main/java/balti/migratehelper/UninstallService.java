@@ -58,7 +58,10 @@ public class UninstallService extends Service {
                 "mount -o rw,remount /data\n" +
                 "mount -o rw,remount /system/app/MigrateHelper\n" +
                 "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                "rm -rf " + context.getApplicationInfo().dataDir + " " + sourceDir + " " + TEMP_DIR_NAME + "\n" +
+                "rm -rf " + context.getApplicationInfo().dataDir + " " + sourceDir + " " + TEMP_DIR_NAME + " " +
+                    new File(getExternalCacheDir(), "progressLog").getAbsolutePath() + " " +
+                    new File(getExternalCacheDir(), "errorLog").getAbsolutePath() + " " +
+                    "\n" +
                 "mount -o ro,remount /system\n";
 
         if (dpiValue > 0)

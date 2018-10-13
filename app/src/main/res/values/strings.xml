@@ -31,10 +31,14 @@
     App restore will continue after contacts are restored.
     </string>
     <string name="change_dpi_and_reboot_desc">Your DPI will be changed. Your device will be automatically rebooted to effect changes.</string>
+    <string name="change_dpi_and_reboot">Change DPI and reboot?</string>
+    <string name="send_logs_first">Send logs first</string>
+
 
     <!--progress.xml-->
     <string name="close">CLOSE</string>
     <string name="minimize">Minimize</string>
+    <string name="report">Report</string>
 
     <!--RootRestoreTask.java-->
     <string name="finished">Finished!</string>
@@ -43,8 +47,6 @@
     <string name="change_dpi_and_reboot_prompt">Click OK to change DPI and reboot</string>
     <string name="making_script">Making script</string>
     <string name="uninstall">Uninstall</string>
-    <string name="reboot">!! Reboot !!</string>
-    <string name="change_dpi_and_reboot">Change DPI and reboot?</string>
 
     <!--app_selector.xml-->
     <string name="select_apps">Select what to restore</string>
@@ -90,7 +92,7 @@
     <string name="scanning">Scanning</string>
     <string name="dpi_null">DPI file is null</string>
     <string name="dpi_value_not_found">DPI value not found</string>
-    <string name="dpi_will_be_restored_in_the_end">DPI will be restored in the end and rebooted</string>
+    <string name="dpi_will_be_restored_in_the_end">Reboot needed for DPI change</string>
     <string name="dpi_will_be_restored_in_the_end_desc">
         The screen DPI value from the backup will be restored once you press OK button after the backup is completed. Your device will be rebooted to affect the changes\n\n
         Press OK to continue, Cancel to completely skip DPI change.
@@ -110,6 +112,20 @@
 
     <!--ComposeSmsActivity.java-->
     <string name="please_change_sms_app">\"Migrate helper\" is not meant to be used as an sms app. Please change the default sms app</string>
+
+    <!--error_report_layout.xml-->
+    <string name="share_progress_logs">Share progress logs</string>
+    <string name="share_error_logs">Share error logs</string>
+    <string name="agree_and_send">Agree and send</string>
+    <string name="error_report_disclaimer">Thanks for your interest in helping to improve this app. You agree to share:\n\n
+        - Status of app and data restores (no private data)\n
+        - Personal info like phone numbers <b><i>ARE NOT RECORDED</i></b>\n
+        - You may be contacted via email address if further follow up is needed.\n\n
+        Click \"Agree and send\" to proceed.
+    </string>
+    <string name="log_files_do_not_exist">Log files do not exist</string>
+    <string name="progress_log_does_not_exist">\"progressLog\" does not exist</string>
+    <string name="error_log_does_not_exist">\"errorLog\" does not exist</string>
 
     <!--extra_backups_progress.xml-->
     <string name="contacts">Contacts</string>

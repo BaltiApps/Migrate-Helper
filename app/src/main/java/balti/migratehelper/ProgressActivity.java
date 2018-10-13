@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 public class ProgressActivity extends AppCompatActivity {
 
-    Button okOnFinish, close;
+    Button okOnFinish, close, reportLog;
     ProgressBar progressBar;
     TextView messageView, messageHead, progressPercentage;
     TextView errorView;
@@ -56,15 +56,27 @@ public class ProgressActivity extends AppCompatActivity {
         progressPercentage = findViewById(R.id.progressPercentage);
         okOnFinish = findViewById(R.id.okOnFinish);
         close = findViewById(R.id.close);
+        reportLog = findViewById(R.id.reportLogButton);
+
+        reportLog.setVisibility(View.GONE);
 
         messageView.setGravity(Gravity.BOTTOM);
         messageView.setMovementMethod(new ScrollingMovementMethod());
-
+        
         type = "";
 
         if (getIntent().getExtras() != null){
             handleProgress(getIntent());
         }
+
+        reportLog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new CommonTools(ProgressActivity.this).reportLogs(true);
+
+            }
+        });
 
         progressReceiver = new BroadcastReceiver() {
             @Override
@@ -109,6 +121,8 @@ public class ProgressActivity extends AppCompatActivity {
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+            reportLog.setVisibility(View.VISIBLE);
+
             try {
                 setAppIcon.cancel(true);
             } catch (Exception ignored){}
@@ -131,7 +145,7 @@ public class ProgressActivity extends AppCompatActivity {
             if (dpiValue > 0) {
                 okOnFinish.setVisibility(View.INVISIBLE);
 
-                new AlertDialog.Builder(this)
+                final AlertDialog dpiDialog = new AlertDialog.Builder(this)
                         .setTitle(R.string.change_dpi_and_reboot)
                         .setMessage(R.string.change_dpi_and_reboot_desc)
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -140,8 +154,24 @@ public class ProgressActivity extends AppCompatActivity {
                                 startService(new Intent(ProgressActivity.this, UninstallService.class).putExtra("dpiValue", dpiValue));
                             }
                         })
+                        .setNeutralButton(R.string.send_logs_first, null)
                         .setCancelable(false)
-                        .show();
+                        .create();
+
+                dpiDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        Button logButton = dpiDialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+                        logButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                new CommonTools(ProgressActivity.this).reportLogs(true);
+                            }
+                        });
+                    }
+                });
+
+                dpiDialog.show();
             }
             else {
                 okOnFinish.setText(R.string.uninstall);
@@ -153,6 +183,8 @@ public class ProgressActivity extends AppCompatActivity {
         else if (type.equals("finishedOk")){
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+            reportLog.setVisibility(View.GONE);
 
             try {
                 setAppIcon.cancel(true);
