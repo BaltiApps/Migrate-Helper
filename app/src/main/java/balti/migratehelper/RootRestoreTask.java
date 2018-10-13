@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 
@@ -32,7 +33,7 @@ import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
     private Context context;
-    private String errors;
+    private ArrayList<String> errors;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder progress;
 
@@ -72,7 +73,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         this.isContactAppPresent = isContactAppPresent;
         this.dpiValue = dpiValue;
 
-        errors = "";
+        errors = new ArrayList<>(0);
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
         activityIntent = new Intent(context, ProgressActivity.class);
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -176,17 +177,17 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                 String lowerLine = line.toLowerCase().trim();
                 if (lowerLine.startsWith("selinux"))
                     continue;
-                errors = errors + line + "\n";
+                errors.add(line);
             }
 
         }
         catch (Exception e){
             e.printStackTrace();
-            errors = errors + e.getMessage() + "\n";
+            errors.add(e.getMessage());
             return CODE_ERROR;
         }
 
-        if (errors.equals(""))
+        if (errors.size() == 0)
             return SUCCESS;
         else return EXECUTION_ERROR;
 
@@ -280,15 +281,19 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
             restoreIntent.putExtra("type", "finishedErrors");
             restoreIntent.putExtra("log", log);
-            restoreIntent.putExtra("errors", errors + "\n" + context.getString(R.string.failed) + " " + o);
+
+            errors.add("\n" + context.getString(R.string.failed) + " " + o);
+            restoreIntent.putStringArrayListExtra("errors", errors);
             restoreIntent.putExtra("head", context.getString(R.string.finished_with_errors));
 
             activityIntent.putExtras(restoreIntent);
 
             progress.setContentIntent(PendingIntent.getActivity(context, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                     .setContentTitle(context.getString(R.string.finished_with_errors))
-                    .setContentText(errors)
                     .setProgress(0, 0, false);
+
+            if (errors.size() > 0)
+                    progress.setContentText(errors.get(0));
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);

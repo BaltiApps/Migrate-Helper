@@ -15,6 +15,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 
@@ -65,8 +66,12 @@ public class RestoreService extends Service {
 
                         try {
 
-                            if (intent.hasExtra("errors"))
-                                errorWriter.write(intent.getStringExtra("errors") + "\n");
+                            if (intent.hasExtra("errors")) {
+                                ArrayList<String> receivedErrors = intent.getStringArrayListExtra("errors");
+                                for (String err : receivedErrors) {
+                                    errorWriter.write(err + "\n");
+                                }
+                            }
 
 
                             if (intent.hasExtra("log"))
@@ -102,8 +107,7 @@ public class RestoreService extends Service {
 
                         try {
                             progressWriter.write((lastProgressLog = intent.getStringExtra("log")) + "\n");
-                        } catch (IOException ignored) {
-                        }
+                        } catch (IOException ignored) {}
 
                     }
 

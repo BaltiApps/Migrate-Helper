@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class ProgressActivity extends AppCompatActivity {
 
     Button okOnFinish, close, reportLog;
@@ -137,8 +139,12 @@ public class ProgressActivity extends AppCompatActivity {
 
             messageHead.setTextColor(Color.RED);
 
-            if (intent.hasExtra("errors"))
-                errorView.setText(intent.getStringExtra("errors"));
+            if (intent.hasExtra("errors")) {
+                ArrayList<String> receivedErrors = intent.getStringArrayListExtra("errors");
+                for (String err : receivedErrors) {
+                    errorView.append(err + "\n");
+                }
+            }
 
             dpiValue = intent.getIntExtra("dpiValue", 0);
 
