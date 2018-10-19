@@ -644,6 +644,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                                 restoreCalls();
                             }
                         })
+                        .setCancelable(false)
                         .show();
             }
             else {
