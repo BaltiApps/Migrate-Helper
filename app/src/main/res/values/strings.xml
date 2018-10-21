@@ -97,6 +97,11 @@
         The screen DPI value from the backup will be restored once you press OK button after the backup is completed. Your device will be rebooted to affect the changes\n\n
         Press OK to continue, Cancel to completely skip DPI change.
     </string>
+    <string name="keyboard_null">Keyboard file is null</string>
+    <string name="keyboard_value_not_found">Keyboard value not found</string>
+    <string name="keyboard_corrupt">Keyboard file is corrupted</string>
+    <string name="keyboard_will_be_restored">will be set after app restore</string>
+    <string name="keyboard_not_in_restore_list">not in restore list</string>
     <string name="filtering">Filtering\n</string>
     <string name="please_do_not_press_back_button">Please do not press back button.</string>
 
@@ -132,6 +137,7 @@
     <string name="sms">SMS messages</string>
     <string name="calls">Call logs</string>
     <string name="dpi">Screen DPI</string>
+    <string name="keyboard">Default keyboard</string>
     <string name="applications">Applications</string>
 
     <!--contacts_dialog_view.xml-->

@@ -76,6 +76,13 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
     private int dpiValue = 0;
 
+    LinearLayout keyboardView;
+    ImageView keyboardDone, keyboardCancel;
+    ProgressBar keyboardProgress;
+    TextView keyboardStatusText;
+
+    String keyboardText = "";
+
     LinearLayout applications;
     ImageView appsDone;
     ProgressBar appsProgress;
@@ -97,6 +104,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     static boolean isShowSms = false;
     static boolean isShowCalls = false;
     static boolean isShowDpi = false;
+    static boolean isShowKeyboard = false;
 
     BroadcastReceiver startRestoreFromExtraBackups;
 
@@ -115,7 +123,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
     CallsPacket callsPackets[];
     AlertDialog callsPermissionDialog;
+
     AlertDialog dpiDialog;
+
     int CALLS_PERMISSION_REQUEST = 4;
     int CALLS_RESTORE_JOB = 40;
 
@@ -152,6 +162,12 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         dpiStatusText = findViewById(R.id.extra_backup_progress_item_dpi_progress_in_words);
         dpiDone = findViewById(R.id.extra_backup_progress_item_dpi_done);
         dpiCancel = findViewById(R.id.extra_backup_progress_item_dpi_cancel);
+
+        keyboardView = findViewById(R.id.extra_backup_progress_item_keyboard);
+        keyboardProgress = findViewById(R.id.extra_backup_progress_item_keyboard_progress);
+        keyboardStatusText = findViewById(R.id.extra_backup_progress_item_keyboard_progress_in_words);
+        keyboardDone = findViewById(R.id.extra_backup_progress_item_keyboard_done);
+        keyboardCancel = findViewById(R.id.extra_backup_progress_item_keyboard_cancel);
 
         applications = findViewById(R.id.extra_backup_progress_item_applications);
         appsProgress = findViewById(R.id.extra_backup_progress_item_app_progress);
@@ -215,11 +231,16 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             if (isShowDpi = getJsonFromDataPackets.dpiPacket.selected){
                 totalTasks++;
             }
+            if (isShowKeyboard = getJsonFromDataPackets.keyboardPacket.selected){
+                totalTasks++;
+            }
         }
         else {
             isShowContacts = false;
             isShowSms = false;
             isShowCalls = false;
+            isShowDpi = false;
+            isShowKeyboard = false;
         }
 
         if (numberOfApps > 0) totalTasks++;
@@ -250,6 +271,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 if (isShowSms) smsView.setVisibility(View.VISIBLE);
                 if (isShowCalls) callsView.setVisibility(View.VISIBLE);
                 if (isShowDpi) dpiView.setVisibility(View.VISIBLE);
+                if (isShowKeyboard) keyboardView.setVisibility(View.VISIBLE);
 
                 restoreContacts();
             }
@@ -588,6 +610,26 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             // next process 3
 
+            restoreKeyboard();
+
+        }
+
+    }
+
+    private void restoreKeyboard(){
+
+        if (isShowKeyboard) {
+
+            headProgressBar.setProgress(++intProgressTask);
+            headTitle.setText(R.string.keyboard);
+
+            new GetKeyboardTextTask().execute();
+
+        }
+        else {
+
+            // next process 4
+
             triggerRootRestoreTask();
 
         }
@@ -747,7 +789,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                 // next process 3
 
-                triggerRootRestoreTask();
+                restoreKeyboard();
             }
             else if (!err.equals("")){
                 dpiStatusText.setText(err);
@@ -757,7 +799,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                 // next process 3
 
-                triggerRootRestoreTask();
+                restoreKeyboard();
             }
             else {
                 dpiValue = dpiV;
@@ -775,7 +817,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                                 // next process 3
 
-                                triggerRootRestoreTask();
+                                restoreKeyboard();
                             }
                         })
                         .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -789,7 +831,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                                 // next process 3
 
-                                triggerRootRestoreTask();
+                                restoreKeyboard();
                             }
                         })
                         .setCancelable(false)
@@ -797,6 +839,157 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                 dpiDialog.show();
             }
+
+        }
+    }
+
+    class GetKeyboardTextTask extends AsyncTask{
+
+        String keybText, keybName, err;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            keyboardStatusText.setVisibility(View.VISIBLE);
+            keyboardProgress.setVisibility(View.VISIBLE);
+            keyboardCancel.setVisibility(View.GONE);
+            keyboardDone.setVisibility(View.GONE);
+
+            keyboardStatusText.setText(R.string.scanning);
+            keybText = keybName = err = "";
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+
+            if (getJsonFromDataPackets.keyboardPacket.keyboardFile == null) {
+                err = getString(R.string.keyboard_null);
+            }
+            else {
+
+                String kPackageName = "";
+
+                try {
+                    BufferedReader reader = new BufferedReader(new FileReader(getJsonFromDataPackets.keyboardPacket.keyboardFile));
+                    String line;
+                    int n = 0;
+                    while ((line = reader.readLine()) != null){
+
+                        line = line.trim();
+
+                        if (!line.equals("")) {
+                            keybText = keybText + line;
+                            n++;
+                        }
+
+                    }
+
+                    keybText = keybText.trim();
+
+                    if (n != 1) {
+                        err = getString(R.string.keyboard_corrupt);
+                    }
+                    else {
+                        kPackageName = keybText;
+                        if (keybText.contains("/"))
+                            kPackageName = keybText.split("/")[0];
+
+                        Object[] r = isKeyboardInRestoreList(kPackageName);
+
+                        if (r.length == 1){
+                            err = (String)r[0];
+                        }
+                        else {
+
+                            keybName = (String)r[0];
+
+                            if (!(boolean)r[1]){
+                                err = keybName + " " + getString(R.string.keyboard_not_in_restore_list);
+                            }
+                            else {
+                                err = "";
+                            }
+                        }
+                    }
+                }
+                catch (Exception e){
+                    err = e.getMessage();
+                }
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            dpiProgress.setVisibility(View.GONE);
+
+            if (err.equals("")){
+
+                onKeyboardSuccess(keybText, keybName);
+
+                // next process 4
+
+                triggerRootRestoreTask();
+            }
+            else {
+                onKeyboardError(err);
+
+                // next process 4
+
+                triggerRootRestoreTask();
+            }
+
+        }
+
+        Object[] isKeyboardInRestoreList(String keyboardPackageName){
+
+            String kName = "";
+
+            for (JSONObject jsonObject : getJsonFromDataPackets.jsonAppPackets){
+                try {
+                    String appName = jsonObject.getString("app_name");
+                    String apkName = jsonObject.getString("apk");
+                    String packageName = jsonObject.getString("package_name");
+
+                    boolean isApp = jsonObject.getBoolean(APP_CHECK) || apkName.equals("NULL");
+
+                    if (keyboardPackageName.equals(packageName)){
+                        kName = appName;
+
+                        return new Object[]{kName, isApp};
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return new Object[]{e.getMessage()};
+                }
+            }
+            return new Object[]{kName, false};
+        }
+
+        void onKeyboardError(String message){
+
+            keyboardCancel.setVisibility(View.VISIBLE);
+            keyboardDone.setVisibility(View.GONE);
+            keyboardProgress.setVisibility(View.GONE);
+            keyboardStatusText.setVisibility(View.VISIBLE);
+
+            keyboardStatusText.setText(message);
+            keyboardText = "";
+        }
+
+        void onKeyboardSuccess(String keybText, String keybName){
+
+            keyboardText = keybText;
+
+            keyboardCancel.setVisibility(View.GONE);
+            keyboardDone.setVisibility(View.VISIBLE);
+            keyboardProgress.setVisibility(View.GONE);
+            keyboardStatusText.setVisibility(View.VISIBLE);
+
+            keyboardStatusText.setText(keybName + " " + getString(R.string.keyboard_will_be_restored));
 
         }
     }
@@ -906,6 +1099,13 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                         }
                     }
 
+                    scriptWriter.write("echo  \n");
+                }
+
+                if (!keyboardText.equals("")){
+                    scriptWriter.write("echo Set keyboard...\n");
+                    scriptWriter.write("ime enable " + keyboardText + " 2>/dev/null\n");
+                    scriptWriter.write("ime set " + keyboardText + " 2>/dev/null\n");
                     scriptWriter.write("echo  \n");
                 }
 

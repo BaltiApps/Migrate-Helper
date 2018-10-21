@@ -383,6 +383,96 @@
                 android:orientation="horizontal"
                 android:layout_margin="@dimen/small_padding_width"
                 android:background="@color/listItem"
+                android:id="@+id/extra_backup_progress_item_keyboard"
+                android:padding="@dimen/small_padding_width"
+                android:gravity="center_vertical"
+                android:visibility="gone"
+                >
+
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_keyboard_icon"
+                    android:padding="15dp"
+                    />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/keyboard"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:layout_margin="@dimen/large_padding_width"
+                        />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:layout_gravity="end"
+                            android:paddingStart="@dimen/large_padding_width"
+                            android:paddingEnd="@dimen/large_padding_width"
+                            android:textColor="@color/colorAccent"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:id="@+id/extra_backup_progress_item_keyboard_progress_in_words"
+                            android:visibility="gone"
+                            />
+
+                        <ProgressBar
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:id="@+id/extra_backup_progress_item_keyboard_progress"
+                            android:visibility="gone"
+                            android:indeterminate="true"
+                            />
+
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="@dimen/extra_item_done_wh"
+                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:src="@drawable/ic_item_done"
+                    android:id="@+id/extra_backup_progress_item_keyboard_done"
+                    android:layout_margin="@dimen/large_padding_width"
+                    android:visibility="invisible"
+                    />
+
+                <ImageView
+                    android:layout_width="@dimen/extra_item_done_wh"
+                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:src="@drawable/ic_item_cancel"
+                    android:id="@+id/extra_backup_progress_item_keyboard_cancel"
+                    android:layout_margin="@dimen/large_padding_width"
+                    android:visibility="gone"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_padding_width"
+                android:background="@color/listItem"
                 android:gravity="center_vertical"
                 android:id="@+id/extra_backup_progress_item_applications"
                 android:padding="@dimen/small_padding_width"

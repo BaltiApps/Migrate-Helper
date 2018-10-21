@@ -11,7 +11,7 @@ app_uid=$(dumpsys package $3 | grep userId= | head -n 1 | cut -d '=' -f2)
 # sometimes app_uid has two lines. example: Google maps (com.google.android.apps.maps)
 # so "head -n 1" takes only the first line.
 
-rm -rf ${dataDir}
+rm -rf ${dataDir} 2>/dev/null
 
 $1/busybox tar -xzpf $2
 rm $2

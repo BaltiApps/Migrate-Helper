@@ -52,7 +52,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     TextView waitingMessageDesc;
     ImageButton clearAll;
     ImageButton selectAll;
-    TextView actionButton;
+    Button actionButton;
     ScrollView restoreContent;
     LinearLayout appCheckboxBar;
     ListView appList;
@@ -180,7 +180,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 appList.setAdapter(adapter);
 
                 if (mainGetJsonFromDataPackets.contactPackets.length != 0 || mainGetJsonFromDataPackets.smsPackets.length != 0
-                        || mainGetJsonFromDataPackets.callsPackets.length != 0 || mainGetJsonFromDataPackets.dpiPacket.dpiFile != null){
+                        || mainGetJsonFromDataPackets.callsPackets.length != 0 || mainGetJsonFromDataPackets.dpiPacket.dpiFile != null
+                        || mainGetJsonFromDataPackets.keyboardPacket.keyboardFile != null){
                     extrasBar.setVisibility(View.VISIBLE);
                     extrasSelect.setChecked(true);
                     extrasBar.setOnClickListener(new View.OnClickListener() {
@@ -261,6 +262,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         SmsPacket[] smsPackets;
         CallsPacket[] callsPackets;
         DpiPacket dpiPacket;
+        KeyboardPacket keyboardPacket;
 
         public ExtrasUpdate(GetJsonFromDataPackets getJsonFromDataPackets) {
             this.getJsonFromDataPackets = getJsonFromDataPackets;
@@ -268,6 +270,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             smsPackets = getJsonFromDataPackets.smsPackets;
             callsPackets = getJsonFromDataPackets.callsPackets;
             dpiPacket = getJsonFromDataPackets.dpiPacket;
+            keyboardPacket = getJsonFromDataPackets.keyboardPacket;
         }
 
         @Override
@@ -356,7 +359,20 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
             DpiPacket tempDpiPacket = new DpiPacket(dpiPacket.dpiFile, dpiPacket.selected);
 
-            return new Object[]{tempContactPackets, contactsViewItems, tempSmsPackets, smsViewItems, tempCallsPackets, callsViewItems, tempDpiPacket, dpiViewItem};
+            View keyboardViewItem = null;
+            if (keyboardPacket.keyboardFile != null) {
+                keyboardViewItem = View.inflate(AppSelector.this, R.layout.extra_item, null);
+                ImageView icon = keyboardViewItem.findViewById(R.id.extra_item_icon);
+                icon.setImageResource(R.drawable.ic_keyboard_icon);
+
+                TextView tv = keyboardViewItem.findViewById(R.id.extra_item_name);
+                tv.setText(R.string.keyboard);
+            }
+
+            KeyboardPacket tempKeyboardPacket = new KeyboardPacket(keyboardPacket.keyboardFile, keyboardPacket.selected);
+
+            return new Object[]{tempContactPackets, contactsViewItems, tempSmsPackets, smsViewItems, tempCallsPackets, callsViewItems, tempDpiPacket, dpiViewItem,
+                    tempKeyboardPacket, keyboardViewItem};
         }
 
         @Override
@@ -427,7 +443,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
             final DpiPacket tempDpiPacket[] = new DpiPacket[]{null};
 
-
             if (received[7] != null) {
                 tempDpiPacket[0] = (DpiPacket) received[6];
                 View dpiViewItem = (View)received[7];
@@ -445,6 +460,25 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 holder.addView(dpiViewItem);
             }
 
+            final KeyboardPacket tempKeyboardPacket[] = new KeyboardPacket[]{null};
+
+            if (received[9] != null) {
+                tempKeyboardPacket[0] = (KeyboardPacket) received[8];
+                View keyboardViewItem = (View)received[9];
+
+                CheckBox keyboard_cb = keyboardViewItem.findViewById(R.id.extras_item_select);
+                keyboard_cb.setChecked(tempKeyboardPacket[0].selected);
+
+                keyboard_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        tempKeyboardPacket[0].selected = b;
+                    }
+                });
+
+                holder.addView(keyboardViewItem);
+            }
+
 
             holder.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
@@ -457,13 +491,14 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 public void onClick(View view) {
 
                     if (contactsPackets.length == 0 && smsPackets.length == 0
-                            && callsPackets.length == 0 && dpiPacket.dpiFile == null)
+                            && callsPackets.length == 0 && dpiPacket.dpiFile == null && keyboardPacket.keyboardFile == null)
                         return;
 
                     boolean anyContact;
                     boolean anySms;
                     boolean anyCalls;
                     boolean isDpi;
+                    boolean isKeyboard;
 
                     if (tempContactPackets.length > 0) {
                          anyContact= tempContactPackets[0].selected;
@@ -510,7 +545,16 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                         isDpi = false;
                     }
 
-                    extrasSelect.setChecked(anyContact || anySms || anyCalls || isDpi);
+                    if (tempKeyboardPacket[0] != null){
+                        isKeyboard = tempKeyboardPacket[0].selected;
+                        keyboardPacket.keyboardFile = tempKeyboardPacket[0].keyboardFile;
+                        keyboardPacket.selected = tempKeyboardPacket[0].selected;
+                    }
+                    else {
+                        isKeyboard = false;
+                    }
+
+                    extrasSelect.setChecked(anyContact || anySms || anyCalls || isDpi || isKeyboard);
                     ad.dismiss();
                 }
             });
@@ -655,6 +699,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "cp " + TEMP_DIR_NAME + "/*.calls.db " + mtdDirName + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/*.perm " + mtdDirName + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/screen.dpi " + mtdDirName + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/default.kyb " + mtdDirName + " 2>/dev/null\n" +
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
 

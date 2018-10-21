@@ -119,7 +119,11 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         if (!screenDpi.exists())
             screenDpi = null;
 
-        return new GetJsonFromDataPackets(jsonObjects, vcfFiles, smsFiles, callsFiles, screenDpi);
+        File keyboardFile = new File(directoryPath[0], "default.kyb");
+        if (!keyboardFile.exists())
+            keyboardFile = null;
+
+        return new GetJsonFromDataPackets(jsonObjects, vcfFiles, smsFiles, callsFiles, screenDpi, keyboardFile);
     }
 
     @Override
