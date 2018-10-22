@@ -688,8 +688,9 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         File initSu = new File(getFilesDir(), "initSu.sh");
 
         String moveCommand = "#!sbin/sh\n\n" +
-                "pm grant balti.migratehelper android.permission.DUMP\n" +
-                "pm grant balti.migratehelper android.permission.PACKAGE_USAGE_STATS\n" +
+                "pm grant " + getPackageName() + " android.permission.DUMP\n" +
+                "pm grant " + getPackageName() + " android.permission.PACKAGE_USAGE_STATS\n" +
+                "pm grant " + getPackageName() + " android.permission.WRITE_SECURE_SETTINGS\n" +
                 "mv -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME + "/busybox\n" +
                 "rm -rf " + mtdDirName + "\n" +
                 "mkdir -p " + mtdDirName + "\n" +
