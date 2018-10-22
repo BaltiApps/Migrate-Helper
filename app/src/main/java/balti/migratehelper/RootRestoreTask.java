@@ -170,6 +170,8 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                 }
                 else {
                     publishProgress("restoring_app", c, numberOfAppJobs, head, line, icon);
+                    if (line.startsWith("Failed to find package"))
+                        errors.add("restoreDataScript: " + line);
                 }
             }
 

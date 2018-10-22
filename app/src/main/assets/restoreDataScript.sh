@@ -8,6 +8,10 @@ cd /data/data/
 dataDir=$(dumpsys package $3 | grep dataDir | head -n 1 | cut -d '=' -f2)
 app_uid=$(dumpsys package $3 | grep userId= | head -n 1 | cut -d '=' -f2)
 
+if [ ! -n "$app_uid" ]; then
+    echo "Failed to find package $3. Cannot restore data."
+fi
+
 # sometimes app_uid has two lines. example: Google maps (com.google.android.apps.maps)
 # so "head -n 1" takes only the first line.
 
