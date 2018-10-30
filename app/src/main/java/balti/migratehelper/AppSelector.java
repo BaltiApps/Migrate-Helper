@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -33,10 +34,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import static balti.migratehelper.CommonTools.DEBUG_TAG;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
 import static balti.migratehelper.GetJsonFromData.IS_PERMISSIBLE;
@@ -69,8 +72,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     private String restoreDataScriptPath = "";
 
     static String TEMP_DIR_NAME = "/data/balti.migrate";
+    static String METADATA_HOLDER_DIR = "/sdcard/.migrate_mtd/";
 
-    private String mtdDirName;
     private String initError;
 
     private static int SUCCESS = 0;
@@ -132,7 +135,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 waitingStatusMessage.setText(R.string.reading_metadata);
                 waitingMessageDesc.setText("");
                 getJsonFromData = new GetJsonFromData(AppSelector.this, waitingMessageDesc);
-                getJsonFromData.execute(mtdDirName);
+                getJsonFromData.execute(METADATA_HOLDER_DIR);
             }
             else if (rootCopyResult == SCRIPT_ERROR){
                 showError(getString(R.string.are_you_rooted), getString(R.string.are_you_rooted_desc));
@@ -576,6 +579,10 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         back = findViewById(R.id.app_selecter_back_button);
         title = findViewById(R.id.app_selector_title);
 
+        String externalPasteDir = getExternalCacheDir().getAbsolutePath() + "/Migrate/";
+        METADATA_HOLDER_DIR = "/sdcard" + externalPasteDir.substring(externalPasteDir.indexOf("/Android"));
+        Log.d(DEBUG_TAG, "mtd holder " + METADATA_HOLDER_DIR);
+
         appAllSelect = findViewById(R.id.appAllSelect);
         dataAllSelect = findViewById(R.id.dataAllSelect);
         permissionsAllSelect = findViewById(R.id.permissionsAllSelect);
@@ -598,7 +605,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         extrasBar = findViewById(R.id.extras_bar);
         extrasSelect = findViewById(R.id.extras_select);
 
-        mtdDirName = new File(getExternalCacheDir(), "metadataFiles").getAbsolutePath() + "/";
+        METADATA_HOLDER_DIR = new File(METADATA_HOLDER_DIR).getAbsolutePath() + "/";
 
         if (getIntent().getExtras() != null && getIntent().getExtras().getBoolean("all?", true)){
             title.setText(R.string.everything);
@@ -641,7 +648,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             @Override
             public void onReceive(Context context, Intent intent) {
                 ExtraBackupsProgress.setData(mainGetJsonFromDataPackets, numberOfApps,
-                        installScriptPath, restoreDataScriptPath, extraSelectBoolean, mtdDirName);
+                        installScriptPath, restoreDataScriptPath, extraSelectBoolean, METADATA_HOLDER_DIR);
                 LocalBroadcastManager.getInstance(AppSelector.this).sendBroadcast(new Intent("startRestoreFromExtraBackups"));
                 finish();
             }
@@ -692,15 +699,15 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "pm grant " + getPackageName() + " android.permission.PACKAGE_USAGE_STATS\n" +
                 "pm grant " + getPackageName() + " android.permission.WRITE_SECURE_SETTINGS\n" +
                 "mv -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME + "/busybox\n" +
-                "rm -rf " + mtdDirName + "\n" +
-                "mkdir -p " + mtdDirName + "\n" +
-                "cp " + TEMP_DIR_NAME + "/*.json " + mtdDirName + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/*.vcf " + mtdDirName + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/*.sms.db " + mtdDirName + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/*.calls.db " + mtdDirName + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/*.perm " + mtdDirName + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/screen.dpi " + mtdDirName + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/default.kyb " + mtdDirName + " 2>/dev/null\n" +
+                "rm -rf " + METADATA_HOLDER_DIR + "\n" +
+                "mkdir -p " + METADATA_HOLDER_DIR + "\n" +
+                "cp " + TEMP_DIR_NAME + "/*.json " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/*.vcf " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/*.sms.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/*.calls.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/*.perm " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/screen.dpi " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/default.kyb " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
 
@@ -716,11 +723,15 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             }
             writer.close();
 
-            String cmd = "su -c sh " + initSu.getAbsolutePath();
-            Process checkSu = Runtime.getRuntime().exec(cmd);
+            Process checkSu = Runtime.getRuntime().exec("su");
 
+            BufferedWriter suWriter = new BufferedWriter(new OutputStreamWriter(checkSu.getOutputStream()));
             BufferedReader outputReader = new BufferedReader(new InputStreamReader(checkSu.getInputStream()));
             BufferedReader err = new BufferedReader(new InputStreamReader(checkSu.getErrorStream()));
+
+            suWriter.write("sh " + initSu.getAbsolutePath() + "\n");
+            suWriter.write("exit\n");
+            suWriter.flush();
 
             String outputLine, output = "";
             while ((outputLine = outputReader.readLine()) != null)

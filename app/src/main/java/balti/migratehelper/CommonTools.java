@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
+
 public class CommonTools {
 
     Context context;
@@ -56,8 +58,8 @@ public class CommonTools {
     }
 
     void reportLogs(boolean isErrorLogMandatory){
-        final File progressLog = new File(context.getExternalCacheDir(), "progressLog");
-        final File errorLog = new File(context.getExternalCacheDir(), "errorLog");
+        final File progressLog = new File(METADATA_HOLDER_DIR, "progressLog");
+        final File errorLog = new File(METADATA_HOLDER_DIR, "errorLog");
 
         if (isErrorLogMandatory && !errorLog.exists()){
             new AlertDialog.Builder(context)

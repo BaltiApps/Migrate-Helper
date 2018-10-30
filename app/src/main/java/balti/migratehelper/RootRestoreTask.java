@@ -152,9 +152,15 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         startMillis = timeInMillis();
 
         try {
-            Process restoreProcess = Runtime.getRuntime().exec("su -c sh " + restoreScript.getAbsolutePath());
+            Process restoreProcess = Runtime.getRuntime().exec("su");
+
+            BufferedWriter suRestoreProcessWriter = new BufferedWriter(new OutputStreamWriter(restoreProcess.getOutputStream()));
             BufferedReader outputReader = new BufferedReader(new InputStreamReader(restoreProcess.getInputStream()));
             BufferedReader errorReader = new BufferedReader(new InputStreamReader(restoreProcess.getErrorStream()));
+
+            suRestoreProcessWriter.write("sh " + restoreScript.getAbsolutePath() + "\n");
+            suRestoreProcessWriter.write("exit\n");
+            suRestoreProcessWriter.flush();
 
             String line;
             int c = -1;

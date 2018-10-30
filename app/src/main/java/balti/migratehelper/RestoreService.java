@@ -17,6 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
 import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 
 /**
@@ -50,8 +51,8 @@ public class RestoreService extends Service {
 
         try {
 
-            progressWriter = new BufferedWriter(new FileWriter(new File(getExternalCacheDir(), "progressLog")));
-            errorWriter = new BufferedWriter(new FileWriter(new File(getExternalCacheDir(), "errorLog")));
+            progressWriter = new BufferedWriter(new FileWriter(new File(METADATA_HOLDER_DIR, "progressLog")));
+            errorWriter = new BufferedWriter(new FileWriter(new File(METADATA_HOLDER_DIR, "errorLog")));
         } catch (IOException e) {
             e.printStackTrace();
         }

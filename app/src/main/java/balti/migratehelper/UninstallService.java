@@ -13,10 +13,11 @@ import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Objects;
 
+import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
 
 public class UninstallService extends Service {
@@ -46,32 +47,28 @@ public class UninstallService extends Service {
         if (sourceDir.startsWith("/system"))
             disableApp(context);
 
+        Process fullProcess = Runtime.getRuntime().exec("su");
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fullProcess.getOutputStream()));
 
         if (dpiValue > 0) {
-            Runtime.getRuntime().exec("su -c wm density " + dpiValue).waitFor();
+            writer.write("wm density " + dpiValue + "\n");
         }
 
-        File tempScript = new File(context.getFilesDir() + "/tempScript.sh");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(tempScript));
-        String command = "#!/sbin/sh\n\n" +
-                "mount -o rw,remount /system\n" +
-                "mount -o rw,remount /data\n" +
-                "mount -o rw,remount /system/app/MigrateHelper\n" +
-                "mount -o rw,remount /data/data/balti.migratehelper\n" +
-                "rm -rf " + context.getApplicationInfo().dataDir + " " + sourceDir + " " + TEMP_DIR_NAME + " " +
-                    new File(getExternalCacheDir(), "progressLog").getAbsolutePath() + " " +
-                    new File(getExternalCacheDir(), "errorLog").getAbsolutePath() + " " +
-                    "\n" +
-                "mount -o ro,remount /system\n";
+        writer.write("mount -o rw,remount /system\n");
+        writer.write("mount -o rw,remount /data\n");
+        writer.write("mount -o rw,remount /system/app/MigrateHelper\n");
+        writer.write("mount -o rw,remount /data/data/balti.migratehelper\n");
+        writer.write("rm -rf " + context.getApplicationInfo().dataDir + " " + sourceDir + " " + TEMP_DIR_NAME + " " +
+                new File(METADATA_HOLDER_DIR).getAbsolutePath() + "\n");
 
-        if (dpiValue > 0)
-            command = command + "reboot\n";
-
-        writer.write(command);
-        writer.close();
+        if (dpiValue > 0){
+            writer.write("reboot\nexit\n");
+        }
 
         context.stopService(new Intent(context, StupidStartupService.class));
-        Runtime.getRuntime().exec("su -c sh " + tempScript.getAbsolutePath()).waitFor();
+
+        writer.flush();
+        fullProcess.waitFor();
 
         stopSelf();
 
