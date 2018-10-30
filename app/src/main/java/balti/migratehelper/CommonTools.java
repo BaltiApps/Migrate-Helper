@@ -113,8 +113,8 @@ public class CommonTools {
 
                             ArrayList<Uri> uris = new ArrayList<>(0);
 
-                            if (shareErrors.isChecked()) uris.add(FileProvider.getUriForFile(context, "migrate.provider", errorLog));
-                            if (shareProgress.isChecked()) uris.add(FileProvider.getUriForFile(context, "migrate.provider", progressLog));
+                            if (shareErrors.isChecked()) uris.add(FileProvider.getUriForFile(context, "migrate.helper.provider", errorLog));
+                            if (shareProgress.isChecked()) uris.add(FileProvider.getUriForFile(context, "migrate.helper.provider", progressLog));
 
                             emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
 

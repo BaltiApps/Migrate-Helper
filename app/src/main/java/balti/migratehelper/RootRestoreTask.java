@@ -177,7 +177,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
             while ((line = errorReader.readLine()) != null) {
                 String lowerLine = line.toLowerCase().trim();
-                if (lowerLine.startsWith("selinux"))
+                if (lowerLine.startsWith("selinux") || (lowerLine.startsWith("pkg:") && lowerLine.split(" ").length == 2))
                     continue;
                 errors.add(line);
             }

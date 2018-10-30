@@ -1013,6 +1013,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                 appsProgress.setVisibility(View.VISIBLE);
                 appsStatusText.setVisibility(View.VISIBLE);
+
+                appsProgress.setIndeterminate(false);
             }
         }
 
@@ -1021,8 +1023,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             if (n == 0)
                 return null;
-            else
-                appsProgress.setIndeterminate(false);
 
             Vector<JSONObject> jsonObjects = getJsonFromDataPackets.jsonAppPackets;
 
