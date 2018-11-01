@@ -5,5 +5,5 @@
 apkPath=$1/$2
 
 chmod 777 ${apkPath}
-pm install -r -d ${apkPath}
+pm install -r -d -t ${apkPath}
 rm -rf ${apkPath}
