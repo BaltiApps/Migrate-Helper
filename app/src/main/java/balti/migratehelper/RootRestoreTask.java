@@ -59,6 +59,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     static String DISPLAY_HEAD = "display head: ";
     static String INSTALLING_HEAD = "Installing app: ";
     static String RESTORE_DATA_HEAD = "Restoring data: ";
+    static String RESTORE_END_TAG = "--- Restore complete ---";
 
     private boolean isContactAppPresent;
 
@@ -166,6 +167,9 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
             int c = -1;
             String head = "", icon = "";
             while ((line = outputReader.readLine()) != null) {
+
+                line = line.trim();
+
                 if (line.startsWith(DISPLAY_HEAD)) {
                     c++;
                     head = line.substring(DISPLAY_HEAD.length()).trim();
@@ -179,6 +183,9 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                     if (line.startsWith("Failed to find package"))
                         errors.add("restoreDataScript: " + line);
                 }
+
+                if (line.equals(RESTORE_END_TAG))
+                    break;
             }
 
             while ((line = errorReader.readLine()) != null) {

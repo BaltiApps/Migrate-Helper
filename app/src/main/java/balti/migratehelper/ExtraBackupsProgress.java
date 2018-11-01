@@ -40,6 +40,8 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
@@ -49,6 +51,7 @@ import static balti.migratehelper.GetJsonFromData.PERM_CHECK;
 import static balti.migratehelper.RootRestoreTask.DISPLAY_HEAD;
 import static balti.migratehelper.RootRestoreTask.INSTALLING_HEAD;
 import static balti.migratehelper.RootRestoreTask.RESTORE_DATA_HEAD;
+import static balti.migratehelper.RootRestoreTask.RESTORE_END_TAG;
 
 public class ExtraBackupsProgress extends AppCompatActivity implements OnDBRestoreComplete {
 
@@ -1048,6 +1051,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             try {
                 scriptWriter = new BufferedWriter(new FileWriter(restoreScript));
 
+                scriptWriter.write("#!sbin/sh\n\n");
+
                 for (int i = 0; i < jsonObjects.size(); i++) {
 
                     JSONObject jsonObject = jsonObjects.get(i);
@@ -1094,12 +1099,23 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                         BufferedReader permReader = new BufferedReader(new FileReader(permFile));
                         String pLine;
 
+                        Set<String> permissionSet = new TreeSet<>();
+
                         while ((pLine = permReader.readLine()) != null){
                             pLine = pLine.substring(0, pLine.indexOf(':')).trim();
-                            if (pLine.startsWith("android.permission")) scriptWriter.write("pm grant " + packageName + " " + pLine + " 2>/dev/null\n");
+                            if (pLine.startsWith("android.permission") && isDangerousPermission(pLine))
+                                permissionSet.add(pLine);
                         }
+
+                        for (String p : permissionSet) {
+                            String actualPermission = p.substring(p.lastIndexOf('.') + 1).trim();
+                            scriptWriter.write("pm grant " + packageName + " " + p + " 2>/dev/null && echo Grant: " + actualPermission + "\n");
+                        }
+
+                        permissionSet.clear();
                     }
 
+                    scriptWriter.write("echo  \n");
                     scriptWriter.write("echo  \n");
                 }
 
@@ -1110,6 +1126,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     scriptWriter.write("echo  \n");
                 }
 
+                scriptWriter.write("echo " + RESTORE_END_TAG + "\n");
                 scriptWriter.close();
                 restoreScript.setExecutable(true);
 
@@ -1118,6 +1135,44 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             }
 
             return restoreScript;
+        }
+
+        boolean isDangerousPermission(String permission){
+
+            String dangerousPermissions[] = new String[]{
+                    "android.permission.READ_CALENDAR",
+                    "android.permission.WRITE_CALENDAR",
+                    "android.permission.CAMERA",
+                    "android.permission.READ_CONTACTS",
+                    "android.permission.WRITE_CONTACTS",
+                    "android.permission.GET_ACCOUNTS",
+                    "android.permission.ACCESS_FINE_LOCATION",
+                    "android.permission.ACCESS_COARSE_LOCATION",
+                    "android.permission.RECORD_AUDIO",
+                    "android.permission.READ_PHONE_STATE",
+                    "android.permission.READ_PHONE_NUMBERS",
+                    "android.permission.CALL_PHONE",
+                    "android.permission.ANSWER_PHONE_CALLS",
+                    "android.permission.READ_CALL_LOG",
+                    "android.permission.WRITE_CALL_LOG",
+                    "android.permission.ADD_VOICEMAIL",
+                    "android.permission.USE_SIP",
+                    "android.permission.PROCESS_OUTGOING_CALLS",
+                    "android.permission.BODY_SENSORS",
+                    "android.permission.SEND_SMS",
+                    "android.permission.RECEIVE_SMS",
+                    "android.permission.READ_SMS",
+                    "android.permission.RECEIVE_WAP_PUSH",
+                    "android.permission.RECEIVE_MMS",
+                    "android.permission.READ_EXTERNAL_STORAGE",
+                    "android.permission.WRITE_EXTERNAL_STORAGE"
+            };
+
+            for (String dP : dangerousPermissions)
+                if (permission.trim().equals(dP))
+                    return true;
+
+            return false;
         }
 
         @Override
