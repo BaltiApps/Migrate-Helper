@@ -45,6 +45,18 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/please_use_magisk"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/colorAccent"
+            />
+
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
 
         <Button
             android:id="@+id/restoreSu"
@@ -74,6 +86,7 @@
             android:layout_height="60dp"
             android:background="@drawable/uninstall_button"
             android:text="@string/uninstallOrDisable" />
+
 
     </LinearLayout>
 

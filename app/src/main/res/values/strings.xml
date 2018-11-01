@@ -5,6 +5,7 @@
     <string name="restore_all">Restore all apps and data</string>
     <string name="uninstallOrDisable">Uninstall or disable</string>
     <string name="selective_restore">Choose what to restore</string>
+    <string name="please_use_magisk">Make sure to use Magisk</string>
 
     <!--MainActivity.java-->
     <string name="too_fast">Whoa, too fast!!</string>

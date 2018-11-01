@@ -67,6 +67,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
     AppListAdapter adapter;
 
+    Process checkSu;
+
     private String busyboxBinaryFilePath = "";
     private String installScriptPath = "";
     private String restoreDataScriptPath = "";
@@ -110,6 +112,15 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             actionButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
+                    try {
+                        checkSu.destroy();
+                    }catch (Exception ignored){}
+
+                    try {
+                        rootCopyTask.cancel(true);
+                    }catch (Exception ignored){}
+
                     finish();
                 }
             });
@@ -723,7 +734,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             }
             writer.close();
 
-            Process checkSu = Runtime.getRuntime().exec("su");
+            checkSu = Runtime.getRuntime().exec("su");
 
             BufferedWriter suWriter = new BufferedWriter(new OutputStreamWriter(checkSu.getOutputStream()));
             BufferedReader outputReader = new BufferedReader(new InputStreamReader(checkSu.getInputStream()));
