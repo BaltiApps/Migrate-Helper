@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -39,7 +38,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import static balti.migratehelper.CommonTools.DEBUG_TAG;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
 import static balti.migratehelper.GetJsonFromData.IS_PERMISSIBLE;
@@ -592,7 +590,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         String externalPasteDir = getExternalCacheDir().getAbsolutePath() + "/Migrate/";
         METADATA_HOLDER_DIR = "/sdcard" + externalPasteDir.substring(externalPasteDir.indexOf("/Android"));
-        Log.d(DEBUG_TAG, "mtd holder " + METADATA_HOLDER_DIR);
 
         appAllSelect = findViewById(R.id.appAllSelect);
         dataAllSelect = findViewById(R.id.dataAllSelect);
