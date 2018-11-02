@@ -40,6 +40,7 @@
     <string name="close">CLOSE</string>
     <string name="minimize">Minimize</string>
     <string name="report">Report</string>
+    <string name="minimizing_may_decrease_speed">Minimizing this screen may decrease restore speed!</string>
 
     <!--RootRestoreTask.java-->
     <string name="finished">Finished!</string>
