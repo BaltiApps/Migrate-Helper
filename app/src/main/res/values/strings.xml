@@ -65,7 +65,7 @@
     <string name="failed_desc">Please grant root permission.</string>
     <string name="everything">Everything selected!</string>
     <string name="reading_metadata">Reading metadata...</string>
-    <string name="initMessageShort">This can take a minute.</string>
+    <string name="initMessageShort">This can take upto 3 minutes.\n\nIn case you have waited more than 5 minutes\nClick CANCEL\nOpen Magisk app\nClose the app and retry restoring</string>
     <string name="are_you_rooted">Are you rooted?</string>
     <string name="are_you_rooted_desc">Script error.\nMake sure to grant root.\nRoot with Magisk if needed.</string>
     <string name="code_error">Code error!</string>
