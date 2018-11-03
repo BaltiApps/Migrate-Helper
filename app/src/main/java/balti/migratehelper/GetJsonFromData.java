@@ -69,9 +69,11 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
     protected GetJsonFromDataPackets doInBackground(String... directoryPath) {
 
         Vector<JSONObject> jsonObjects = new Vector<>(0);
+
         try {
 
             File[] files = new File(directoryPath[0]).listFiles(jsonFilter);
+            if (files == null) files = new File[0];
 
             int n = files.length;
 
@@ -91,6 +93,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         File[] vcfFiles = new File[0];
         try {
             vcfFiles = new File(directoryPath[0]).listFiles(vcfFilter);
+            if (vcfFiles == null) vcfFiles = new File[0];
         }
         catch (Exception e){
             e.printStackTrace();
@@ -100,6 +103,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         File[] smsFiles = new File[0];
         try {
             smsFiles = new File(directoryPath[0]).listFiles(smsDBFilter);
+            if (smsFiles == null) smsFiles = new File[0];
         }
         catch (Exception e){
             e.printStackTrace();
@@ -109,6 +113,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         File[] callsFiles = new File[0];
         try {
             callsFiles = new File(directoryPath[0]).listFiles(callsDBFilter);
+            if (callsFiles == null) callsFiles = new File[0];
         }
         catch (Exception e){
             e.printStackTrace();

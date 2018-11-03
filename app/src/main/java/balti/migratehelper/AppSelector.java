@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -41,7 +40,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import static balti.migratehelper.CommonTools.DEBUG_TAG;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
 import static balti.migratehelper.GetJsonFromData.IS_PERMISSIBLE;
@@ -76,7 +74,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     private String restoreDataScriptPath = "";
 
     static String TEMP_DIR_NAME = "/data/balti.migrate";
-    static String METADATA_HOLDER_DIR = "/sdcard/.migrate_mtd/";
+    static String METADATA_HOLDER_DIR = "/sdcard/";
 
     private String initError;
 
@@ -611,8 +609,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
                 while ((line = reader.readLine()) != null){
 
-                    Log.d(DEBUG_TAG, line);
-
                     String data[] = line.split(" ");
                     if (data.length == 2 && data[0].equals("sdk")){
                         originating_sdk = Integer.parseInt(data[1].trim());
@@ -633,8 +629,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             super.onPostExecute(o);
 
             int current_sdk = Build.VERSION.SDK_INT;
-
-            Log.d(DEBUG_TAG, current_sdk + " " + originating_sdk);
 
             if (originating_sdk != 0 && originating_sdk != current_sdk){
 

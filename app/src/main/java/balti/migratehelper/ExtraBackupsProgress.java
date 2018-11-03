@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.provider.Telephony;
@@ -51,7 +52,6 @@ import static balti.migratehelper.GetJsonFromData.PERM_CHECK;
 import static balti.migratehelper.RootRestoreTask.DISPLAY_HEAD;
 import static balti.migratehelper.RootRestoreTask.INSTALLING_HEAD;
 import static balti.migratehelper.RootRestoreTask.RESTORE_DATA_HEAD;
-import static balti.migratehelper.RootRestoreTask.RESTORE_END_TAG;
 
 public class ExtraBackupsProgress extends AppCompatActivity implements OnDBRestoreComplete {
 
@@ -347,12 +347,16 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 contactCount = j+1;
                 try {
                     Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setDataAndType(FileProvider.getUriForFile(ExtraBackupsProgress.this, "migrate.helper.provider", packet.vcfFile), "text/x-vcard");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                        i.setDataAndType(FileProvider.getUriForFile(ExtraBackupsProgress.this, "migrate.helper.provider", packet.vcfFile), "text/x-vcard");
+                    else
+                        i.setDataAndType(Uri.fromFile(packet.vcfFile), "text/x-vcard");
                     i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     startActivityForResult(i, CONTACTS_RESTORE);
                 }
                 catch (Exception e){
                     e.printStackTrace();
+                    continue;
                 }
 
                 return;
@@ -997,7 +1001,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         }
     }
 
-    class FilterAcceptedApps extends AsyncTask{
+    class FilterAcceptedApps extends AsyncTask<Object, Object, File>{
 
         int n = 0;
         boolean isContactAppPresent = false;
@@ -1022,10 +1026,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         }
 
         @Override
-        protected Object doInBackground(Object[] objects) {
-
-            if (n == 0)
-                return null;
+        protected File doInBackground(Object[] objects) {
 
             Vector<JSONObject> jsonObjects = getJsonFromDataPackets.jsonAppPackets;
 
@@ -1049,6 +1050,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             BufferedWriter scriptWriter;
 
             try {
+
+                restoreScript.createNewFile();
+
                 scriptWriter = new BufferedWriter(new FileWriter(restoreScript));
 
                 scriptWriter.write("#!sbin/sh\n\n");
@@ -1126,7 +1130,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     scriptWriter.write("echo  \n");
                 }
 
-                scriptWriter.write("echo " + RESTORE_END_TAG + "\n");
                 scriptWriter.close();
                 restoreScript.setExecutable(true);
 
@@ -1184,8 +1187,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         }
 
         @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
+        protected void onPostExecute(File file) {
+            super.onPostExecute(file);
 
             if (n > 0) {
                 appsDone.setVisibility(View.VISIBLE);
@@ -1195,8 +1198,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             startService(new Intent(ExtraBackupsProgress.this, RestoreService.class));
 
-            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, numberOfApps, isContactAppPresent, dpiValue);
-            RestoreService.ROOT_RESTORE_TASK.execute((File)o);
+            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, numberOfApps, isContactAppPresent, dpiValue, file);
+            RestoreService.ROOT_RESTORE_TASK.execute();
         }
     }
 

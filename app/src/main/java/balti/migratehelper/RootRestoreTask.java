@@ -59,7 +59,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     static String DISPLAY_HEAD = "display head: ";
     static String INSTALLING_HEAD = "Installing app: ";
     static String RESTORE_DATA_HEAD = "Restoring data: ";
-    static String RESTORE_END_TAG = "--- Restore complete ---";
 
     private boolean isContactAppPresent;
 
@@ -67,12 +66,15 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     private BufferedWriter suProcessForVcfCheckWriter;
     private BufferedReader suProcessForVcfCheckReader;
 
-    RootRestoreTask(Context context, int numberOfAppJobs, boolean isContactAppPresent, int dpiValue) {
+    File actualRestoreScript;
+
+    RootRestoreTask(Context context, int numberOfAppJobs, boolean isContactAppPresent, int dpiValue, File actualRestoreScript) {
 
         this.context = context;
         this.numberOfAppJobs = numberOfAppJobs;
         this.isContactAppPresent = isContactAppPresent;
         this.dpiValue = dpiValue;
+        this.actualRestoreScript = actualRestoreScript;
 
         errors = new ArrayList<>(0);
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
@@ -96,10 +98,12 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
         String command1 = "dumpsys activity services | grep com.google.android.contacts/com.google.android.apps.contacts.vcard.VCardService\n";
         String command2 = "dumpsys activity services | grep com.android.contacts/.vcard.VCardService\n";
+        String command3 = "dumpsys activity services | grep com.android.contacts/.common.vcard.VCardService\n";
 
         try {
             suProcessForVcfCheckWriter.write(command1);
             suProcessForVcfCheckWriter.write(command2);
+            suProcessForVcfCheckWriter.write(command3);
             suProcessForVcfCheckWriter.write("echo DONE\n");
             suProcessForVcfCheckWriter.flush();
 
@@ -148,8 +152,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
         }
 
-        File restoreScript = files[0];
-
         startMillis = timeInMillis();
 
         try {
@@ -159,7 +161,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
             BufferedReader outputReader = new BufferedReader(new InputStreamReader(restoreProcess.getInputStream()));
             BufferedReader errorReader = new BufferedReader(new InputStreamReader(restoreProcess.getErrorStream()));
 
-            suRestoreProcessWriter.write("sh " + restoreScript.getAbsolutePath() + "\n");
+            suRestoreProcessWriter.write("sh " + actualRestoreScript.getAbsolutePath() + "\n");
             suRestoreProcessWriter.write("exit\n");
             suRestoreProcessWriter.flush();
 
@@ -183,9 +185,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                     if (line.startsWith("Failed to find package"))
                         errors.add("restoreDataScript: " + line);
                 }
-
-                if (line.equals(RESTORE_END_TAG))
-                    break;
             }
 
             while ((line = errorReader.readLine()) != null) {
