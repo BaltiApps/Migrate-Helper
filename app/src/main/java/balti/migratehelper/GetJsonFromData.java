@@ -123,7 +123,9 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         if (!keyboardFile.exists())
             keyboardFile = null;
 
-        return new GetJsonFromDataPackets(jsonObjects, vcfFiles, smsFiles, callsFiles, screenDpi, keyboardFile);
+        File package_data = new File(directoryPath[0], "package-data");
+
+        return new GetJsonFromDataPackets(jsonObjects, vcfFiles, smsFiles, callsFiles, screenDpi, keyboardFile, package_data);
     }
 
     @Override

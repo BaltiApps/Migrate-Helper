@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -31,13 +32,16 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import static balti.migratehelper.CommonTools.DEBUG_TAG;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
 import static balti.migratehelper.GetJsonFromData.IS_PERMISSIBLE;
@@ -580,6 +584,111 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         }
     }
 
+    class ReadPackageData extends AsyncTask{
+
+        GetJsonFromDataPackets gjfdp;
+        int originating_sdk = 0;
+
+        ReadPackageData(GetJsonFromDataPackets getJsonFromDataPackets){
+            gjfdp = getJsonFromDataPackets;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            waitingMessageDesc.setText(R.string.reading_package_data);
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+
+            File package_data = gjfdp.package_data;
+            String line;
+
+            try {
+
+                BufferedReader reader = new BufferedReader(new FileReader(package_data));
+
+                while ((line = reader.readLine()) != null){
+
+                    Log.d(DEBUG_TAG, line);
+
+                    String data[] = line.split(" ");
+                    if (data.length == 2 && data[0].equals("sdk")){
+                        originating_sdk = Integer.parseInt(data[1].trim());
+                    }
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            int current_sdk = Build.VERSION.SDK_INT;
+
+            Log.d(DEBUG_TAG, current_sdk + " " + originating_sdk);
+
+            if (originating_sdk != 0 && originating_sdk != current_sdk){
+
+                String message = getString(R.string.restore_in_different_version_warning) + "\n\n" +
+                        getString(R.string.originating_sdk) + ": " + originating_sdk + "\n" +
+                        getString(R.string.current_sdk) + ": " + current_sdk;
+
+                new AlertDialog.Builder(AppSelector.this)
+                        .setMessage(message)
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                if (intentSelectAll){
+                                    waitingStatusMessage.setText(R.string.selecting_all);
+                                    actionButton.setVisibility(View.INVISIBLE);
+
+                                    numberOfApps = gjfdp.jsonAppPackets.size();
+                                    mainGetJsonFromDataPackets = gjfdp;
+                                    extraSelectBoolean = true;
+
+                                    startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
+                                }
+                                else {
+                                    appUpdateTask = new AppUpdate(gjfdp);
+                                    appUpdateTask.execute();
+                                }
+                            }
+                        })
+                        .show();
+
+            }
+            else {
+
+                if (intentSelectAll){
+                    waitingStatusMessage.setText(R.string.selecting_all);
+                    actionButton.setVisibility(View.INVISIBLE);
+
+                    numberOfApps = gjfdp.jsonAppPackets.size();
+                    mainGetJsonFromDataPackets = gjfdp;
+                    extraSelectBoolean = true;
+
+                    startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
+                }
+                else {
+                    appUpdateTask = new AppUpdate(gjfdp);
+                    appUpdateTask.execute();
+                }
+            }
+
+        }
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -716,6 +825,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "cp " + TEMP_DIR_NAME + "/*.perm " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/screen.dpi " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/default.kyb " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/package-data " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
 
@@ -780,7 +890,9 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             return;
         }
 
-        if (intentSelectAll){
+        new ReadPackageData(getJsonFromDataPackets).execute();
+
+        /*if (intentSelectAll){
             waitingStatusMessage.setText(R.string.selecting_all);
             actionButton.setVisibility(View.INVISIBLE);
 
@@ -793,7 +905,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         else {
             appUpdateTask = new AppUpdate(getJsonFromDataPackets);
             appUpdateTask.execute();
-        }
+        }*/
     }
 
 
@@ -921,5 +1033,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             adapter.notifyDataSetChanged();
         }
     }
+
+
 
 }

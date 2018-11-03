@@ -65,7 +65,7 @@
     <string name="failed_desc">Please grant root permission.</string>
     <string name="everything">Everything selected!</string>
     <string name="reading_metadata">Reading metadata...</string>
-    <string name="initMessageShort">This can take upto 3 minutes.\n\nIn case you have waited more than 5 minutes\nClick CANCEL\nOpen Magisk app\nClose the app and retry restoring</string>
+    <string name="initMessageShort">This can take upto 3 minutes.\n\nIn case you have waited more than 5 minutes\nClick CANCEL\nOpen Magisk app\nClose the Magisk app\n Open this app and retry restoring</string>
     <string name="are_you_rooted">Are you rooted?</string>
     <string name="are_you_rooted_desc">Script error.\nMake sure to grant root.\nRoot with Magisk if needed.</string>
     <string name="code_error">Code error!</string>
@@ -76,6 +76,10 @@
     <string name="null_adapter">Null adapter</string>
     <string name="restore_contacts_dialog_header">Restore contacts</string>
     <string name="proceed">Proceed</string>
+    <string name="reading_package_data">Reading package data</string>
+    <string name="restore_in_different_version_warning">The original backup was taken in a different Android version. Some apps may fail to restore</string>
+    <string name="originating_sdk">Originating backup SDK</string>
+    <string name="current_sdk">Current SDK</string>
 
     <!--ExtraBackupsProgress.java-->
     <string name="do_not_close">Please do not press back/home/recents or close this app.</string>

@@ -12,8 +12,10 @@ public class GetJsonFromDataPackets {
     CallsPacket callsPackets[];
     DpiPacket dpiPacket;
     KeyboardPacket keyboardPacket;
+    File package_data;
 
-    public GetJsonFromDataPackets(Vector<JSONObject> jsonAppPackets, File[] vcfFiles, File[] smsDBFiles, File[] callsDBFiles, File screenDpiFile, File keyboardFile) {
+    public GetJsonFromDataPackets(Vector<JSONObject> jsonAppPackets, File[] vcfFiles, File[] smsDBFiles, File[] callsDBFiles,
+                                  File screenDpiFile, File keyboardFile, File package_data) {
 
         if (jsonAppPackets != null){
             this.jsonAppPackets = jsonAppPackets;
@@ -60,5 +62,7 @@ public class GetJsonFromDataPackets {
             keyboardPacket = new KeyboardPacket(null, false);
         }
         else keyboardPacket = new KeyboardPacket(keyboardFile, true);
+
+        this.package_data = package_data;
     }
 }
