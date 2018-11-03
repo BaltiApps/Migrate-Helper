@@ -77,6 +77,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         this.actualRestoreScript = actualRestoreScript;
 
         errors = new ArrayList<>(0);
+
         restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
         activityIntent = new Intent(context, ProgressActivity.class);
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
