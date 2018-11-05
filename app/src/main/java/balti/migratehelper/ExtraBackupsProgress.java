@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
@@ -1045,7 +1046,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 publishProgress(getString(R.string.filtering), c, n);
             }
 
-            File restoreScript = new File(getFilesDir(), "restoreAppScript.sh");
+            File restoreScript = new File(getFilesDir(), "the_restore_script.sh");
 
             BufferedWriter scriptWriter;
 
@@ -1130,6 +1131,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     scriptWriter.write("echo  \n");
                 }
 
+                scriptWriter.write("mv " + restoreScript.getAbsolutePath() + " " + METADATA_HOLDER_DIR + "/\n");
                 scriptWriter.close();
                 restoreScript.setExecutable(true);
 
