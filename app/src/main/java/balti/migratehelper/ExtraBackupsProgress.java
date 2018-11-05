@@ -1132,6 +1132,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 }
 
                 scriptWriter.write("mv " + restoreScript.getAbsolutePath() + " " + METADATA_HOLDER_DIR + "/\n");
+                scriptWriter.write("mv " + TEMP_DIR_NAME + "/package-data" + " " + METADATA_HOLDER_DIR + "/\n");
                 scriptWriter.close();
                 restoreScript.setExecutable(true);
 

@@ -39,6 +39,14 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/share_package_data"
+            android:checked="true"
+            android:id="@+id/share_package_data"
+            />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/share_error_logs"
             android:checked="true"
             android:id="@+id/share_errors_checkbox"

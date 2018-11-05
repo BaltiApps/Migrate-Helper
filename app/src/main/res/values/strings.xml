@@ -128,6 +128,7 @@
     <string name="share_progress_logs">Share progress logs</string>
     <string name="share_error_logs">Share error logs</string>
     <string name="share_script">Share script</string>
+    <string name="share_package_data">Share package-data</string>
     <string name="agree_and_send">Agree and send</string>
     <string name="error_report_disclaimer">Thanks for your interest in helping to improve this app. You agree to share:\n\n
         - Status of app and data restores (no private data)\n
@@ -139,6 +140,7 @@
     <string name="progress_log_does_not_exist">\"progressLog\" does not exist</string>
     <string name="error_log_does_not_exist">\"errorLog\" does not exist</string>
     <string name="restore_script_does_not_exist">\"the_restore_script.sh\" does not exist</string>
+    <string name="package_data_does_not_exist">\"package-data\" does not exist</string>
 
     <!--extra_backups_progress.xml-->
     <string name="contacts">Contacts</string>
