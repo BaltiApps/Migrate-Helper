@@ -1058,6 +1058,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                 scriptWriter.write("#!sbin/sh\n\n");
 
+                scriptWriter.write("cp " + restoreScript.getAbsolutePath() + " " + METADATA_HOLDER_DIR + "/\n");
+
                 for (int i = 0; i < jsonObjects.size(); i++) {
 
                     JSONObject jsonObject = jsonObjects.get(i);
@@ -1131,7 +1133,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     scriptWriter.write("echo \" \"\n");
                 }
 
-                scriptWriter.write("mv " + restoreScript.getAbsolutePath() + " " + METADATA_HOLDER_DIR + "/\n");
                 scriptWriter.write("mv " + TEMP_DIR_NAME + "/package-data" + " " + METADATA_HOLDER_DIR + "/\n");
                 scriptWriter.close();
                 restoreScript.setExecutable(true);
