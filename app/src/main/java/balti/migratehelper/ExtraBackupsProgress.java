@@ -1084,15 +1084,15 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     if (packageName.equals("com.google.android.contacts") || packageName.equals("com.android.contacts"))
                         isContactAppPresent = true;
 
-                    command += "echo " + DISPLAY_HEAD + appName + " " + icon + "\n";
+                    command += "echo \"" + DISPLAY_HEAD + appName + " " + icon + "\"\n";
 
                     if (isApp) {
-                        command += "echo " + INSTALLING_HEAD + apkName + "\n";
+                        command += "echo \"" + INSTALLING_HEAD + apkName + "\"\n";
                         if (isData) command += "pm uninstall " + packageName + " 2>/dev/null\n";
                         command += "sh " + installScriptPath + " " + TEMP_DIR_NAME + " " + apkName + "\n";
                     }
                     if (isData) {
-                        command += "echo " + RESTORE_DATA_HEAD + dataName + "\n";
+                        command += "echo \"" + RESTORE_DATA_HEAD + dataName + "\"\n";
                         command += "sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + dataName + " " + packageName + "\n";
                     }
 
@@ -1120,15 +1120,15 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                         permissionSet.clear();
                     }
 
-                    scriptWriter.write("echo  \n");
-                    scriptWriter.write("echo  \n");
+                    scriptWriter.write("echo \" \"\n");
+                    scriptWriter.write("echo \" \"\n");
                 }
 
                 if (!keyboardText.equals("")){
-                    scriptWriter.write("echo Set keyboard...\n");
+                    scriptWriter.write("echo \"Set keyboard...\"\n");
                     scriptWriter.write("ime enable " + keyboardText + " 2>/dev/null\n");
                     scriptWriter.write("ime set " + keyboardText + " 2>/dev/null\n");
-                    scriptWriter.write("echo  \n");
+                    scriptWriter.write("echo \" \"\n");
                 }
 
                 scriptWriter.write("mv " + restoreScript.getAbsolutePath() + " " + METADATA_HOLDER_DIR + "/\n");
