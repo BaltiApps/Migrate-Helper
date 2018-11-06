@@ -29,7 +29,7 @@ public class ProgressActivity extends AppCompatActivity {
     ProgressBar progressBar;
     TextView messageView, messageHead, progressPercentage;
     TextView errorView;
-    ImageView icon;
+    ImageView iconHolder;
 
     BroadcastReceiver progressReceiver;
     IntentFilter progressReceiverIF;
@@ -40,6 +40,7 @@ public class ProgressActivity extends AppCompatActivity {
     int dpiValue = 0;
 
     String lastMsg = "";
+    String lastIcon = "";
 
     SetAppIcon setAppIcon;
 
@@ -50,7 +51,7 @@ public class ProgressActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        icon = findViewById(R.id.logoIcon);
+        iconHolder = findViewById(R.id.logoIcon);
         messageHead = findViewById(R.id.messageHead);
         messageView = findViewById(R.id.messageView);
         errorView = findViewById(R.id.errorLogTextView);
@@ -89,6 +90,7 @@ public class ProgressActivity extends AppCompatActivity {
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
         LocalBroadcastManager.getInstance(this).registerReceiver(progressReceiver, progressReceiverIF);
 
+
         okOnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,6 +106,7 @@ public class ProgressActivity extends AppCompatActivity {
             }
         });
 
+        trySettingAppIcon();
     }
 
     void handleProgress(Intent intent){
@@ -119,6 +122,17 @@ public class ProgressActivity extends AppCompatActivity {
             wasContactBeingRestored = false;
         }
 
+        if (type.equals("app_icon") && intent.hasExtra("icon_string")) {
+            String iconString = intent.getStringExtra("icon_string");
+
+            try {
+                setAppIcon.cancel(true);
+            } catch (Exception ignored) {
+            }
+            setAppIcon = new SetAppIcon(iconHolder);
+            setAppIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, iconString.trim());
+        }
+
         if (type.equals("finishedErrors")){
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -129,7 +143,7 @@ public class ProgressActivity extends AppCompatActivity {
                 setAppIcon.cancel(true);
             } catch (Exception ignored){}
 
-            icon.setImageResource(R.drawable.ic_error);
+            iconHolder.setImageResource(R.drawable.ic_error);
             messageHead.setText(intent.getStringExtra("head"));
 
             if (intent.hasExtra("total_time"))
@@ -196,7 +210,7 @@ public class ProgressActivity extends AppCompatActivity {
                 setAppIcon.cancel(true);
             } catch (Exception ignored){}
 
-            icon.setImageResource(R.drawable.ic_finished);
+            iconHolder.setImageResource(R.drawable.ic_finished);
             messageHead.setText(intent.getStringExtra("head"));
 
             if (intent.hasExtra("total_time"))
@@ -233,18 +247,14 @@ public class ProgressActivity extends AppCompatActivity {
         else if (type.equals("restoring_app")) {
 
             String head = intent.getStringExtra("head");
-            String icon = intent.getStringExtra("icon");
             messageHead.setText(head);
             progressBar.setMax(intent.getIntExtra("n", 0));
             updateProgress(intent.getIntExtra("p", 0));
 
             appendLog("log", intent);
 
-            try {
-                setAppIcon.cancel(true);
-            } catch (Exception ignored){}
-            setAppIcon = new SetAppIcon(this.icon);
-            setAppIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, icon.trim());
+            trySettingAppIcon();
+
         }
         else if (type.equals("waiting_for_contacts")) {
 
@@ -255,7 +265,7 @@ public class ProgressActivity extends AppCompatActivity {
 
             progressBar.setIndeterminate(true);
 
-            icon.setImageResource(R.drawable.ic_waiting);
+            iconHolder.setImageResource(R.drawable.ic_waiting);
 
         }
     }
@@ -285,7 +295,31 @@ public class ProgressActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
+        try {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
+        }
+        catch (Exception ignored){}
+    }
+
+    void trySettingAppIcon(){
+
+        try {
+
+            if (RootRestoreTask.ICON_STRING != null && !lastIcon.equals(RootRestoreTask.ICON_STRING)) {
+
+                try {
+                    setAppIcon.cancel(true);
+                }catch (Exception ignored){}
+
+                setAppIcon = new SetAppIcon(iconHolder);
+                lastIcon = RootRestoreTask.ICON_STRING;
+                setAppIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, lastIcon);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 }
 

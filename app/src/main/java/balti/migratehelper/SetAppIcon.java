@@ -40,5 +40,8 @@ public class SetAppIcon extends AsyncTask<String, Void, Bitmap> {
             iconHolder.setImageDrawable(null);
             iconHolder.setImageBitmap(bitmap);
         }
+        else {
+            iconHolder.setImageResource(R.drawable.ic_app);
+        }
     }
 }

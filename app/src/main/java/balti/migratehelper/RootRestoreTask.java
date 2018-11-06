@@ -66,7 +66,9 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     private BufferedWriter suProcessForVcfCheckWriter;
     private BufferedReader suProcessForVcfCheckReader;
 
-    File actualRestoreScript;
+    private File actualRestoreScript;
+
+    static String ICON_STRING = "";
 
     RootRestoreTask(Context context, int numberOfAppJobs, boolean isContactAppPresent, int dpiValue, File actualRestoreScript) {
 
@@ -168,7 +170,8 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
             String line;
             int c = -1;
-            String head = "", icon = "";
+            String head = "";
+
             while ((line = outputReader.readLine()) != null) {
 
                 line = line.trim();
@@ -177,12 +180,12 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                     c++;
                     head = line.substring(DISPLAY_HEAD.length()).trim();
                     if (head.contains(" ")) {
-                        icon = head.split(" ")[1];
+                        ICON_STRING = head.split(" ")[1].trim();
                         head = head.split(" ")[0];
                     }
                 }
                 else {
-                    publishProgress("restoring_app", c, numberOfAppJobs, head, line, icon);
+                    publishProgress("restoring_app", c, numberOfAppJobs, head, line);
                     if (line.startsWith("Failed to find package"))
                         errors.add("restoreDataScript: " + line);
                 }
@@ -243,7 +246,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         restoreIntent.putExtra("n", max = (int) values[2]);
         restoreIntent.putExtra("head", head = (String) values[3]);
         restoreIntent.putExtra("log", (String) values[4]);
-        restoreIntent.putExtra("icon", (String) values[5]);
 
         activityIntent.putExtras(Objects.requireNonNull(restoreIntent.getExtras()));
 
