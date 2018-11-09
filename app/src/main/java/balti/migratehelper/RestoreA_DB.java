@@ -57,6 +57,9 @@ class RestoreA_DB extends AsyncTask {
         for (int j = 0; j < dbFiles.size(); j++) {
 
             SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbFiles.get(j), null);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
+                db = SQLiteDatabase.openDatabase(dbFiles.get(j).getAbsolutePath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            }
 
             Cursor cursor = db.query(tableName, projection, null, null, null, null, null);
 

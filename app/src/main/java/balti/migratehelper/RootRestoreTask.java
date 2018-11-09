@@ -70,13 +70,13 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
     static String ICON_STRING = "";
 
-    RootRestoreTask(Context context, int numberOfAppJobs, boolean isContactAppPresent, int dpiValue, File actualRestoreScript) {
+    RootRestoreTask(Context context, int numberOfAppJobs, boolean isContactAppPresent, int dpiValue, String actualRestoreScriptPath) {
 
         this.context = context;
         this.numberOfAppJobs = numberOfAppJobs;
         this.isContactAppPresent = isContactAppPresent;
         this.dpiValue = dpiValue;
-        this.actualRestoreScript = actualRestoreScript;
+        this.actualRestoreScript = new File(actualRestoreScriptPath);
 
         errors = new ArrayList<>(0);
 

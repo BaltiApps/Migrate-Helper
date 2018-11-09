@@ -1202,7 +1202,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             startService(new Intent(ExtraBackupsProgress.this, RestoreService.class));
 
-            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, numberOfApps, isContactAppPresent, dpiValue, file);
+            RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, numberOfApps, isContactAppPresent, dpiValue, file.getAbsolutePath());
             RestoreService.ROOT_RESTORE_TASK.execute();
         }
     }
