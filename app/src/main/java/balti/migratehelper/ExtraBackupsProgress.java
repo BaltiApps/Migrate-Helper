@@ -1110,11 +1110,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                         while ((pLine = permReader.readLine()) != null){
                             pLine = pLine.trim();
-                            if (!pLine.equals("no_permissions_granted") && pLine.contains(":")) {
-                                pLine = pLine.substring(0, pLine.indexOf(':')).trim();
-                                if (pLine.startsWith("android.permission") && isDangerousPermission(pLine))
-                                    permissionSet.add(pLine);
-                            }
+                            if (pLine.startsWith("android.permission") && isDangerousPermission(pLine))
+                                permissionSet.add(pLine);
+
                         }
 
                         for (String p : permissionSet) {
