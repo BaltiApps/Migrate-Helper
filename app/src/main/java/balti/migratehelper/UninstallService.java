@@ -60,6 +60,7 @@ public class UninstallService extends Service {
         writer.write("mount -o rw,remount /data/data/balti.migratehelper\n");
         writer.write("rm -rf " + context.getApplicationInfo().dataDir + " " + sourceDir + " " + TEMP_DIR_NAME + " " +
                 new File(METADATA_HOLDER_DIR).getAbsolutePath() + "\n");
+        writer.write("rm -rf /data/data/*.tar.gz\n");
 
         if (dpiValue > 0){
             writer.write("reboot\nexit\n");

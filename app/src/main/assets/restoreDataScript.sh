@@ -2,7 +2,10 @@
 
 # parameters: TEMP_DIR_NAME tar.gz_file package_name
 
-mv $1/$2 /data/data/
+#   Starting from v1.2 tar.gz files are unpacked under /data/data
+
+#mv $1/$2 /data/data/
+# Changed from v1.2
 cd /data/data/
 
 dataDir=$(dumpsys package $3 | grep dataDir | head -n 1 | cut -d '=' -f2)
@@ -25,7 +28,9 @@ else
 
     restorecon -RF ${dataDir}
 
-    rm -rf $1/$2
+    #rm -rf $1/$2
+    # Changed from v1.2
+    rm -rf /data/data/$2
 fi
 
 
