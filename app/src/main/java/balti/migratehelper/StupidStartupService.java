@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -46,19 +47,29 @@ public class StupidStartupService extends Service {
             notification.setPriority(Notification.PRIORITY_MAX);
         }
 
-        notification.setSmallIcon(R.drawable.ic_notification_icon)
-                .setContentTitle(context.getString(R.string.notifHeader))
-                .setContentText(context.getString(R.string.notifBody));
+        SharedPreferences main = getSharedPreferences("main", MODE_PRIVATE);
 
-        PendingIntent view = PendingIntent.getActivity(context, 1, new Intent(context, MainActivity.class), 0);
+        if (!main.getBoolean("temporaryDisable", false)) {
 
-        notification.setContentIntent(view);
+            notification.setSmallIcon(R.drawable.ic_notification_icon)
+                    .setContentTitle(context.getString(R.string.notifHeader))
+                    .setContentText(context.getString(R.string.notifBody));
 
-        notification.setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setDefaults(Notification.DEFAULT_ALL)
-                .setOngoing(true);
+            PendingIntent view = PendingIntent.getActivity(context, 1, new Intent(context, MainActivity.class), 0);
 
-        startForeground(232, notification.build());
+            notification.setContentIntent(view);
+
+            notification.setVisibility(Notification.VISIBILITY_PUBLIC)
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setOngoing(true);
+
+            startForeground(232, notification.build());
+
+        }
+        else {
+            stopSelf();
+        }
+
     }
 
 }

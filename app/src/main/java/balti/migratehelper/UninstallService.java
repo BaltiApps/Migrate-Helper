@@ -12,12 +12,10 @@ import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Objects;
 
-import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
 import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
 
 public class UninstallService extends Service {
@@ -44,9 +42,6 @@ public class UninstallService extends Service {
 
         String sourceDir = context.getApplicationInfo().sourceDir;
 
-        if (sourceDir.startsWith("/system"))
-            disableApp(context);
-
         Process fullProcess = Runtime.getRuntime().exec("su");
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fullProcess.getOutputStream()));
 
@@ -54,13 +49,20 @@ public class UninstallService extends Service {
             writer.write("wm density " + dpiValue + "\n");
         }
 
-        writer.write("mount -o rw,remount /system\n");
-        writer.write("mount -o rw,remount /data\n");
-        writer.write("mount -o rw,remount /system/app/MigrateHelper\n");
-        writer.write("mount -o rw,remount /data/data/balti.migratehelper\n");
-        writer.write("rm -rf " + context.getApplicationInfo().dataDir + " " + sourceDir + " " + TEMP_DIR_NAME + " " +
-                new File(METADATA_HOLDER_DIR).getAbsolutePath() + "\n");
+        writer.write("rm -rf " + TEMP_DIR_NAME + "\n");
         writer.write("rm -rf /data/data/*.tar.gz\n");
+
+        if (sourceDir.startsWith("/system")) {
+            disableApp(context);
+            writer.write("mount -o rw,remount /system\n");
+            writer.write("mount -o rw,remount /data\n");
+            writer.write("mount -o rw,remount /system/app/MigrateHelper\n");
+            writer.write("mount -o rw,remount /data/data/balti.migratehelper\n");
+            writer.write("rm -rf " + context.getApplicationInfo().dataDir + " " + sourceDir + "\n");
+        }
+        else {
+            writer.write("pm uninstall " + getPackageName() + "\n");
+        }
 
         if (dpiValue > 0){
             writer.write("reboot\nexit\n");

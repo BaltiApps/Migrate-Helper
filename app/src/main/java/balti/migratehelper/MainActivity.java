@@ -21,7 +21,7 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button rootRestoreButton, disable, selectiveRestore;
+    Button rootRestoreButton, disable, selectiveRestore, temporaryDisable;
 
     ImageButton close;
 
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.do_not_use)
+                        .setTitle(R.string.turn_off_internet_and_updates)
                         .setMessage(R.string.do_not_use_desc)
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override

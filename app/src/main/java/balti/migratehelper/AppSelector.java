@@ -74,7 +74,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     private String restoreDataScriptPath = "";
 
     static String TEMP_DIR_NAME = "/data/balti.migrate";
-    static String METADATA_HOLDER_DIR = "/sdcard/";
+    static String METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migrate";
 
     private String initError;
 
@@ -236,7 +236,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                             extraSelectBoolean = extrasSelect.isChecked();
 
                             new AlertDialog.Builder(AppSelector.this)
-                                    .setTitle(R.string.do_not_use)
+                                    .setTitle(R.string.turn_off_internet_and_updates)
                                     .setMessage(R.string.do_not_use_desc)
                                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                         @Override
