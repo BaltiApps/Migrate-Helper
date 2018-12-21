@@ -25,7 +25,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
     static String PERM_CHECK = "PERM_CHECK";
     static String IS_PERMISSIBLE = "IS_PERMISSIBLE";
 
-    private FileFilter jsonFilter, vcfFilter, smsDBFilter, callsDBFilter;
+    private FileFilter jsonFilter, vcfFilter, smsDBFilter, callsDBFilter, packageDataFilter;
 
     private String error;
 
@@ -61,6 +61,13 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
             @Override
             public boolean accept(File file) {
                 return file.getName().endsWith(".calls.db");
+            }
+        };
+
+        packageDataFilter = new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.getName().startsWith("package_data");
             }
         };
     }
@@ -128,9 +135,17 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         if (!keyboardFile.exists())
             keyboardFile = null;
 
-        File package_data = new File(directoryPath[0], "package-data");
+        File[] package_datas = new File[0];
+        try {
+            package_datas = new File(directoryPath[0]).listFiles(packageDataFilter);
+            if (package_datas == null) package_datas = new File[0];
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            error = error + e.getMessage() + "\n";
+        }
 
-        return new GetJsonFromDataPackets(jsonObjects, vcfFiles, smsFiles, callsFiles, screenDpi, keyboardFile, package_data);
+        return new GetJsonFromDataPackets(jsonObjects, vcfFiles, smsFiles, callsFiles, screenDpi, keyboardFile, package_datas);
     }
 
     @Override

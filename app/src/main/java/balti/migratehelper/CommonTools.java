@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,7 +63,12 @@ public class CommonTools {
     void reportLogs(boolean isErrorLogMandatory){
         final File progressLog = new File(METADATA_HOLDER_DIR, "progressLog.txt");
         final File errorLog = new File(METADATA_HOLDER_DIR, "errorLog.txt");
-        final File package_data = new File(METADATA_HOLDER_DIR, "package-data.txt");
+        final File package_datas[] = new File(METADATA_HOLDER_DIR).listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.getName().startsWith("package-data");
+            }
+        });
         final File theRestoreScript = new File(METADATA_HOLDER_DIR, "the_restore_script.sh");
 
         if (isErrorLogMandatory && !errorLog.exists()){
@@ -72,7 +78,7 @@ public class CommonTools {
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         }
-        else if (errorLog.exists() || progressLog.exists() || theRestoreScript.exists() || package_data.exists()) {
+        else if (errorLog.exists() || progressLog.exists() || theRestoreScript.exists() || package_datas.length > 0) {
 
             View errorReportView = View.inflate(context, R.layout.error_report_layout, null);
 
@@ -91,7 +97,7 @@ public class CommonTools {
                 shareProgress.setChecked(true);
             }
 
-            if (!package_data.exists()){
+            if (package_datas.length > 0){
                 sharePackageData.setChecked(false);
                 sharePackageData.setEnabled(false);
             }
@@ -146,8 +152,10 @@ public class CommonTools {
                                     uris.add(FileProvider.getUriForFile(context, "migrate.helper.provider", progressLog));
                                 if (shareScript.isChecked())
                                     uris.add(FileProvider.getUriForFile(context, "migrate.helper.provider", theRestoreScript));
-                                if (sharePackageData.isChecked())
-                                    uris.add(FileProvider.getUriForFile(context, "migrate.helper.provider", package_data));
+                                if (sharePackageData.isChecked()){
+                                    for (File f : package_datas)
+                                        uris.add(FileProvider.getUriForFile(context, "migrate.helper.provider", f));
+                                }
                             }
                             else {
                                 if (shareErrors.isChecked())
@@ -156,8 +164,10 @@ public class CommonTools {
                                     uris.add(Uri.fromFile(progressLog));
                                 if (shareScript.isChecked())
                                     uris.add(Uri.fromFile(theRestoreScript));
-                                if (sharePackageData.isChecked())
-                                    uris.add(Uri.fromFile(package_data));
+                                if (sharePackageData.isChecked()){
+                                    for (File f : package_datas)
+                                        uris.add(Uri.fromFile(f));
+                                }
                             }
 
                             emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);

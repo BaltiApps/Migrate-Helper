@@ -586,6 +586,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         GetJsonFromDataPackets gjfdp;
         int originating_sdk = 0;
+        int current_sdk = 0;
 
         ReadPackageData(GetJsonFromDataPackets getJsonFromDataPackets){
             gjfdp = getJsonFromDataPackets;
@@ -594,27 +595,34 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            current_sdk = Build.VERSION.SDK_INT;
             waitingMessageDesc.setText(R.string.reading_package_data);
         }
 
         @Override
         protected Object doInBackground(Object[] objects) {
 
-            File package_data = gjfdp.package_data;
+            File package_datas[] = gjfdp.package_datas;
             String line;
 
             try {
 
-                BufferedReader reader = new BufferedReader(new FileReader(package_data));
+                for (int i = 0; i < package_datas.length; i++) {
+                    BufferedReader reader = new BufferedReader(new FileReader(package_datas[i]));
 
-                while ((line = reader.readLine()) != null){
+                    while ((line = reader.readLine()) != null) {
 
-                    String data[] = line.split(" ");
-                    if (data.length == 2 && data[0].equals("sdk")){
-                        originating_sdk = Integer.parseInt(data[1].trim());
+                        String data[] = line.split(" ");
+                        if (data.length == 2 && data[0].equals("sdk")) {
+                            originating_sdk = Integer.parseInt(data[1].trim());
+                            if (originating_sdk != current_sdk)
+                            {
+                                i = package_datas.length;
+                                break;
+                            }
+                        }
                     }
                 }
-
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -627,8 +635,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
-
-            int current_sdk = Build.VERSION.SDK_INT;
 
             if (originating_sdk != 0 && originating_sdk != current_sdk){
 
@@ -819,7 +825,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "cp " + TEMP_DIR_NAME + "/*.perm " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/screen.dpi " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME + "/default.kyb " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/package-data " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME + "/package-data*.txt " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
 
