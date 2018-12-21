@@ -40,11 +40,14 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
+import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_NEW;
+import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_OLD;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
 import static balti.migratehelper.GetJsonFromData.IS_PERMISSIBLE;
 import static balti.migratehelper.GetJsonFromData.PERM_CHECK;
+
+//import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
 
 public class AppSelector extends AppCompatActivity implements OnConvertMetadataToJSON, OnCheck, CompoundButton.OnCheckedChangeListener {
 
@@ -815,17 +818,29 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "pm grant " + getPackageName() + " android.permission.DUMP\n" +
                 "pm grant " + getPackageName() + " android.permission.PACKAGE_USAGE_STATS\n" +
                 "pm grant " + getPackageName() + " android.permission.WRITE_SECURE_SETTINGS\n" +
-                "mv -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME + "/busybox\n" +
+
+                "cp -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME_OLD + "/busybox 2>/dev/null\n" +
+                "cp -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME_NEW + "/busybox 2>/dev/null\n" +
                 "rm -rf " + METADATA_HOLDER_DIR + "\n" +
                 "mkdir -p " + METADATA_HOLDER_DIR + "\n" +
-                "cp " + TEMP_DIR_NAME + "/*.json " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/*.vcf " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/*.sms.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/*.calls.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/*.perm " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/screen.dpi " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/default.kyb " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME + "/package-data*.txt " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+
+                "cp " + TEMP_DIR_NAME_OLD + "/*.json " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/*.vcf " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/*.sms.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/*.calls.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/*.perm " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/screen.dpi " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/default.kyb " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/package-data*.txt " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+
+                "cp " + TEMP_DIR_NAME_NEW + "/*.json " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/*.vcf " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/*.sms.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/*.calls.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/*.perm " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/screen.dpi " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/default.kyb " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/package-data*.txt " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
 

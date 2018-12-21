@@ -17,8 +17,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Objects;
 
-import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
+import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_NEW;
+import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_OLD;
 import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
+
+//import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
 
 public class UninstallService extends Service {
 
@@ -62,15 +65,17 @@ public class UninstallService extends Service {
         }
 
         if (doUninstall) {
-            writer.write("rm -rf " + TEMP_DIR_NAME + "\n");
+            writer.write("mount -o rw,remount " + TEMP_DIR_NAME_OLD + "\n");
+            writer.write("mount -o rw,remount " + TEMP_DIR_NAME_NEW + "\n");
+            writer.write("mount -o rw,remount /data\n");
+            writer.write("rm -rf " + TEMP_DIR_NAME_OLD + "\n");
+            writer.write("rm -rf " + TEMP_DIR_NAME_NEW + "\n");
             writer.write("rm -rf /data/data/*.tar.gz\n");
 
             if (sourceDir.startsWith("/system")) {
                 disableApp();
                 writer.write("mount -o rw,remount /system\n");
-                writer.write("mount -o rw,remount /data\n");
                 writer.write("mount -o rw,remount /system/app/MigrateHelper\n");
-                writer.write("mount -o rw,remount /data/data/balti.migratehelper\n");
                 writer.write("rm -rf " + getApplicationInfo().dataDir + " " + sourceDir + "\n");
             } else {
                 writer.write("pm uninstall " + getPackageName() + "\n");

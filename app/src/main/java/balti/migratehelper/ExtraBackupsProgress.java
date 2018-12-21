@@ -46,13 +46,16 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
-import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
+import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_NEW;
+import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_OLD;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
 import static balti.migratehelper.GetJsonFromData.PERM_CHECK;
 import static balti.migratehelper.RootRestoreTask.DISPLAY_HEAD;
 import static balti.migratehelper.RootRestoreTask.INSTALLING_HEAD;
 import static balti.migratehelper.RootRestoreTask.RESTORE_DATA_HEAD;
+
+//import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
 
 public class ExtraBackupsProgress extends AppCompatActivity implements OnDBRestoreComplete {
 
@@ -1091,11 +1094,11 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     if (isApp) {
                         command += "echo \"" + INSTALLING_HEAD + apkName + "\"\n";
                         if (isData) command += "pm uninstall " + packageName + " 2>/dev/null\n";
-                        command += "sh " + installScriptPath + " " + TEMP_DIR_NAME + " " + packageName+".app" + " " + apkName + " " + packageName + "\n";
+                        command += "sh " + installScriptPath + " " + TEMP_DIR_NAME_OLD + " " + TEMP_DIR_NAME_NEW + " " + packageName+".app" + " " + apkName + " " + packageName + "\n";
                     }
                     if (isData) {
                         command += "echo \"" + RESTORE_DATA_HEAD + dataName + "\"\n";
-                        command += "sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME + " " + dataName + " " + packageName + "\n";
+                        command += "sh " + restoreDataScriptPath + " " + TEMP_DIR_NAME_OLD + " " + TEMP_DIR_NAME_NEW + " " + dataName + " " + packageName + "\n";
                     }
 
                     scriptWriter.write(command);
@@ -1134,7 +1137,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     scriptWriter.write("echo \" \"\n");
                 }
 
-                scriptWriter.write("mv " + TEMP_DIR_NAME + "/package-data" + " " + METADATA_HOLDER_DIR + "/\n");
+                scriptWriter.write("mv -f " + TEMP_DIR_NAME_OLD + "/package-data*" + " " + METADATA_HOLDER_DIR + "/\n 2>/dev/null");
+                scriptWriter.write("mv -f " + TEMP_DIR_NAME_NEW + "/package-data*" + " " + METADATA_HOLDER_DIR + "/\n 2>/dev/null");
                 scriptWriter.close();
                 restoreScript.setExecutable(true);
 

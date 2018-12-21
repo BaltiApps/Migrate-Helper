@@ -21,8 +21,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 
-import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
 import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
+
+//import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
 
 
 
@@ -269,11 +270,12 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         restoreIntent.putExtra("total_time", totalTime);
         restoreIntent.putExtra("dpiValue", dpiValue);
 
-        try {
+        // disabled from v2.0 to facilitate temporaryDisable
+        /*try {
             Runtime.getRuntime().exec("su -c rm -rf " + TEMP_DIR_NAME);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         if ( o == SUCCESS) {
 

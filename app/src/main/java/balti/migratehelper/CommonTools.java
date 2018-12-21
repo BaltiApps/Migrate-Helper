@@ -29,7 +29,8 @@ public class CommonTools {
     static String UNINSTALL_INTENT_FILTER = "migrate_helper_uninstall_broadcast";
     static String DEBUG_TAG = "migrate_helper_tag";
 
-    static String TEMP_DIR_NAME = "/data/balti.migrate";
+    static String TEMP_DIR_NAME_OLD = "/data/balti.migrate";
+    static String TEMP_DIR_NAME_NEW = "/data/local/tmp/balti.migrate";
 
     public CommonTools(Context context) {
         this.context = context;
