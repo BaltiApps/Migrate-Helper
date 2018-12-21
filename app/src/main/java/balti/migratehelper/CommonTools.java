@@ -28,6 +28,8 @@ public class CommonTools {
     static String UNINSTALL_INTENT_FILTER = "migrate_helper_uninstall_broadcast";
     static String DEBUG_TAG = "migrate_helper_tag";
 
+    static String TEMP_DIR_NAME = "/data/balti.migrate";
+
     public CommonTools(Context context) {
         this.context = context;
     }
@@ -58,9 +60,9 @@ public class CommonTools {
     }
 
     void reportLogs(boolean isErrorLogMandatory){
-        final File progressLog = new File(METADATA_HOLDER_DIR, "progressLog");
-        final File errorLog = new File(METADATA_HOLDER_DIR, "errorLog");
-        final File package_data = new File(METADATA_HOLDER_DIR, "package-data");
+        final File progressLog = new File(METADATA_HOLDER_DIR, "progressLog.txt");
+        final File errorLog = new File(METADATA_HOLDER_DIR, "errorLog.txt");
+        final File package_data = new File(METADATA_HOLDER_DIR, "package-data.txt");
         final File theRestoreScript = new File(METADATA_HOLDER_DIR, "the_restore_script.sh");
 
         if (isErrorLogMandatory && !errorLog.exists()){

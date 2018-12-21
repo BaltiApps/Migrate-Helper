@@ -51,8 +51,8 @@ public class RestoreService extends Service {
 
         try {
 
-            progressWriter = new BufferedWriter(new FileWriter(new File(METADATA_HOLDER_DIR, "progressLog")));
-            errorWriter = new BufferedWriter(new FileWriter(new File(METADATA_HOLDER_DIR, "errorLog")));
+            progressWriter = new BufferedWriter(new FileWriter(new File(METADATA_HOLDER_DIR, "progressLog.txt")));
+            errorWriter = new BufferedWriter(new FileWriter(new File(METADATA_HOLDER_DIR, "errorLog.txt")));
         } catch (IOException e) {
             e.printStackTrace();
         }

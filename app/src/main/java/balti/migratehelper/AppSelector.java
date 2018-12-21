@@ -40,6 +40,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
 import static balti.migratehelper.GetJsonFromData.IS_PERMISSIBLE;
@@ -73,7 +74,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     private String installScriptPath = "";
     private String restoreDataScriptPath = "";
 
-    static String TEMP_DIR_NAME = "/data/balti.migrate";
     static String METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migrate";
 
     private String initError;

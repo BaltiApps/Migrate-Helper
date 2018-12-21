@@ -20,8 +20,6 @@
     <string name="howToRestore">If you change your mind later,\n\nIf you are not rooted: Clear data of this app\n(Settings -> Apps -> Migrate helper -> Storage -> Clear data)\nand reboot.\n\n
     If you are rooted: reflash the backup zip file.
     </string>
-    <string name="temporary_disable_desc">This will leave the app installed and also usable from the app drawer, but will stop giving you notification to restore backup on boot.\n\n
-    This is useful if you want to restore some apps later without flashing the whole migrate zip package again.</string>
     <string name="goAhead">Go ahead</string>
     <string name="unsupported_device">Unsupported device.</string>
     <string name="cpu_arch_is">Your CPU arch is:</string>
@@ -35,8 +33,8 @@
     <string name="waiting_for_contacts_desc">Migrate helper has detected that you have chosen to restore contact handling apps which may conflict with currently running contact restore operation.\n\n
     App restore will continue after contacts are restored.
     </string>
-    <string name="change_dpi_and_reboot_desc">Your DPI will be changed. Your device will be automatically rebooted to effect changes.</string>
-    <string name="change_dpi_and_reboot">Change DPI and reboot?</string>
+    <!--<string name="change_dpi_and_reboot_desc">Your DPI will be changed. Your device will be automatically rebooted to effect changes.</string>
+    <string name="change_dpi_and_reboot">Change DPI and reboot?</string>-->
     <string name="send_logs_first">Send logs first</string>
 
 
@@ -49,10 +47,10 @@
     <!--RootRestoreTask.java-->
     <string name="finished">Finished!</string>
     <string name="finished_with_errors">Finished with errors!</string>
-    <string name="uninstall_prompt">Click OK to uninstall this app</string>
-    <string name="change_dpi_and_reboot_prompt">Click OK to change DPI and reboot</string>
+    <string name="uninstall_prompt">Click FINISH to uninstall this app</string>
+    <string name="change_dpi_and_reboot_prompt">Click FINISH to change DPI and reboot</string>
     <string name="making_script">Making script</string>
-    <string name="uninstall">Uninstall</string>
+    <string name="finish">Finish</string>
 
     <!--app_selector.xml-->
     <string name="select_apps">Select what to restore</string>
@@ -69,7 +67,7 @@
     <string name="failed_desc">Please grant root permission.</string>
     <string name="everything">Everything selected!</string>
     <string name="reading_metadata">Reading metadata...</string>
-    <string name="initMessageShort">This can take upto 3 minutes.\n\nIn case you have waited more than 5 minutes\nClick CANCEL\nOpen Magisk app\nClose the Magisk app\n Open this app and retry restoring</string>
+    <string name="initMessageShort">This can take upto 3 minutes.\n\nIn case you have waited more than 5 minutes\nClick CANCEL\nOpen Magisk app\nClose the Magisk app\nOpen this app and retry restoring</string>
     <string name="are_you_rooted">Are you rooted?</string>
     <string name="are_you_rooted_desc">Script error.\nMake sure to grant root.\nRoot with Magisk if needed.</string>
     <string name="code_error">Code error!</string>
@@ -153,6 +151,16 @@
     <string name="dpi">Screen DPI</string>
     <string name="keyboard">Default keyboard</string>
     <string name="applications">Applications</string>
+    
+    <!--uninstall_activity.xml-->
+    <string name="uninstall_desc">Completely removes this helper app.</string>
+    <string name="temporary_disable_desc">This will leave the app installed and also usable from the app drawer, but will stop giving you notification to restore backup on boot.\n\n
+    This is useful if you want to restore some apps later without flashing the whole migrate zip package again.</string>
+    <string name="change_dpi">Change DPI value</string>
+    <string name="reboot">Reboot (recommended)</string>
+
+    <!--UninstallService.java-->
+    <string name="finishing">Finishing...</string>
 
     <!--contacts_dialog_view.xml-->
     <string name="select_provider">Please select <b>Contacts</b> app if asked to make a selection.</string>

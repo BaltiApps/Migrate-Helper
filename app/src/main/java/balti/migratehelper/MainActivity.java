@@ -82,6 +82,44 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        disable = findViewById(R.id.disable);
+        disable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                directUninstall();
+            }
+        });
+
+        temporaryDisable = findViewById(R.id.temporary_disable);
+        temporaryDisable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new AlertDialog.Builder(MainActivity.this)
+                        .setMessage(R.string.temporary_disable_desc)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                stopService(new Intent(MainActivity.this, StupidStartupService.class));
+                                editor.putBoolean("temporaryDisable", true);
+                                editor.commit();
+                                finishAffinity();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
+
+            }
+        });
+
+        close = findViewById(R.id.close_button);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         progressReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -96,22 +134,6 @@ public class MainActivity extends AppCompatActivity {
         };
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
         LocalBroadcastManager.getInstance(this).registerReceiver(progressReceiver, progressReceiverIF);
-
-        disable = findViewById(R.id.disable);
-        disable.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                disableAlert();
-            }
-        });
-
-        close = findViewById(R.id.close_button);
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
 
         sendBroadcast(new Intent("requestProgress"));
     }
@@ -177,15 +199,21 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    void disableAlert(){
+    void directUninstall(){
         new AlertDialog.Builder(this)
                 .setTitle(R.string.sure)
                 .setMessage(R.string.howToRestore)
                 .setPositiveButton(R.string.goAhead, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        startService(new Intent(MainActivity.this, UninstallService.class));
-                        finish();
+                        Intent uninstallIntent = new Intent(MainActivity.this, UninstallService.class);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(uninstallIntent);
+                        }
+                        else {
+                            startService(uninstallIntent);
+                        }
+                        finishAffinity();
                     }
                 })
                 .setNegativeButton(getString(android.R.string.cancel), null)

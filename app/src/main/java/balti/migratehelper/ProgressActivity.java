@@ -2,7 +2,6 @@ package balti.migratehelper;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -10,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
@@ -43,6 +41,7 @@ public class ProgressActivity extends AppCompatActivity {
     String lastIcon = "";
 
     SetAppIcon setAppIcon;
+    CommonTools commonTools;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,6 +67,8 @@ public class ProgressActivity extends AppCompatActivity {
         
         type = "";
 
+        commonTools = new CommonTools(this);
+
         if (getIntent().getExtras() != null){
             handleProgress(getIntent());
         }
@@ -76,7 +77,7 @@ public class ProgressActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                new CommonTools(ProgressActivity.this).reportLogs(true);
+                commonTools.reportLogs(true);
 
             }
         });
@@ -94,8 +95,7 @@ public class ProgressActivity extends AppCompatActivity {
         okOnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startService(new Intent(ProgressActivity.this, UninstallService.class));
-                finish();
+                startActivity(new Intent(ProgressActivity.this, UninstallActivity.class).putExtra("dpiValue", dpiValue));
             }
         });
 
@@ -122,7 +122,7 @@ public class ProgressActivity extends AppCompatActivity {
             wasContactBeingRestored = false;
         }
 
-        if (type.equals("app_icon") && intent.hasExtra("icon_string")) {
+        /*if (type.equals("app_icon") && intent.hasExtra("icon_string")) {
             String iconString = intent.getStringExtra("icon_string");
 
             try {
@@ -131,7 +131,7 @@ public class ProgressActivity extends AppCompatActivity {
             }
             setAppIcon = new SetAppIcon(iconHolder);
             setAppIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, iconString.trim());
-        }
+        }*/
 
         if (type.equals("finishedErrors")){
 
@@ -162,7 +162,11 @@ public class ProgressActivity extends AppCompatActivity {
 
             dpiValue = intent.getIntExtra("dpiValue", 0);
 
-            if (dpiValue > 0) {
+            okOnFinish.setText(R.string.finish);
+            close.setVisibility(View.GONE);
+            okOnFinish.setVisibility(View.VISIBLE);
+
+            /*if (dpiValue > 0) {
                 okOnFinish.setVisibility(View.INVISIBLE);
 
                 final AlertDialog dpiDialog = new AlertDialog.Builder(this)
@@ -194,11 +198,9 @@ public class ProgressActivity extends AppCompatActivity {
                 dpiDialog.show();
             }
             else {
-                okOnFinish.setText(R.string.uninstall);
+                okOnFinish.setText(R.string.finish);
                 okOnFinish.setVisibility(View.VISIBLE);
-            }
-
-            close.setVisibility(View.GONE);
+            }*/
         }
         else if (type.equals("finishedOk")){
 
@@ -220,7 +222,12 @@ public class ProgressActivity extends AppCompatActivity {
 
             dpiValue = intent.getIntExtra("dpiValue", 0);
 
-            if (dpiValue > 0) {
+            okOnFinish.setText(R.string.finish);
+            close.setVisibility(View.GONE);
+            updateProgress(progressBar.getMax());
+            okOnFinish.setVisibility(View.VISIBLE);
+
+            /*if (dpiValue > 0) {
                 okOnFinish.setVisibility(View.INVISIBLE);
 
                 new AlertDialog.Builder(this)
@@ -236,13 +243,10 @@ public class ProgressActivity extends AppCompatActivity {
                         .show();
             }
             else {
-                okOnFinish.setText(R.string.uninstall);
+                okOnFinish.setText(R.string.finish);
                 okOnFinish.setVisibility(View.VISIBLE);
-            }
+            }*/
 
-            close.setVisibility(View.GONE);
-
-            updateProgress(progressBar.getMax());
         }
         else if (type.equals("restoring_app")) {
 

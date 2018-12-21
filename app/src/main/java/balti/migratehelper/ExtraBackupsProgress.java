@@ -46,7 +46,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
-import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
+import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
 import static balti.migratehelper.GetJsonFromData.DATA_CHECK;
 import static balti.migratehelper.GetJsonFromData.PERM_CHECK;

@@ -19,7 +19,7 @@ if [ ! -n "$app_uid" ]; then
 else
     rm -rf ${dataDir} 2>/dev/null
 
-    # adding legacy support in v1.3
+    # adding legacy support in v2.0
 
     if [ ! -e /data/data/$2 ] && [ -e $1/$2 ]; then
         cd $1

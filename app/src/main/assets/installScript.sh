@@ -5,7 +5,7 @@
 
 if [ -e $1/$2 ]; then
 
-    #split apk support from v1.3
+    #split apk support from v2.0
     full_apk_dir=$1/$2
 
     chmod 777 "$full_apk_dir"

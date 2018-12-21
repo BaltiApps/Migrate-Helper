@@ -34,20 +34,22 @@ public class Listener extends BroadcastReceiver {
 
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             SharedPreferences main = context.getSharedPreferences("main", Context.MODE_PRIVATE);
-            PackageManager packageManager = context.getPackageManager();
-            ComponentName componentName = new ComponentName(context.getPackageName(), MainActivity.class.getName());
-            if (!main.getBoolean("isDisabled", false)) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(new Intent(context, StupidStartupService.class));
+            if (!main.getBoolean("temporaryDisable", false)) {
+
+                PackageManager packageManager = context.getPackageManager();
+                ComponentName componentName = new ComponentName(context.getPackageName(), MainActivity.class.getName());
+                if (!main.getBoolean("isDisabled", false)) {
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(new Intent(context, StupidStartupService.class));
+                    } else {
+                        context.startService(new Intent(context, StupidStartupService.class));
+                    }
+                    packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                } else {
+                    packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
                 }
-                else {
-                    context.startService(new Intent(context, StupidStartupService.class));
-                }
-                packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-            }
-            else {
-                packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
             }
         }
     }

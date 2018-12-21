@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 
-import static balti.migratehelper.AppSelector.TEMP_DIR_NAME;
+import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
 import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 
 
@@ -289,6 +289,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
             progress.setContentIntent(PendingIntent.getActivity(context, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                     .setContentTitle(context.getString(R.string.finished))
+                    .setContentText(log)
                     .setProgress(0, 0, false);
         }
         else {
@@ -317,10 +318,10 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
         progress.setOngoing(true);
 
-        String uninstallTitle = (dpiValue > 0)? context.getString(R.string.change_dpi_and_reboot) : context.getString(R.string.uninstall);
-        PendingIntent uninstallPendingIntent = PendingIntent.getService(context, 79,
-                new Intent(context, UninstallService.class).putExtra("dpiValue", dpiValue), 0);
-        NotificationCompat.Action uninstallAction = new NotificationCompat.Action(0, uninstallTitle, uninstallPendingIntent);
+        //String uninstallTitle = (dpiValue > 0)? context.getString(R.string.change_dpi_and_reboot) : context.getString(R.string.uninstall);
+        PendingIntent uninstallPendingIntent = PendingIntent.getActivity(context, 79,
+                new Intent(context, UninstallActivity.class).putExtra("dpiValue", dpiValue), 0);
+        NotificationCompat.Action uninstallAction = new NotificationCompat.Action(0, context.getString(R.string.finish), uninstallPendingIntent);
 
         progress.addAction(uninstallAction);
 
