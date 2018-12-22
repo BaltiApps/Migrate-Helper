@@ -19,13 +19,15 @@ import android.widget.Toast;
 
 import java.util.Objects;
 
+import static balti.migratehelper.CommonTools.ACTION_END_ALL;
+
 public class MainActivity extends AppCompatActivity {
 
     Button rootRestoreButton, disable, selectiveRestore, temporaryDisable;
 
     ImageButton close;
 
-    BroadcastReceiver progressReceiver;
+    BroadcastReceiver progressReceiver, endOnDisable;
     IntentFilter progressReceiverIF;
 
     SharedPreferences main;
@@ -135,6 +137,14 @@ public class MainActivity extends AppCompatActivity {
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
         LocalBroadcastManager.getInstance(this).registerReceiver(progressReceiver, progressReceiverIF);
 
+        endOnDisable = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                finish();
+            }
+        };
+        registerReceiver(endOnDisable, new IntentFilter(ACTION_END_ALL));
+
         sendBroadcast(new Intent("requestProgress"));
     }
 
@@ -195,6 +205,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
+        }catch (Exception ignored){}
+        try {
+            unregisterReceiver(endOnDisable);
         }catch (Exception ignored){}
         super.onDestroy();
     }

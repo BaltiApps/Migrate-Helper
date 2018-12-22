@@ -77,7 +77,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     private String installScriptPath = "";
     private String restoreDataScriptPath = "";
 
-    static String METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migrate";
+    static String METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migratehelper";
 
     private String initError;
 
@@ -841,6 +841,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "cp " + TEMP_DIR_NAME_NEW + "/screen.dpi " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME_NEW + "/default.kyb " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME_NEW + "/package-data*.txt " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
 

@@ -10,6 +10,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
+import static balti.migratehelper.CommonTools.ACTION_END_ALL;
+
 public class UninstallActivity extends Activity {
 
     CheckBox changeDpiCheckbox;
@@ -92,7 +94,7 @@ public class UninstallActivity extends Activity {
                     startService(uninstallIntent);
                 }
 
-                finishAffinity();
+                sendBroadcast(new Intent(ACTION_END_ALL));
             }
         });
     }

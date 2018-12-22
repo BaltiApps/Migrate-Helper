@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import static balti.migratehelper.CommonTools.ACTION_END_ALL;
+
 public class ProgressActivity extends AppCompatActivity {
 
     Button okOnFinish, close, reportLog;
@@ -29,7 +31,7 @@ public class ProgressActivity extends AppCompatActivity {
     TextView errorView;
     ImageView iconHolder;
 
-    BroadcastReceiver progressReceiver;
+    BroadcastReceiver progressReceiver, endOnDisable;
     IntentFilter progressReceiverIF;
 
     String type;
@@ -91,6 +93,14 @@ public class ProgressActivity extends AppCompatActivity {
         progressReceiverIF = new IntentFilter(getString(R.string.actionRestoreOnProgress));
         LocalBroadcastManager.getInstance(this).registerReceiver(progressReceiver, progressReceiverIF);
 
+
+        endOnDisable = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                finish();
+            }
+        };
+        registerReceiver(endOnDisable, new IntentFilter(ACTION_END_ALL));
 
         okOnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -301,6 +311,10 @@ public class ProgressActivity extends AppCompatActivity {
         super.onDestroy();
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
+        }
+        catch (Exception ignored){}
+        try {
+            unregisterReceiver(endOnDisable);
         }
         catch (Exception ignored){}
     }
