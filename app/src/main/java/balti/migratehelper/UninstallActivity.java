@@ -70,6 +70,9 @@ public class UninstallActivity extends Activity {
                 else {
                     startService(uninstallIntent);
                 }
+
+                sendBroadcast(new Intent(ACTION_END_ALL));
+                finish();
             }
         });
 
@@ -95,6 +98,7 @@ public class UninstallActivity extends Activity {
                 }
 
                 sendBroadcast(new Intent(ACTION_END_ALL));
+                finish();
             }
         });
     }

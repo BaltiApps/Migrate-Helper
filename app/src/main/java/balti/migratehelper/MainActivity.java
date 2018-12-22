@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                                 stopService(new Intent(MainActivity.this, StupidStartupService.class));
                                 editor.putBoolean("temporaryDisable", true);
                                 editor.commit();
-                                finishAffinity();
+                                sendBroadcast(new Intent(ACTION_END_ALL));
                             }
                         })
                         .setNegativeButton(android.R.string.cancel, null)

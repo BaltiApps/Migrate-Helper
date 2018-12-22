@@ -56,6 +56,7 @@ public class UninstallService extends Service {
     void finishTasks(int dpiValue, boolean doUninstall, boolean doReboot) throws IOException, InterruptedException {
 
         String sourceDir = getApplicationInfo().sourceDir;
+        sourceDir = sourceDir.substring(0, sourceDir.lastIndexOf('/'));
 
         Process fullProcess = Runtime.getRuntime().exec("su");
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fullProcess.getOutputStream()));
