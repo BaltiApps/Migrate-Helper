@@ -6,4 +6,5 @@
     <color name="lightGray">#2d2d2d</color>
     <color name="cancelRed">#d50000</color>
     <color name="colorButtons">#00695c</color>
+    <color name="grey_bg">#424242</color>
 </resources>

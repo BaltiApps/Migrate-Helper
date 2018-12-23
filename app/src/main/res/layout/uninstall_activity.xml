@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimary"
+    android:background="@color/lightGray"
+    android:padding="@dimen/small_padding_width"
     >
 
     <LinearLayout
@@ -33,8 +34,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="@dimen/large_padding_width"
-        android:layout_margin="@dimen/small_padding_width"
-        android:background="@color/lightGray"
+        android:layout_margin="@dimen/large_padding_width"
+        android:background="@color/grey_bg"
         android:elevation="@dimen/small_padding_width"
         android:clickable="true"
         android:focusable="true"
@@ -64,8 +65,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="@dimen/large_padding_width"
-        android:layout_margin="@dimen/small_padding_width"
-        android:background="@color/lightGray"
+        android:layout_margin="@dimen/large_padding_width"
+        android:background="@color/grey_bg"
         android:elevation="@dimen/small_padding_width"
         android:clickable="true"
         android:focusable="true"

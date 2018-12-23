@@ -7,6 +7,19 @@
     <string name="temporary_disable">Temporary disable</string>
     <string name="selective_restore">Choose what to restore</string>
     <string name="please_use_magisk">Make sure to use Magisk</string>
+    <string name="lastLog">Last logs</string>
+
+    <!--last_log_report.xml-->
+    <string name="seeProgressLog">See Progress log</string>
+    <string name="seeErrorLog">See Error log</string>
+    <string name="report_logs">Report logs</string>
+    <string name="progressLog">Progress log</string>
+    <string name="errorLog">Error log</string>
+
+    <!--SimpleLogDisplay.java-->
+    <string name="no_header">No header</string>
+    <string name="no_filepath">No filepath</string>
+    <string name="log_reading_error">Log reading error</string>
 
     <!--MainActivity.java-->
     <string name="too_fast">Whoa, too fast!!</string>
@@ -80,7 +93,7 @@
     <string name="proceed">Proceed</string>
     <string name="reading_package_data">Reading package data</string>
     <string name="restore_in_different_version_warning">The original backup was taken in a different Android version. Some apps may fail to restore</string>
-    <string name="originating_sdk">Originating backup SDK</string>
+    <string name="originating_sdk">Originating backup SDKs</string>
     <string name="current_sdk">Current SDK</string>
 
     <!--ExtraBackupsProgress.java-->

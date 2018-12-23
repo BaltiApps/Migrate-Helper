@@ -588,8 +588,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     class ReadPackageData extends AsyncTask{
 
         GetJsonFromDataPackets gjfdp;
-        int originating_sdk = 0;
         int current_sdk = 0;
+        ArrayList<Integer> mismatchingSdks;
 
         ReadPackageData(GetJsonFromDataPackets getJsonFromDataPackets){
             gjfdp = getJsonFromDataPackets;
@@ -598,15 +598,20 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            mismatchingSdks = null;
             current_sdk = Build.VERSION.SDK_INT;
             waitingMessageDesc.setText(R.string.reading_package_data);
         }
 
         @Override
         protected Object doInBackground(Object[] objects) {
+            int originating_sdk = 0;
 
             File package_datas[] = gjfdp.package_datas;
             String line;
+
+            if (package_datas.length > 0)
+                mismatchingSdks = new ArrayList<>(0);
 
             try {
 
@@ -620,8 +625,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                             originating_sdk = Integer.parseInt(data[1].trim());
                             if (originating_sdk != current_sdk)
                             {
-                                i = package_datas.length;
-                                break;
+                                mismatchingSdks.add(originating_sdk);
                             }
                         }
                     }
@@ -635,14 +639,24 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             return null;
         }
 
+        String concatMismatchingSdks(){
+            StringBuilder msdk = new StringBuilder();
+            for (int i = 0; i < mismatchingSdks.size(); i++){
+                if (i != 0)
+                    msdk.append(", ").append(i);
+                else msdk.append(i);
+            }
+            return msdk.toString();
+        }
+
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
 
-            if (originating_sdk != 0 && originating_sdk != current_sdk){
+            if (mismatchingSdks != null && mismatchingSdks.size() > 0){
 
                 String message = getString(R.string.restore_in_different_version_warning) + "\n\n" +
-                        getString(R.string.originating_sdk) + ": " + originating_sdk + "\n" +
+                        getString(R.string.originating_sdk) + ": " + concatMismatchingSdks() + "\n" +
                         getString(R.string.current_sdk) + ": " + current_sdk;
 
                 new AlertDialog.Builder(AppSelector.this)

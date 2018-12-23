@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,16 +16,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.Objects;
 
+import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
 import static balti.migratehelper.CommonTools.ACTION_END_ALL;
 
 public class MainActivity extends AppCompatActivity {
 
     Button rootRestoreButton, disable, selectiveRestore, temporaryDisable;
-
+    TextView lastLogs;
     ImageButton close;
 
     BroadcastReceiver progressReceiver, endOnDisable;
@@ -33,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences main;
     SharedPreferences.Editor editor;
 
+    CommonTools commonTools;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +46,10 @@ public class MainActivity extends AppCompatActivity {
 
         main = getSharedPreferences("main", MODE_PRIVATE);
         editor = main.edit();
+
+        commonTools = new CommonTools(this);
+
+        getExternalCacheDir();
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P && !main.getBoolean("android_version_warning", false)){
             new AlertDialog.Builder(this)
@@ -111,6 +121,15 @@ public class MainActivity extends AppCompatActivity {
                         .setNegativeButton(android.R.string.cancel, null)
                         .show();
 
+            }
+        });
+
+        lastLogs = findViewById(R.id.last_logs_textView);
+        lastLogs.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
+        lastLogs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showLog();
             }
         });
 
@@ -231,6 +250,58 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton(getString(android.R.string.cancel), null)
                 .show();
+    }
+
+    void showLog(){
+        View lView = View.inflate(this, R.layout.last_log_report, null);
+        Button pLog = lView.findViewById(R.id.view_progress_log);
+        Button eLog = lView.findViewById(R.id.view_error_log);
+        Button report = lView.findViewById(R.id.report_logs);
+
+        final AlertDialog ad = new AlertDialog.Builder(this, R.style.DarkAlert)
+                .setTitle(R.string.lastLog)
+                .setIcon(R.drawable.ic_log)
+                .setView(lView)
+                .setNegativeButton(R.string.close, null)
+                .create();
+
+        pLog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File f = new File(METADATA_HOLDER_DIR, "progressLog.txt");
+                if (f.exists())
+                    startActivity(
+                            new Intent(MainActivity.this, SimpleLogDisplay.class)
+                                    .putExtra("head", getString(R.string.progressLog))
+                                    .putExtra("filePath", f.getAbsolutePath())
+                    );
+                else Toast.makeText(MainActivity.this, getString(R.string.progress_log_does_not_exist), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        eLog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File f = new File(METADATA_HOLDER_DIR, "errorLog.txt");
+                if (f.exists())
+                    startActivity(
+                            new Intent(MainActivity.this, SimpleLogDisplay.class)
+                                    .putExtra("head", getString(R.string.errorLog))
+                                    .putExtra("filePath", f.getAbsolutePath())
+                    );
+                else Toast.makeText(MainActivity.this, getString(R.string.error_log_does_not_exist), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        report.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commonTools.reportLogs(false);
+                ad.dismiss();
+            }
+        });
+
+        ad.show();
     }
 
 }
