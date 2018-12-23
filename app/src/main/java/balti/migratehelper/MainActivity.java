@@ -22,8 +22,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.Objects;
 
-import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
 import static balti.migratehelper.CommonTools.ACTION_END_ALL;
+import static balti.migratehelper.CommonTools.METADATA_HOLDER_DIR;
 
 public class MainActivity extends AppCompatActivity {
 

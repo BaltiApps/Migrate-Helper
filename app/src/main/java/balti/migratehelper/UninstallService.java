@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Objects;
 
+import static balti.migratehelper.CommonTools.METADATA_HOLDER_DIR;
 import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_NEW;
 import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_OLD;
 import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
@@ -71,6 +72,7 @@ public class UninstallService extends Service {
             writer.write("mount -o rw,remount /data\n");
             writer.write("rm -rf " + TEMP_DIR_NAME_OLD + "\n");
             writer.write("rm -rf " + TEMP_DIR_NAME_NEW + "\n");
+            writer.write("rm -rf " + METADATA_HOLDER_DIR + "\n");
             writer.write("rm -rf /data/data/*.tar.gz\n");
 
             if (sourceDir.startsWith("/system")) {

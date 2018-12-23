@@ -38,6 +38,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Vector;
 
 import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_NEW;
@@ -76,8 +77,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     private String busyboxBinaryFilePath = "";
     private String installScriptPath = "";
     private String restoreDataScriptPath = "";
-
-    static String METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migratehelper";
 
     private String initError;
 
@@ -149,7 +148,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 waitingStatusMessage.setText(R.string.reading_metadata);
                 waitingMessageDesc.setText("");
                 getJsonFromData = new GetJsonFromData(AppSelector.this, waitingMessageDesc);
-                getJsonFromData.execute(METADATA_HOLDER_DIR);
+                getJsonFromData.execute(CommonTools.METADATA_HOLDER_DIR);
             }
             else if (rootCopyResult == SCRIPT_ERROR){
                 showError(getString(R.string.are_you_rooted), getString(R.string.are_you_rooted_desc));
@@ -714,8 +713,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         back = findViewById(R.id.app_selecter_back_button);
         title = findViewById(R.id.app_selector_title);
 
-        String externalPasteDir = getExternalCacheDir().getAbsolutePath() + "/Migrate/";
-        METADATA_HOLDER_DIR = "/sdcard" + externalPasteDir.substring(externalPasteDir.indexOf("/Android"));
+        String externalPasteDir = Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath();
+        CommonTools.METADATA_HOLDER_DIR = "/sdcard" + externalPasteDir.substring(externalPasteDir.indexOf("/Android"));
 
         appAllSelect = findViewById(R.id.appAllSelect);
         dataAllSelect = findViewById(R.id.dataAllSelect);
@@ -739,7 +738,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         extrasBar = findViewById(R.id.extras_bar);
         extrasSelect = findViewById(R.id.extras_select);
 
-        METADATA_HOLDER_DIR = new File(METADATA_HOLDER_DIR).getAbsolutePath() + "/";
+        CommonTools.METADATA_HOLDER_DIR = new File(CommonTools.METADATA_HOLDER_DIR).getAbsolutePath() + "/";
 
         if (getIntent().getExtras() != null && getIntent().getExtras().getBoolean("all?", true)){
             title.setText(R.string.everything);
@@ -782,7 +781,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             @Override
             public void onReceive(Context context, Intent intent) {
                 ExtraBackupsProgress.setData(mainGetJsonFromDataPackets, numberOfApps,
-                        installScriptPath, restoreDataScriptPath, extraSelectBoolean, METADATA_HOLDER_DIR);
+                        installScriptPath, restoreDataScriptPath, extraSelectBoolean, CommonTools.METADATA_HOLDER_DIR);
                 LocalBroadcastManager.getInstance(AppSelector.this).sendBroadcast(new Intent("startRestoreFromExtraBackups"));
                 finish();
             }
@@ -835,26 +834,26 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
                 "cp -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME_OLD + "/busybox 2>/dev/null\n" +
                 "cp -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME_NEW + "/busybox 2>/dev/null\n" +
-                "rm -rf " + METADATA_HOLDER_DIR + "\n" +
-                "mkdir -p " + METADATA_HOLDER_DIR + "\n" +
+                "rm -rf " + CommonTools.METADATA_HOLDER_DIR + "\n" +
+                "mkdir -p " + CommonTools.METADATA_HOLDER_DIR + "\n" +
 
-                "cp " + TEMP_DIR_NAME_OLD + "/*.json " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_OLD + "/*.vcf " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_OLD + "/*.sms.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_OLD + "/*.calls.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_OLD + "/*.perm " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_OLD + "/screen.dpi " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_OLD + "/default.kyb " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_OLD + "/package-data*.txt " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/*.json " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/*.vcf " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/*.sms.db " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/*.calls.db " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/*.perm " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/screen.dpi " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/default.kyb " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/package-data*.txt " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
 
-                "cp " + TEMP_DIR_NAME_NEW + "/*.json " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_NEW + "/*.vcf " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_NEW + "/*.sms.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_NEW + "/*.calls.db " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_NEW + "/*.perm " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_NEW + "/screen.dpi " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_NEW + "/default.kyb " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_NEW + "/package-data*.txt " + METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/*.json " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/*.vcf " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/*.sms.db " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/*.calls.db " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/*.perm " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/screen.dpi " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/default.kyb " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/package-data*.txt " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
 
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";

@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
-
 public class CommonTools {
 
     Context context;
@@ -32,6 +30,7 @@ public class CommonTools {
 
     static String TEMP_DIR_NAME_OLD = "/data/balti.migrate";
     static String TEMP_DIR_NAME_NEW = "/data/local/tmp/migrate_cache";
+    static String METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migratehelper/cache";
 
     public CommonTools(Context context) {
         this.context = context;
@@ -99,7 +98,7 @@ public class CommonTools {
                 shareProgress.setChecked(true);
             }
 
-            if (package_datas.length > 0){
+            if (package_datas.length == 0){
                 sharePackageData.setChecked(false);
                 sharePackageData.setEnabled(false);
             }
@@ -142,7 +141,7 @@ public class CommonTools {
                             emailIntent.setType("text/plain");
                             emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"help.baltiapps@gmail.com"});
-                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Log report for Migrate");
+                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Log report for Migrate Helper");
                             emailIntent.putExtra(Intent.EXTRA_TEXT, body);
 
                             ArrayList<Uri> uris = new ArrayList<>(0);

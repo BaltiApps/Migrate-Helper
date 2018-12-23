@@ -17,7 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static balti.migratehelper.AppSelector.METADATA_HOLDER_DIR;
+import static balti.migratehelper.CommonTools.METADATA_HOLDER_DIR;
 import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 
 /**
