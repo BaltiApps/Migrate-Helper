@@ -1060,6 +1060,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 scriptWriter = new BufferedWriter(new FileWriter(restoreScript));
 
                 scriptWriter.write("#!sbin/sh\n\n");
+                scriptWriter.write("echo \" \"\n");
+                scriptWriter.write("sleep 1s\n");
+                scriptWriter.write("echo \"--- RESTORE PID: $$\"\n");
 
                 scriptWriter.write("cp " + restoreScript.getAbsolutePath() + " " + METADATA_HOLDER_DIR + "/\n");
 

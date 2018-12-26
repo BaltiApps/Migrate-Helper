@@ -3,8 +3,10 @@ package balti.migratehelper;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 
+import static balti.migratehelper.CommonTools.CANCEL_RESTORE_INTENT_FILTER;
 import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 
 //import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
@@ -46,6 +49,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     private int SUCCESS = 0;
     private int CODE_ERROR = 990;
     private int EXECUTION_ERROR = 999;
+    private boolean isCancelled = false;
 
     private long startMillis;
     private long endMillis;
@@ -70,6 +74,11 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     private File actualRestoreScript;
 
     static String ICON_STRING = "";
+    static int RESTORE_PROCESS_ID = -9999999;
+
+    private Process restoreProcess = null;
+
+    BroadcastReceiver cancelReceiver;
 
     RootRestoreTask(Context context, int numberOfAppJobs, boolean isContactAppPresent, int dpiValue, String actualRestoreScriptPath) {
 
@@ -93,6 +102,14 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
             e.printStackTrace();
         }
 
+        cancelReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                isCancelled = true;
+                cancelProcess();
+            }
+        };
+        LocalBroadcastManager.getInstance(context).registerReceiver(cancelReceiver, new IntentFilter(CANCEL_RESTORE_INTENT_FILTER));
     }
 
 
@@ -159,7 +176,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         startMillis = timeInMillis();
 
         try {
-            Process restoreProcess = Runtime.getRuntime().exec("su");
+            restoreProcess = Runtime.getRuntime().exec("su");
 
             BufferedWriter suRestoreProcessWriter = new BufferedWriter(new OutputStreamWriter(restoreProcess.getOutputStream()));
             BufferedReader outputReader = new BufferedReader(new InputStreamReader(restoreProcess.getInputStream()));
@@ -183,6 +200,13 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                     if (head.contains(" ")) {
                         ICON_STRING = head.split(" ")[1].trim();
                         head = head.split(" ")[0];
+                    }
+                }
+                else if (line.startsWith("--- RESTORE PID:")) {
+                    try {
+                        RESTORE_PROCESS_ID = Integer.parseInt(line.substring(line.lastIndexOf(" ") + 1));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
                 else {
@@ -211,6 +235,26 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         else return EXECUTION_ERROR;
 
 
+    }
+
+
+    void cancelProcess() {
+        try {
+            Process killProcess = Runtime.getRuntime().exec("su");
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(killProcess.getOutputStream()));
+            writer.write("kill -9 " + RESTORE_PROCESS_ID + "\n");
+            writer.write("kill -15 " + RESTORE_PROCESS_ID + "\n");
+            writer.write("exit\n");
+            writer.flush();
+
+            killProcess.waitFor();
+
+            try {
+                restoreProcess.waitFor();
+            }
+            catch (Exception ignored){}
+
+        } catch (Exception ignored) {}
     }
 
     @Override
@@ -277,7 +321,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
             e.printStackTrace();
         }*/
 
-        if ( o == SUCCESS) {
+        if ( o == SUCCESS && !isCancelled) {
 
             Toast.makeText(context, context.getString(R.string.finished), Toast.LENGTH_SHORT).show();
 
@@ -293,6 +337,27 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                     .setContentTitle(context.getString(R.string.finished))
                     .setContentText(log)
                     .setProgress(0, 0, false);
+        }
+        else if (isCancelled){
+
+            Toast.makeText(context, context.getString(R.string.restoreCancelled), Toast.LENGTH_SHORT).show();
+
+            String log = (dpiValue > 0)? context.getString(R.string.change_dpi_and_reboot_prompt) : context.getString(R.string.uninstall_prompt);
+
+            restoreIntent.putExtra("type", "restoreCancelled");
+            restoreIntent.putExtra("log", context.getString(R.string.restoreCancelled) + "\n" + log);
+
+            errors.add("\n" + context.getString(R.string.restoreCancelled));
+            restoreIntent.putStringArrayListExtra("errors", errors);
+            restoreIntent.putExtra("head", context.getString(R.string.restoreCancelled));
+
+            activityIntent.putExtras(restoreIntent);
+
+            progress.setContentIntent(PendingIntent.getActivity(context, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentTitle(context.getString(R.string.restoreCancelled))
+                    .setContentText(log)
+                    .setProgress(0, 0, false);
+
         }
         else {
             Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
@@ -328,6 +393,8 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         progress.addAction(uninstallAction);
 
         notificationManager.notify(ON_FINISH_NOTIFICATION_ID, progress.build());
+
+        LocalBroadcastManager.getInstance(context).unregisterReceiver(cancelReceiver);
     }
 
     long timeInMillis(){

@@ -22,10 +22,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import static balti.migratehelper.CommonTools.ACTION_END_ALL;
+import static balti.migratehelper.CommonTools.CANCEL_RESTORE_INTENT_FILTER;
 
 public class ProgressActivity extends AppCompatActivity {
 
-    Button okOnFinish, close, reportLog;
+    Button okOnFinish, close, reportLog, cancelButton;
     ProgressBar progressBar;
     TextView messageView, messageHead, progressPercentage;
     TextView errorView;
@@ -61,6 +62,7 @@ public class ProgressActivity extends AppCompatActivity {
         okOnFinish = findViewById(R.id.okOnFinish);
         close = findViewById(R.id.close);
         reportLog = findViewById(R.id.reportLogButton);
+        cancelButton = findViewById(R.id.cancelRestore);
 
         reportLog.setVisibility(View.GONE);
 
@@ -109,6 +111,13 @@ public class ProgressActivity extends AppCompatActivity {
             }
         });
 
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LocalBroadcastManager.getInstance(ProgressActivity.this).sendBroadcast(new Intent(CANCEL_RESTORE_INTENT_FILTER));
+            }
+        });
+
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,17 +140,6 @@ public class ProgressActivity extends AppCompatActivity {
             messageView.setText("");
             wasContactBeingRestored = false;
         }
-
-        /*if (type.equals("app_icon") && intent.hasExtra("icon_string")) {
-            String iconString = intent.getStringExtra("icon_string");
-
-            try {
-                setAppIcon.cancel(true);
-            } catch (Exception ignored) {
-            }
-            setAppIcon = new SetAppIcon(iconHolder);
-            setAppIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, iconString.trim());
-        }*/
 
         if (type.equals("finishedErrors")){
 
@@ -172,45 +170,46 @@ public class ProgressActivity extends AppCompatActivity {
 
             dpiValue = intent.getIntExtra("dpiValue", 0);
 
+            cancelButton.setVisibility(View.GONE);
             okOnFinish.setText(R.string.finish);
             close.setVisibility(View.GONE);
             okOnFinish.setVisibility(View.VISIBLE);
 
-            /*if (dpiValue > 0) {
-                okOnFinish.setVisibility(View.INVISIBLE);
+        }
+        else if (type.equals("restoreCancelled")){
 
-                final AlertDialog dpiDialog = new AlertDialog.Builder(this)
-                        .setTitle(R.string.change_dpi_and_reboot)
-                        .setMessage(R.string.change_dpi_and_reboot_desc)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startService(new Intent(ProgressActivity.this, UninstallService.class).putExtra("dpiValue", dpiValue));
-                            }
-                        })
-                        .setNeutralButton(R.string.send_logs_first, null)
-                        .setCancelable(false)
-                        .create();
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-                dpiDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                    @Override
-                    public void onShow(DialogInterface dialog) {
-                        Button logButton = dpiDialog.getButton(DialogInterface.BUTTON_NEUTRAL);
-                        logButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                new CommonTools(ProgressActivity.this).reportLogs(true);
-                            }
-                        });
-                    }
-                });
+            reportLog.setVisibility(View.VISIBLE);
 
-                dpiDialog.show();
+            try {
+                setAppIcon.cancel(true);
+            } catch (Exception ignored){}
+
+            iconHolder.setImageResource(R.drawable.ic_cancelled);
+            messageHead.setText(intent.getStringExtra("head"));
+
+            if (intent.hasExtra("total_time"))
+                messageHead.append("\n(" + intent.getStringExtra("total_time") + ")");
+
+            appendLog("log", intent);
+
+            messageHead.setTextColor(Color.RED);
+
+            if (intent.hasExtra("errors")) {
+                ArrayList<String> receivedErrors = intent.getStringArrayListExtra("errors");
+                for (String err : receivedErrors) {
+                    errorView.append(err + "\n");
+                }
             }
-            else {
-                okOnFinish.setText(R.string.finish);
-                okOnFinish.setVisibility(View.VISIBLE);
-            }*/
+
+            dpiValue = intent.getIntExtra("dpiValue", 0);
+
+            cancelButton.setVisibility(View.GONE);
+            okOnFinish.setText(R.string.finish);
+            close.setVisibility(View.GONE);
+            okOnFinish.setVisibility(View.VISIBLE);
+
         }
         else if (type.equals("finishedOk")){
 
@@ -232,30 +231,11 @@ public class ProgressActivity extends AppCompatActivity {
 
             dpiValue = intent.getIntExtra("dpiValue", 0);
 
+            cancelButton.setVisibility(View.GONE);
             okOnFinish.setText(R.string.finish);
             close.setVisibility(View.GONE);
             updateProgress(progressBar.getMax());
             okOnFinish.setVisibility(View.VISIBLE);
-
-            /*if (dpiValue > 0) {
-                okOnFinish.setVisibility(View.INVISIBLE);
-
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.change_dpi_and_reboot)
-                        .setMessage(R.string.change_dpi_and_reboot_desc)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startService(new Intent(ProgressActivity.this, UninstallService.class).putExtra("dpiValue", dpiValue));
-                            }
-                        })
-                        .setCancelable(false)
-                        .show();
-            }
-            else {
-                okOnFinish.setText(R.string.finish);
-                okOnFinish.setVisibility(View.VISIBLE);
-            }*/
 
         }
         else if (type.equals("restoring_app")) {

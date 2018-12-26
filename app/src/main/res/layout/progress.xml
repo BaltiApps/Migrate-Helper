@@ -140,6 +140,16 @@
             />
 
         <Button
+            android:id="@+id/cancelRestore"
+            android:layout_width="@dimen/log_button_width"
+            android:layout_height="@dimen/button_height"
+            android:text="@string/abort"
+            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
+            android:background="@drawable/cancel_restore"
+            android:foreground="?android:attr/selectableItemBackground"
+            />
+
+        <Button
             android:id="@+id/close"
             android:layout_width="@dimen/log_button_width"
             android:layout_height="@dimen/button_height"

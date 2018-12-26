@@ -63,7 +63,9 @@ public class RestoreService extends Service {
                 returnIntent = intent;
                 if (intent.hasExtra("type")) {
 
-                    if (intent.getStringExtra("type").equals("finishedErrors")) {
+                    String type = intent.getStringExtra("type");
+
+                    if (type.equals("finishedErrors") || type.equals("restoreCancelled")) {
 
                         try {
 
@@ -87,7 +89,7 @@ public class RestoreService extends Service {
 
                         stopSelf();
 
-                    } else if (intent.getStringExtra("type").equals("finishedOk")) {
+                    } else if (type.equals("finishedOk")) {
 
                         try {
 
@@ -103,7 +105,7 @@ public class RestoreService extends Service {
 
                         stopSelf();
 
-                    } else if (intent.getStringExtra("type").equals("restoring_app") && intent.hasExtra("log")
+                    } else if (type.equals("restoring_app") && intent.hasExtra("log")
                             && !intent.getStringExtra("log").equals(lastProgressLog)) {
 
                         try {

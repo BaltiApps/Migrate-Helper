@@ -25,6 +25,7 @@ public class CommonTools {
     Context context;
 
     static String UNINSTALL_INTENT_FILTER = "migrate_helper_uninstall_broadcast";
+    static String CANCEL_RESTORE_INTENT_FILTER = "migrate_helper_cancel_restore_broadcast";
     static String DEBUG_TAG = "migrate_helper_tag";
     static String ACTION_END_ALL = "MIGRATE_ACTION_END_ALL";
 

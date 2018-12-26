@@ -53,6 +53,7 @@
 
     <!--progress.xml-->
     <string name="close">CLOSE</string>
+    <string name="abort">Abort!</string>
     <string name="minimize">Minimize</string>
     <string name="report">Report</string>
     <string name="minimizing_may_decrease_speed">Minimizing this screen may decrease restore speed!</string>
@@ -64,6 +65,7 @@
     <string name="change_dpi_and_reboot_prompt">Click FINISH to change DPI and reboot</string>
     <string name="making_script">Making script</string>
     <string name="finish">Finish</string>
+    <string name="restoreCancelled">Restore cancelled.</string>
 
     <!--app_selector.xml-->
     <string name="select_apps">Select what to restore</string>
