@@ -116,6 +116,11 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/colorAccent" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/current_version_name"
+                    />
 
             </LinearLayout>
 

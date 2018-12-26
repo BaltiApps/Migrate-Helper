@@ -1,5 +1,16 @@
 <resources>
+
+    <!--Version changes to be made in
+
+    current_version_name (must not have blank spaces)
+    build.gradle
+
+    -->
+
+    <!--please also update last tested version in MainActivity-->
+
     <string name="app_name">Migrate helper</string>
+    <string name="current_version_name">2.0(christmas_beta)</string>
 
     <!--activity_main.xml-->
     <string name="restore_all">Restore all apps and data</string>
