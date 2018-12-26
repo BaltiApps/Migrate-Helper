@@ -37,28 +37,33 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
     static String METADATA_FILE_FIELD = "metadata_file";
     static String METADATA_FILE_NAME = "metadata_file_name";
-    static int ON_FINISH_NOTIFICATION_ID = 101;
     static String DISPLAY_HEAD = "display head: ";
     static String INSTALLING_HEAD = "Installing app: ";
     static String RESTORE_DATA_HEAD = "Restoring data: ";
     static String ICON_STRING = "";
-    static int RESTORE_PROCESS_ID = -9999999;
-    int numberOfAppJobs;
-    BroadcastReceiver cancelReceiver;
-    private Context context;
+
+    private static int RESTORE_PROCESS_ID = -9999999;
+    private static int ON_FINISH_NOTIFICATION_ID = 101;
+    private int SUCCESS = 0;
+    private int CODE_ERROR = 990;
+    private int EXECUTION_ERROR = 999;
+
+    private int numberOfAppJobs;
+    private int dpiValue = 0;
+    private long startMillis;
+    private long endMillis;
+    private boolean isCancelled = false;
+    private boolean isContactAppPresent;
+
     private ArrayList<String> errors;
+
+    private BroadcastReceiver cancelReceiver;
+    private Context context;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder progress;
     private Intent restoreIntent;
     private Intent activityIntent;
-    private int SUCCESS = 0;
-    private int CODE_ERROR = 990;
-    private int EXECUTION_ERROR = 999;
-    private boolean isCancelled = false;
-    private long startMillis;
-    private long endMillis;
-    private int dpiValue = 0;
-    private boolean isContactAppPresent;
+
     private Process suProcessForVcfCheck;
     private BufferedWriter suProcessForVcfCheckWriter;
     private BufferedReader suProcessForVcfCheckReader;
@@ -96,7 +101,6 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         };
         LocalBroadcastManager.getInstance(context).registerReceiver(cancelReceiver, new IntentFilter(CANCEL_RESTORE_INTENT_FILTER));
     }
-
 
     boolean isVcfBeingRead() {
 
@@ -221,6 +225,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
 
     void cancelProcess() {
+
         try {
             Process killProcess = Runtime.getRuntime().exec("su");
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(killProcess.getOutputStream()));

@@ -16,13 +16,15 @@ import java.util.Vector;
 
 public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPackets> {
 
+    private OnConvertMetadataToJSON classContext;
+    private Context context;
+    private TextView statusDisplayView;
+
     static String APP_CHECK = "APP_CHECK";
     static String DATA_CHECK = "DATA_CHECK";
     static String PERM_CHECK = "PERM_CHECK";
     static String IS_PERMISSIBLE = "IS_PERMISSIBLE";
-    private OnConvertMetadataToJSON classContext;
-    private Context context;
-    private TextView statusDisplayView;
+
     private FileFilter jsonFilter, vcfFilter, smsDBFilter, callsDBFilter, packageDataFilter;
 
     private String error;

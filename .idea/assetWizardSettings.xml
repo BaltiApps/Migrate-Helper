@@ -123,7 +123,7 @@
                           <map>
                             <entry key="color" value="d50000" />
                             <entry key="height" value="50" />
-                            <entry key="outputName" value="ic_error" />
+                            <entry key="outputName" value="ic_error_on_finish" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="$PROJECT_DIR$/app/src/main/res/drawable-nodpi/normal_button.svg" />
                             <entry key="width" value="50" />

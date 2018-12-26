@@ -26,12 +26,15 @@ import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 
 public class RestoreService extends Service {
 
-
-    static RootRestoreTask ROOT_RESTORE_TASK;
-    static int RESTORE_SERVICE_NOTIFICATION_ID = 100;
     BroadcastReceiver progressReceiver, requestListener;
     IntentFilter progressReceiverIF, requestListenerIF;
+
     Intent returnIntent;
+
+    static RootRestoreTask ROOT_RESTORE_TASK;
+
+    static int RESTORE_SERVICE_NOTIFICATION_ID = 100;
+
     BufferedWriter progressWriter, errorWriter;
     String lastProgressLog = "";
 

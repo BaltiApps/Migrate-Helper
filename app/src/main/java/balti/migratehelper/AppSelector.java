@@ -55,37 +55,40 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     private static int SUCCESS = 0;
     private static int CODE_ERROR = 1;
     private static int SCRIPT_ERROR = 2;
+
     ImageButton back;
     TextView title;
+    TextView waitingStatusMessage, waitingMessageDesc;
     CheckBox appAllSelect, dataAllSelect, permissionsAllSelect;
     RelativeLayout waitingLayout;
-    TextView waitingStatusMessage;
-    TextView waitingMessageDesc;
-    ImageButton clearAll;
-    ImageButton selectAll;
+    ImageButton clearAll, selectAll;
     Button actionButton;
     ScrollView restoreContent;
-    LinearLayout appCheckboxBar;
+    LinearLayout appCheckboxBar, extrasBar;
     ListView appList;
-    LinearLayout extrasBar;
     CheckBox extrasSelect;
     ProgressBar justAProgress;
     ImageView errorIcon;
     AppListAdapter adapter;
     Process checkSu;
-    int numberOfApps = 0;
-    boolean intentSelectAll = false;
-    boolean anyAppSelected = true;
-    RootCopyTask rootCopyTask;
-    GetJsonFromData getJsonFromData;
-    AppUpdate appUpdateTask;
-    GetJsonFromDataPackets mainGetJsonFromDataPackets = null;
-    boolean extraSelectBoolean = true;
-    BroadcastReceiver extraBackupsProgressReadyReceiver;
+
     private String busyboxBinaryFilePath = "";
     private String installScriptPath = "";
     private String restoreDataScriptPath = "";
     private String initError;
+
+    int numberOfApps = 0;
+    boolean intentSelectAll = false;
+
+    boolean anyAppSelected = true;
+    boolean extraSelectBoolean = true;
+
+    GetJsonFromDataPackets mainGetJsonFromDataPackets = null;
+
+    RootCopyTask rootCopyTask;
+    GetJsonFromData getJsonFromData;
+    AppUpdate appUpdateTask;
+    BroadcastReceiver extraBackupsProgressReadyReceiver;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

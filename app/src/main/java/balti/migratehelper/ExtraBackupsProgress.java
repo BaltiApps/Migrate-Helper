@@ -59,63 +59,82 @@ import static balti.migratehelper.RootRestoreTask.RESTORE_DATA_HEAD;
 
 public class ExtraBackupsProgress extends AppCompatActivity implements OnDBRestoreComplete {
 
+    TextView headTitle;
+    ProgressBar headProgressBar;
+
+    LinearLayout contactsView;
+    ImageView contactsDone, contactsCancel;
+    ProgressBar contactsProgress;
+
+    LinearLayout smsView;
+    ImageView smsDone, smsCancel;
+    ProgressBar smsProgress;
+    TextView smsStatusText;
+
+    LinearLayout callsView;
+    ImageView callsDone, callsCancel;
+    ProgressBar callsProgress;
+    TextView callsStatusText;
+
+    LinearLayout dpiView;
+    ImageView dpiDone, dpiCancel;
+    ProgressBar dpiProgress;
+    TextView dpiStatusText;
+
+    private int dpiValue = 0;
+
+    LinearLayout keyboardView;
+    ImageView keyboardDone, keyboardCancel;
+    ProgressBar keyboardProgress;
+    TextView keyboardStatusText;
+
+    String keyboardText = "";
+
+    LinearLayout applications;
+    ImageView appsDone;
+    ProgressBar appsProgress;
+    TextView appsStatusText;
+
     static int totalTasks = 0;
     static int intProgressTask = 0;
+
+    private static int CONTACTS_RESTORE = 10;
+
     static GetJsonFromDataPackets getJsonFromDataPackets;
     static int numberOfApps = 0;
     static String installScriptPath;
     static String restoreDataScriptPath;
     static boolean extraSelectBoolean;
     static String mtdDirName;
+
     static boolean isShowContacts = false;
     static boolean isShowSms = false;
     static boolean isShowCalls = false;
     static boolean isShowDpi = false;
     static boolean isShowKeyboard = false;
-    private static int CONTACTS_RESTORE = 10;
-    TextView headTitle;
-    ProgressBar headProgressBar;
-    LinearLayout contactsView;
-    ImageView contactsDone, contactsCancel;
-    ProgressBar contactsProgress;
-    LinearLayout smsView;
-    ImageView smsDone, smsCancel;
-    ProgressBar smsProgress;
-    TextView smsStatusText;
-    LinearLayout callsView;
-    ImageView callsDone, callsCancel;
-    ProgressBar callsProgress;
-    TextView callsStatusText;
-    LinearLayout dpiView;
-    ImageView dpiDone, dpiCancel;
-    ProgressBar dpiProgress;
-    TextView dpiStatusText;
-    LinearLayout keyboardView;
-    ImageView keyboardDone, keyboardCancel;
-    ProgressBar keyboardProgress;
-    TextView keyboardStatusText;
-    String keyboardText = "";
-    LinearLayout applications;
-    ImageView appsDone;
-    ProgressBar appsProgress;
-    TextView appsStatusText;
+
     BroadcastReceiver startRestoreFromExtraBackups;
+
     BroadcastReceiver progressReceiver;
     IntentFilter progressReceiverIF;
+
     ContactsPacket contactsPackets[];
     int contactCount = 0;
+
     SmsPacket smsPacket[];
     AlertDialog smsPermissionDialog;
     String actualDefaultSmsAppName = "";
     int SET_THIS_AS_DEFAULT_SMS_APP = 2;
     int SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP = 3;
     int SMS_RESTORE_JOB = 20;
+
     CallsPacket callsPackets[];
     AlertDialog callsPermissionDialog;
+
     AlertDialog dpiDialog;
+
     int CALLS_PERMISSION_REQUEST = 4;
     int CALLS_RESTORE_JOB = 40;
-    private int dpiValue = 0;
 
     static void setData(GetJsonFromDataPackets getJsonFromDataPackets, int numberOfApps, String installScriptPath, String restoreDataScriptPath, boolean extraSelectBoolean, String mtdDirName) {
 

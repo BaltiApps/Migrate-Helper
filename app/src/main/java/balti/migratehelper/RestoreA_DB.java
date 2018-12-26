@@ -16,16 +16,17 @@ import java.util.List;
 
 class RestoreA_DB extends AsyncTask {
 
-    Context context;
-    TextView statusText;
-    OnDBRestoreComplete classContext;
     private List<File> dbFiles;
     private String projection[];
     private String mirror[][];
     private ProgressBar progressBar;
     private String tableName;
     private Uri uri;
+    Context context;
     private int code;
+    TextView statusText;
+
+    OnDBRestoreComplete classContext;
 
     public RestoreA_DB(List<File> dbFiles, String[] projection, String[][] mirror, ProgressBar progressBar, TextView statusText, String tableName, Uri restoreUri, Context context, int code) {
         this.dbFiles = dbFiles;

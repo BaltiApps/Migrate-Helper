@@ -114,6 +114,7 @@ public class ProgressActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                cancelButton.setText(R.string.please_wait);
                 LocalBroadcastManager.getInstance(ProgressActivity.this).sendBroadcast(new Intent(CANCEL_RESTORE_INTENT_FILTER));
             }
         });
@@ -153,7 +154,7 @@ public class ProgressActivity extends AppCompatActivity {
             } catch (Exception ignored) {
             }
 
-            iconHolder.setImageResource(R.drawable.ic_error);
+            iconHolder.setImageResource(R.drawable.ic_error_on_finish);
             messageHead.setText(intent.getStringExtra("head"));
 
             if (intent.hasExtra("total_time"))
@@ -188,6 +189,7 @@ public class ProgressActivity extends AppCompatActivity {
             } catch (Exception ignored) {
             }
 
+            cancelButton.setText(R.string.abort);
             iconHolder.setImageResource(R.drawable.ic_cancelled);
             messageHead.setText(intent.getStringExtra("head"));
 
