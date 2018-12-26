@@ -68,12 +68,12 @@ public class ProgressActivity extends AppCompatActivity {
 
         messageView.setGravity(Gravity.BOTTOM);
         messageView.setMovementMethod(new ScrollingMovementMethod());
-        
+
         type = "";
 
         commonTools = new CommonTools(this);
 
-        if (getIntent().getExtras() != null){
+        if (getIntent().getExtras() != null) {
             handleProgress(getIntent());
         }
 
@@ -128,20 +128,21 @@ public class ProgressActivity extends AppCompatActivity {
         trySettingAppIcon();
     }
 
-    void handleProgress(Intent intent){
+    void handleProgress(Intent intent) {
 
         messageHead.setTextColor(getResources().getColor(R.color.colorAccent));
         try {
             type = intent.getStringExtra("type");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch (Exception e){ e.printStackTrace(); }
 
         if (wasContactBeingRestored && !type.equals("waiting_for_contacts")) {
             messageView.setText("");
             wasContactBeingRestored = false;
         }
 
-        if (type.equals("finishedErrors")){
+        if (type.equals("finishedErrors")) {
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -149,7 +150,8 @@ public class ProgressActivity extends AppCompatActivity {
 
             try {
                 setAppIcon.cancel(true);
-            } catch (Exception ignored){}
+            } catch (Exception ignored) {
+            }
 
             iconHolder.setImageResource(R.drawable.ic_error);
             messageHead.setText(intent.getStringExtra("head"));
@@ -175,8 +177,7 @@ public class ProgressActivity extends AppCompatActivity {
             close.setVisibility(View.GONE);
             okOnFinish.setVisibility(View.VISIBLE);
 
-        }
-        else if (type.equals("restoreCancelled")){
+        } else if (type.equals("restoreCancelled")) {
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -184,7 +185,8 @@ public class ProgressActivity extends AppCompatActivity {
 
             try {
                 setAppIcon.cancel(true);
-            } catch (Exception ignored){}
+            } catch (Exception ignored) {
+            }
 
             iconHolder.setImageResource(R.drawable.ic_cancelled);
             messageHead.setText(intent.getStringExtra("head"));
@@ -210,8 +212,7 @@ public class ProgressActivity extends AppCompatActivity {
             close.setVisibility(View.GONE);
             okOnFinish.setVisibility(View.VISIBLE);
 
-        }
-        else if (type.equals("finishedOk")){
+        } else if (type.equals("finishedOk")) {
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -219,7 +220,8 @@ public class ProgressActivity extends AppCompatActivity {
 
             try {
                 setAppIcon.cancel(true);
-            } catch (Exception ignored){}
+            } catch (Exception ignored) {
+            }
 
             iconHolder.setImageResource(R.drawable.ic_finished);
             messageHead.setText(intent.getStringExtra("head"));
@@ -237,8 +239,7 @@ public class ProgressActivity extends AppCompatActivity {
             updateProgress(progressBar.getMax());
             okOnFinish.setVisibility(View.VISIBLE);
 
-        }
-        else if (type.equals("restoring_app")) {
+        } else if (type.equals("restoring_app")) {
 
             String head = intent.getStringExtra("head");
             messageHead.setText(head);
@@ -249,8 +250,7 @@ public class ProgressActivity extends AppCompatActivity {
 
             trySettingAppIcon();
 
-        }
-        else if (type.equals("waiting_for_contacts")) {
+        } else if (type.equals("waiting_for_contacts")) {
 
             wasContactBeingRestored = true;
 
@@ -264,7 +264,7 @@ public class ProgressActivity extends AppCompatActivity {
         }
     }
 
-    void appendLog(String key, Intent intent){
+    void appendLog(String key, Intent intent) {
 
         if (intent.hasExtra(key)) {
             String msg = intent.getStringExtra(key);
@@ -277,11 +277,11 @@ public class ProgressActivity extends AppCompatActivity {
         }
     }
 
-    void updateProgress(int c){
+    void updateProgress(int c) {
         int n = progressBar.getMax();
         progressBar.setIndeterminate(false);
         if (n != 0)
-            progressPercentage.setText((int)((c*100.0)/n) + "%");
+            progressPercentage.setText((int) ((c * 100.0) / n) + "%");
         else progressPercentage.setText("");
         progressBar.setProgress(c);
     }
@@ -291,15 +291,15 @@ public class ProgressActivity extends AppCompatActivity {
         super.onDestroy();
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored){}
         try {
             unregisterReceiver(endOnDisable);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored){}
     }
 
-    void trySettingAppIcon(){
+    void trySettingAppIcon() {
 
         try {
 
@@ -307,14 +307,14 @@ public class ProgressActivity extends AppCompatActivity {
 
                 try {
                     setAppIcon.cancel(true);
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {
+                }
 
                 setAppIcon = new SetAppIcon(iconHolder);
                 lastIcon = RootRestoreTask.ICON_STRING;
                 setAppIcon.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, lastIcon);
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

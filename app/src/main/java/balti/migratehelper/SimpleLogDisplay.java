@@ -56,11 +56,22 @@ public class SimpleLogDisplay extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        try {
+            loadLogText.cancel(true);
+        } catch (Exception ignored) {
+        }
+    }
+
     class LoadLogText extends AsyncTask {
 
         Intent intent;
         String err;
-        LoadLogText(Intent intent){
+
+        LoadLogText(Intent intent) {
             this.intent = intent;
         }
 
@@ -75,10 +86,10 @@ public class SimpleLogDisplay extends AppCompatActivity {
         @Override
         protected Object doInBackground(Object[] objects) {
 
-            if (!intent.hasExtra("head")){
+            if (!intent.hasExtra("head")) {
                 err += getString(R.string.no_header) + "\n";
             }
-            if (!intent.hasExtra("filePath")){
+            if (!intent.hasExtra("filePath")) {
                 err += getString(R.string.no_filepath) + "\n";
             }
 
@@ -95,7 +106,7 @@ public class SimpleLogDisplay extends AppCompatActivity {
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
                 String line;
 
-                while ((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     publishProgress(1, line + "\n");
                 }
 
@@ -118,8 +129,7 @@ public class SimpleLogDisplay extends AppCompatActivity {
 
                 if (i == 0) header.setText((String) values[1]);
                 else logBody.append((String) values[1]);
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -129,7 +139,7 @@ public class SimpleLogDisplay extends AppCompatActivity {
             super.onPostExecute(o);
             progressBar.setVisibility(View.GONE);
 
-            if (!err.equals("")){
+            if (!err.equals("")) {
                 new AlertDialog.Builder(SimpleLogDisplay.this)
                         .setTitle(R.string.log_reading_error)
                         .setMessage(err)
@@ -143,14 +153,5 @@ public class SimpleLogDisplay extends AppCompatActivity {
                         .show();
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        try {
-            loadLogText.cancel(true);
-        }catch (Exception ignored){}
     }
 }

@@ -1,176 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/app_list_bg"
-    >
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/colorPrimary"
-        android:padding="@dimen/large_padding_width"
         android:layout_marginBottom="@dimen/small_padding_width"
-        >
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding_width">
 
 
         <TextView
+            android:id="@+id/extra_backup_progress_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/please_wait"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/extra_backup_progress_title"
             android:padding="@dimen/large_padding_width"
-            />
+            android:text="@string/please_wait"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <ProgressBar
+            android:id="@+id/extra_backup_progress_head_progress"
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_margin="@dimen/large_padding_width"
-            android:id="@+id/extra_backup_progress_head_progress"
-            />
+            android:layout_margin="@dimen/large_padding_width" />
 
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/do_not_close"
-            android:padding="@dimen/large_padding_width"
             android:drawableStart="@drawable/ic_warning"
             android:drawablePadding="@dimen/large_padding_width"
-            />
+            android:padding="@dimen/large_padding_width"
+            android:text="@string/do_not_close" />
 
     </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true"
-        >
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/extra_backup_progress_item_contacts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_margin="@dimen/small_padding_width"
                 android:background="@color/lightGray"
                 android:gravity="center_vertical"
-                android:id="@+id/extra_backup_progress_item_contacts"
+                android:orientation="horizontal"
                 android:padding="@dimen/small_padding_width"
-                android:visibility="gone"
-                >
+                android:visibility="gone">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_contact_icon"
                     android:padding="15dp"
-                    />
+                    android:src="@drawable/ic_contact_icon" />
 
                 <TextView
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="@string/contacts"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:layout_margin="@dimen/large_padding_width"
-                    />
+                    android:layout_weight="1"
+                    android:text="@string/contacts"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <ImageView
+                    android:id="@+id/extra_backup_progress_item_contacts_done"
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
                     android:src="@drawable/ic_item_done"
-                    android:id="@+id/extra_backup_progress_item_contacts_done"
-                    android:visibility="gone"
-                    />
+                    android:visibility="gone" />
 
                 <ImageView
+                    android:id="@+id/extra_backup_progress_item_contacts_cancel"
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
                     android:src="@drawable/ic_item_cancel"
-                    android:id="@+id/extra_backup_progress_item_contacts_cancel"
-                    android:visibility="gone"
-                    />
+                    android:visibility="gone" />
 
                 <ProgressBar
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
                     android:id="@+id/extra_backup_progress_item_contacts_progress"
-                    android:visibility="gone"
-                    />
+                    android:layout_width="@dimen/extra_item_done_wh"
+                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_margin="@dimen/small_padding_width"
-                android:background="@color/lightGray"
                 android:id="@+id/extra_backup_progress_item_sms"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small_padding_width"
+                android:background="@color/lightGray"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:padding="@dimen/small_padding_width"
-                android:visibility="gone"
-                >
+                android:visibility="gone">
 
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_sms_icon"
                     android:padding="15dp"
-                    />
+                    android:src="@drawable/ic_sms_icon" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    >
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/large_padding_width"
                         android:text="@string/sms"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:layout_margin="@dimen/large_padding_width"
-                        />
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        >
+                        android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--"
-                            android:layout_gravity="end"
-                            android:paddingStart="@dimen/large_padding_width"
-                            android:paddingEnd="@dimen/large_padding_width"
-                            android:textColor="@color/colorAccent"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
                             android:id="@+id/extra_backup_progress_item_sms_progress_in_words"
-                            android:visibility="gone"
-                            />
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:paddingStart="@dimen/large_padding_width"
+                            android:paddingEnd="@dimen/large_padding_width"
+                            android:text="--"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:textColor="@color/colorAccent"
+                            android:visibility="gone" />
 
                         <ProgressBar
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            style="?android:attr/progressBarStyleHorizontal"
                             android:id="@+id/extra_backup_progress_item_sms_progress"
-                            android:visibility="gone"
-                            />
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:visibility="gone" />
 
 
                     </LinearLayout>
@@ -179,87 +160,78 @@
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
-                    android:src="@drawable/ic_item_done"
                     android:id="@+id/extra_backup_progress_item_sms_done"
-                    android:layout_margin="@dimen/large_padding_width"
-                    android:visibility="invisible"
-                    />
-
-                <ImageView
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
-                    android:src="@drawable/ic_item_cancel"
+                    android:layout_margin="@dimen/large_padding_width"
+                    android:src="@drawable/ic_item_done"
+                    android:visibility="invisible" />
+
+                <ImageView
                     android:id="@+id/extra_backup_progress_item_sms_cancel"
+                    android:layout_width="@dimen/extra_item_done_wh"
+                    android:layout_height="@dimen/extra_item_done_wh"
                     android:layout_margin="@dimen/large_padding_width"
-                    android:visibility="gone"
-                    />
+                    android:src="@drawable/ic_item_cancel"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_margin="@dimen/small_padding_width"
-                android:background="@color/lightGray"
                 android:id="@+id/extra_backup_progress_item_calls"
-                android:padding="@dimen/small_padding_width"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small_padding_width"
+                android:background="@color/lightGray"
                 android:gravity="center_vertical"
-                android:visibility="gone"
-                >
+                android:orientation="horizontal"
+                android:padding="@dimen/small_padding_width"
+                android:visibility="gone">
 
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_call_log_icon"
                     android:padding="15dp"
-                    />
+                    android:src="@drawable/ic_call_log_icon" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    >
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/large_padding_width"
                         android:text="@string/calls"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:layout_margin="@dimen/large_padding_width"
-                        />
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        >
+                        android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--"
-                            android:layout_gravity="end"
-                            android:paddingStart="@dimen/large_padding_width"
-                            android:paddingEnd="@dimen/large_padding_width"
-                            android:textColor="@color/colorAccent"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
                             android:id="@+id/extra_backup_progress_item_calls_progress_in_words"
-                            android:visibility="gone"
-                            />
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:paddingStart="@dimen/large_padding_width"
+                            android:paddingEnd="@dimen/large_padding_width"
+                            android:text="--"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:textColor="@color/colorAccent"
+                            android:visibility="gone" />
 
                         <ProgressBar
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            style="?android:attr/progressBarStyleHorizontal"
                             android:id="@+id/extra_backup_progress_item_calls_progress"
-                            android:visibility="gone"
-                            />
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:visibility="gone" />
 
 
                     </LinearLayout>
@@ -268,88 +240,79 @@
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
-                    android:src="@drawable/ic_item_done"
                     android:id="@+id/extra_backup_progress_item_calls_done"
-                    android:layout_margin="@dimen/large_padding_width"
-                    android:visibility="invisible"
-                    />
-
-                <ImageView
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
-                    android:src="@drawable/ic_item_cancel"
+                    android:layout_margin="@dimen/large_padding_width"
+                    android:src="@drawable/ic_item_done"
+                    android:visibility="invisible" />
+
+                <ImageView
                     android:id="@+id/extra_backup_progress_item_calls_cancel"
+                    android:layout_width="@dimen/extra_item_done_wh"
+                    android:layout_height="@dimen/extra_item_done_wh"
                     android:layout_margin="@dimen/large_padding_width"
-                    android:visibility="gone"
-                    />
+                    android:src="@drawable/ic_item_cancel"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_margin="@dimen/small_padding_width"
-                android:background="@color/lightGray"
                 android:id="@+id/extra_backup_progress_item_dpi"
-                android:padding="@dimen/small_padding_width"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small_padding_width"
+                android:background="@color/lightGray"
                 android:gravity="center_vertical"
-                android:visibility="gone"
-                >
+                android:orientation="horizontal"
+                android:padding="@dimen/small_padding_width"
+                android:visibility="gone">
 
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_dpi_icon"
                     android:padding="15dp"
-                    />
+                    android:src="@drawable/ic_dpi_icon" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    >
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/large_padding_width"
                         android:text="@string/dpi"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:layout_margin="@dimen/large_padding_width"
-                        />
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        >
+                        android:orientation="horizontal">
 
                         <TextView
+                            android:id="@+id/extra_backup_progress_item_dpi_progress_in_words"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="--"
                             android:layout_gravity="end"
                             android:paddingStart="@dimen/large_padding_width"
                             android:paddingEnd="@dimen/large_padding_width"
-                            android:textColor="@color/colorAccent"
+                            android:text="--"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:id="@+id/extra_backup_progress_item_dpi_progress_in_words"
-                            android:visibility="gone"
-                            />
+                            android:textColor="@color/colorAccent"
+                            android:visibility="gone" />
 
                         <ProgressBar
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            style="?android:attr/progressBarStyleHorizontal"
                             android:id="@+id/extra_backup_progress_item_dpi_progress"
-                            android:visibility="gone"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:indeterminate="true"
-                            />
+                            android:visibility="gone" />
 
 
                     </LinearLayout>
@@ -358,88 +321,79 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:id="@+id/extra_backup_progress_item_dpi_done"
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
-                    android:src="@drawable/ic_item_done"
-                    android:id="@+id/extra_backup_progress_item_dpi_done"
                     android:layout_margin="@dimen/large_padding_width"
-                    android:visibility="invisible"
-                    />
+                    android:src="@drawable/ic_item_done"
+                    android:visibility="invisible" />
 
                 <ImageView
+                    android:id="@+id/extra_backup_progress_item_dpi_cancel"
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
-                    android:src="@drawable/ic_item_cancel"
-                    android:id="@+id/extra_backup_progress_item_dpi_cancel"
                     android:layout_margin="@dimen/large_padding_width"
-                    android:visibility="gone"
-                    />
+                    android:src="@drawable/ic_item_cancel"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/extra_backup_progress_item_keyboard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_margin="@dimen/small_padding_width"
                 android:background="@color/lightGray"
-                android:id="@+id/extra_backup_progress_item_keyboard"
-                android:padding="@dimen/small_padding_width"
                 android:gravity="center_vertical"
-                android:visibility="gone"
-                >
+                android:orientation="horizontal"
+                android:padding="@dimen/small_padding_width"
+                android:visibility="gone">
 
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_keyboard_icon"
                     android:padding="15dp"
-                    />
+                    android:src="@drawable/ic_keyboard_icon" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    >
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/keyboard"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:layout_margin="@dimen/large_padding_width"
-                        />
+                        android:text="@string/keyboard"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        >
+                        android:orientation="horizontal">
 
                         <TextView
+                            android:id="@+id/extra_backup_progress_item_keyboard_progress_in_words"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="--"
                             android:layout_gravity="end"
                             android:paddingStart="@dimen/large_padding_width"
                             android:paddingEnd="@dimen/large_padding_width"
-                            android:textColor="@color/colorAccent"
+                            android:text="--"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:id="@+id/extra_backup_progress_item_keyboard_progress_in_words"
-                            android:visibility="gone"
-                            />
+                            android:textColor="@color/colorAccent"
+                            android:visibility="gone" />
 
                         <ProgressBar
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            style="?android:attr/progressBarStyleHorizontal"
                             android:id="@+id/extra_backup_progress_item_keyboard_progress"
-                            android:visibility="gone"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:indeterminate="true"
-                            />
+                            android:visibility="gone" />
 
 
                     </LinearLayout>
@@ -448,103 +402,93 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:id="@+id/extra_backup_progress_item_keyboard_done"
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
-                    android:src="@drawable/ic_item_done"
-                    android:id="@+id/extra_backup_progress_item_keyboard_done"
                     android:layout_margin="@dimen/large_padding_width"
-                    android:visibility="invisible"
-                    />
+                    android:src="@drawable/ic_item_done"
+                    android:visibility="invisible" />
 
                 <ImageView
+                    android:id="@+id/extra_backup_progress_item_keyboard_cancel"
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
-                    android:src="@drawable/ic_item_cancel"
-                    android:id="@+id/extra_backup_progress_item_keyboard_cancel"
                     android:layout_margin="@dimen/large_padding_width"
-                    android:visibility="gone"
-                    />
+                    android:src="@drawable/ic_item_cancel"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/extra_backup_progress_item_applications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_margin="@dimen/small_padding_width"
                 android:background="@color/lightGray"
                 android:gravity="center_vertical"
-                android:id="@+id/extra_backup_progress_item_applications"
+                android:orientation="horizontal"
                 android:padding="@dimen/small_padding_width"
-                android:visibility="gone"
-                >
+                android:visibility="gone">
 
 
-                    <ImageView
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp"
+                    android:src="@drawable/ic_app" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_app"
-                        android:padding="15dp"
-                        />
+                        android:layout_margin="@dimen/large_padding_width"
+                        android:text="@string/apps"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        >
+                        android:orientation="horizontal">
 
                         <TextView
+                            android:id="@+id/extra_backup_progress_item_app_progress_in_words"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/apps"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:layout_margin="@dimen/large_padding_width"
-                            />
+                            android:layout_gravity="end"
+                            android:paddingStart="@dimen/large_padding_width"
+                            android:paddingEnd="@dimen/large_padding_width"
+                            android:text="--"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:textColor="@color/colorAccent"
+                            android:visibility="gone" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <ProgressBar
+                            android:id="@+id/extra_backup_progress_item_app_progress"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            >
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="--"
-                                android:layout_gravity="end"
-                                android:paddingStart="@dimen/large_padding_width"
-                                android:paddingEnd="@dimen/large_padding_width"
-                                android:textColor="@color/colorAccent"
-                                android:textAppearance="?android:attr/textAppearanceSmall"
-                                android:id="@+id/extra_backup_progress_item_app_progress_in_words"
-                                android:visibility="gone"
-                                />
-
-                            <ProgressBar
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:id="@+id/extra_backup_progress_item_app_progress"
-                                android:visibility="gone"
-                                />
+                            android:layout_weight="1"
+                            android:visibility="gone" />
 
 
-                        </LinearLayout>
+                    </LinearLayout>
 
 
                 </LinearLayout>
 
 
                 <ImageView
+                    android:id="@+id/extra_backup_progress_item_app_done"
                     android:layout_width="@dimen/extra_item_done_wh"
                     android:layout_height="@dimen/extra_item_done_wh"
-                    android:src="@drawable/ic_item_done"
-                    android:id="@+id/extra_backup_progress_item_app_done"
                     android:layout_margin="@dimen/large_padding_width"
-                    android:visibility="invisible"
-                    />
+                    android:src="@drawable/ic_item_done"
+                    android:visibility="invisible" />
 
             </LinearLayout>
 
@@ -552,8 +496,6 @@
         </LinearLayout>
 
     </ScrollView>
-
-
 
 
 </LinearLayout>

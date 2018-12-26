@@ -85,7 +85,7 @@ public class UninstallService extends Service {
             }
         }
 
-        if (doReboot){
+        if (doReboot) {
             writer.write("reboot\n");
         }
 
@@ -100,7 +100,7 @@ public class UninstallService extends Service {
 
     }
 
-    void disableApp(){
+    void disableApp() {
 
         SharedPreferences.Editor editor = getSharedPreferences("main", MODE_PRIVATE).edit();
         editor.putBoolean("isDisabled", true);

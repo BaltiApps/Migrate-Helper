@@ -1,31 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    >
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
-        >
+        android:orientation="horizontal">
 
         <ImageView
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="@dimen/small_padding_width"
             android:padding="@dimen/large_padding_width"
-            android:src="@drawable/ic_contact_icon"
-            />
+            android:src="@drawable/ic_contact_icon" />
 
         <LinearLayout
+            android:id="@+id/contact_files_display_holder"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:id="@+id/contact_files_display_holder"
-            android:orientation="vertical">
-        </LinearLayout>
+            android:orientation="vertical"></LinearLayout>
 
 
     </LinearLayout>
@@ -33,11 +30,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/select_provider"
-        android:padding="@dimen/small_padding_width"
-        android:textAppearance="?android:attr/textAppearanceListItem"
         android:gravity="center_horizontal"
-        />
+        android:padding="@dimen/small_padding_width"
+        android:text="@string/select_provider"
+        android:textAppearance="?android:attr/textAppearanceListItem" />
 
 
 </LinearLayout>

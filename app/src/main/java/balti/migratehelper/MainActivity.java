@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         getExternalCacheDir();
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P && !main.getBoolean("android_version_warning", false)){
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P && !main.getBoolean("android_version_warning", false)) {
             new AlertDialog.Builder(this)
                     .setTitle(R.string.too_fast)
                     .setMessage(R.string.too_fast_desc)
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                startActivity(new Intent(MainActivity.this, AppSelector.class). putExtra("all?", true));
+                                startActivity(new Intent(MainActivity.this, AppSelector.class).putExtra("all?", true));
                             }
                         })
                         .setCancelable(false)
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         selectiveRestore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, AppSelector.class). putExtra("all?", false));
+                startActivity(new Intent(MainActivity.this, AppSelector.class).putExtra("all?", false));
             }
         });
 
@@ -149,7 +149,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(toSendIntent);
                 try {
                     LocalBroadcastManager.getInstance(MainActivity.this).unregisterReceiver(progressReceiver);
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {
+                }
                 finish();
             }
         };
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
         final String cpu_abi = Build.SUPPORTED_ABIS[0];
 
-        if (!(cpu_abi.equals("armeabi-v7a") || cpu_abi.equals("arm64-v8a") || cpu_abi.equals("x86") || cpu_abi.equals("x86_64"))){
+        if (!(cpu_abi.equals("armeabi-v7a") || cpu_abi.equals("arm64-v8a") || cpu_abi.equals("x86") || cpu_abi.equals("x86_64"))) {
 
 
             new AlertDialog.Builder(this)
@@ -208,9 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
                             try {
                                 startActivity(Intent.createChooser(email, getString(R.string.select_mail)));
-                            }
-                            catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -224,14 +223,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
         try {
             unregisterReceiver(endOnDisable);
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
         super.onDestroy();
     }
 
-    void directUninstall(){
+    void directUninstall() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.sure)
                 .setMessage(R.string.howToRestore)
@@ -241,8 +242,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent uninstallIntent = new Intent(MainActivity.this, UninstallService.class);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             startForegroundService(uninstallIntent);
-                        }
-                        else {
+                        } else {
                             startService(uninstallIntent);
                         }
                         finishAffinity();
@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    void showLog(){
+    void showLog() {
         View lView = View.inflate(this, R.layout.last_log_report, null);
         Button pLog = lView.findViewById(R.id.view_progress_log);
         Button eLog = lView.findViewById(R.id.view_error_log);
@@ -275,7 +275,8 @@ public class MainActivity extends AppCompatActivity {
                                     .putExtra("head", getString(R.string.progressLog))
                                     .putExtra("filePath", f.getAbsolutePath())
                     );
-                else Toast.makeText(MainActivity.this, getString(R.string.progress_log_does_not_exist), Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(MainActivity.this, getString(R.string.progress_log_does_not_exist), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -289,7 +290,8 @@ public class MainActivity extends AppCompatActivity {
                                     .putExtra("head", getString(R.string.errorLog))
                                     .putExtra("filePath", f.getAbsolutePath())
                     );
-                else Toast.makeText(MainActivity.this, getString(R.string.error_log_does_not_exist), Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(MainActivity.this, getString(R.string.error_log_does_not_exist), Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -16,17 +16,16 @@ import java.util.List;
 
 class RestoreA_DB extends AsyncTask {
 
+    Context context;
+    TextView statusText;
+    OnDBRestoreComplete classContext;
     private List<File> dbFiles;
     private String projection[];
     private String mirror[][];
     private ProgressBar progressBar;
     private String tableName;
     private Uri uri;
-    Context context;
     private int code;
-    TextView statusText;
-
-    OnDBRestoreComplete classContext;
 
     public RestoreA_DB(List<File> dbFiles, String[] projection, String[][] mirror, ProgressBar progressBar, TextView statusText, String tableName, Uri restoreUri, Context context, int code) {
         this.dbFiles = dbFiles;
@@ -39,7 +38,7 @@ class RestoreA_DB extends AsyncTask {
         this.context = context;
         this.code = code;
 
-        classContext = (OnDBRestoreComplete)context;
+        classContext = (OnDBRestoreComplete) context;
     }
 
     @Override
@@ -81,7 +80,7 @@ class RestoreA_DB extends AsyncTask {
                     try {
                         ContentValues contentValues = new ContentValues();
 
-                        for (int i = 0; i < mirror.length; i++){
+                        for (int i = 0; i < mirror.length; i++) {
                             switch (mirror[i][1]) {
                                 case "s":
                                     contentValues.put(mirror[i][0], cursor.getString(cursor.getColumnIndex(projection[i])));
@@ -127,7 +126,7 @@ class RestoreA_DB extends AsyncTask {
     @Override
     protected void onProgressUpdate(Object[] values) {
         super.onProgressUpdate(values);
-        progressBar.setProgress((int)values[0]);
+        progressBar.setProgress((int) values[0]);
         statusText.setText(progressBar.getProgress() + "/" + progressBar.getMax());
     }
 

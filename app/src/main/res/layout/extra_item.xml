@@ -1,36 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    >
+    android:orientation="horizontal">
 
 
     <ImageView
+        android:id="@+id/extra_item_icon"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:id="@+id/extra_item_icon"
         android:layout_margin="@dimen/small_padding_width"
-        android:padding="@dimen/large_padding_width"
-        />
+        android:padding="@dimen/large_padding_width" />
 
 
     <TextView
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
         android:id="@+id/extra_item_name"
-        android:text="Extra name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_margin="@dimen/large_padding_width"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        />
+        android:layout_weight="1"
+        android:text="Extra name"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 
     <CheckBox
+        android:id="@+id/extras_item_select"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:id="@+id/extras_item_select"
-        android:padding="@dimen/large_padding_width"
-        />
+        android:padding="@dimen/large_padding_width" />
 
 </LinearLayout>

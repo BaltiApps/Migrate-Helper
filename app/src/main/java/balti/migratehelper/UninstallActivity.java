@@ -43,8 +43,7 @@ public class UninstallActivity extends Activity {
                 if (isChecked) {
                     rebootCheckbox.setChecked(true);
                     rebootCheckbox.setEnabled(false);
-                }
-                else {
+                } else {
                     rebootCheckbox.setEnabled(true);
                 }
             }
@@ -66,8 +65,7 @@ public class UninstallActivity extends Activity {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     startForegroundService(uninstallIntent);
-                }
-                else {
+                } else {
                     startService(uninstallIntent);
                 }
 
@@ -92,8 +90,7 @@ public class UninstallActivity extends Activity {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     startForegroundService(uninstallIntent);
-                }
-                else {
+                } else {
                     startService(uninstallIntent);
                 }
 

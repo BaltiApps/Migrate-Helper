@@ -22,22 +22,20 @@ import java.util.ArrayList;
 
 public class CommonTools {
 
-    Context context;
-
     static String UNINSTALL_INTENT_FILTER = "migrate_helper_uninstall_broadcast";
     static String CANCEL_RESTORE_INTENT_FILTER = "migrate_helper_cancel_restore_broadcast";
     static String DEBUG_TAG = "migrate_helper_tag";
     static String ACTION_END_ALL = "MIGRATE_ACTION_END_ALL";
-
     static String TEMP_DIR_NAME_OLD = "/data/balti.migrate";
     static String TEMP_DIR_NAME_NEW = "/data/local/tmp/migrate_cache";
     static String METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migratehelper/cache";
+    Context context;
 
     public CommonTools(Context context) {
         this.context = context;
     }
 
-    String unpackAssetToInternal(String assetFileName, String targetFileName){
+    String unpackAssetToInternal(String assetFileName, String targetFileName) {
 
         AssetManager assetManager = context.getAssets();
         File unpackFile = new File(context.getFilesDir(), targetFileName);
@@ -62,7 +60,7 @@ public class CommonTools {
         return path;
     }
 
-    void reportLogs(boolean isErrorLogMandatory){
+    void reportLogs(boolean isErrorLogMandatory) {
         final File progressLog = new File(METADATA_HOLDER_DIR, "progressLog.txt");
         final File errorLog = new File(METADATA_HOLDER_DIR, "errorLog.txt");
         final File package_datas[] = new File(METADATA_HOLDER_DIR).listFiles(new FileFilter() {
@@ -73,14 +71,13 @@ public class CommonTools {
         });
         final File theRestoreScript = new File(METADATA_HOLDER_DIR, "the_restore_script.sh");
 
-        if (isErrorLogMandatory && !errorLog.exists()){
+        if (isErrorLogMandatory && !errorLog.exists()) {
             new AlertDialog.Builder(context)
                     .setTitle(R.string.log_files_do_not_exist)
                     .setMessage(context.getString(R.string.error_log_does_not_exist))
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
-        }
-        else if (errorLog.exists() || progressLog.exists() || theRestoreScript.exists() || package_datas.length > 0) {
+        } else if (errorLog.exists() || progressLog.exists() || theRestoreScript.exists() || package_datas.length > 0) {
 
             View errorReportView = View.inflate(context, R.layout.error_report_layout, null);
 
@@ -90,42 +87,37 @@ public class CommonTools {
             shareScript = errorReportView.findViewById(R.id.share_script_checkbox);
             sharePackageData = errorReportView.findViewById(R.id.share_package_data);
 
-            if (!progressLog.exists()){
+            if (!progressLog.exists()) {
                 shareProgress.setChecked(false);
                 shareProgress.setEnabled(false);
-            }
-            else {
+            } else {
                 shareProgress.setEnabled(true);
                 shareProgress.setChecked(true);
             }
 
-            if (package_datas.length == 0){
+            if (package_datas.length == 0) {
                 sharePackageData.setChecked(false);
                 sharePackageData.setEnabled(false);
-            }
-            else {
+            } else {
                 sharePackageData.setEnabled(true);
                 sharePackageData.setChecked(true);
             }
 
-            if (!theRestoreScript.exists()){
+            if (!theRestoreScript.exists()) {
                 shareScript.setChecked(false);
                 shareScript.setEnabled(false);
-            }
-            else {
+            } else {
                 shareScript.setEnabled(true);
                 shareScript.setChecked(true);
             }
 
-            if (isErrorLogMandatory && errorLog.exists()){
+            if (isErrorLogMandatory && errorLog.exists()) {
                 shareErrors.setChecked(true);
                 shareErrors.setEnabled(false);
-            }
-            else if (!errorLog.exists()){
+            } else if (!errorLog.exists()) {
                 shareErrors.setChecked(false);
                 shareErrors.setEnabled(false);
-            }
-            else {
+            } else {
                 shareErrors.setChecked(true);
                 shareErrors.setEnabled(true);
             }
@@ -154,19 +146,18 @@ public class CommonTools {
                                     uris.add(FileProvider.getUriForFile(context, "migrate.helper.provider", progressLog));
                                 if (shareScript.isChecked())
                                     uris.add(FileProvider.getUriForFile(context, "migrate.helper.provider", theRestoreScript));
-                                if (sharePackageData.isChecked()){
+                                if (sharePackageData.isChecked()) {
                                     for (File f : package_datas)
                                         uris.add(FileProvider.getUriForFile(context, "migrate.helper.provider", f));
                                 }
-                            }
-                            else {
+                            } else {
                                 if (shareErrors.isChecked())
                                     uris.add(Uri.fromFile(errorLog));
                                 if (shareProgress.isChecked())
                                     uris.add(Uri.fromFile(progressLog));
                                 if (shareScript.isChecked())
                                     uris.add(Uri.fromFile(theRestoreScript));
-                                if (sharePackageData.isChecked()){
+                                if (sharePackageData.isChecked()) {
                                     for (File f : package_datas)
                                         uris.add(Uri.fromFile(f));
                                 }
@@ -177,14 +168,15 @@ public class CommonTools {
                             try {
                                 context.startActivity(Intent.createChooser(emailIntent, context.getString(R.string.select_mail)));
                                 Toast.makeText(context, context.getString(R.string.select_mail), Toast.LENGTH_SHORT).show();
-                            } catch (Exception e) { Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show(); }
+                            } catch (Exception e) {
+                                Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
 
                         }
                     })
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
-        }
-        else {
+        } else {
 
             String msg = "";
             if (!progressLog.exists())
@@ -204,7 +196,7 @@ public class CommonTools {
 
     }
 
-    String getDeviceSpecifications(){
+    String getDeviceSpecifications() {
 
         String body = "";
 
@@ -220,10 +212,10 @@ public class CommonTools {
         return body;
     }
 
-    boolean isServiceRunning(String name){
+    boolean isServiceRunning(String name) {
         boolean result = false;
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (name.equals(service.service.getClassName()))
                 result = true;
         }

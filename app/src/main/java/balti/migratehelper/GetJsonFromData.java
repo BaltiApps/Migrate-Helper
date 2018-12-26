@@ -16,20 +16,18 @@ import java.util.Vector;
 
 public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPackets> {
 
-    private OnConvertMetadataToJSON classContext;
-    private Context context;
-    private TextView statusDisplayView;
-
     static String APP_CHECK = "APP_CHECK";
     static String DATA_CHECK = "DATA_CHECK";
     static String PERM_CHECK = "PERM_CHECK";
     static String IS_PERMISSIBLE = "IS_PERMISSIBLE";
-
+    private OnConvertMetadataToJSON classContext;
+    private Context context;
+    private TextView statusDisplayView;
     private FileFilter jsonFilter, vcfFilter, smsDBFilter, callsDBFilter, packageDataFilter;
 
     private String error;
 
-    GetJsonFromData(Context context, TextView statusDisplayView){
+    GetJsonFromData(Context context, TextView statusDisplayView) {
         this.context = context;
         classContext = (OnConvertMetadataToJSON) context;
         this.statusDisplayView = statusDisplayView;
@@ -91,8 +89,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
                 if (jsonObject != null)
                     jsonObjects.add(jsonObject);
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             error = error + e.getMessage() + "\n";
         }
@@ -101,8 +98,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         try {
             vcfFiles = new File(directoryPath[0]).listFiles(vcfFilter);
             if (vcfFiles == null) vcfFiles = new File[0];
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             error = error + e.getMessage() + "\n";
         }
@@ -111,8 +107,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         try {
             smsFiles = new File(directoryPath[0]).listFiles(smsDBFilter);
             if (smsFiles == null) smsFiles = new File[0];
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             error = error + e.getMessage() + "\n";
         }
@@ -121,8 +116,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         try {
             callsFiles = new File(directoryPath[0]).listFiles(callsDBFilter);
             if (callsFiles == null) callsFiles = new File[0];
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             error = error + e.getMessage() + "\n";
         }
@@ -139,8 +133,7 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         try {
             package_datas = new File(directoryPath[0]).listFiles(packageDataFilter);
             if (package_datas == null) package_datas = new File[0];
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             error = error + e.getMessage() + "\n";
         }
@@ -160,13 +153,13 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         classContext.onConvertMetadataToJSON(dataPackets, error);
     }
 
-    private JSONObject getJsonData(File file){
+    private JSONObject getJsonData(File file) {
         JSONObject mainObject = null;
         String fullFileText = "";
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String l;
-            while ((l = reader.readLine()) != null){
+            while ((l = reader.readLine()) != null) {
                 fullFileText = fullFileText + l + "\n";
             }
             mainObject = new JSONObject(fullFileText);

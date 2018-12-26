@@ -27,15 +27,11 @@ import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 public class RestoreService extends Service {
 
 
+    static RootRestoreTask ROOT_RESTORE_TASK;
+    static int RESTORE_SERVICE_NOTIFICATION_ID = 100;
     BroadcastReceiver progressReceiver, requestListener;
     IntentFilter progressReceiverIF, requestListenerIF;
-
     Intent returnIntent;
-
-    static RootRestoreTask ROOT_RESTORE_TASK;
-
-    static int RESTORE_SERVICE_NOTIFICATION_ID = 100;
-
     BufferedWriter progressWriter, errorWriter;
     String lastProgressLog = "";
 
@@ -110,7 +106,8 @@ public class RestoreService extends Service {
 
                         try {
                             progressWriter.write((lastProgressLog = intent.getStringExtra("log")) + "\n");
-                        } catch (IOException ignored) {}
+                        } catch (IOException ignored) {
+                        }
 
                     }
 
@@ -138,8 +135,7 @@ public class RestoreService extends Service {
         NotificationCompat.Builder dummy;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             dummy = new NotificationCompat.Builder(this, PROGRESS_CHANNEL);
-        }
-        else {
+        } else {
             dummy = new NotificationCompat.Builder(this);
         }
         dummy.setSmallIcon(R.drawable.ic_notification_icon);
@@ -157,16 +153,20 @@ public class RestoreService extends Service {
         super.onDestroy();
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(requestListener);
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
 
         try {
             progressWriter.close();
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
         try {
             errorWriter.close();
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 }

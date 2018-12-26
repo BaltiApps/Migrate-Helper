@@ -9,7 +9,7 @@ public class SetAppIcon extends AsyncTask<String, Void, Bitmap> {
 
     ImageView iconHolder;
 
-    SetAppIcon(ImageView iconHolder){
+    SetAppIcon(ImageView iconHolder) {
         this.iconHolder = iconHolder;
     }
 
@@ -26,8 +26,7 @@ public class SetAppIcon extends AsyncTask<String, Void, Bitmap> {
                 imageData[i] = Byte.parseByte(bytes[i]);
             }
             bmp = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return bmp;
@@ -39,8 +38,7 @@ public class SetAppIcon extends AsyncTask<String, Void, Bitmap> {
         if (bitmap != null) {
             iconHolder.setImageDrawable(null);
             iconHolder.setImageBitmap(bitmap);
-        }
-        else {
+        } else {
             iconHolder.setImageResource(R.drawable.ic_app);
         }
     }

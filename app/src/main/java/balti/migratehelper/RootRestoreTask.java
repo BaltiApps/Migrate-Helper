@@ -29,56 +29,41 @@ import static balti.migratehelper.Listener.PROGRESS_CHANNEL;
 //import static balti.migratehelper.CommonTools.TEMP_DIR_NAME;
 
 
-
 /**
  * Created by sayantan on 23/10/17.
  */
 
 public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
+    static String METADATA_FILE_FIELD = "metadata_file";
+    static String METADATA_FILE_NAME = "metadata_file_name";
+    static int ON_FINISH_NOTIFICATION_ID = 101;
+    static String DISPLAY_HEAD = "display head: ";
+    static String INSTALLING_HEAD = "Installing app: ";
+    static String RESTORE_DATA_HEAD = "Restoring data: ";
+    static String ICON_STRING = "";
+    static int RESTORE_PROCESS_ID = -9999999;
+    int numberOfAppJobs;
+    BroadcastReceiver cancelReceiver;
     private Context context;
     private ArrayList<String> errors;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder progress;
-
     private Intent restoreIntent;
     private Intent activityIntent;
-
-    int numberOfAppJobs;
-
     private int SUCCESS = 0;
     private int CODE_ERROR = 990;
     private int EXECUTION_ERROR = 999;
     private boolean isCancelled = false;
-
     private long startMillis;
     private long endMillis;
-
     private int dpiValue = 0;
-
-    static String METADATA_FILE_FIELD = "metadata_file";
-    static String METADATA_FILE_NAME = "metadata_file_name";
-
-    static int ON_FINISH_NOTIFICATION_ID = 101;
-
-    static String DISPLAY_HEAD = "display head: ";
-    static String INSTALLING_HEAD = "Installing app: ";
-    static String RESTORE_DATA_HEAD = "Restoring data: ";
-
     private boolean isContactAppPresent;
-
     private Process suProcessForVcfCheck;
     private BufferedWriter suProcessForVcfCheckWriter;
     private BufferedReader suProcessForVcfCheckReader;
-
     private File actualRestoreScript;
-
-    static String ICON_STRING = "";
-    static int RESTORE_PROCESS_ID = -9999999;
-
     private Process restoreProcess = null;
-
-    BroadcastReceiver cancelReceiver;
 
     RootRestoreTask(Context context, int numberOfAppJobs, boolean isContactAppPresent, int dpiValue, String actualRestoreScriptPath) {
 
@@ -90,7 +75,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
         errors = new ArrayList<>(0);
 
-        restoreIntent  = new Intent(context.getString(R.string.actionRestoreOnProgress));
+        restoreIntent = new Intent(context.getString(R.string.actionRestoreOnProgress));
         activityIntent = new Intent(context, ProgressActivity.class);
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -113,7 +98,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     }
 
 
-    boolean isVcfBeingRead(){
+    boolean isVcfBeingRead() {
 
         if (suProcessForVcfCheck == null) return false;
 
@@ -129,7 +114,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
             suProcessForVcfCheckWriter.flush();
 
             String output = "", line;
-            while ((line = suProcessForVcfCheckReader.readLine()) != null){
+            while ((line = suProcessForVcfCheckReader.readLine()) != null) {
                 output = output + line + "\n";
                 if (line.trim().equals("DONE")) break;
             }
@@ -201,15 +186,13 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                         ICON_STRING = head.split(" ")[1].trim();
                         head = head.split(" ")[0];
                     }
-                }
-                else if (line.startsWith("--- RESTORE PID:")) {
+                } else if (line.startsWith("--- RESTORE PID:")) {
                     try {
                         RESTORE_PROCESS_ID = Integer.parseInt(line.substring(line.lastIndexOf(" ") + 1));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
-                else {
+                } else {
                     publishProgress("restoring_app", c, numberOfAppJobs, head, line);
                     if (line.startsWith("Failed to find package"))
                         errors.add("restoreDataScript: " + line);
@@ -223,8 +206,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                 errors.add(line);
             }
 
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             errors.add(e.getMessage());
             return CODE_ERROR;
@@ -251,10 +233,11 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
 
             try {
                 restoreProcess.waitFor();
+            } catch (Exception ignored) {
             }
-            catch (Exception ignored){}
 
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -321,15 +304,15 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
             e.printStackTrace();
         }*/
 
-        if ( o == SUCCESS && !isCancelled) {
+        if (o == SUCCESS && !isCancelled) {
 
             Toast.makeText(context, context.getString(R.string.finished), Toast.LENGTH_SHORT).show();
 
-            String log = (dpiValue > 0)? context.getString(R.string.change_dpi_and_reboot_prompt) : context.getString(R.string.uninstall_prompt);
+            String log = (dpiValue > 0) ? context.getString(R.string.change_dpi_and_reboot_prompt) : context.getString(R.string.uninstall_prompt);
 
             restoreIntent.putExtra("type", "finishedOk");
             restoreIntent.putExtra("log", log);
-            restoreIntent.putExtra("head", context.getString(R.string.finished) );
+            restoreIntent.putExtra("head", context.getString(R.string.finished));
 
             activityIntent.putExtras(restoreIntent);
 
@@ -337,12 +320,11 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                     .setContentTitle(context.getString(R.string.finished))
                     .setContentText(log)
                     .setProgress(0, 0, false);
-        }
-        else if (isCancelled){
+        } else if (isCancelled) {
 
             Toast.makeText(context, context.getString(R.string.restoreCancelled), Toast.LENGTH_SHORT).show();
 
-            String log = (dpiValue > 0)? context.getString(R.string.change_dpi_and_reboot_prompt) : context.getString(R.string.uninstall_prompt);
+            String log = (dpiValue > 0) ? context.getString(R.string.change_dpi_and_reboot_prompt) : context.getString(R.string.uninstall_prompt);
 
             restoreIntent.putExtra("type", "restoreCancelled");
             restoreIntent.putExtra("log", context.getString(R.string.restoreCancelled) + "\n" + log);
@@ -358,11 +340,10 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                     .setContentText(log)
                     .setProgress(0, 0, false);
 
-        }
-        else {
+        } else {
             Toast.makeText(context, context.getString(R.string.failed), Toast.LENGTH_SHORT).show();
 
-            String log = (dpiValue > 0)? context.getString(R.string.change_dpi_and_reboot_prompt) : context.getString(R.string.uninstall_prompt);
+            String log = (dpiValue > 0) ? context.getString(R.string.change_dpi_and_reboot_prompt) : context.getString(R.string.uninstall_prompt);
 
             restoreIntent.putExtra("type", "finishedErrors");
             restoreIntent.putExtra("log", log);
@@ -378,7 +359,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
                     .setProgress(0, 0, false);
 
             if (errors.size() > 0)
-                    progress.setContentText(errors.get(0));
+                progress.setContentText(errors.get(0));
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(restoreIntent);
@@ -397,12 +378,12 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
         LocalBroadcastManager.getInstance(context).unregisterReceiver(cancelReceiver);
     }
 
-    long timeInMillis(){
+    long timeInMillis() {
         Calendar calendar = Calendar.getInstance();
         return calendar.getTimeInMillis();
     }
 
-    String calendarDifference(long start, long end){
+    String calendarDifference(long start, long end) {
         String diff = "";
 
         try {
@@ -425,8 +406,8 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
             long s = longDiff;
             diff = diff + s + "secs";
 
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored){}
 
         return diff;
     }

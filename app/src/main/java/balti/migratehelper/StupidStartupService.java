@@ -31,7 +31,7 @@ public class StupidStartupService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    void notif(Context context){
+    void notif(Context context) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
 
@@ -41,8 +41,7 @@ public class StupidStartupService extends Service {
             assert notificationManager != null;
             notificationManager.createNotificationChannel(initialNotifChannel);
             notification = new NotificationCompat.Builder(context, INIT_CHANNEL);
-        }
-        else {
+        } else {
             notification = new NotificationCompat.Builder(context);
             notification.setPriority(Notification.PRIORITY_MAX);
         }
@@ -65,8 +64,7 @@ public class StupidStartupService extends Service {
 
             startForeground(232, notification.build());
 
-        }
-        else {
+        } else {
             stopSelf();
         }
 

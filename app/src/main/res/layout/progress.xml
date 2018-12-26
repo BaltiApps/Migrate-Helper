@@ -2,68 +2,62 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/log_bg_portrait"
-    >
+    android:orientation="vertical">
 
 
     <LinearLayout
+        android:id="@+id/restore_top_status_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:background="@color/colorPrimary"
         android:gravity="center_vertical"
-        android:padding="20dp"
-        android:id="@+id/restore_top_status_bar"
-        >
+        android:orientation="vertical"
+        android:padding="20dp">
 
 
         <ImageView
+            android:id="@+id/logoIcon"
             android:layout_width="@dimen/small_icon_wh"
             android:layout_height="@dimen/small_icon_wh"
-            android:src="@drawable/ic_waiting"
-            android:id="@+id/logoIcon"
             android:layout_marginBottom="10dp"
-            />
+            android:src="@drawable/ic_waiting" />
 
         <TextView
+            android:id="@+id/messageHead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lines="2"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textStyle="bold"
-            android:id="@+id/messageHead"
-            android:textColor="@color/colorAccent"
             android:gravity="center_vertical"
+            android:lines="2"
             android:text="@string/please_wait"
-            />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
-            >
+            android:orientation="horizontal">
 
             <ProgressBar
                 android:id="@+id/progressBar"
                 style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
             <TextView
+                android:id="@+id/progressPercentage"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
+                android:gravity="end"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
                 android:text="--"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textStyle="bold"
                 android:textColor="@color/colorAccent"
-                android:gravity="end"
-                android:paddingBottom="5dp"
-                android:paddingTop="5dp"
-                android:id="@+id/progressPercentage"
-                />
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -75,18 +69,17 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="@dimen/large_padding_width"
-        >
+        android:padding="@dimen/large_padding_width">
 
         <TextView
+            android:id="@+id/messageView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:id="@+id/messageView"
-            android:scrollbars="vertical"
+            android:background="@drawable/log_message"
             android:fontFamily="monospace"
             android:padding="@dimen/large_padding_width"
-            android:background="@drawable/log_message"
+            android:scrollbars="vertical"
             android:textColor="@android:color/white" />
 
         <ScrollView
@@ -108,69 +101,61 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/minimizing_may_decrease_speed"
             android:drawableStart="@drawable/ic_warning"
             android:drawablePadding="@dimen/small_padding_width"
-            android:textSize="13sp"
             android:gravity="center_vertical"
-            />
+            android:text="@string/minimizing_may_decrease_speed"
+            android:textSize="13sp" />
 
 
     </LinearLayout>
 
 
     <LinearLayout
+        android:id="@+id/restore_bottom_button_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
-        android:orientation="horizontal"
-        android:gravity="end"
         android:layout_marginTop="@dimen/large_padding_width"
-        android:id="@+id/restore_bottom_button_bar"
-        >
+        android:gravity="end"
+        android:orientation="horizontal">
 
         <Button
+            android:id="@+id/reportLogButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:id="@+id/reportLogButton"
-            android:text="@string/report"
             android:backgroundTint="@color/colorPrimary"
+            android:text="@string/report"
             android:textColor="@color/colorAccent"
-            android:visibility="gone"
-            />
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/cancelRestore"
             android:layout_width="@dimen/log_button_width"
             android:layout_height="@dimen/button_height"
-            android:text="@string/abort"
-            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
             android:background="@drawable/cancel_restore"
             android:foreground="?android:attr/selectableItemBackground"
-            />
+            android:text="@string/abort"
+            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark" />
 
         <Button
             android:id="@+id/close"
             android:layout_width="@dimen/log_button_width"
             android:layout_height="@dimen/button_height"
-            android:text="@string/minimize"
-            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
             android:background="@drawable/log_action_button"
             android:foreground="?android:attr/selectableItemBackground"
-            />
+            android:text="@string/minimize"
+            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark" />
 
         <Button
             android:id="@+id/okOnFinish"
             android:layout_width="@dimen/log_button_width"
             android:layout_height="@dimen/button_height"
-            android:text="@android:string/ok"
-            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
             android:background="@drawable/log_action_button"
             android:foreground="?android:attr/selectableItemBackground"
-            android:visibility="gone"
-            />
-
-
+            android:text="@android:string/ok"
+            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
+            android:visibility="gone" />
 
 
     </LinearLayout>

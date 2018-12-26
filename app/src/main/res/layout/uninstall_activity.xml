@@ -1,92 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/lightGray"
-    android:padding="@dimen/small_padding_width"
-    >
+    android:orientation="vertical"
+    android:padding="@dimen/small_padding_width">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/large_padding_width"
-        >
+        android:padding="@dimen/large_padding_width">
 
         <CheckBox
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/change_dpi"
             android:id="@+id/change_dpi_checkbox"
-            />
-
-        <CheckBox
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/reboot"
+            android:text="@string/change_dpi" />
+
+        <CheckBox
             android:id="@+id/reboot_checkbox"
-            />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/reboot" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/uninstall_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/large_padding_width"
         android:layout_margin="@dimen/large_padding_width"
         android:background="@color/grey_bg"
-        android:elevation="@dimen/small_padding_width"
         android:clickable="true"
+        android:elevation="@dimen/small_padding_width"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        android:id="@+id/uninstall_view"
-        >
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding_width">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/uninstallFromSystem"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/colorAccent"
-            />
+            android:textColor="@color/colorAccent" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/uninstall_desc"
-            />
+            android:text="@string/uninstall_desc" />
 
     </LinearLayout>
 
 
     <LinearLayout
+        android:id="@+id/temporary_disable_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/large_padding_width"
         android:layout_margin="@dimen/large_padding_width"
         android:background="@color/grey_bg"
-        android:elevation="@dimen/small_padding_width"
         android:clickable="true"
+        android:elevation="@dimen/small_padding_width"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        android:id="@+id/temporary_disable_view"
-        >
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding_width">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/temporary_disable"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/colorAccent"
-            />
+            android:textColor="@color/colorAccent" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/temporary_disable_desc"
-            />
+            android:text="@string/temporary_disable_desc" />
 
     </LinearLayout>
 

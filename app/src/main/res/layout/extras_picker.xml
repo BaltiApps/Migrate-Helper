@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fillViewport="true"
-            >
+            android:fillViewport="true">
 
             <LinearLayout
+                android:id="@+id/extras_picker_item_holder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_margin="@dimen/small_padding_width"
-                android:id="@+id/extras_picker_item_holder" />
+                android:orientation="vertical" />
 
         </ScrollView>
 
@@ -29,29 +27,26 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/small_padding_width"
             android:background="@color/colorPrimary"
-            >
+            android:orientation="horizontal"
+            android:padding="@dimen/small_padding_width">
 
             <Button
+                android:id="@+id/extras_picker_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@android:string/cancel"
                 android:backgroundTint="@color/colorPrimary"
-                android:id="@+id/extras_picker_cancel"
-                />
+                android:text="@android:string/cancel" />
 
             <Button
+                android:id="@+id/extras_picker_ok"
                 android:layout_width="@dimen/button_width"
                 android:layout_height="@dimen/button_height"
-                android:text="@android:string/ok"
-                android:background="@drawable/next"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
+                android:background="@drawable/next"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:id="@+id/extras_picker_ok"
-                />
+                android:text="@android:string/ok" />
 
 
         </RelativeLayout>
@@ -59,10 +54,9 @@
     </LinearLayout>
 
     <ProgressBar
+        android:id="@+id/extra_picker_round_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:id="@+id/extra_picker_round_progress"
-        />
+        android:layout_centerInParent="true" />
 
 </RelativeLayout>

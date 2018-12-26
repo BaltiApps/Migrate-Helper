@@ -52,6 +52,9 @@ import static balti.migratehelper.GetJsonFromData.PERM_CHECK;
 
 public class AppSelector extends AppCompatActivity implements OnConvertMetadataToJSON, OnCheck, CompoundButton.OnCheckedChangeListener {
 
+    private static int SUCCESS = 0;
+    private static int CODE_ERROR = 1;
+    private static int SCRIPT_ERROR = 2;
     ImageButton back;
     TextView title;
     CheckBox appAllSelect, dataAllSelect, permissionsAllSelect;
@@ -66,644 +69,23 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     ListView appList;
     LinearLayout extrasBar;
     CheckBox extrasSelect;
-
     ProgressBar justAProgress;
     ImageView errorIcon;
-
     AppListAdapter adapter;
-
     Process checkSu;
-
-    private String busyboxBinaryFilePath = "";
-    private String installScriptPath = "";
-    private String restoreDataScriptPath = "";
-
-    private String initError;
-
-    private static int SUCCESS = 0;
-    private static int CODE_ERROR = 1;
-    private static int SCRIPT_ERROR = 2;
-
     int numberOfApps = 0;
     boolean intentSelectAll = false;
     boolean anyAppSelected = true;
-
     RootCopyTask rootCopyTask;
     GetJsonFromData getJsonFromData;
     AppUpdate appUpdateTask;
-
     GetJsonFromDataPackets mainGetJsonFromDataPackets = null;
     boolean extraSelectBoolean = true;
-
     BroadcastReceiver extraBackupsProgressReadyReceiver;
-
-    class RootCopyTask extends AsyncTask{
-
-        int rootCopyResult;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            waitingStatusMessage.setText(R.string.requesting_root);
-            waitingMessageDesc.setText(R.string.initMessageShort);
-
-            actionButton.setText(android.R.string.cancel);
-            actionButton.setBackground(getDrawable(R.drawable.cancel_root_request));
-            actionButton.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,0);
-            actionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    try {
-                        checkSu.destroy();
-                    }catch (Exception ignored){}
-
-                    try {
-                        rootCopyTask.cancel(true);
-                    }catch (Exception ignored){}
-
-                    finish();
-                }
-            });
-            actionButton.setVisibility(View.VISIBLE);
-
-            restoreContent.setVisibility(View.GONE);
-        }
-
-        @Override
-        protected Object doInBackground(Object[] objects) {
-
-            unpackBinaries();
-            rootCopyResult = rootCopy();
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-
-            if (rootCopyResult == SUCCESS){
-                waitingStatusMessage.setText(R.string.reading_metadata);
-                waitingMessageDesc.setText("");
-                getJsonFromData = new GetJsonFromData(AppSelector.this, waitingMessageDesc);
-                getJsonFromData.execute(CommonTools.METADATA_HOLDER_DIR);
-            }
-            else if (rootCopyResult == SCRIPT_ERROR){
-                showError(getString(R.string.are_you_rooted), getString(R.string.are_you_rooted_desc));
-                waitingMessageDesc.append("\n\n" + initError);
-            }
-            else {
-                showError(getString(R.string.code_error), initError);
-            }
-
-        }
-    }
-
-    class AppUpdate extends AsyncTask{
-
-        GetJsonFromDataPackets getJsonFromDataPackets;
-
-        AppUpdate(GetJsonFromDataPackets getJsonFromDataPackets){
-            this.getJsonFromDataPackets = getJsonFromDataPackets;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            waitingLayout.setVisibility(View.VISIBLE);
-            restoreContent.setVisibility(View.GONE);
-        }
-
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            adapter = new AppListAdapter(AppSelector.this, getJsonFromDataPackets.jsonAppPackets);
-            return adapter;
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-
-            mainGetJsonFromDataPackets = getJsonFromDataPackets;
-
-            if (o != null){
-                waitingLayout.setVisibility(View.GONE);
-                restoreContent.setVisibility(View.VISIBLE);
-
-                if (mainGetJsonFromDataPackets.jsonAppPackets.size() > 0)
-                appList.setAdapter(adapter);
-
-                if (mainGetJsonFromDataPackets.contactPackets.length != 0 || mainGetJsonFromDataPackets.smsPackets.length != 0
-                        || mainGetJsonFromDataPackets.callsPackets.length != 0 || mainGetJsonFromDataPackets.dpiPacket.dpiFile != null
-                        || mainGetJsonFromDataPackets.keyboardPacket.keyboardFile != null){
-                    extrasBar.setVisibility(View.VISIBLE);
-                    extrasSelect.setChecked(true);
-                    extrasBar.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            new ExtrasUpdate(mainGetJsonFromDataPackets).execute();
-                        }
-                    });
-                }
-                else {
-                    extrasBar.setVisibility(View.GONE);
-                }
-
-                if (mainGetJsonFromDataPackets.jsonAppPackets.size() != 0){
-                    appCheckboxBar.setVisibility(View.VISIBLE);
-                    appList.setVisibility(View.VISIBLE);
-                }
-                else {
-                    appCheckboxBar.setVisibility(View.GONE);
-                    appList.setVisibility(View.GONE);
-                }
-
-                onCheck(mainGetJsonFromDataPackets.jsonAppPackets);
-
-                actionButton.setText(R.string.restore);
-                actionButton.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_next, 0);
-                actionButton.setBackground(getResources().getDrawable(R.drawable.next));
-                actionButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (anyAppSelected || extrasSelect.isChecked()) {
-                            waitingStatusMessage.setText(R.string.please_wait);
-                            actionButton.setVisibility(View.INVISIBLE);
-
-                            waitingLayout.setVisibility(View.VISIBLE);
-                            restoreContent.setVisibility(View.GONE);
-
-                            extraSelectBoolean = extrasSelect.isChecked();
-
-                            new AlertDialog.Builder(AppSelector.this)
-                                    .setTitle(R.string.turn_off_internet_and_updates)
-                                    .setMessage(R.string.do_not_use_desc)
-                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
-                                        }
-                                    })
-                                    .setNegativeButton(R.string.later, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            finish();
-                                        }
-                                    })
-                                    .setCancelable(false)
-                                    .show();
-
-                        }
-                    }
-                });
-
-            }
-            else {
-                showError(getString(R.string.code_error), getString(R.string.null_adapter));
-            }
-        }
-    }
-
-    class ExtrasUpdate extends AsyncTask{
-
-        AlertDialog ad;
-        View masterView;
-        LinearLayout holder;
-        ProgressBar progressBar;
-
-        GetJsonFromDataPackets getJsonFromDataPackets;
-        ContactsPacket[] contactsPackets;
-        SmsPacket[] smsPackets;
-        CallsPacket[] callsPackets;
-        DpiPacket dpiPacket;
-        KeyboardPacket keyboardPacket;
-
-        public ExtrasUpdate(GetJsonFromDataPackets getJsonFromDataPackets) {
-            this.getJsonFromDataPackets = getJsonFromDataPackets;
-            contactsPackets = getJsonFromDataPackets.contactPackets;
-            smsPackets = getJsonFromDataPackets.smsPackets;
-            callsPackets = getJsonFromDataPackets.callsPackets;
-            dpiPacket = getJsonFromDataPackets.dpiPacket;
-            keyboardPacket = getJsonFromDataPackets.keyboardPacket;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            masterView = View.inflate(AppSelector.this, R.layout.extras_picker, null);
-            holder = masterView.findViewById(R.id.extras_picker_item_holder);
-            progressBar = masterView.findViewById(R.id.extra_picker_round_progress);
-
-            ad = new AlertDialog.Builder(AppSelector.this)
-                    .setView(masterView)
-                    .create();
-
-            ad.show();
-
-            holder.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Object doInBackground(Object[] objects) {
-
-            ContactsPacket[] tempContactPackets = new ContactsPacket[contactsPackets.length];
-            ArrayList<View> contactsViewItems = new ArrayList<>(0);
-
-            SmsPacket[] tempSmsPackets = new SmsPacket[smsPackets.length];
-            ArrayList<View> smsViewItems = new ArrayList<>(0);
-
-            CallsPacket[] tempCallsPackets = new CallsPacket[callsPackets.length];
-            ArrayList<View> callsViewItems = new ArrayList<>(0);
-
-            for (int j = 0; j < contactsPackets.length; j++){
-                tempContactPackets[j] = new ContactsPacket(contactsPackets[j].vcfFile, contactsPackets[j].selected);
-            }
-
-            for (final ContactsPacket packet : tempContactPackets){
-                View cView = View.inflate(AppSelector.this, R.layout.extra_item, null);
-                ImageView icon = cView.findViewById(R.id.extra_item_icon);
-                icon.setImageResource(R.drawable.ic_contact_icon);
-
-                TextView tv = cView.findViewById(R.id.extra_item_name);
-                tv.setText(packet.vcfFile.getName());
-
-                contactsViewItems.add(cView);
-            }
-
-            for (int j = 0; j < smsPackets.length; j++){
-                tempSmsPackets[j] = new SmsPacket(smsPackets[j].smsDBFile, smsPackets[j].selected);
-            }
-
-            for (final SmsPacket packet : tempSmsPackets){
-                View sView = View.inflate(AppSelector.this, R.layout.extra_item, null);
-                ImageView icon = sView.findViewById(R.id.extra_item_icon);
-                icon.setImageResource(R.drawable.ic_sms_icon);
-
-                TextView tv = sView.findViewById(R.id.extra_item_name);
-                tv.setText(packet.smsDBFile.getName());
-
-                smsViewItems.add(sView);
-            }
-
-            for (int j = 0; j < callsPackets.length; j++){
-                tempCallsPackets[j] = new CallsPacket(callsPackets[j].callsDBFile, callsPackets[j].selected);
-            }
-
-            for (final CallsPacket packet : tempCallsPackets){
-                View clView = View.inflate(AppSelector.this, R.layout.extra_item, null);
-                ImageView icon = clView.findViewById(R.id.extra_item_icon);
-                icon.setImageResource(R.drawable.ic_call_log_icon);
-
-                TextView tv = clView.findViewById(R.id.extra_item_name);
-                tv.setText(packet.callsDBFile.getName());
-
-                callsViewItems.add(clView);
-            }
-
-            View dpiViewItem = null;
-            if (dpiPacket.dpiFile != null) {
-                dpiViewItem = View.inflate(AppSelector.this, R.layout.extra_item, null);
-                ImageView icon = dpiViewItem.findViewById(R.id.extra_item_icon);
-                icon.setImageResource(R.drawable.ic_dpi_icon);
-
-                TextView tv = dpiViewItem.findViewById(R.id.extra_item_name);
-                tv.setText(R.string.dpi);
-            }
-
-            DpiPacket tempDpiPacket = new DpiPacket(dpiPacket.dpiFile, dpiPacket.selected);
-
-            View keyboardViewItem = null;
-            if (keyboardPacket.keyboardFile != null) {
-                keyboardViewItem = View.inflate(AppSelector.this, R.layout.extra_item, null);
-                ImageView icon = keyboardViewItem.findViewById(R.id.extra_item_icon);
-                icon.setImageResource(R.drawable.ic_keyboard_icon);
-
-                TextView tv = keyboardViewItem.findViewById(R.id.extra_item_name);
-                tv.setText(R.string.keyboard);
-            }
-
-            KeyboardPacket tempKeyboardPacket = new KeyboardPacket(keyboardPacket.keyboardFile, keyboardPacket.selected);
-
-            return new Object[]{tempContactPackets, contactsViewItems, tempSmsPackets, smsViewItems, tempCallsPackets, callsViewItems, tempDpiPacket, dpiViewItem,
-                    tempKeyboardPacket, keyboardViewItem};
-        }
-
-        @Override
-        protected void onPostExecute(final Object o) {
-            super.onPostExecute(o);
-
-            if (holder.getChildCount() > 0)
-                holder.removeAllViews();
-
-            Object received[] = (Object[])o;
-
-            final ContactsPacket[] tempContactPackets = (ContactsPacket[])received[0];
-            ArrayList<View> contactViews = (ArrayList<View>)received[1];
-            for (int i = 0; i < contactViews.size(); i++) {
-                View v = contactViews.get(i);
-
-                CheckBox cb = v.findViewById(R.id.extras_item_select);
-                cb.setChecked(tempContactPackets[i].selected);
-
-                final int finalI = i;
-                cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        tempContactPackets[finalI].selected = b;
-                    }
-                });
-
-                holder.addView(v);
-            }
-
-            final SmsPacket[] tempSmsPackets = (SmsPacket[])received[2];
-            ArrayList<View> smsViews = (ArrayList<View>)received[3];
-            for (int i = 0; i < smsViews.size(); i++) {
-                View v = smsViews.get(i);
-
-                CheckBox cb = v.findViewById(R.id.extras_item_select);
-                cb.setChecked(tempSmsPackets[i].selected);
-
-                final int finalI = i;
-                cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        tempSmsPackets[finalI].selected = b;
-                    }
-                });
-
-                holder.addView(v);
-            }
-
-            final CallsPacket[] tempCallsPackets = (CallsPacket[])received[4];
-            ArrayList<View> callsViews = (ArrayList<View>)received[5];
-            for (int i = 0; i < callsViews.size(); i++) {
-                View v = callsViews.get(i);
-
-                CheckBox cb = v.findViewById(R.id.extras_item_select);
-                cb.setChecked(tempCallsPackets[i].selected);
-
-                final int finalI = i;
-                cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        tempCallsPackets[finalI].selected = b;
-                    }
-                });
-
-                holder.addView(v);
-            }
-
-            final DpiPacket tempDpiPacket[] = new DpiPacket[]{null};
-
-            if (received[7] != null) {
-                tempDpiPacket[0] = (DpiPacket) received[6];
-                View dpiViewItem = (View)received[7];
-
-                CheckBox dpi_cb = dpiViewItem.findViewById(R.id.extras_item_select);
-                dpi_cb.setChecked(tempDpiPacket[0].selected);
-
-                dpi_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        tempDpiPacket[0].selected = b;
-                    }
-                });
-
-                holder.addView(dpiViewItem);
-            }
-
-            final KeyboardPacket tempKeyboardPacket[] = new KeyboardPacket[]{null};
-
-            if (received[9] != null) {
-                tempKeyboardPacket[0] = (KeyboardPacket) received[8];
-                View keyboardViewItem = (View)received[9];
-
-                CheckBox keyboard_cb = keyboardViewItem.findViewById(R.id.extras_item_select);
-                keyboard_cb.setChecked(tempKeyboardPacket[0].selected);
-
-                keyboard_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        tempKeyboardPacket[0].selected = b;
-                    }
-                });
-
-                holder.addView(keyboardViewItem);
-            }
-
-
-            holder.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
-
-            Button ok = masterView.findViewById(R.id.extras_picker_ok);
-            Button cancel = masterView.findViewById(R.id.extras_picker_cancel);
-
-            ok.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    if (contactsPackets.length == 0 && smsPackets.length == 0
-                            && callsPackets.length == 0 && dpiPacket.dpiFile == null && keyboardPacket.keyboardFile == null)
-                        return;
-
-                    boolean anyContact;
-                    boolean anySms;
-                    boolean anyCalls;
-                    boolean isDpi;
-                    boolean isKeyboard;
-
-                    if (tempContactPackets.length > 0) {
-                         anyContact= tempContactPackets[0].selected;
-                        for (int j = 0; j < contactsPackets.length; j++) {
-                            contactsPackets[j].selected = tempContactPackets[j].selected;
-                            contactsPackets[j].vcfFile = tempContactPackets[j].vcfFile;
-                            anyContact = anyContact || contactsPackets[j].selected;
-                        }
-                    }
-                    else {
-                        anyContact = false;
-                    }
-
-                    if (tempSmsPackets.length > 0) {
-                        anySms= tempSmsPackets[0].selected;
-                        for (int j = 0; j < smsPackets.length; j++) {
-                            smsPackets[j].selected = tempSmsPackets[j].selected;
-                            smsPackets[j].smsDBFile = tempSmsPackets[j].smsDBFile;
-                            anySms = anySms || smsPackets[j].selected;
-                        }
-                    }
-                    else {
-                        anySms = false;
-                    }
-
-                    if (tempCallsPackets.length > 0) {
-                        anyCalls= tempCallsPackets[0].selected;
-                        for (int j = 0; j < callsPackets.length; j++) {
-                            callsPackets[j].selected = tempCallsPackets[j].selected;
-                            callsPackets[j].callsDBFile = tempCallsPackets[j].callsDBFile;
-                            anyCalls = anyCalls || callsPackets[j].selected;
-                        }
-                    }
-                    else {
-                        anyCalls = false;
-                    }
-
-                    if (tempDpiPacket[0] != null){
-                        isDpi = tempDpiPacket[0].selected;
-                        dpiPacket.dpiFile = tempDpiPacket[0].dpiFile;
-                        dpiPacket.selected = tempDpiPacket[0].selected;
-                    }
-                    else {
-                        isDpi = false;
-                    }
-
-                    if (tempKeyboardPacket[0] != null){
-                        isKeyboard = tempKeyboardPacket[0].selected;
-                        keyboardPacket.keyboardFile = tempKeyboardPacket[0].keyboardFile;
-                        keyboardPacket.selected = tempKeyboardPacket[0].selected;
-                    }
-                    else {
-                        isKeyboard = false;
-                    }
-
-                    extrasSelect.setChecked(anyContact || anySms || anyCalls || isDpi || isKeyboard);
-                    ad.dismiss();
-                }
-            });
-
-            cancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ad.dismiss();
-                }
-            });
-        }
-    }
-
-    class ReadPackageData extends AsyncTask{
-
-        GetJsonFromDataPackets gjfdp;
-        int current_sdk = 0;
-        ArrayList<Integer> mismatchingSdks;
-
-        ReadPackageData(GetJsonFromDataPackets getJsonFromDataPackets){
-            gjfdp = getJsonFromDataPackets;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mismatchingSdks = null;
-            current_sdk = Build.VERSION.SDK_INT;
-            waitingMessageDesc.setText(R.string.reading_package_data);
-        }
-
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            int originating_sdk = 0;
-
-            File package_datas[] = gjfdp.package_datas;
-            String line;
-
-            if (package_datas.length > 0)
-                mismatchingSdks = new ArrayList<>(0);
-
-            try {
-
-                for (int i = 0; i < package_datas.length; i++) {
-                    BufferedReader reader = new BufferedReader(new FileReader(package_datas[i]));
-
-                    while ((line = reader.readLine()) != null) {
-
-                        String data[] = line.split(" ");
-                        if (data.length == 2 && data[0].equals("sdk")) {
-                            originating_sdk = Integer.parseInt(data[1].trim());
-                            if (originating_sdk != current_sdk)
-                            {
-                                mismatchingSdks.add(originating_sdk);
-                            }
-                        }
-                    }
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            return null;
-        }
-
-        String concatMismatchingSdks(){
-            StringBuilder msdk = new StringBuilder();
-            for (int i = 0; i < mismatchingSdks.size(); i++){
-                if (i != 0)
-                    msdk.append(", ").append(i);
-                else msdk.append(i);
-            }
-            return msdk.toString();
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-
-            if (mismatchingSdks != null && mismatchingSdks.size() > 0){
-
-                String message = getString(R.string.restore_in_different_version_warning) + "\n\n" +
-                        getString(R.string.originating_sdk) + ": " + concatMismatchingSdks() + "\n" +
-                        getString(R.string.current_sdk) + ": " + current_sdk;
-
-                new AlertDialog.Builder(AppSelector.this)
-                        .setMessage(message)
-                        .setCancelable(false)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                if (intentSelectAll){
-                                    waitingStatusMessage.setText(R.string.selecting_all);
-                                    actionButton.setVisibility(View.INVISIBLE);
-
-                                    numberOfApps = gjfdp.jsonAppPackets.size();
-                                    mainGetJsonFromDataPackets = gjfdp;
-                                    extraSelectBoolean = true;
-
-                                    startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
-                                }
-                                else {
-                                    appUpdateTask = new AppUpdate(gjfdp);
-                                    appUpdateTask.execute();
-                                }
-                            }
-                        })
-                        .show();
-
-            }
-            else {
-
-                if (intentSelectAll){
-                    waitingStatusMessage.setText(R.string.selecting_all);
-                    actionButton.setVisibility(View.INVISIBLE);
-
-                    numberOfApps = gjfdp.jsonAppPackets.size();
-                    mainGetJsonFromDataPackets = gjfdp;
-                    extraSelectBoolean = true;
-
-                    startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
-                }
-                else {
-                    appUpdateTask = new AppUpdate(gjfdp);
-                    appUpdateTask.execute();
-                }
-            }
-
-        }
-    }
+    private String busyboxBinaryFilePath = "";
+    private String installScriptPath = "";
+    private String restoreDataScriptPath = "";
+    private String initError;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -740,7 +122,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         CommonTools.METADATA_HOLDER_DIR = new File(CommonTools.METADATA_HOLDER_DIR).getAbsolutePath() + "/";
 
-        if (getIntent().getExtras() != null && getIntent().getExtras().getBoolean("all?", true)){
+        if (getIntent().getExtras() != null && getIntent().getExtras().getBoolean("all?", true)) {
             title.setText(R.string.everything);
             intentSelectAll = true;
             restoreContent.setVisibility(View.GONE);
@@ -788,19 +170,17 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         };
         LocalBroadcastManager.getInstance(this).registerReceiver(extraBackupsProgressReadyReceiver, new IntentFilter("extraBackupsProgressReady"));
 
-        if (RestoreService.ROOT_RESTORE_TASK != null && RestoreService.ROOT_RESTORE_TASK.getStatus() == AsyncTask.Status.RUNNING){
+        if (RestoreService.ROOT_RESTORE_TASK != null && RestoreService.ROOT_RESTORE_TASK.getStatus() == AsyncTask.Status.RUNNING) {
             Intent toSendIntent = new Intent(AppSelector.this, ProgressActivity.class);
             startActivity(toSendIntent);
             finish();
-        }
-        else {
+        } else {
             rootCopyTask = new RootCopyTask();
             rootCopyTask.execute();
         }
     }
 
-
-    private void unpackBinaries(){
+    private void unpackBinaries() {
 
         String cpu_abi = Build.SUPPORTED_ABIS[0];
 
@@ -811,14 +191,13 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         if (cpu_abi.equals("armeabi-v7a") || cpu_abi.equals("arm64-v8a")) {
             busyboxBinaryFilePath = commonTools.unpackAssetToInternal("busybox", "busybox");
-        }
-        else if (cpu_abi.equals("x86") || cpu_abi.equals("x86_64")) {
+        } else if (cpu_abi.equals("x86") || cpu_abi.equals("x86_64")) {
             busyboxBinaryFilePath = commonTools.unpackAssetToInternal("busybox-x86", "busybox");
         }
 
     }
 
-    int rootCopy(){
+    int rootCopy() {
 
         unpackBinaries();
 
@@ -891,14 +270,12 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 initError = initError + errLine + "\n";
             }
 
-            if (!output.equals("") && output.contains("ROOT_OK") && initError.equals("")){
+            if (!output.equals("") && output.contains("ROOT_OK") && initError.equals("")) {
                 return SUCCESS;
-            }
-            else {
+            } else {
                 return SCRIPT_ERROR;
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             initError = initError + e.getMessage() + "\n";
             return CODE_ERROR;
         }
@@ -907,14 +284,14 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     @Override
     public void onConvertMetadataToJSON(GetJsonFromDataPackets getJsonFromDataPackets, String error) {
 
-        if (!error.startsWith("")){
+        if (!error.startsWith("")) {
             showError(getString(R.string.code_error), error);
             return;
         }
 
         Vector<JSONObject> appData = getJsonFromDataPackets.jsonAppPackets;
 
-        if (getJsonFromDataPackets.contactPackets.length == 0 && getJsonFromDataPackets.smsPackets.length == 0 && appData.size() == 0 && getJsonFromDataPackets.callsPackets.length == 0){
+        if (getJsonFromDataPackets.contactPackets.length == 0 && getJsonFromDataPackets.smsPackets.length == 0 && appData.size() == 0 && getJsonFromDataPackets.callsPackets.length == 0) {
             showError(getString(R.string.nothing_to_restore), getString(R.string.no_metadata_found));
             return;
         }
@@ -937,34 +314,34 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         }*/
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(extraBackupsProgressReadyReceiver);
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
         cancelAllProcesses();
     }
 
-    void cancelAllProcesses(){
+    void cancelAllProcesses() {
         try {
             rootCopyTask.cancel(true);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored){}
 
         try {
             getJsonFromData.cancel(true);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored){}
 
         try {
             appUpdateTask.cancel(true);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored){}
     }
 
-    void showError(String mainMessage, String description){
+    void showError(String mainMessage, String description) {
         justAProgress.setVisibility(View.INVISIBLE);
         errorIcon.setVisibility(View.VISIBLE);
         waitingStatusMessage.setText(mainMessage);
@@ -988,9 +365,12 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         if (appList.size() > 0) {
             app = data = permissions = true;
-            try { isPermissible = appList.get(0).getBoolean(IS_PERMISSIBLE); } catch (JSONException e) { e.printStackTrace(); }
-        }
-        else app = data = permissions = false;
+            try {
+                isPermissible = appList.get(0).getBoolean(IS_PERMISSIBLE);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else app = data = permissions = false;
         for (int i = 0; i < appList.size(); i++) {
             try {
 
@@ -1043,19 +423,17 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
-        if (compoundButton == permissionsAllSelect){
+        if (compoundButton == permissionsAllSelect) {
             adapter.checkAllPermissions(b);
             adapter.notifyDataSetChanged();
-        }
-        else if (compoundButton == appAllSelect) {
+        } else if (compoundButton == appAllSelect) {
             adapter.checkAllApp(b);
             adapter.notifyDataSetChanged();
         } else if (compoundButton == dataAllSelect) {
-            if (b){
+            if (b) {
                 appAllSelect.setChecked(true);
                 appAllSelect.setEnabled(false);
-            }
-            else {
+            } else {
                 appAllSelect.setEnabled(true);
             }
             adapter.checkAllData(b);
@@ -1063,6 +441,601 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         }
     }
 
+    class RootCopyTask extends AsyncTask {
+
+        int rootCopyResult;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            waitingStatusMessage.setText(R.string.requesting_root);
+            waitingMessageDesc.setText(R.string.initMessageShort);
+
+            actionButton.setText(android.R.string.cancel);
+            actionButton.setBackground(getDrawable(R.drawable.cancel_root_request));
+            actionButton.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
+            actionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    try {
+                        checkSu.destroy();
+                    } catch (Exception ignored) {
+                    }
+
+                    try {
+                        rootCopyTask.cancel(true);
+                    } catch (Exception ignored) {
+                    }
+
+                    finish();
+                }
+            });
+            actionButton.setVisibility(View.VISIBLE);
+
+            restoreContent.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+
+            unpackBinaries();
+            rootCopyResult = rootCopy();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            if (rootCopyResult == SUCCESS) {
+                waitingStatusMessage.setText(R.string.reading_metadata);
+                waitingMessageDesc.setText("");
+                getJsonFromData = new GetJsonFromData(AppSelector.this, waitingMessageDesc);
+                getJsonFromData.execute(CommonTools.METADATA_HOLDER_DIR);
+            } else if (rootCopyResult == SCRIPT_ERROR) {
+                showError(getString(R.string.are_you_rooted), getString(R.string.are_you_rooted_desc));
+                waitingMessageDesc.append("\n\n" + initError);
+            } else {
+                showError(getString(R.string.code_error), initError);
+            }
+
+        }
+    }
+
+    class AppUpdate extends AsyncTask {
+
+        GetJsonFromDataPackets getJsonFromDataPackets;
+
+        AppUpdate(GetJsonFromDataPackets getJsonFromDataPackets) {
+            this.getJsonFromDataPackets = getJsonFromDataPackets;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            waitingLayout.setVisibility(View.VISIBLE);
+            restoreContent.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            adapter = new AppListAdapter(AppSelector.this, getJsonFromDataPackets.jsonAppPackets);
+            return adapter;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            mainGetJsonFromDataPackets = getJsonFromDataPackets;
+
+            if (o != null) {
+                waitingLayout.setVisibility(View.GONE);
+                restoreContent.setVisibility(View.VISIBLE);
+
+                if (mainGetJsonFromDataPackets.jsonAppPackets.size() > 0)
+                    appList.setAdapter(adapter);
+
+                if (mainGetJsonFromDataPackets.contactPackets.length != 0 || mainGetJsonFromDataPackets.smsPackets.length != 0
+                        || mainGetJsonFromDataPackets.callsPackets.length != 0 || mainGetJsonFromDataPackets.dpiPacket.dpiFile != null
+                        || mainGetJsonFromDataPackets.keyboardPacket.keyboardFile != null) {
+                    extrasBar.setVisibility(View.VISIBLE);
+                    extrasSelect.setChecked(true);
+                    extrasBar.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            new ExtrasUpdate(mainGetJsonFromDataPackets).execute();
+                        }
+                    });
+                } else {
+                    extrasBar.setVisibility(View.GONE);
+                }
+
+                if (mainGetJsonFromDataPackets.jsonAppPackets.size() != 0) {
+                    appCheckboxBar.setVisibility(View.VISIBLE);
+                    appList.setVisibility(View.VISIBLE);
+                } else {
+                    appCheckboxBar.setVisibility(View.GONE);
+                    appList.setVisibility(View.GONE);
+                }
+
+                onCheck(mainGetJsonFromDataPackets.jsonAppPackets);
+
+                actionButton.setText(R.string.restore);
+                actionButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_next, 0);
+                actionButton.setBackground(getResources().getDrawable(R.drawable.next));
+                actionButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (anyAppSelected || extrasSelect.isChecked()) {
+                            waitingStatusMessage.setText(R.string.please_wait);
+                            actionButton.setVisibility(View.INVISIBLE);
+
+                            waitingLayout.setVisibility(View.VISIBLE);
+                            restoreContent.setVisibility(View.GONE);
+
+                            extraSelectBoolean = extrasSelect.isChecked();
+
+                            new AlertDialog.Builder(AppSelector.this)
+                                    .setTitle(R.string.turn_off_internet_and_updates)
+                                    .setMessage(R.string.do_not_use_desc)
+                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
+                                        }
+                                    })
+                                    .setNegativeButton(R.string.later, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            finish();
+                                        }
+                                    })
+                                    .setCancelable(false)
+                                    .show();
+
+                        }
+                    }
+                });
+
+            } else {
+                showError(getString(R.string.code_error), getString(R.string.null_adapter));
+            }
+        }
+    }
+
+    class ExtrasUpdate extends AsyncTask {
+
+        AlertDialog ad;
+        View masterView;
+        LinearLayout holder;
+        ProgressBar progressBar;
+
+        GetJsonFromDataPackets getJsonFromDataPackets;
+        ContactsPacket[] contactsPackets;
+        SmsPacket[] smsPackets;
+        CallsPacket[] callsPackets;
+        DpiPacket dpiPacket;
+        KeyboardPacket keyboardPacket;
+
+        public ExtrasUpdate(GetJsonFromDataPackets getJsonFromDataPackets) {
+            this.getJsonFromDataPackets = getJsonFromDataPackets;
+            contactsPackets = getJsonFromDataPackets.contactPackets;
+            smsPackets = getJsonFromDataPackets.smsPackets;
+            callsPackets = getJsonFromDataPackets.callsPackets;
+            dpiPacket = getJsonFromDataPackets.dpiPacket;
+            keyboardPacket = getJsonFromDataPackets.keyboardPacket;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            masterView = View.inflate(AppSelector.this, R.layout.extras_picker, null);
+            holder = masterView.findViewById(R.id.extras_picker_item_holder);
+            progressBar = masterView.findViewById(R.id.extra_picker_round_progress);
+
+            ad = new AlertDialog.Builder(AppSelector.this)
+                    .setView(masterView)
+                    .create();
+
+            ad.show();
+
+            holder.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+
+            ContactsPacket[] tempContactPackets = new ContactsPacket[contactsPackets.length];
+            ArrayList<View> contactsViewItems = new ArrayList<>(0);
+
+            SmsPacket[] tempSmsPackets = new SmsPacket[smsPackets.length];
+            ArrayList<View> smsViewItems = new ArrayList<>(0);
+
+            CallsPacket[] tempCallsPackets = new CallsPacket[callsPackets.length];
+            ArrayList<View> callsViewItems = new ArrayList<>(0);
+
+            for (int j = 0; j < contactsPackets.length; j++) {
+                tempContactPackets[j] = new ContactsPacket(contactsPackets[j].vcfFile, contactsPackets[j].selected);
+            }
+
+            for (final ContactsPacket packet : tempContactPackets) {
+                View cView = View.inflate(AppSelector.this, R.layout.extra_item, null);
+                ImageView icon = cView.findViewById(R.id.extra_item_icon);
+                icon.setImageResource(R.drawable.ic_contact_icon);
+
+                TextView tv = cView.findViewById(R.id.extra_item_name);
+                tv.setText(packet.vcfFile.getName());
+
+                contactsViewItems.add(cView);
+            }
+
+            for (int j = 0; j < smsPackets.length; j++) {
+                tempSmsPackets[j] = new SmsPacket(smsPackets[j].smsDBFile, smsPackets[j].selected);
+            }
+
+            for (final SmsPacket packet : tempSmsPackets) {
+                View sView = View.inflate(AppSelector.this, R.layout.extra_item, null);
+                ImageView icon = sView.findViewById(R.id.extra_item_icon);
+                icon.setImageResource(R.drawable.ic_sms_icon);
+
+                TextView tv = sView.findViewById(R.id.extra_item_name);
+                tv.setText(packet.smsDBFile.getName());
+
+                smsViewItems.add(sView);
+            }
+
+            for (int j = 0; j < callsPackets.length; j++) {
+                tempCallsPackets[j] = new CallsPacket(callsPackets[j].callsDBFile, callsPackets[j].selected);
+            }
+
+            for (final CallsPacket packet : tempCallsPackets) {
+                View clView = View.inflate(AppSelector.this, R.layout.extra_item, null);
+                ImageView icon = clView.findViewById(R.id.extra_item_icon);
+                icon.setImageResource(R.drawable.ic_call_log_icon);
+
+                TextView tv = clView.findViewById(R.id.extra_item_name);
+                tv.setText(packet.callsDBFile.getName());
+
+                callsViewItems.add(clView);
+            }
+
+            View dpiViewItem = null;
+            if (dpiPacket.dpiFile != null) {
+                dpiViewItem = View.inflate(AppSelector.this, R.layout.extra_item, null);
+                ImageView icon = dpiViewItem.findViewById(R.id.extra_item_icon);
+                icon.setImageResource(R.drawable.ic_dpi_icon);
+
+                TextView tv = dpiViewItem.findViewById(R.id.extra_item_name);
+                tv.setText(R.string.dpi);
+            }
+
+            DpiPacket tempDpiPacket = new DpiPacket(dpiPacket.dpiFile, dpiPacket.selected);
+
+            View keyboardViewItem = null;
+            if (keyboardPacket.keyboardFile != null) {
+                keyboardViewItem = View.inflate(AppSelector.this, R.layout.extra_item, null);
+                ImageView icon = keyboardViewItem.findViewById(R.id.extra_item_icon);
+                icon.setImageResource(R.drawable.ic_keyboard_icon);
+
+                TextView tv = keyboardViewItem.findViewById(R.id.extra_item_name);
+                tv.setText(R.string.keyboard);
+            }
+
+            KeyboardPacket tempKeyboardPacket = new KeyboardPacket(keyboardPacket.keyboardFile, keyboardPacket.selected);
+
+            return new Object[]{tempContactPackets, contactsViewItems, tempSmsPackets, smsViewItems, tempCallsPackets, callsViewItems, tempDpiPacket, dpiViewItem,
+                    tempKeyboardPacket, keyboardViewItem};
+        }
+
+        @Override
+        protected void onPostExecute(final Object o) {
+            super.onPostExecute(o);
+
+            if (holder.getChildCount() > 0)
+                holder.removeAllViews();
+
+            Object received[] = (Object[]) o;
+
+            final ContactsPacket[] tempContactPackets = (ContactsPacket[]) received[0];
+            ArrayList<View> contactViews = (ArrayList<View>) received[1];
+            for (int i = 0; i < contactViews.size(); i++) {
+                View v = contactViews.get(i);
+
+                CheckBox cb = v.findViewById(R.id.extras_item_select);
+                cb.setChecked(tempContactPackets[i].selected);
+
+                final int finalI = i;
+                cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        tempContactPackets[finalI].selected = b;
+                    }
+                });
+
+                holder.addView(v);
+            }
+
+            final SmsPacket[] tempSmsPackets = (SmsPacket[]) received[2];
+            ArrayList<View> smsViews = (ArrayList<View>) received[3];
+            for (int i = 0; i < smsViews.size(); i++) {
+                View v = smsViews.get(i);
+
+                CheckBox cb = v.findViewById(R.id.extras_item_select);
+                cb.setChecked(tempSmsPackets[i].selected);
+
+                final int finalI = i;
+                cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        tempSmsPackets[finalI].selected = b;
+                    }
+                });
+
+                holder.addView(v);
+            }
+
+            final CallsPacket[] tempCallsPackets = (CallsPacket[]) received[4];
+            ArrayList<View> callsViews = (ArrayList<View>) received[5];
+            for (int i = 0; i < callsViews.size(); i++) {
+                View v = callsViews.get(i);
+
+                CheckBox cb = v.findViewById(R.id.extras_item_select);
+                cb.setChecked(tempCallsPackets[i].selected);
+
+                final int finalI = i;
+                cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        tempCallsPackets[finalI].selected = b;
+                    }
+                });
+
+                holder.addView(v);
+            }
+
+            final DpiPacket tempDpiPacket[] = new DpiPacket[]{null};
+
+            if (received[7] != null) {
+                tempDpiPacket[0] = (DpiPacket) received[6];
+                View dpiViewItem = (View) received[7];
+
+                CheckBox dpi_cb = dpiViewItem.findViewById(R.id.extras_item_select);
+                dpi_cb.setChecked(tempDpiPacket[0].selected);
+
+                dpi_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        tempDpiPacket[0].selected = b;
+                    }
+                });
+
+                holder.addView(dpiViewItem);
+            }
+
+            final KeyboardPacket tempKeyboardPacket[] = new KeyboardPacket[]{null};
+
+            if (received[9] != null) {
+                tempKeyboardPacket[0] = (KeyboardPacket) received[8];
+                View keyboardViewItem = (View) received[9];
+
+                CheckBox keyboard_cb = keyboardViewItem.findViewById(R.id.extras_item_select);
+                keyboard_cb.setChecked(tempKeyboardPacket[0].selected);
+
+                keyboard_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        tempKeyboardPacket[0].selected = b;
+                    }
+                });
+
+                holder.addView(keyboardViewItem);
+            }
+
+
+            holder.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+
+            Button ok = masterView.findViewById(R.id.extras_picker_ok);
+            Button cancel = masterView.findViewById(R.id.extras_picker_cancel);
+
+            ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if (contactsPackets.length == 0 && smsPackets.length == 0
+                            && callsPackets.length == 0 && dpiPacket.dpiFile == null && keyboardPacket.keyboardFile == null)
+                        return;
+
+                    boolean anyContact;
+                    boolean anySms;
+                    boolean anyCalls;
+                    boolean isDpi;
+                    boolean isKeyboard;
+
+                    if (tempContactPackets.length > 0) {
+                        anyContact = tempContactPackets[0].selected;
+                        for (int j = 0; j < contactsPackets.length; j++) {
+                            contactsPackets[j].selected = tempContactPackets[j].selected;
+                            contactsPackets[j].vcfFile = tempContactPackets[j].vcfFile;
+                            anyContact = anyContact || contactsPackets[j].selected;
+                        }
+                    } else {
+                        anyContact = false;
+                    }
+
+                    if (tempSmsPackets.length > 0) {
+                        anySms = tempSmsPackets[0].selected;
+                        for (int j = 0; j < smsPackets.length; j++) {
+                            smsPackets[j].selected = tempSmsPackets[j].selected;
+                            smsPackets[j].smsDBFile = tempSmsPackets[j].smsDBFile;
+                            anySms = anySms || smsPackets[j].selected;
+                        }
+                    } else {
+                        anySms = false;
+                    }
+
+                    if (tempCallsPackets.length > 0) {
+                        anyCalls = tempCallsPackets[0].selected;
+                        for (int j = 0; j < callsPackets.length; j++) {
+                            callsPackets[j].selected = tempCallsPackets[j].selected;
+                            callsPackets[j].callsDBFile = tempCallsPackets[j].callsDBFile;
+                            anyCalls = anyCalls || callsPackets[j].selected;
+                        }
+                    } else {
+                        anyCalls = false;
+                    }
+
+                    if (tempDpiPacket[0] != null) {
+                        isDpi = tempDpiPacket[0].selected;
+                        dpiPacket.dpiFile = tempDpiPacket[0].dpiFile;
+                        dpiPacket.selected = tempDpiPacket[0].selected;
+                    } else {
+                        isDpi = false;
+                    }
+
+                    if (tempKeyboardPacket[0] != null) {
+                        isKeyboard = tempKeyboardPacket[0].selected;
+                        keyboardPacket.keyboardFile = tempKeyboardPacket[0].keyboardFile;
+                        keyboardPacket.selected = tempKeyboardPacket[0].selected;
+                    } else {
+                        isKeyboard = false;
+                    }
+
+                    extrasSelect.setChecked(anyContact || anySms || anyCalls || isDpi || isKeyboard);
+                    ad.dismiss();
+                }
+            });
+
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ad.dismiss();
+                }
+            });
+        }
+    }
+
+    class ReadPackageData extends AsyncTask {
+
+        GetJsonFromDataPackets gjfdp;
+        int current_sdk = 0;
+        ArrayList<Integer> mismatchingSdks;
+
+        ReadPackageData(GetJsonFromDataPackets getJsonFromDataPackets) {
+            gjfdp = getJsonFromDataPackets;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mismatchingSdks = null;
+            current_sdk = Build.VERSION.SDK_INT;
+            waitingMessageDesc.setText(R.string.reading_package_data);
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            int originating_sdk = 0;
+
+            File package_datas[] = gjfdp.package_datas;
+            String line;
+
+            if (package_datas.length > 0)
+                mismatchingSdks = new ArrayList<>(0);
+
+            try {
+
+                for (int i = 0; i < package_datas.length; i++) {
+                    BufferedReader reader = new BufferedReader(new FileReader(package_datas[i]));
+
+                    while ((line = reader.readLine()) != null) {
+
+                        String data[] = line.split(" ");
+                        if (data.length == 2 && data[0].equals("sdk")) {
+                            originating_sdk = Integer.parseInt(data[1].trim());
+                            if (originating_sdk != current_sdk) {
+                                mismatchingSdks.add(originating_sdk);
+                            }
+                        }
+                    }
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        String concatMismatchingSdks() {
+            StringBuilder msdk = new StringBuilder();
+            for (int i = 0; i < mismatchingSdks.size(); i++) {
+                if (i != 0)
+                    msdk.append(", ").append(i);
+                else msdk.append(i);
+            }
+            return msdk.toString();
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            if (mismatchingSdks != null && mismatchingSdks.size() > 0) {
+
+                String message = getString(R.string.restore_in_different_version_warning) + "\n\n" +
+                        getString(R.string.originating_sdk) + ": " + concatMismatchingSdks() + "\n" +
+                        getString(R.string.current_sdk) + ": " + current_sdk;
+
+                new AlertDialog.Builder(AppSelector.this)
+                        .setMessage(message)
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                if (intentSelectAll) {
+                                    waitingStatusMessage.setText(R.string.selecting_all);
+                                    actionButton.setVisibility(View.INVISIBLE);
+
+                                    numberOfApps = gjfdp.jsonAppPackets.size();
+                                    mainGetJsonFromDataPackets = gjfdp;
+                                    extraSelectBoolean = true;
+
+                                    startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
+                                } else {
+                                    appUpdateTask = new AppUpdate(gjfdp);
+                                    appUpdateTask.execute();
+                                }
+                            }
+                        })
+                        .show();
+
+            } else {
+
+                if (intentSelectAll) {
+                    waitingStatusMessage.setText(R.string.selecting_all);
+                    actionButton.setVisibility(View.INVISIBLE);
+
+                    numberOfApps = gjfdp.jsonAppPackets.size();
+                    mainGetJsonFromDataPackets = gjfdp;
+                    extraSelectBoolean = true;
+
+                    startActivity(new Intent(AppSelector.this, ExtraBackupsProgress.class));
+                } else {
+                    appUpdateTask = new AppUpdate(gjfdp);
+                    appUpdateTask.execute();
+                }
+            }
+
+        }
+    }
 
 
 }

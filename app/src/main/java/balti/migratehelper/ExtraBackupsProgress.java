@@ -59,82 +59,112 @@ import static balti.migratehelper.RootRestoreTask.RESTORE_DATA_HEAD;
 
 public class ExtraBackupsProgress extends AppCompatActivity implements OnDBRestoreComplete {
 
-    TextView headTitle;
-    ProgressBar headProgressBar;
-
-    LinearLayout contactsView;
-    ImageView contactsDone, contactsCancel;
-    ProgressBar contactsProgress;
-
-    LinearLayout smsView;
-    ImageView smsDone, smsCancel;
-    ProgressBar smsProgress;
-    TextView smsStatusText;
-
-    LinearLayout callsView;
-    ImageView callsDone, callsCancel;
-    ProgressBar callsProgress;
-    TextView callsStatusText;
-
-    LinearLayout dpiView;
-    ImageView dpiDone, dpiCancel;
-    ProgressBar dpiProgress;
-    TextView dpiStatusText;
-
-    private int dpiValue = 0;
-
-    LinearLayout keyboardView;
-    ImageView keyboardDone, keyboardCancel;
-    ProgressBar keyboardProgress;
-    TextView keyboardStatusText;
-
-    String keyboardText = "";
-
-    LinearLayout applications;
-    ImageView appsDone;
-    ProgressBar appsProgress;
-    TextView appsStatusText;
-
     static int totalTasks = 0;
     static int intProgressTask = 0;
-
-    private static int CONTACTS_RESTORE = 10;
-
     static GetJsonFromDataPackets getJsonFromDataPackets;
     static int numberOfApps = 0;
     static String installScriptPath;
     static String restoreDataScriptPath;
     static boolean extraSelectBoolean;
     static String mtdDirName;
-
     static boolean isShowContacts = false;
     static boolean isShowSms = false;
     static boolean isShowCalls = false;
     static boolean isShowDpi = false;
     static boolean isShowKeyboard = false;
-
+    private static int CONTACTS_RESTORE = 10;
+    TextView headTitle;
+    ProgressBar headProgressBar;
+    LinearLayout contactsView;
+    ImageView contactsDone, contactsCancel;
+    ProgressBar contactsProgress;
+    LinearLayout smsView;
+    ImageView smsDone, smsCancel;
+    ProgressBar smsProgress;
+    TextView smsStatusText;
+    LinearLayout callsView;
+    ImageView callsDone, callsCancel;
+    ProgressBar callsProgress;
+    TextView callsStatusText;
+    LinearLayout dpiView;
+    ImageView dpiDone, dpiCancel;
+    ProgressBar dpiProgress;
+    TextView dpiStatusText;
+    LinearLayout keyboardView;
+    ImageView keyboardDone, keyboardCancel;
+    ProgressBar keyboardProgress;
+    TextView keyboardStatusText;
+    String keyboardText = "";
+    LinearLayout applications;
+    ImageView appsDone;
+    ProgressBar appsProgress;
+    TextView appsStatusText;
     BroadcastReceiver startRestoreFromExtraBackups;
-
     BroadcastReceiver progressReceiver;
     IntentFilter progressReceiverIF;
-
     ContactsPacket contactsPackets[];
     int contactCount = 0;
-
     SmsPacket smsPacket[];
     AlertDialog smsPermissionDialog;
     String actualDefaultSmsAppName = "";
     int SET_THIS_AS_DEFAULT_SMS_APP = 2;
     int SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP = 3;
     int SMS_RESTORE_JOB = 20;
-
     CallsPacket callsPackets[];
     AlertDialog callsPermissionDialog;
-
     AlertDialog dpiDialog;
-
     int CALLS_PERMISSION_REQUEST = 4;
     int CALLS_RESTORE_JOB = 40;
+    private int dpiValue = 0;
+
+    static void setData(GetJsonFromDataPackets getJsonFromDataPackets, int numberOfApps, String installScriptPath, String restoreDataScriptPath, boolean extraSelectBoolean, String mtdDirName) {
+
+        ExtraBackupsProgress.getJsonFromDataPackets = getJsonFromDataPackets;
+        ExtraBackupsProgress.numberOfApps = numberOfApps;
+        ExtraBackupsProgress.installScriptPath = installScriptPath;
+        ExtraBackupsProgress.restoreDataScriptPath = restoreDataScriptPath;
+        ExtraBackupsProgress.extraSelectBoolean = extraSelectBoolean;
+        ExtraBackupsProgress.mtdDirName = mtdDirName;
+
+        if (extraSelectBoolean) {
+
+            for (ContactsPacket cp : getJsonFromDataPackets.contactPackets) {
+                if (isShowContacts = cp.selected) {
+                    totalTasks++;
+                    break;
+                }
+            }
+
+            for (SmsPacket sp : getJsonFromDataPackets.smsPackets) {
+                if (isShowSms = sp.selected) {
+                    totalTasks++;
+                    break;
+                }
+            }
+
+            for (CallsPacket clp : getJsonFromDataPackets.callsPackets) {
+                if (isShowCalls = clp.selected) {
+                    totalTasks++;
+                    break;
+                }
+            }
+            if (isShowDpi = getJsonFromDataPackets.dpiPacket.selected) {
+                totalTasks++;
+            }
+            if (isShowKeyboard = getJsonFromDataPackets.keyboardPacket.selected) {
+                totalTasks++;
+            }
+        } else {
+            isShowContacts = false;
+            isShowSms = false;
+            isShowCalls = false;
+            isShowDpi = false;
+            isShowKeyboard = false;
+        }
+
+        if (numberOfApps > 0) totalTasks++;
+
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -204,63 +234,13 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("extraBackupsProgressReady"));
     }
 
-    static void setData(GetJsonFromDataPackets getJsonFromDataPackets, int numberOfApps, String installScriptPath, String restoreDataScriptPath, boolean extraSelectBoolean, String mtdDirName){
-
-        ExtraBackupsProgress.getJsonFromDataPackets = getJsonFromDataPackets;
-        ExtraBackupsProgress.numberOfApps = numberOfApps;
-        ExtraBackupsProgress.installScriptPath = installScriptPath;
-        ExtraBackupsProgress.restoreDataScriptPath = restoreDataScriptPath;
-        ExtraBackupsProgress.extraSelectBoolean = extraSelectBoolean;
-        ExtraBackupsProgress.mtdDirName = mtdDirName;
-
-        if (extraSelectBoolean) {
-
-            for (ContactsPacket cp : getJsonFromDataPackets.contactPackets) {
-                if (isShowContacts = cp.selected) {
-                    totalTasks++;
-                    break;
-                }
-            }
-
-            for (SmsPacket sp : getJsonFromDataPackets.smsPackets) {
-                if (isShowSms = sp.selected) {
-                    totalTasks++;
-                    break;
-                }
-            }
-
-            for (CallsPacket clp : getJsonFromDataPackets.callsPackets){
-                if (isShowCalls = clp.selected) {
-                    totalTasks++;
-                    break;
-                }
-            }
-            if (isShowDpi = getJsonFromDataPackets.dpiPacket.selected){
-                totalTasks++;
-            }
-            if (isShowKeyboard = getJsonFromDataPackets.keyboardPacket.selected){
-                totalTasks++;
-            }
-        }
-        else {
-            isShowContacts = false;
-            isShowSms = false;
-            isShowCalls = false;
-            isShowDpi = false;
-            isShowKeyboard = false;
-        }
-
-        if (numberOfApps > 0) totalTasks++;
-
-    }
-
-    void triggerRootRestoreTask(){
+    void triggerRootRestoreTask() {
 
         new FilterAcceptedApps().execute();
 
     }
 
-    void triggerRestoreProcessStart(){
+    void triggerRestoreProcessStart() {
 
         try {
 
@@ -281,12 +261,10 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 if (isShowKeyboard) keyboardView.setVisibility(View.VISIBLE);
 
                 restoreContacts();
-            }
-            else {
+            } else {
                 triggerRootRestoreTask();
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -333,8 +311,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     })
                     .setCancelable(false)
                     .show();
-        }
-        else {
+        } else {
 
             // next process 0
 
@@ -342,13 +319,13 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         }
     }
 
-    private void nextContact(){
+    private void nextContact() {
         int j;
         for (j = contactCount; j < contactsPackets.length; j++) {
 
             ContactsPacket packet = contactsPackets[j];
             if (packet.selected) {
-                contactCount = j+1;
+                contactCount = j + 1;
                 try {
                     Intent i = new Intent(Intent.ACTION_VIEW);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
@@ -357,8 +334,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                         i.setDataAndType(Uri.fromFile(packet.vcfFile), "text/x-vcard");
                     i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     startActivityForResult(i, CONTACTS_RESTORE);
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     continue;
                 }
@@ -366,7 +342,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 return;
             }
         }
-        if (j >= contactsPackets.length){
+        if (j >= contactsPackets.length) {
 
             // next process 0
 
@@ -378,9 +354,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         }
     }
 
-    private void restoreSms(){
+    private void restoreSms() {
 
-        if (isShowSms){
+        if (isShowSms) {
 
             headProgressBar.setProgress(++intProgressTask);
             headTitle.setText(R.string.sms);
@@ -391,11 +367,10 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            if (!Telephony.Sms.getDefaultSmsPackage(ExtraBackupsProgress.this).equals(getPackageName())){
+                            if (!Telephony.Sms.getDefaultSmsPackage(ExtraBackupsProgress.this).equals(getPackageName())) {
                                 actualDefaultSmsAppName = Telephony.Sms.getDefaultSmsPackage(ExtraBackupsProgress.this);
                                 setDefaultSms(getPackageName(), SET_THIS_AS_DEFAULT_SMS_APP);
-                            }
-                            else {
+                            } else {
                                 nextSms();
                             }
                         }
@@ -419,8 +394,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             if (!Telephony.Sms.getDefaultSmsPackage(this).equals(getPackageName()))
                 smsPermissionDialog.show();
             else nextSms();
-        }
-        else {
+        } else {
 
             // next process 1
 
@@ -430,13 +404,13 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
     }
 
-    private void setDefaultSms(String packageName, int requestCode){
+    private void setDefaultSms(String packageName, int requestCode) {
         Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
         intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName);
         startActivityForResult(intent, requestCode);
     }
 
-    private void nextSms(){
+    private void nextSms() {
 
         int j;
         List<File> acceptedFiles = new ArrayList<>(0);
@@ -500,7 +474,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         restoreA_DB.execute();
     }
 
-    private void restoreCalls(){
+    private void restoreCalls() {
 
         if (isShowCalls) {
 
@@ -513,10 +487,9 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            if (ContextCompat.checkSelfPermission(ExtraBackupsProgress.this, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED){
+                            if (ContextCompat.checkSelfPermission(ExtraBackupsProgress.this, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
                                 ActivityCompat.requestPermissions(ExtraBackupsProgress.this, new String[]{Manifest.permission.WRITE_CALL_LOG}, CALLS_PERMISSION_REQUEST);
-                            }
-                            else {
+                            } else {
                                 nextCalls();
                             }
                         }
@@ -539,8 +512,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             if (ContextCompat.checkSelfPermission(ExtraBackupsProgress.this, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED)
                 callsPermissionDialog.show();
             else nextCalls();
-        }
-        else {
+        } else {
 
             // next process 2
 
@@ -550,7 +522,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
     }
 
-    private void nextCalls(){
+    private void nextCalls() {
 
         int j;
         List<File> acceptedFiles = new ArrayList<>(0);
@@ -607,7 +579,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         restoreA_DB.execute();
     }
 
-    private void restoreDpi(){
+    private void restoreDpi() {
 
         if (isShowDpi) {
 
@@ -616,8 +588,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             new GetDpiValueTask().execute();
 
-        }
-        else {
+        } else {
 
             // next process 3
 
@@ -627,7 +598,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
     }
 
-    private void restoreKeyboard(){
+    private void restoreKeyboard() {
 
         if (isShowKeyboard) {
 
@@ -636,8 +607,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             new GetKeyboardTextTask().execute();
 
-        }
-        else {
+        } else {
 
             // next process 4
 
@@ -652,17 +622,18 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         super.onDestroy();
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(progressReceiver);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored){}
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(startRestoreFromExtraBackups);
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CALLS_PERMISSION_REQUEST){
+        if (requestCode == CALLS_PERMISSION_REQUEST) {
             nextCalls();
         }
     }
@@ -671,16 +642,14 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CONTACTS_RESTORE){
+        if (requestCode == CONTACTS_RESTORE) {
 
             nextContact();
-        }
-        else if (requestCode == SET_THIS_AS_DEFAULT_SMS_APP){
+        } else if (requestCode == SET_THIS_AS_DEFAULT_SMS_APP) {
             nextSms();
-        }
-        else if (requestCode == SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP) {
+        } else if (requestCode == SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP) {
 
-            if (Telephony.Sms.getDefaultSmsPackage(this).equals(getPackageName())){
+            if (Telephony.Sms.getDefaultSmsPackage(this).equals(getPackageName())) {
                 new AlertDialog.Builder(this)
                         .setMessage(R.string.you_will_not_be_able_to_receive_sms)
                         .setPositiveButton(R.string.change, new DialogInterface.OnClickListener() {
@@ -699,8 +668,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                         })
                         .setCancelable(false)
                         .show();
-            }
-            else {
+            } else {
                 // next process 1
 
                 restoreCalls();
@@ -711,14 +679,13 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
     @Override
     public void onDBRestoreComplete(int code) {
-        if (code == SMS_RESTORE_JOB){
+        if (code == SMS_RESTORE_JOB) {
             smsDone.setVisibility(View.VISIBLE);
             smsCancel.setVisibility(View.GONE);
 
             setDefaultSms(actualDefaultSmsAppName, SET_ORIGINAL_APP_AS_DEFAULT_SMS_APP);
 
-        }
-        else if (code == CALLS_RESTORE_JOB){
+        } else if (code == CALLS_RESTORE_JOB) {
             // next process 2
 
             callsDone.setVisibility(View.VISIBLE);
@@ -729,7 +696,12 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         }
     }
 
-    class GetDpiValueTask extends AsyncTask{
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(this, R.string.please_do_not_press_back_button, Toast.LENGTH_SHORT).show();
+    }
+
+    class GetDpiValueTask extends AsyncTask {
 
         String err;
         int pDensity, oDensity;
@@ -755,31 +727,27 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 err = getString(R.string.dpi_null);
                 dpiCancel.setVisibility(View.VISIBLE);
                 dpiDone.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 try {
                     BufferedReader reader = new BufferedReader(new FileReader(getJsonFromDataPackets.dpiPacket.dpiFile));
                     String line;
-                    while ((line = reader.readLine()) != null){
+                    while ((line = reader.readLine()) != null) {
 
                         line = line.trim();
 
-                        if (line.startsWith("Physical density:")){
+                        if (line.startsWith("Physical density:")) {
                             pDensity = Integer.parseInt(line.substring(line.lastIndexOf(' ')).trim());
-                        }
-                        else if (line.startsWith("Override density:")){
+                        } else if (line.startsWith("Override density:")) {
                             oDensity = Integer.parseInt(line.substring(line.lastIndexOf(' ')).trim());
                         }
                     }
 
-                    if (oDensity > 0){
+                    if (oDensity > 0) {
                         dpiV = oDensity;
-                    }
-                    else if (pDensity > 0){
+                    } else if (pDensity > 0) {
                         dpiV = pDensity;
                     }
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     err = e.getMessage();
                 }
             }
@@ -792,7 +760,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             dpiProgress.setVisibility(View.GONE);
 
-            if (dpiV == 0){
+            if (dpiV == 0) {
                 dpiStatusText.setText(R.string.dpi_value_not_found);
 
                 dpiCancel.setVisibility(View.VISIBLE);
@@ -801,8 +769,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 // next process 3
 
                 restoreKeyboard();
-            }
-            else if (!err.equals("")){
+            } else if (!err.equals("")) {
                 dpiStatusText.setText(err);
 
                 dpiCancel.setVisibility(View.VISIBLE);
@@ -811,8 +778,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 // next process 3
 
                 restoreKeyboard();
-            }
-            else {
+            } else {
                 dpiValue = dpiV;
                 dpiStatusText.setText("");
 
@@ -854,7 +820,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         }
     }
 
-    class GetKeyboardTextTask extends AsyncTask{
+    class GetKeyboardTextTask extends AsyncTask {
 
         String keybText, keybName, err;
 
@@ -875,8 +841,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             if (getJsonFromDataPackets.keyboardPacket.keyboardFile == null) {
                 err = getString(R.string.keyboard_null);
-            }
-            else {
+            } else {
 
                 String kPackageName = "";
 
@@ -884,7 +849,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     BufferedReader reader = new BufferedReader(new FileReader(getJsonFromDataPackets.keyboardPacket.keyboardFile));
                     String line;
                     int n = 0;
-                    while ((line = reader.readLine()) != null){
+                    while ((line = reader.readLine()) != null) {
 
                         line = line.trim();
 
@@ -899,31 +864,27 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                     if (n != 1) {
                         err = getString(R.string.keyboard_corrupt);
-                    }
-                    else {
+                    } else {
                         kPackageName = keybText;
                         if (keybText.contains("/"))
                             kPackageName = keybText.split("/")[0];
 
                         Object[] r = isKeyboardInRestoreList(kPackageName);
 
-                        if (r.length == 1){
-                            err = (String)r[0];
-                        }
-                        else {
+                        if (r.length == 1) {
+                            err = (String) r[0];
+                        } else {
 
-                            keybName = (String)r[0];
+                            keybName = (String) r[0];
 
-                            if (!(boolean)r[1]){
+                            if (!(boolean) r[1]) {
                                 err = keybName + " " + getString(R.string.keyboard_not_in_restore_list);
-                            }
-                            else {
+                            } else {
                                 err = "";
                             }
                         }
                     }
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     err = e.getMessage();
                 }
 
@@ -937,15 +898,14 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
             dpiProgress.setVisibility(View.GONE);
 
-            if (err.equals("")){
+            if (err.equals("")) {
 
                 onKeyboardSuccess(keybText, keybName);
 
                 // next process 4
 
                 triggerRootRestoreTask();
-            }
-            else {
+            } else {
                 onKeyboardError(err);
 
                 // next process 4
@@ -955,11 +915,11 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
         }
 
-        Object[] isKeyboardInRestoreList(String keyboardPackageName){
+        Object[] isKeyboardInRestoreList(String keyboardPackageName) {
 
             String kName = "";
 
-            for (JSONObject jsonObject : getJsonFromDataPackets.jsonAppPackets){
+            for (JSONObject jsonObject : getJsonFromDataPackets.jsonAppPackets) {
                 try {
                     String appName = jsonObject.getString("app_name");
                     String apkName = jsonObject.getString("apk");
@@ -967,7 +927,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                     boolean isApp = jsonObject.getBoolean(APP_CHECK) || apkName.equals("NULL");
 
-                    if (keyboardPackageName.equals(packageName)){
+                    if (keyboardPackageName.equals(packageName)) {
                         kName = appName;
 
                         return new Object[]{kName, isApp};
@@ -980,7 +940,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             return new Object[]{kName, false};
         }
 
-        void onKeyboardError(String message){
+        void onKeyboardError(String message) {
 
             keyboardCancel.setVisibility(View.VISIBLE);
             keyboardDone.setVisibility(View.GONE);
@@ -991,7 +951,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             keyboardText = "";
         }
 
-        void onKeyboardSuccess(String keybText, String keybName){
+        void onKeyboardSuccess(String keybText, String keybName) {
 
             keyboardText = keybText;
 
@@ -1005,7 +965,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         }
     }
 
-    class FilterAcceptedApps extends AsyncTask<Object, Object, File>{
+    class FilterAcceptedApps extends AsyncTask<Object, Object, File> {
 
         int n = 0;
         boolean isContactAppPresent = false;
@@ -1097,7 +1057,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     if (isApp) {
                         command += "echo \"" + INSTALLING_HEAD + apkName + "\"\n";
                         if (isData) command += "pm uninstall " + packageName + " 2>/dev/null\n";
-                        command += "sh " + installScriptPath + " " + TEMP_DIR_NAME_OLD + " " + TEMP_DIR_NAME_NEW + " " + packageName+".app" + " " + apkName + " " + packageName + "\n";
+                        command += "sh " + installScriptPath + " " + TEMP_DIR_NAME_OLD + " " + TEMP_DIR_NAME_NEW + " " + packageName + ".app" + " " + apkName + " " + packageName + "\n";
                     }
                     if (isData) {
                         command += "echo \"" + RESTORE_DATA_HEAD + dataName + "\"\n";
@@ -1114,7 +1074,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                         Set<String> permissionSet = new TreeSet<>();
 
-                        while ((pLine = permReader.readLine()) != null){
+                        while ((pLine = permReader.readLine()) != null) {
                             pLine = pLine.trim();
                             if (pLine.startsWith("android.permission") && isDangerousPermission(pLine))
                                 permissionSet.add(pLine);
@@ -1133,7 +1093,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                     scriptWriter.write("echo \" \"\n");
                 }
 
-                if (!keyboardText.equals("")){
+                if (!keyboardText.equals("")) {
                     scriptWriter.write("echo \"Set keyboard...\"\n");
                     scriptWriter.write("ime enable " + keyboardText + " 2>/dev/null\n");
                     scriptWriter.write("ime set " + keyboardText + " 2>/dev/null\n");
@@ -1152,7 +1112,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             return restoreScript;
         }
 
-        boolean isDangerousPermission(String permission){
+        boolean isDangerousPermission(String permission) {
 
             String dangerousPermissions[] = new String[]{
                     "android.permission.READ_CALENDAR",
@@ -1193,8 +1153,8 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
         @Override
         protected void onProgressUpdate(Object[] values) {
             super.onProgressUpdate(values);
-            appsProgress.setProgress((int)values[1]);
-            appsProgress.setProgress((int)values[2]);
+            appsProgress.setProgress((int) values[1]);
+            appsProgress.setProgress((int) values[2]);
             appsStatusText.setText(values[0] + " " + values[1] + "/" + values[2]);
         }
 
@@ -1213,10 +1173,5 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
             RestoreService.ROOT_RESTORE_TASK = new RootRestoreTask(ExtraBackupsProgress.this, numberOfApps, isContactAppPresent, dpiValue, file.getAbsolutePath());
             RestoreService.ROOT_RESTORE_TASK.execute();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        Toast.makeText(this, R.string.please_do_not_press_back_button, Toast.LENGTH_SHORT).show();
     }
 }
