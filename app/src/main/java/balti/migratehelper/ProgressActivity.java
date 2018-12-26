@@ -120,7 +120,7 @@ public class ProgressActivity extends AppCompatActivity {
                 abortDialog = new AlertDialog.Builder(ProgressActivity.this)
                         .setTitle(R.string.abort_title)
                         .setMessage(R.string.abort_desc)
-                        .setPositiveButton(R.string.proceed, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.abort_anyway, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 cancelButton.setText(R.string.please_wait);

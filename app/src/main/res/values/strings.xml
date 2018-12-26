@@ -60,6 +60,7 @@
     <string name="abort_title">This is highly not recommended!</string>
     <string name="abort_desc">This may leave all apps unusable and a factory reset may be necessary</string>
     <string name="let_it_continue">Let it continue</string>
+    <string name="abort_anyway">Abort anyway</string>
     <!--<string name="change_dpi_and_reboot_desc">Your DPI will be changed. Your device will be automatically rebooted to effect changes.</string>
     <string name="change_dpi_and_reboot">Change DPI and reboot?</string>
     <string name="send_logs_first">Send logs first</string>-->
