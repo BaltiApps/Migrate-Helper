@@ -46,9 +46,12 @@
     <string name="waiting_for_contacts_desc">Migrate helper has detected that you have chosen to restore contact handling apps which may conflict with currently running contact restore operation.\n\n
     App restore will continue after contacts are restored.
     </string>
+    <string name="abort_title">This is highly not recommended!</string>
+    <string name="abort_desc">This may leave all apps unusable and a factory reset may be necessary</string>
+    <string name="let_it_continue">Let it continue</string>
     <!--<string name="change_dpi_and_reboot_desc">Your DPI will be changed. Your device will be automatically rebooted to effect changes.</string>
-    <string name="change_dpi_and_reboot">Change DPI and reboot?</string>-->
-    <string name="send_logs_first">Send logs first</string>
+    <string name="change_dpi_and_reboot">Change DPI and reboot?</string>
+    <string name="send_logs_first">Send logs first</string>-->
 
 
     <!--progress.xml-->

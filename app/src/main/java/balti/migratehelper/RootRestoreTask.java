@@ -52,7 +52,7 @@ public class RootRestoreTask extends AsyncTask<File, Object, Integer> {
     private int dpiValue = 0;
     private long startMillis;
     private long endMillis;
-    private boolean isCancelled = false;
+    static boolean isCancelled = false;
     private boolean isContactAppPresent;
 
     private ArrayList<String> errors;

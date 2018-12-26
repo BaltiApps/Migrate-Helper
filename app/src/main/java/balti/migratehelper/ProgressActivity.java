@@ -2,6 +2,7 @@ package balti.migratehelper;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
@@ -34,6 +36,7 @@ public class ProgressActivity extends AppCompatActivity {
 
     BroadcastReceiver progressReceiver, endOnDisable;
     IntentFilter progressReceiverIF;
+    AlertDialog abortDialog = null;
 
     String type;
     boolean wasContactBeingRestored = false;
@@ -114,8 +117,22 @@ public class ProgressActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancelButton.setText(R.string.please_wait);
-                LocalBroadcastManager.getInstance(ProgressActivity.this).sendBroadcast(new Intent(CANCEL_RESTORE_INTENT_FILTER));
+                abortDialog = new AlertDialog.Builder(ProgressActivity.this)
+                        .setTitle(R.string.abort_title)
+                        .setMessage(R.string.abort_desc)
+                        .setPositiveButton(R.string.proceed, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                cancelButton.setText(R.string.please_wait);
+                                LocalBroadcastManager.getInstance(ProgressActivity.this).sendBroadcast(new Intent(CANCEL_RESTORE_INTENT_FILTER));
+                            }
+                        })
+                        .setNegativeButton(R.string.let_it_continue, null)
+                        .setCancelable(false)
+                        .create();
+
+                if (!RootRestoreTask.isCancelled)
+                    abortDialog.show();
             }
         });
 
@@ -178,6 +195,11 @@ public class ProgressActivity extends AppCompatActivity {
             close.setVisibility(View.GONE);
             okOnFinish.setVisibility(View.VISIBLE);
 
+            try {
+                if (abortDialog != null)
+                    abortDialog.dismiss();
+            }catch (Exception ignored){}
+
         } else if (type.equals("restoreCancelled")) {
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -214,6 +236,11 @@ public class ProgressActivity extends AppCompatActivity {
             close.setVisibility(View.GONE);
             okOnFinish.setVisibility(View.VISIBLE);
 
+            try {
+                if (abortDialog != null)
+                    abortDialog.dismiss();
+            }catch (Exception ignored){}
+
         } else if (type.equals("finishedOk")) {
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -240,6 +267,11 @@ public class ProgressActivity extends AppCompatActivity {
             close.setVisibility(View.GONE);
             updateProgress(progressBar.getMax());
             okOnFinish.setVisibility(View.VISIBLE);
+
+            try {
+                if (abortDialog != null)
+                    abortDialog.dismiss();
+            }catch (Exception ignored){}
 
         } else if (type.equals("restoring_app")) {
 
