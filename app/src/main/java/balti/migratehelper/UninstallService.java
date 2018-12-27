@@ -67,6 +67,7 @@ public class UninstallService extends Service {
         }
 
         if (doUninstall) {
+
             writer.write("mount -o rw,remount " + TEMP_DIR_NAME_OLD + "\n");
             writer.write("mount -o rw,remount " + TEMP_DIR_NAME_NEW + "\n");
             writer.write("mount -o rw,remount /data\n");
@@ -83,6 +84,9 @@ public class UninstallService extends Service {
             } else {
                 writer.write("pm uninstall " + getPackageName() + "\n");
             }
+
+            writer.write("rm -rf /sdcard/Android/data/balti.migratehelper/helper\n");
+
         }
 
         if (doReboot) {

@@ -183,7 +183,9 @@
     <string name="applications">Applications</string>
     
     <!--uninstall_activity.xml-->
-    <string name="uninstall_desc">Completely removes this helper app.</string>
+    <string name="uninstall_desc">Completely removes this helper app.\n\n
+    In case the app is not removed, please manually delete the <b>/system/app/MigrateHelper</b> directory.
+    </string>
     <string name="temporary_disable_desc">This will leave the app installed and also usable from the app drawer, but will stop giving you notification to restore backup on boot.\n\n
     This is useful if you want to restore some apps later without flashing the whole migrate zip package again.</string>
     <string name="change_dpi">Change DPI value</string>
