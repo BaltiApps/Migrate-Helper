@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -38,9 +39,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Vector;
 
+import static balti.migratehelper.CommonTools.DEBUG_TAG;
 import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_NEW;
 import static balti.migratehelper.CommonTools.TEMP_DIR_NAME_OLD;
 import static balti.migratehelper.GetJsonFromData.APP_CHECK;
@@ -226,7 +230,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "cp " + TEMP_DIR_NAME_OLD + "/*.perm " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME_OLD + "/screen.dpi " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME_OLD + "/default.kyb " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_OLD + "/package-data*.txt " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_OLD + "/package-data* " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
 
                 "cp " + TEMP_DIR_NAME_NEW + "/*.json " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME_NEW + "/*.vcf " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
@@ -235,7 +239,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 "cp " + TEMP_DIR_NAME_NEW + "/*.perm " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME_NEW + "/screen.dpi " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME_NEW + "/default.kyb " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
-                "cp " + TEMP_DIR_NAME_NEW + "/package-data*.txt " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
+                "cp " + TEMP_DIR_NAME_NEW + "/package-data* " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
 
                 "echo ROOT_OK\n" +
                 "rm " + initSu.getAbsolutePath() + "\n";
@@ -927,7 +931,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         GetJsonFromDataPackets gjfdp;
         int current_sdk = 0;
-        ArrayList<Integer> mismatchingSdks;
+        Set<Integer> mismatchingSdks;
 
         ReadPackageData(GetJsonFromDataPackets getJsonFromDataPackets) {
             gjfdp = getJsonFromDataPackets;
@@ -946,21 +950,25 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             int originating_sdk = 0;
 
             File package_datas[] = gjfdp.package_datas;
+            Log.d(DEBUG_TAG, "length other: " + gjfdp.jsonAppPackets.size());
             String line;
 
             if (package_datas.length > 0)
-                mismatchingSdks = new ArrayList<>(0);
+                mismatchingSdks = new HashSet<>(0);
 
             try {
+                Log.d(DEBUG_TAG, "length: " + package_datas.length);
 
                 for (int i = 0; i < package_datas.length; i++) {
                     BufferedReader reader = new BufferedReader(new FileReader(package_datas[i]));
+                    Log.d(DEBUG_TAG, "fname: " + package_datas[i].getName());
 
                     while ((line = reader.readLine()) != null) {
 
                         String data[] = line.split(" ");
                         if (data.length == 2 && data[0].equals("sdk")) {
                             originating_sdk = Integer.parseInt(data[1].trim());
+                            Log.d(DEBUG_TAG, "sdk: " + originating_sdk);
                             if (originating_sdk != current_sdk) {
                                 mismatchingSdks.add(originating_sdk);
                             }
@@ -976,16 +984,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             return null;
         }
 
-        String concatMismatchingSdks() {
-            StringBuilder msdk = new StringBuilder();
-            for (int i = 0; i < mismatchingSdks.size(); i++) {
-                if (i != 0)
-                    msdk.append(", ").append(i);
-                else msdk.append(i);
-            }
-            return msdk.toString();
-        }
-
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
@@ -993,7 +991,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             if (mismatchingSdks != null && mismatchingSdks.size() > 0) {
 
                 String message = getString(R.string.restore_in_different_version_warning) + "\n\n" +
-                        getString(R.string.originating_sdk) + ": " + concatMismatchingSdks() + "\n" +
+                        getString(R.string.originating_sdk) + ": " + mismatchingSdks + "\n" +
                         getString(R.string.current_sdk) + ": " + current_sdk;
 
                 new AlertDialog.Builder(AppSelector.this)

@@ -2,6 +2,7 @@ package balti.migratehelper;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -13,6 +14,8 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Vector;
+
+import static balti.migratehelper.CommonTools.DEBUG_TAG;
 
 public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPackets> {
 
@@ -67,7 +70,8 @@ public class GetJsonFromData extends AsyncTask<String, String, GetJsonFromDataPa
         packageDataFilter = new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return file.getName().startsWith("package_data");
+                Log.d(DEBUG_TAG, file.getName());
+                return file.getName().startsWith("package-data");
             }
         };
     }
