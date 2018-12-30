@@ -79,7 +79,10 @@ public class RestoreService extends Service {
                             if (intent.hasExtra("log"))
                                 progressWriter.write("\n\n" + intent.getStringExtra("log") + "\n");
 
+                            progressWriter.write("--- Migrate version " + context.getString(R.string.current_version_name) + " ---\n");
                             progressWriter.close();
+
+                            errorWriter.write("--- Migrate helper version " + context.getString(R.string.current_version_name) + " ---\n");
                             errorWriter.close();
 
                         } catch (IOException e) {
@@ -95,7 +98,10 @@ public class RestoreService extends Service {
                             if (intent.hasExtra("log"))
                                 progressWriter.write("\n\n" + intent.getStringExtra("log") + "\n");
 
+                            progressWriter.write("--- Migrate version " + context.getString(R.string.current_version_name) + " ---\n");
                             progressWriter.close();
+
+                            errorWriter.write("--- Migrate helper version " + context.getString(R.string.current_version_name) + " ---\n");
                             errorWriter.close();
 
                         } catch (IOException e) {

@@ -9,12 +9,15 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import static balti.migratehelper.CommonTools.ACTION_END_ALL;
 
 public class UninstallActivity extends Activity {
 
+    LinearLayout dpiLayout;
     CheckBox changeDpiCheckbox;
+    TextView dpiTextView;
     CheckBox rebootCheckbox;
     LinearLayout uninstallView;
     LinearLayout temporaryDisableView;
@@ -30,12 +33,15 @@ public class UninstallActivity extends Activity {
 
         editor = getSharedPreferences("main", MODE_PRIVATE).edit();
 
+        dpiLayout = findViewById(R.id.change_dpi_layout);
         changeDpiCheckbox = findViewById(R.id.change_dpi_checkbox);
+        dpiTextView = findViewById(R.id.dpi_value_text_view);
         rebootCheckbox = findViewById(R.id.reboot_checkbox);
         uninstallView = findViewById(R.id.uninstall_view);
         temporaryDisableView = findViewById(R.id.temporary_disable_view);
 
         dpiValue = getIntent().getIntExtra("dpiValue", 0);
+        dpiTextView.setText("(" + dpiValue + ")");
 
         changeDpiCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -50,7 +56,7 @@ public class UninstallActivity extends Activity {
         });
 
         if (dpiValue > 0) changeDpiCheckbox.setChecked(true);
-        else changeDpiCheckbox.setVisibility(View.GONE);
+        else dpiLayout.setVisibility(View.GONE);
 
         final Intent uninstallIntent = new Intent(this, UninstallService.class);
 

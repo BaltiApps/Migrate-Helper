@@ -51,7 +51,6 @@
 
         <activity android:name=".UninstallActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
             android:theme="@style/UninstallActivityTheme"
             />
 
