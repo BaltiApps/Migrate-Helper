@@ -1075,7 +1075,7 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
 
                     if (isApp) {
                         command += "echo \"" + INSTALLING_HEAD + apkName + "\"\n";
-                        if (isData) command += "pm uninstall " + packageName + " 2>/dev/null\n";
+                        // if (isData) command += "pm uninstall " + packageName + " 2>/dev/null\n";
                         command += "sh " + installScriptPath + " " + TEMP_DIR_NAME_OLD + " " + TEMP_DIR_NAME_NEW + " " + packageName + ".app" + " " + apkName + " " + packageName + "\n";
                     }
                     if (isData) {

@@ -10,7 +10,7 @@
     <!--please also update last tested version in MainActivity-->
 
     <string name="app_name">Migrate helper</string>
-    <string name="current_version_name">2.0.1(christmas_beta)</string>
+    <string name="current_version_name">2.0.2</string>
 
     <!--activity_main.xml-->
     <string name="restore_all">Restore all apps and data</string>
