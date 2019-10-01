@@ -99,11 +99,21 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_selector);
 
+        File mtdHolder = new File(CommonTools.METADATA_HOLDER_DIR);
+        if (!mtdHolder.exists()) {
+            mtdHolder.mkdirs();
+        }
+        if (!mtdHolder.canWrite() && !mtdHolder.canRead()) {
+            String externalPasteDir = Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath();
+            CommonTools.METADATA_HOLDER_DIR = "/sdcard" + externalPasteDir.substring(externalPasteDir.indexOf("/Android"));
+            mtdHolder = new File(CommonTools.METADATA_HOLDER_DIR);
+            mtdHolder.mkdirs();
+        }
+
+        CommonTools.METADATA_HOLDER_DIR = mtdHolder.getAbsolutePath() + "/";
+
         back = findViewById(R.id.app_selecter_back_button);
         title = findViewById(R.id.app_selector_title);
-
-        String externalPasteDir = Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath();
-        CommonTools.METADATA_HOLDER_DIR = "/sdcard" + externalPasteDir.substring(externalPasteDir.indexOf("/Android"));
 
         appAllSelect = findViewById(R.id.appAllSelect);
         dataAllSelect = findViewById(R.id.dataAllSelect);
@@ -126,8 +136,6 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         appList = findViewById(R.id.app_list);
         extrasBar = findViewById(R.id.extras_bar);
         extrasSelect = findViewById(R.id.extras_select);
-
-        CommonTools.METADATA_HOLDER_DIR = new File(CommonTools.METADATA_HOLDER_DIR).getAbsolutePath() + "/";
 
         if (getIntent().getExtras() != null && getIntent().getExtras().getBoolean("all?", true)) {
             title.setText(R.string.everything);
@@ -220,8 +228,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
                 "cp -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME_OLD + "/busybox 2>/dev/null\n" +
                 "cp -f " + busyboxBinaryFilePath + " " + TEMP_DIR_NAME_NEW + "/busybox 2>/dev/null\n" +
-                "rm -rf " + CommonTools.METADATA_HOLDER_DIR + "\n" +
                 "mkdir -p " + CommonTools.METADATA_HOLDER_DIR + "\n" +
+                "rm -rf " + CommonTools.METADATA_HOLDER_DIR + "/*\n" +
 
                 "cp " + TEMP_DIR_NAME_OLD + "/*.json " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
                 "cp " + TEMP_DIR_NAME_OLD + "/*.vcf " + CommonTools.METADATA_HOLDER_DIR + " 2>/dev/null\n" +
