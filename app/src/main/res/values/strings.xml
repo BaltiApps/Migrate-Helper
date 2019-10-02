@@ -201,6 +201,8 @@
     <string name="notifHeader">Migrate package flashed!</string>
     <string name="notifBody">Click to continue restoration!!</string>
 
+    <!--CommonToolsKotlin.kt-->
+    <string name="error_occurred">Error occurred!!</string>
 
     <!--Do not change!!-->
     <string name="actionSu" translatable="false">Migrate_helper_fix_SU</string>

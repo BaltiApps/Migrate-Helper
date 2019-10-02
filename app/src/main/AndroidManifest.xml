@@ -24,7 +24,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".MainActivity"
+        <activity android:name=".simpleActivities.MainActivityKotlin"
             android:screenOrientation="portrait"
             >
             <intent-filter>
@@ -58,18 +58,20 @@
             android:screenOrientation="portrait"
             />
 
-        <receiver android:name=".Listener">
+        <receiver android:name=".utilities.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" android:priority="999"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
 
-        <service android:name=".StupidStartupService"
+        <service android:name=".utilities.StupidStartupServiceKotlin"
             android:exported="false"/>
 
         <service android:name=".RestoreService"
             android:exported="false"/>
+
+        <service android:name=".UninstallService"/>
         
         <provider
             android:authorities="migrate.helper.provider"
@@ -80,6 +82,8 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths"/>
         </provider>
+
+        <!--Dummies-->
 
         <receiver android:name=".SmsBroadcastReceiver"
             android:permission="android.permission.BROADCAST_SMS">
@@ -121,8 +125,6 @@
                 <data android:scheme="mmsto" />
             </intent-filter>
         </service>
-
-        <service android:name=".UninstallService"/>
 
     </application>
 
