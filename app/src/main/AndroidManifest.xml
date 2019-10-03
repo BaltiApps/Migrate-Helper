@@ -22,6 +22,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:name=".AppInstance"
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity android:name=".simpleActivities.MainActivityKotlin"
@@ -54,7 +55,7 @@
             android:theme="@style/UninstallActivityTheme"
             />
 
-        <activity android:name=".SimpleLogDisplay"
+        <activity android:name=".simpleActivities.SimpleLogViewer"
             android:screenOrientation="portrait"
             />
 
@@ -71,7 +72,7 @@
         <service android:name=".RestoreService"
             android:exported="false"/>
 
-        <service android:name=".UninstallService"/>
+        <service android:name=".utilities.UninstallServiceKotlin"/>
         
         <provider
             android:authorities="migrate.helper.provider"
