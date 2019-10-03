@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        disable = findViewById(R.id.disable);
+        disable = findViewById(R.id.uninstall_from_system);
         disable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

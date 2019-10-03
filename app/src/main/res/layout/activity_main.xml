@@ -74,7 +74,7 @@
                     android:layout_height="20dp" />
 
                 <Button
-                    android:id="@+id/disable"
+                    android:id="@+id/uninstall_from_system"
                     android:layout_width="300dp"
                     android:layout_height="60dp"
                     android:background="@drawable/uninstall_button"

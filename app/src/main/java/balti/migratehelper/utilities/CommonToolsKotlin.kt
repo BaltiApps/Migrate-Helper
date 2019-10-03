@@ -26,6 +26,7 @@ class CommonToolsKotlin(val context: Context) {
 
         val DEBUG_TAG = "migrate_helper_tag"
         val TEMP_DIR_NAME = "/data/local/tmp/migrate_cache"
+        val METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migratehelper/cache"
 
         val FILE_MAIN_PREF = "main"
 
@@ -39,6 +40,7 @@ class CommonToolsKotlin(val context: Context) {
         val CHANNEL_RESTORE_END = "Restore finished notification"
         val CHANNEL_RESTORE_RUNNING = "Restore running notification"
         val CHANNEL_RESTORE_ABORTING = "Aborting restore"
+        val CHANNEL_UNINSTALLING = "Uninstalling helper"
 
         val ACTION_RESTORE_PROGRESS = "Helper restore progress broadcast"
         val ACTION_RESTORE_ABORT = "Helper abort broadcast"
@@ -47,16 +49,23 @@ class CommonToolsKotlin(val context: Context) {
         val ACTION_RESTORE_SERVICE_STARTED = "restore service started"
         val ACTION_END_ALL = "helper_end_all"
 
+        val EXTRA_DPI_VALUE = "dpiValue"
+        val EXTRA_DO_REBOOT = "doReboot"
+        val EXTRA_DO_UNINSTALL = "doUninstall"
+
         val PENDING_INIT_REQUEST_ID = 231
         val PENDING_INIT_NOTIFICATION_ID = 232
 
-        val METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migratehelper/cache"
+        val SIMPLE_LOG_VIEWER_HEAD = "slg_head"
+        val SIMPLE_LOG_VIEWER_FILEPATH = "slg_filePath"
 
         val PREF_TEMPORARY_DISABLE = "temporaryDisable"
         val PREF_IS_DISABLED = "isDisabled"
         val PREF_ANDROID_VERSION_WARNING = "android_version_warning"
 
         val HELPER_STATUS = "HELPER_STATUS"
+
+        val UNINSTALL_START_ID = 234
 
         val REPORTING_EMAIL = "help.baltiapps@gmail.com"
         val TG_LINK = "https://t.me/migrateApp"
