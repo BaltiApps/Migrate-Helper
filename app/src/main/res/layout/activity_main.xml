@@ -63,22 +63,11 @@
                     android:layout_height="20dp" />
 
                 <Button
-                    android:id="@+id/restoreSu"
+                    android:id="@+id/restoreButton"
                     android:layout_width="300dp"
                     android:layout_height="90dp"
                     android:background="@drawable/restore_button"
-                    android:text="@string/restore_all" />
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp" />
-
-                <Button
-                    android:id="@+id/selective_restore"
-                    android:layout_width="300dp"
-                    android:layout_height="60dp"
-                    android:background="@drawable/uninstall_button"
-                    android:text="@string/selective_restore" />
+                    android:text="@string/restore_main" />
 
                 <Space
                     android:layout_width="wrap_content"

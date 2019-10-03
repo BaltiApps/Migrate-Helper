@@ -27,7 +27,7 @@ import static balti.migratehelper.CommonTools.METADATA_HOLDER_DIR;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button rootRestoreButton, disable, selectiveRestore, temporaryDisable;
+    Button rootRestoreButton, disable, temporaryDisable;
     TextView lastLogs;
     ImageButton close;
 
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         }
 
-        rootRestoreButton = findViewById(R.id.restoreSu);
+        rootRestoreButton = findViewById(R.id.restoreButton);
         rootRestoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,14 +83,6 @@ public class MainActivity extends AppCompatActivity {
                         .setCancelable(false)
                         .setNegativeButton(R.string.later, null)
                         .show();
-            }
-        });
-
-        selectiveRestore = findViewById(R.id.selective_restore);
-        selectiveRestore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, AppSelector.class).putExtra("all?", false));
             }
         });
 
