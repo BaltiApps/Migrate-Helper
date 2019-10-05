@@ -14,7 +14,7 @@ import android.view.View
 import android.widget.Toast
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
-import balti.migratehelper.restoreSelector.RestoreSelectorKotlin
+import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_RESTORE_DATA

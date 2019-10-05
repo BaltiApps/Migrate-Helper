@@ -49,6 +49,16 @@ class CommonToolsKotlin(val context: Context) {
         val ACTION_RESTORE_SERVICE_STARTED = "restore service started"
         val ACTION_END_ALL = "helper_end_all"
 
+        val ERROR_APP_JSON_TRY_CATCH = "APP_JSON_TRY_CATCH"
+        val ERROR_APP_JSON = "APP_JSON"
+        val ERROR_CONTACTS_GET_TRY_CATCH = "CONTACTS_GET_TRY_CATCH"
+        val ERROR_SMS_GET_TRY_CATCH = "SMS_GET_TRY_CATCH"
+        val ERROR_CALLS_GET_TRY_CATCH = "CALLS_GET_TRY_CATCH"
+        val ERROR_SETTINGS_GET_TRY_CATCH = "SETTINGS_GET_TRY_CATCH"
+        val ERROR_WIFI_GET_TRY_CATCH = "WIFI_GET_TRY_CATCH"
+
+        val DUMMY_WAIT_TIME = 100L
+
         val EXTRA_DPI_VALUE = "dpiValue"
         val EXTRA_DO_REBOOT = "doReboot"
         val EXTRA_DO_UNINSTALL = "doUninstall"
@@ -62,6 +72,10 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_TEMPORARY_DISABLE = "temporaryDisable"
         val PREF_IS_DISABLED = "isDisabled"
         val PREF_ANDROID_VERSION_WARNING = "android_version_warning"
+
+        val BACKUP_NAME_SETTINGS = "settings.json"
+
+        val WIFI_FILE_NAME = "WifiConfigStore.xml"
 
         val HELPER_STATUS = "HELPER_STATUS"
 

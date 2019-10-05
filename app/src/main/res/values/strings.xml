@@ -157,6 +157,17 @@
     <!--ComposeSmsActivity.java-->
     <string name="please_change_sms_app">\"Migrate helper\" is not meant to be used as an sms app. Please change the default sms app</string>
 
+    <!--GetAppJSONObjects.kt-->
+    <string name="path_not_valid_directory">is not valid directory</string>
+
+    <!--ParentGetter.kt-->
+    <string name="getting_apps">Getting apps</string>
+    <string name="getting_contacts">Getting contacts</string>
+    <string name="getting_sms">Getting sms</string>
+    <string name="getting_calls">Getting calls</string>
+    <string name="getting_settings">Getting settings</string>
+    <string name="getting_wifi">Getting Wifi details</string>
+
     <!--error_report_layout.xml-->
     <string name="report_header">Report via Telegram</string>
     <string name="share_progress_logs">Share progress logs</string>

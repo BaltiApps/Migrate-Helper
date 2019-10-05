@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -64,7 +63,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     TextView title;
     TextView waitingStatusMessage, waitingMessageDesc;
     CheckBox appAllSelect, dataAllSelect, permissionsAllSelect;
-    RelativeLayout waitingLayout;
+    LinearLayout waitingLayout;
     ImageButton clearAll, selectAll;
     Button actionButton;
     ScrollView restoreContent;
@@ -131,7 +130,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         actionButton = findViewById(R.id.restore_selected);
 
-        restoreContent = findViewById(R.id.restore_content);
+        //restoreContent = findViewById(R.id.restore_content);
         appCheckboxBar = findViewById(R.id.app_checkbox_bar);
         appList = findViewById(R.id.app_list);
         extrasBar = findViewById(R.id.extras_bar);
