@@ -96,7 +96,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.app_selector);
+        setContentView(R.layout.restore_selector);
 
         File mtdHolder = new File(CommonTools.METADATA_HOLDER_DIR);
         if (!mtdHolder.exists()) {
@@ -662,6 +662,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         }
 
         @Override
+        //@SuppressLint("WrongThread")
         protected Object doInBackground(Object[] objects) {
 
             ContactsPacket[] tempContactPackets = new ContactsPacket[contactsPackets.length];

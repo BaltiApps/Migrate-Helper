@@ -160,6 +160,9 @@
     <!--GetAppJSONObjects.kt-->
     <string name="path_not_valid_directory">is not valid directory</string>
 
+    <!--RootCopyTask.kt-->
+    <string name="no_busybox">Busybox not found!</string>
+
     <!--ParentGetter.kt-->
     <string name="getting_apps">Getting apps</string>
     <string name="getting_contacts">Getting contacts</string>

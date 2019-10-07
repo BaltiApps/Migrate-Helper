@@ -26,7 +26,7 @@ class CommonToolsKotlin(val context: Context) {
 
         val DEBUG_TAG = "migrate_helper_tag"
         val TEMP_DIR_NAME = "/data/local/tmp/migrate_cache"
-        val METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migratehelper/cache"
+        val METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migratehelper/cache/"
 
         val FILE_MAIN_PREF = "main"
 
