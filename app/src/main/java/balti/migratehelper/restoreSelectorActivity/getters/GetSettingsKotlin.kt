@@ -12,10 +12,10 @@ import org.json.JSONObject
 import java.io.FileFilter
 
 class GetSettingsKotlin(jobCode: Int,
-                        directoryPath: String,
+                        metadataHolderPath: String,
                         context: Context,
                         progressBar: ProgressBar,
-                        waitingText: TextView): ParentGetter(jobCode, directoryPath, context, progressBar, waitingText, R.string.getting_wifi) {
+                        waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_wifi) {
 
     override var fileFilter = FileFilter {
         it.name == CommonToolsKotlin.BACKUP_NAME_SETTINGS

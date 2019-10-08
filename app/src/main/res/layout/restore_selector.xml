@@ -14,7 +14,7 @@
         android:padding="@dimen/large_padding_width">
 
         <ImageButton
-            android:id="@+id/app_selecter_back_button"
+            android:id="@+id/restore_selecter_back_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            android:id="@+id/app_selector_title"
+            android:id="@+id/restore_selector_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="10dp"
@@ -33,7 +33,7 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/app_selector_content"
+        android:id="@+id/restore_selector_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -58,7 +58,7 @@
                     android:layout_centerHorizontal="true" />
 
                 <ImageView
-                    android:id="@+id/app_selector_error_icon"
+                    android:id="@+id/restore_selector_error_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignStart="@id/just_a_progress"
@@ -91,6 +91,7 @@
                     android:layout_alignEnd="@id/waiting_status_text"
                     android:layout_below="@id/waiting_status_text"
                     android:visibility="invisible"
+                    android:id="@+id/restore_selector_progress_bar"
                     />
 
             </RelativeLayout>
@@ -106,7 +107,7 @@
                 >
 
                 <TextView
-                    android:id="@+id/waiting_messages"
+                    android:id="@+id/waiting_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/initMessageShort" />
@@ -267,7 +268,7 @@
         android:padding="10dp">
 
         <Button
-            android:id="@+id/restore_selected"
+            android:id="@+id/restore_selector_action_button"
             android:layout_width="@dimen/button_width"
             android:layout_height="@dimen/button_height"
             android:layout_alignParentEnd="true"
@@ -284,8 +285,8 @@
             android:id="@+id/clear_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/restore_selected"
-            android:layout_alignBottom="@id/restore_selected"
+            android:layout_alignTop="@id/restore_selector_action_button"
+            android:layout_alignBottom="@id/restore_selector_action_button"
             android:background="@android:color/transparent"
             android:foreground="?android:attr/selectableItemBackground"
             android:padding="10dp"
@@ -295,8 +296,8 @@
             android:id="@+id/select_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/restore_selected"
-            android:layout_alignBottom="@id/restore_selected"
+            android:layout_alignTop="@id/restore_selector_action_button"
+            android:layout_alignBottom="@id/restore_selector_action_button"
             android:layout_toEndOf="@id/clear_all"
             android:background="@android:color/transparent"
             android:foreground="?android:attr/selectableItemBackground"

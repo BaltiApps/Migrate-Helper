@@ -14,8 +14,8 @@ import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 
-class RootCopyTask(val jobCode: Int, val tempDir: String,
-                   val context: Context): AsyncTask<Any, Any, Any>() {
+class RootCopyTask(private val jobCode: Int, private val tempDir: String,
+                   private val context: Context): AsyncTask<Any, Any, Any>() {
 
     private val onReadComplete by lazy { context as OnReadComplete }
     private val commonTools by lazy { CommonToolsKotlin(context) }

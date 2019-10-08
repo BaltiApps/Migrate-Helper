@@ -10,10 +10,10 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_CALLS_GET
 import java.io.FileFilter
 
 class GetCallsPackets(jobCode: Int,
-                      directoryPath: String,
+                      metadataHolderPath: String,
                       context: Context,
                       progressBar: ProgressBar,
-                      waitingText: TextView): ParentGetter(jobCode, directoryPath, context, progressBar, waitingText, R.string.getting_calls) {
+                      waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_calls) {
 
     override var fileFilter = FileFilter {
         it.endsWith(".calls.db")

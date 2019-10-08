@@ -12,18 +12,18 @@ import java.io.File
 import java.io.FileFilter
 
 abstract class ParentGetter(private val jobCode: Int,
-                            private val directoryPath: String,
+                            private val metadataHolderPath: String,
                             private val context: Context,
                             private val progressBar: ProgressBar,
                             private val waitingText: TextView,
                             private val initWaitingTextResId: Int): AsyncTask<Any, Any, Any>() {
 
     abstract var fileFilter: FileFilter
-    val vOp by lazy { ViewOperations(context) }
+    private val vOp by lazy { ViewOperations(context) }
 
     private val onReadComplete by lazy { context as OnReadComplete }
 
-    val directory by lazy { File(directoryPath) }
+    private val directory by lazy { File(metadataHolderPath) }
     lateinit var files: Array<File>
 
     val errors by lazy { ArrayList<String>(0) }
@@ -35,7 +35,7 @@ abstract class ParentGetter(private val jobCode: Int,
 
         files = if (directory.isDirectory) { directory.listFiles(fileFilter) }
         else {
-            errors.add("$directoryPath ${vOp.getStringFromRes(R.string.path_not_valid_directory)}")
+            errors.add("$metadataHolderPath ${vOp.getStringFromRes(R.string.path_not_valid_directory)}")
             arrayOf()
         }
 

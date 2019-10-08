@@ -11,10 +11,10 @@ import org.json.JSONObject
 import java.io.FileFilter
 
 class GetAppJSONObjects(jobCode: Int,
-                        directoryPath: String,
+                        metadataHolderPath: String,
                         context: Context,
                         progressBar: ProgressBar,
-                        waitingText: TextView): ParentGetter(jobCode, directoryPath, context, progressBar, waitingText, R.string.getting_apps) {
+                        waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_apps) {
 
     override var fileFilter: FileFilter = FileFilter {
         it.endsWith(".json") && it.name != BACKUP_NAME_SETTINGS

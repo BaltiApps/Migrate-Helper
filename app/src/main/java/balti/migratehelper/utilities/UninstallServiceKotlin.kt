@@ -17,7 +17,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_UNINSTALL
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DPI_VALUE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.TEMP_DIR_NAME
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.UNINSTALL_START_ID
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
@@ -76,7 +76,7 @@ class UninstallServiceKotlin: Service() {
             if (doUninstall) {
 
                 write("mount -o rw,remount /data\n")
-                write("rm -rf $TEMP_DIR_NAME\n")
+                write("rm -rf $MIGRATE_CACHE\n")
                 write("rm -rf $METADATA_HOLDER_DIR\n")
                 write("rm -rf /data/data/*.tar.gz\n")
 

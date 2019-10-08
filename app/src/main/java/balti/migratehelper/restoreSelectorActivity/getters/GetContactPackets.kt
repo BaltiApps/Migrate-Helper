@@ -10,10 +10,10 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_CONTACTS_
 import java.io.FileFilter
 
 class GetContactPackets(jobCode: Int,
-                        directoryPath: String,
+                        metadataHolderPath: String,
                         context: Context,
                         progressBar: ProgressBar,
-                        waitingText: TextView): ParentGetter(jobCode, directoryPath, context, progressBar, waitingText, R.string.getting_contacts) {
+                        waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_contacts) {
 
     override var fileFilter = FileFilter {
         it.endsWith(".vcf")

@@ -111,8 +111,8 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         CommonTools.METADATA_HOLDER_DIR = mtdHolder.getAbsolutePath() + "/";
 
-        back = findViewById(R.id.app_selecter_back_button);
-        title = findViewById(R.id.app_selector_title);
+        back = findViewById(R.id.restore_selecter_back_button);
+        title = findViewById(R.id.restore_selector_title);
 
         appAllSelect = findViewById(R.id.appAllSelect);
         dataAllSelect = findViewById(R.id.dataAllSelect);
@@ -120,15 +120,15 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
 
         waitingLayout = findViewById(R.id.waiting_layout);
         waitingStatusMessage = findViewById(R.id.waiting_status_text);
-        waitingMessageDesc = findViewById(R.id.waiting_messages);
+        waitingMessageDesc = findViewById(R.id.waiting_desc);
 
         justAProgress = findViewById(R.id.just_a_progress);
-        errorIcon = findViewById(R.id.app_selector_error_icon);
+        errorIcon = findViewById(R.id.restore_selector_error_icon);
 
         clearAll = findViewById(R.id.clear_all);
         selectAll = findViewById(R.id.select_all);
 
-        actionButton = findViewById(R.id.restore_selected);
+        actionButton = findViewById(R.id.restore_selector_action_button);
 
         //restoreContent = findViewById(R.id.restore_content);
         appCheckboxBar = findViewById(R.id.app_checkbox_bar);

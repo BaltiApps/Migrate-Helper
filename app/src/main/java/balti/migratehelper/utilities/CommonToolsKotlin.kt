@@ -25,8 +25,6 @@ class CommonToolsKotlin(val context: Context) {
     companion object {
 
         val DEBUG_TAG = "migrate_helper_tag"
-        val TEMP_DIR_NAME = "/data/local/tmp/migrate_cache"
-        val METADATA_HOLDER_DIR = "/sdcard/Android/data/balti.migratehelper/cache/"
 
         val FILE_MAIN_PREF = "main"
 
@@ -56,8 +54,18 @@ class CommonToolsKotlin(val context: Context) {
         val ERROR_CALLS_GET_TRY_CATCH = "CALLS_GET_TRY_CATCH"
         val ERROR_SETTINGS_GET_TRY_CATCH = "SETTINGS_GET_TRY_CATCH"
         val ERROR_WIFI_GET_TRY_CATCH = "WIFI_GET_TRY_CATCH"
+        val ERROR_MAIN_READ_TRY_CATCH = "MAIN_READ_TRY_CATCH"
 
         val DUMMY_WAIT_TIME = 100L
+
+        val JOBCODE_ROOT_COPY = 10000
+        val JOBCODE_GET_APP_JSON = 20000
+        val JOBCODE_GET_CONTACTS = 30000
+        val JOBCODE_GET_SMS = 40000
+        val JOBCODE_GET_CALLS = 50000
+        val JOBCODE_GET_SETTINGS = 60000
+        val JOBCODE_GET_WIFI = 70000
+        val JOBCODE_END_ALL = 80000
 
         val EXTRA_DPI_VALUE = "dpiValue"
         val EXTRA_DO_REBOOT = "doReboot"
@@ -71,7 +79,14 @@ class CommonToolsKotlin(val context: Context) {
 
         val PREF_TEMPORARY_DISABLE = "temporaryDisable"
         val PREF_IS_DISABLED = "isDisabled"
+        val PREF_MANUAL_CACHE = "manualCache"
+        val PREF_MANUAL_METADATA_HOLDER = "manualMetadataHolder"
         val PREF_ANDROID_VERSION_WARNING = "android_version_warning"
+        val PREF_IGNORE_READ_ERRORS = "ignore_read_errors"
+
+        val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
+        val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migratehelper/cache/"
+
 
         val BACKUP_NAME_SETTINGS = "settings.json"
 
@@ -80,6 +95,25 @@ class CommonToolsKotlin(val context: Context) {
         val HELPER_STATUS = "HELPER_STATUS"
 
         val UNINSTALL_START_ID = 234
+
+        val MIGRATE_CACHE: String
+            get() {
+                PREF_DEFAULT_MIGRATE_CACHE.let {default ->
+                    AppInstance.sharedPrefs.getString(PREF_MANUAL_CACHE, default).run {
+                        return this ?: default
+                    }
+                }
+            }
+
+
+        val METADATA_HOLDER_DIR: String
+            get() {
+                PREF_DEFAULT_METADATA_HOLDER.let {default ->
+                    AppInstance.sharedPrefs.getString(PREF_MANUAL_METADATA_HOLDER, default).run {
+                        return this ?: default
+                    }
+                }
+            }
 
         val REPORTING_EMAIL = "help.baltiapps@gmail.com"
         val TG_LINK = "https://t.me/migrateApp"

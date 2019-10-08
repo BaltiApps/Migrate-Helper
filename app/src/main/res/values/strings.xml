@@ -100,7 +100,7 @@
     <string name="reading_metadata">Reading metadata...</string>
     <string name="initMessageShort">This can take upto 3 minutes.\n\nIn case you have waited more than 5 minutes\nClick CANCEL\nOpen Magisk app\nClose the Magisk app\nOpen this app and retry restoring</string>
     <string name="are_you_rooted">Are you rooted?</string>
-    <string name="are_you_rooted_desc">Script error.\nMake sure to grant root.\nRoot with Magisk if needed.</string>
+    <string name="are_you_rooted_desc">Make sure to grant root. Root with Magisk if needed.</string>
     <string name="code_error">Code error!</string>
     <string name="selecting_all">Selecting everything</string>
     <string name="starting_restore">Starting restore</string>

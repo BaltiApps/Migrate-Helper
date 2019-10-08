@@ -10,10 +10,10 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_WIFI_GET_
 import java.io.FileFilter
 
 class GetWifiPacketKotlin(jobCode: Int,
-                          directoryPath: String,
+                          metadataHolderPath: String,
                           context: Context,
                           progressBar: ProgressBar,
-                          waitingText: TextView): ParentGetter(jobCode, directoryPath, context, progressBar, waitingText, R.string.getting_wifi) {
+                          waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_wifi) {
 
     override var fileFilter = FileFilter {
         it.name == CommonToolsKotlin.WIFI_FILE_NAME

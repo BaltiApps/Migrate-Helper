@@ -10,10 +10,10 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_SMS_GET_T
 import java.io.FileFilter
 
 class GetSmsPackets(jobCode: Int,
-                    directoryPath: String,
+                    metadataHolderPath: String,
                     context: Context,
                     progressBar: ProgressBar,
-                    waitingText: TextView): ParentGetter(jobCode, directoryPath, context, progressBar, waitingText, R.string.getting_sms) {
+                    waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_sms) {
 
     override var fileFilter = FileFilter {
         it.endsWith(".sms.db")
