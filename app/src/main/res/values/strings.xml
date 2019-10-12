@@ -157,7 +157,7 @@
     <!--ComposeSmsActivity.java-->
     <string name="please_change_sms_app">\"Migrate helper\" is not meant to be used as an sms app. Please change the default sms app</string>
 
-    <!--GetAppJSONObjects.kt-->
+    <!--GetAppPackets.kt-->
     <string name="path_not_valid_directory">is not valid directory</string>
 
     <!--RootCopyTask.kt-->

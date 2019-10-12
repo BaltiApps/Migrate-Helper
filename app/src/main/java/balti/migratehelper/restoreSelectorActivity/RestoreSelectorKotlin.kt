@@ -21,19 +21,20 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import kotlinx.android.synthetic.main.restore_selector.*
-import org.json.JSONObject
 
 class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
+    companion object {
+        val appPackets by lazy { ArrayList<AppPacketsKotlin>(0) }
+        val contactDataPackets by lazy { ArrayList<ContactsPacketKotlin>(0) }
+        val smsDataPackets by lazy { ArrayList<SmsPacketKotlin>(0) }
+        val callsDataPackets by lazy { ArrayList<CallsPacketKotlin>(0) }
+        var settingsPacket: SettingsPacketKotlin? = null
+        var wifiPacket: WifiPacketKotlin? = null
+    }
+
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val allErrors by lazy { ArrayList<String>(0) }
-
-    private val appJsons by lazy { ArrayList<JSONObject>(0) }
-    private val contactDataPackets by lazy { ArrayList<ContactsPacketKotlin>(0) }
-    private val smsDataPackets by lazy { ArrayList<SmsPacketKotlin>(0) }
-    private val callsDataPackets by lazy { ArrayList<CallsPacketKotlin>(0) }
-    private var settingsPacket : SettingsPacketKotlin? = null
-    private var wifiPacket : WifiPacketKotlin? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +60,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
     private fun doJob(jCode: Int){
         val task = when (jCode){
             JOBCODE_ROOT_COPY -> RootCopyTask(jCode, MIGRATE_CACHE, this)
-            JOBCODE_GET_APP_JSON -> GetAppJSONObjects(jCode, METADATA_HOLDER_DIR, this, restore_selector_progress_bar, waiting_status_text)
+            JOBCODE_GET_APP_JSON -> GetAppPackets(jCode, METADATA_HOLDER_DIR, this, restore_selector_progress_bar, waiting_status_text)
             JOBCODE_GET_CONTACTS -> GetContactPackets(jCode, METADATA_HOLDER_DIR, this, restore_selector_progress_bar, waiting_status_text)
             JOBCODE_GET_SMS -> GetSmsPackets(jCode, METADATA_HOLDER_DIR, this, restore_selector_progress_bar, waiting_status_text)
             JOBCODE_GET_CALLS -> GetCallsPackets(jCode, METADATA_HOLDER_DIR, this, restore_selector_progress_bar, waiting_status_text)
@@ -96,7 +97,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                 }
 
                 JOBCODE_GET_APP_JSON ->
-                    handleResults(JOBCODE_GET_CONTACTS) { appJsons.addAll(jobResult as ArrayList<JSONObject>) }
+                    handleResults(JOBCODE_GET_CONTACTS) { appPackets.addAll(jobResult as ArrayList<AppPacketsKotlin>) }
 
                 JOBCODE_GET_CONTACTS ->
                     handleResults(JOBCODE_GET_SMS) { contactDataPackets.addAll(jobResult as ArrayList<ContactsPacketKotlin>) }
