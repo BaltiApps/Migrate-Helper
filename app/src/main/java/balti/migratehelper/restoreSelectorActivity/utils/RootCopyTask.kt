@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.AsyncTask
 import android.os.Build
 import balti.migratehelper.R
-import balti.migratehelper.restoreSelectorActivity.OnReadComplete
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.BACKUP_NAME_SETTINGS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_NAME
@@ -57,7 +56,9 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
                         write("pm grant ${context.packageName} android.permission.PACKAGE_USAGE_STATS\n")
                         write("pm grant ${context.packageName} android.permission.WRITE_SECURE_SETTINGS\n")
 
+                        write("rm -rf $mtd/* 2>/dev/null\n")
                         write("cp -f $tempDir/*.json $mtd 2>/dev/null\n")
+                        write("cp -f $tempDir/*.icon $mtd 2>/dev/null\n")
                         write("cp -f $tempDir/*.vcf $mtd 2>/dev/null\n")
                         write("cp -f $tempDir/*.sms.db $mtd 2>/dev/null\n")
                         write("cp -f $tempDir/*.calls.db $mtd 2>/dev/null\n")

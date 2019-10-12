@@ -35,12 +35,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ProgressActivity"
+        <activity android:name=".restoreSelectorActivity.RestoreSelectorKotlin"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".AppSelector"
+        <activity android:name=".ProgressActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             />

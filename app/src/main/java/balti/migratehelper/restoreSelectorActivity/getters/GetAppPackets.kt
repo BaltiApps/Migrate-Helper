@@ -18,7 +18,7 @@ class GetAppPackets(jobCode: Int,
                     waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_apps) {
 
     override var fileFilter: FileFilter = FileFilter {
-        it.endsWith(".json") && it.name != BACKUP_NAME_SETTINGS
+        it.name.endsWith(".json") && it.name != BACKUP_NAME_SETTINGS
     }
 
     override fun doInBackground(vararg params: Any?): Any {

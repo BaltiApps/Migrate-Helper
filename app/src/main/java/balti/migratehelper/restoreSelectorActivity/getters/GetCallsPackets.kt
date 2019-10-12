@@ -16,7 +16,7 @@ class GetCallsPackets(jobCode: Int,
                       waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_calls) {
 
     override var fileFilter = FileFilter {
-        it.endsWith(".calls.db")
+        it.name.endsWith(".calls.db")
     }
 
     override fun doInBackground(vararg params: Any?): Any {

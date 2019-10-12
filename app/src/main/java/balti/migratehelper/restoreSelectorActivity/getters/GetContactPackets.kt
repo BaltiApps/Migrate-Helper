@@ -16,7 +16,7 @@ class GetContactPackets(jobCode: Int,
                         waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_contacts) {
 
     override var fileFilter = FileFilter {
-        it.endsWith(".vcf")
+        it.name.endsWith(".vcf")
     }
 
     override fun doInBackground(vararg params: Any?): Any {

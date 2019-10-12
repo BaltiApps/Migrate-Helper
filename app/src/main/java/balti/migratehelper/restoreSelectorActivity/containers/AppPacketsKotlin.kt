@@ -18,6 +18,10 @@ class AppPacketsKotlin(jsonObject: JSONObject) {
     var iconFileName: String? = null
     var installerName: String? = null
 
+    var APP = false
+    var DATA = false
+    var PERMISSION = false
+
     init {
         MtdConstants.MTD_APP_NAME.let {if (jsonObject.has(it)) appName = jsonObject.getString(it)}
         MtdConstants.MTD_IS_SYSTEM.let {if (jsonObject.has(it)) isSystemApp = jsonObject.getBoolean(it)}
@@ -31,6 +35,10 @@ class AppPacketsKotlin(jsonObject: JSONObject) {
         MtdConstants.MTD_PERMISSION.let {if (jsonObject.has(it)) isPermission = jsonObject.getBoolean(it)}
         MtdConstants.MTD_ICON_FILE_NAME.let {if (jsonObject.has(it)) iconFileName = jsonObject.getString(it)}
         MtdConstants.MTD_INSTALLER_NAME.let {if (jsonObject.has(it)) installerName = jsonObject.getString(it)}
+
+        APP = apkName != null
+        DATA = dataName != null
+        PERMISSION = isPermission
     }
 
 }

@@ -7,9 +7,12 @@ import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.restoreSelectorActivity.containers.*
 import balti.migratehelper.restoreSelectorActivity.getters.*
+import balti.migratehelper.restoreSelectorActivity.utils.AppRestoreAdapter
+import balti.migratehelper.restoreSelectorActivity.utils.OnReadComplete
 import balti.migratehelper.restoreSelectorActivity.utils.RootCopyTask
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_MAIN_READ_TRY_CATCH
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_END_ALL
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_GET_APP_JSON
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_GET_CALLS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_GET_CONTACTS
@@ -45,6 +48,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
     private fun showError(mainMessage: String, description: String){
 
         waiting_layout.visibility = View.VISIBLE
+        selector_contents.visibility = View.GONE
 
         just_a_progress.visibility = View.INVISIBLE
         restore_selector_error_icon.visibility = View.VISIBLE
@@ -76,15 +80,20 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
         try {
 
-            fun handleResults(nextJob: Int?, func: () -> Unit) {
-                if (!jobSuccess) {
-                    if (nextJob != null && AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_READ_ERRORS, false)) {
-                        allErrors.add(jobResult.toString())
+            fun handleResults(nextJob: Int, func: () -> Unit) {
+                if (nextJob == JOBCODE_END_ALL){
+                    displayAllData()
+                }
+                else {
+                    if (!jobSuccess) {
+                        if (AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_READ_ERRORS, false)) {
+                            allErrors.add(jobResult.toString())
+                            doJob(nextJob)
+                        } else showError(getString(R.string.code_error), jobResult.toString())
+                    } else {
+                        if (jobResult !is Int) func()
                         doJob(nextJob)
-                    } else showError(getString(R.string.code_error), jobResult.toString())
-                } else {
-                    func()
-                    nextJob?.let { doJob(it) }
+                    }
                 }
             }
 
@@ -97,28 +106,59 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                 }
 
                 JOBCODE_GET_APP_JSON ->
-                    handleResults(JOBCODE_GET_CONTACTS) { appPackets.addAll(jobResult as ArrayList<AppPacketsKotlin>) }
+                    handleResults(JOBCODE_GET_CONTACTS) {
+                        appPackets.clear()
+                        appPackets.addAll(jobResult as ArrayList<AppPacketsKotlin>)
+                    }
 
                 JOBCODE_GET_CONTACTS ->
-                    handleResults(JOBCODE_GET_SMS) { contactDataPackets.addAll(jobResult as ArrayList<ContactsPacketKotlin>) }
+                    handleResults(JOBCODE_GET_SMS) {
+                        contactDataPackets.clear()
+                        contactDataPackets.addAll(jobResult as ArrayList<ContactsPacketKotlin>)
+                    }
 
                 JOBCODE_GET_SMS ->
-                    handleResults(JOBCODE_GET_CALLS) { smsDataPackets.addAll(jobResult as ArrayList<SmsPacketKotlin>) }
+                    handleResults(JOBCODE_GET_CALLS) {
+                        smsDataPackets.clear()
+                        smsDataPackets.addAll(jobResult as ArrayList<SmsPacketKotlin>)
+                    }
 
                 JOBCODE_GET_CALLS ->
-                    handleResults(JOBCODE_GET_SETTINGS) { callsDataPackets.addAll(jobResult as ArrayList<CallsPacketKotlin>) }
+                    handleResults(JOBCODE_GET_SETTINGS) {
+                        callsDataPackets.clear()
+                        callsDataPackets.addAll(jobResult as ArrayList<CallsPacketKotlin>)
+                    }
 
                 JOBCODE_GET_SETTINGS ->
                     handleResults(JOBCODE_GET_WIFI) { settingsPacket = jobResult as SettingsPacketKotlin }
 
                 JOBCODE_GET_WIFI ->
-                    handleResults(null) { wifiPacket = jobResult as WifiPacketKotlin }
+                    handleResults(JOBCODE_END_ALL) { wifiPacket = jobResult as WifiPacketKotlin }
             }
         }
         catch (e: Exception){
             e.printStackTrace()
             showError(getString(R.string.code_error), "$ERROR_MAIN_READ_TRY_CATCH: ${e.message}")
         }
+    }
+
+    private fun displayAllData(){
+
+        selector_contents.visibility = View.VISIBLE
+        waiting_layout.visibility = View.GONE
+        var adapter: AppRestoreAdapter? = null
+
+        commonTools.doBackgroundTask({
+            try {
+                adapter = AppRestoreAdapter(this, appAllSelect, dataAllSelect, permissionsAllSelect)
+            } catch (e: Exception){
+                e.printStackTrace()
+                showError(getString(R.string.code_error), e.message.toString())
+            }
+        }, {
+            if (adapter != null) { app_list.adapter = adapter }
+            else showError(getString(R.string.code_error), getString(R.string.null_adapter))
+        })
     }
 
 }

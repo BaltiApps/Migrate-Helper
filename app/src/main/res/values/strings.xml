@@ -163,6 +163,15 @@
     <!--RootCopyTask.kt-->
     <string name="no_busybox">Busybox not found!</string>
 
+    <!--AppRestoreAdapter.kt-->
+    <string name="packageName">Package :</string>
+    <string name="versionName">Version name :</string>
+    <string name="installer">Installer: </string>
+    <string name="play_store">Play Store</string>
+    <string name="f_droid">F-Droid</string>
+    <string name="data_size">Data size :</string>
+    <string name="system_size">System size :</string>
+
     <!--ParentGetter.kt-->
     <string name="getting_apps">Getting apps</string>
     <string name="getting_contacts">Getting contacts</string>

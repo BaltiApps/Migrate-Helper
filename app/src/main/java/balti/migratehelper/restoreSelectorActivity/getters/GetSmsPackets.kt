@@ -16,7 +16,7 @@ class GetSmsPackets(jobCode: Int,
                     waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_sms) {
 
     override var fileFilter = FileFilter {
-        it.endsWith(".sms.db")
+        it.name.endsWith(".sms.db")
     }
 
     override fun doInBackground(vararg params: Any?): Any {

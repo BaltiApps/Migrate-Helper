@@ -58,6 +58,10 @@ class CommonToolsKotlin(val context: Context) {
 
         val DUMMY_WAIT_TIME = 100L
 
+        val PROPERTY_APP_SELECTION = "app"        // used to set property in AppRestoreAdapter
+        val PROPERTY_DATA_SELECTION = "data"        // used to set property in AppRestoreAdapter
+        val PROPERTY_PERMISSION_SELECTION = "permission"        // used to set property in AppRestoreAdapter
+
         val JOBCODE_ROOT_COPY = 10000
         val JOBCODE_GET_APP_JSON = 20000
         val JOBCODE_GET_CONTACTS = 30000
@@ -83,6 +87,9 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_MANUAL_METADATA_HOLDER = "manualMetadataHolder"
         val PREF_ANDROID_VERSION_WARNING = "android_version_warning"
         val PREF_IGNORE_READ_ERRORS = "ignore_read_errors"
+
+        val PACKAGE_NAME_PLAY_STORE = "com.android.vending"
+        val PACKAGE_NAME_FDROID = "org.fdroid.fdroid.privileged"
 
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migratehelper/cache/"
@@ -157,6 +164,23 @@ class CommonToolsKotlin(val context: Context) {
             e.printStackTrace()
             ""
         }
+    }
+
+    fun getHumanReadableStorageSpace(space: Long): String {
+        var res = "KB"
+
+        var s = space.toDouble()
+
+        if (s > 1024) {
+            s /= 1024.0
+            res = "MB"
+        }
+        if (s > 1024) {
+            s /= 1024.0
+            res = "GB"
+        }
+
+        return String.format("%.2f", s) + " " + res
     }
 
 

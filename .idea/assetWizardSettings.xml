@@ -111,7 +111,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/home/sayantan/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/alert/ic_error_outline_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/home/sayantan/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/file/ic_folder_open_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -121,12 +121,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="d50000" />
-                            <entry key="height" value="50" />
-                            <entry key="outputName" value="ic_error_on_finish" />
-                            <entry key="overrideSize" value="true" />
+                            <entry key="color" value="2c9d94" />
+                            <entry key="outputName" value="ic_folder" />
                             <entry key="sourceFile" value="$PROJECT_DIR$/app/src/main/res/drawable-nodpi/normal_button.svg" />
-                            <entry key="width" value="50" />
                           </map>
                         </option>
                       </PersistentState>

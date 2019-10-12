@@ -53,9 +53,11 @@ class IconTools {
 
     fun setIconFromFile(iconView: ImageView, file: File){
         var icon = ""
-        BufferedReader(FileReader(file)).readLines().forEach {
-            icon += it
-        }
+
+        if (file.exists() && file.canRead())
+            BufferedReader(FileReader(file)).readLines().forEach {
+                icon += it
+            }
 
         setIconFromIconString(iconView, icon)
     }

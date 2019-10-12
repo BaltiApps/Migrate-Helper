@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import balti.migratehelper.R
-import balti.migratehelper.restoreSelectorActivity.OnReadComplete
+import balti.migratehelper.restoreSelectorActivity.utils.OnReadComplete
 import balti.migratehelper.utilities.ViewOperations
 import java.io.File
 import java.io.FileFilter
