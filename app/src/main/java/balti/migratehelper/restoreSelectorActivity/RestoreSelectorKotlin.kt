@@ -90,6 +90,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
             fun handleResults(nextJob: Int, func: () -> Unit) {
                 if (nextJob == JOBCODE_END_ALL){
+                    if (jobResult !is Int) func()
                     displayAllData()
                 }
                 else {
@@ -114,7 +115,9 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                 }
 
                 JOBCODE_GET_APP_JSON ->
-                    handleResults(JOBCODE_GET_CONTACTS) {
+                    handleResults(
+                            if (!AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false)) JOBCODE_GET_CONTACTS
+                            else JOBCODE_END_ALL) {
                         appPackets.clear()
                         appPackets.addAll(jobResult as ArrayList<AppPacketsKotlin>)
                     }
@@ -161,8 +164,9 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         commonTools.doBackgroundTask({
             try {
 
-                if ((contactDataPackets.isNotEmpty() || smsDataPackets.isNotEmpty() || callsDataPackets.isNotEmpty() ||
-                        settingsPacket != null || wifiPacket != null) && !AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false)) {
+                if (!AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false) &&
+                        (contactDataPackets.isNotEmpty() || smsDataPackets.isNotEmpty() || callsDataPackets.isNotEmpty() ||
+                        settingsPacket != null || wifiPacket != null)) {
 
                     commonTools.tryIt { app_list.removeHeaderView(extrasContainer) }
                     app_list.addHeaderView(extrasContainer, null, false)
@@ -285,6 +289,28 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                     commonTools.tryIt { app_list.removeHeaderView(extrasContainer) }
                     extrasContainer.visibility = View.GONE
                 }
+            }
+
+            fun toggleCheckbox(cb: CheckBox, isChecked: Boolean? = null){
+                if (isChecked == null) {
+                    cb.isChecked = true
+                    cb.isChecked = false
+                }
+                else cb.isChecked = isChecked
+            }
+
+            clear_all.setOnClickListener {
+                toggleCheckbox(extrasContainer.extras_select_all)
+                toggleCheckbox(appBar.appAllSelect)
+                toggleCheckbox(appBar.dataAllSelect)
+                toggleCheckbox(appBar.permissionsAllSelect)
+            }
+
+            select_all.setOnClickListener {
+                toggleCheckbox(extrasContainer.extras_select_all, true)
+                toggleCheckbox(appBar.appAllSelect, true)
+                toggleCheckbox(appBar.dataAllSelect, true)
+                toggleCheckbox(appBar.permissionsAllSelect, true)
             }
         })
     }
