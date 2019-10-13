@@ -27,6 +27,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
+import kotlinx.android.synthetic.main.app_selector_header.view.*
 import kotlinx.android.synthetic.main.extra_item.view.*
 import kotlinx.android.synthetic.main.extras_picker.view.*
 import kotlinx.android.synthetic.main.restore_selector.*
@@ -44,7 +45,9 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val allErrors by lazy { ArrayList<String>(0) }
+
     private val extrasContainer by lazy { layoutInflater.inflate(R.layout.extras_picker, app_list, false) }
+    private val appBar by lazy { layoutInflater.inflate(R.layout.app_selector_header, app_list, false) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +58,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
     private fun showError(mainMessage: String, description: String){
 
         waiting_layout.visibility = View.VISIBLE
-        selector_contents.visibility = View.GONE
+        app_list.visibility = View.GONE
 
         just_a_progress.visibility = View.INVISIBLE
         restore_selector_error_icon.visibility = View.VISIBLE
@@ -245,10 +248,20 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                         extrasContainer.restore_selector_extras_container.addView(v)
                     }
 
-                    checkAll(true)
+                    if (appPackets.isNotEmpty()) {
+                        checkAll(true)
+                        extrasContainer.extras_select_all.setOnCheckedChangeListener(extrasAllListener)
+                    }
+
                 }
 
-                adapter = AppRestoreAdapter(this, appAllSelect, dataAllSelect, permissionsAllSelect)
+                commonTools.tryIt {
+                    commonTools.tryIt { app_list.removeHeaderView(appBar) }
+                    app_list.addHeaderView(appBar, null, false)
+                }
+
+                adapter = AppRestoreAdapter(this, appBar.appAllSelect, appBar.dataAllSelect, appBar.permissionsAllSelect)
+
             } catch (e: Exception){
                 e.printStackTrace()
                 error = e.message.toString()
@@ -258,7 +271,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                 error != "" -> showError(getString(R.string.code_error), error)
                 adapter == null -> showError(getString(R.string.code_error), getString(R.string.null_adapter))
                 else -> {
-                    selector_contents.visibility = View.VISIBLE
+                    app_list.visibility = View.VISIBLE
                     waiting_layout.visibility = View.GONE
                     app_list.adapter = adapter
                 }

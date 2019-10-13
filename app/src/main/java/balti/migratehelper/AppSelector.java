@@ -131,7 +131,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         actionButton = findViewById(R.id.restore_selector_action_button);
 
         //restoreContent = findViewById(R.id.restore_content);
-        appCheckboxBar = findViewById(R.id.app_checkbox_bar);
+        //appCheckboxBar = findViewById(R.id.app_checkbox_bar);
         appList = findViewById(R.id.app_list);
         extrasBar = findViewById(R.id.extras_bar);
         //extrasSelect = findViewById(R.id.extras_select);

@@ -144,7 +144,6 @@ class AppRestoreAdapter(val context: Context,
 
         if (appItem.isSystemApp)
             viewHolder.appName.setTextColor(Color.RED)
-        else viewHolder.appName.setTextColor(Color.YELLOW)
 
         appItem.packageName?.let { viewHolder.appCheckBox.setFromProperty(appItem) }
         appItem.packageName?.let { viewHolder.dataCheckBox.setFromProperty(appItem) }
