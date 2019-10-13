@@ -154,6 +154,8 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
         var adapter: AppRestoreAdapter? = null
         var error = ""
+        var extrasExecuted = false
+
         extrasContainer.visibility = View.VISIBLE
 
         commonTools.doBackgroundTask({
@@ -248,19 +250,21 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                         extrasContainer.restore_selector_extras_container.addView(v)
                     }
 
-                    if (appPackets.isNotEmpty()) {
+                    if (allExtras.isNotEmpty()) {
                         checkAll(true)
                         extrasContainer.extras_select_all.setOnCheckedChangeListener(extrasAllListener)
                     }
 
+                    extrasExecuted = true
                 }
 
-                commonTools.tryIt {
-                    commonTools.tryIt { app_list.removeHeaderView(appBar) }
-                    app_list.addHeaderView(appBar, null, false)
+                if (appPackets.isNotEmpty()) {
+                    commonTools.tryIt {
+                        commonTools.tryIt { app_list.removeHeaderView(appBar) }
+                        app_list.addHeaderView(appBar, null, false)
+                    }
+                    adapter = AppRestoreAdapter(this, appBar.appAllSelect, appBar.dataAllSelect, appBar.permissionsAllSelect)
                 }
-
-                adapter = AppRestoreAdapter(this, appBar.appAllSelect, appBar.dataAllSelect, appBar.permissionsAllSelect)
 
             } catch (e: Exception){
                 e.printStackTrace()
@@ -269,7 +273,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         }, {
             when {
                 error != "" -> showError(getString(R.string.code_error), error)
-                adapter == null -> showError(getString(R.string.code_error), getString(R.string.null_adapter))
+                !extrasExecuted && adapter == null -> showError(getString(R.string.code_error), getString(R.string.null_adapter))
                 else -> {
                     app_list.visibility = View.VISIBLE
                     waiting_layout.visibility = View.GONE

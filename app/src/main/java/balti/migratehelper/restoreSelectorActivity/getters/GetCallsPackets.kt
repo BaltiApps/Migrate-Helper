@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.ProgressBar
 import android.widget.TextView
 import balti.migratehelper.R
-import balti.migratehelper.restoreSelectorActivity.containers.ContactsPacketKotlin
+import balti.migratehelper.restoreSelectorActivity.containers.CallsPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_CALLS_GET_TRY_CATCH
 import java.io.FileFilter
@@ -23,11 +23,11 @@ class GetCallsPackets(jobCode: Int,
         try {
             if (files.isNotEmpty()) {
 
-                val contactPackets = ArrayList<ContactsPacketKotlin>(0)
+                val contactPackets = ArrayList<CallsPacketKotlin>(0)
 
                 var c = 0
                 files.forEach {
-                    contactPackets.add(ContactsPacketKotlin(it, true))
+                    contactPackets.add(CallsPacketKotlin(it, true))
                     publishProgress(++c)
                 }
 
