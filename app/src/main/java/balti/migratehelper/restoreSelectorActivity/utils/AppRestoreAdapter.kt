@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.database.DataSetObserver
 import android.graphics.Color
 import android.support.v7.app.AlertDialog
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
@@ -16,7 +15,6 @@ import android.widget.TextView
 import balti.migratehelper.R
 import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin.Companion.appPackets
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DEBUG_TAG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_FDROID
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
@@ -220,8 +218,6 @@ class AppRestoreAdapter(val context: Context,
                         }
                 }
             }
-
-            Log.d(DEBUG_TAG, "state: $appAllChangeFromScanning")
 
             if (appAllChangeFromScanning) allAppSelect.isChecked = !allAppSelect.isChecked
             if (dataAllChangeFromScanning) allDataSelect.isChecked = !allDataSelect.isChecked

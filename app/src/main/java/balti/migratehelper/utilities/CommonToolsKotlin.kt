@@ -87,6 +87,7 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_MANUAL_METADATA_HOLDER = "manualMetadataHolder"
         val PREF_ANDROID_VERSION_WARNING = "android_version_warning"
         val PREF_IGNORE_READ_ERRORS = "ignore_read_errors"
+        val PREF_IGNORE_EXTRAS = "ignore_extras"
 
         val PACKAGE_NAME_PLAY_STORE = "com.android.vending"
         val PACKAGE_NAME_FDROID = "org.fdroid.fdroid.privileged"
@@ -94,9 +95,9 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migratehelper/cache/"
 
+        val EXTRA_VIEW_COUNT = 500
 
         val BACKUP_NAME_SETTINGS = "settings.json"
-
         val WIFI_FILE_NAME = "WifiConfigStore.xml"
 
         val HELPER_STATUS = "HELPER_STATUS"

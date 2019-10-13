@@ -3,6 +3,8 @@ package balti.migratehelper.restoreSelectorActivity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.CheckBox
+import android.widget.CompoundButton
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.restoreSelectorActivity.containers.*
@@ -12,6 +14,7 @@ import balti.migratehelper.restoreSelectorActivity.utils.OnReadComplete
 import balti.migratehelper.restoreSelectorActivity.utils.RootCopyTask
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_MAIN_READ_TRY_CATCH
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_VIEW_COUNT
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_END_ALL
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_GET_APP_JSON
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_GET_CALLS
@@ -22,7 +25,10 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_GET_WIF
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_ROOT_COPY
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
+import kotlinx.android.synthetic.main.extra_item.view.*
+import kotlinx.android.synthetic.main.extras_picker.view.*
 import kotlinx.android.synthetic.main.restore_selector.*
 
 class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
@@ -38,6 +44,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val allErrors by lazy { ArrayList<String>(0) }
+    private val extrasContainer by lazy { layoutInflater.inflate(R.layout.extras_picker, app_list, false) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,8 +64,6 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         restore_selector_action_button.setText(R.string.close)
         restore_selector_action_button.background = getDrawable(R.drawable.next)
         restore_selector_action_button.visibility = View.VISIBLE
-
-        restore_selector_content.visibility = View.GONE
     }
 
     private fun doJob(jCode: Int){
@@ -144,20 +149,126 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
     private fun displayAllData(){
 
-        selector_contents.visibility = View.VISIBLE
-        waiting_layout.visibility = View.GONE
         var adapter: AppRestoreAdapter? = null
+        var error = ""
+        extrasContainer.visibility = View.VISIBLE
 
         commonTools.doBackgroundTask({
             try {
+
+                if ((contactDataPackets.isNotEmpty() || smsDataPackets.isNotEmpty() || callsDataPackets.isNotEmpty() ||
+                        settingsPacket != null || wifiPacket != null) && !AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false)) {
+
+                    commonTools.tryIt { app_list.removeHeaderView(extrasContainer) }
+                    app_list.addHeaderView(extrasContainer, null, false)
+
+                    val extrasAllListener = CompoundButton.OnCheckedChangeListener{ _, isChecked ->
+                        for (i in 0 until extrasContainer.restore_selector_extras_container.childCount) {
+                            commonTools.tryIt {
+                                val item = extrasContainer.restore_selector_extras_container.getChildAt(i)
+                                item.findViewById<CheckBox>(R.id.extras_item_select).isChecked = isChecked
+                            }
+                        }
+                    }
+
+                    fun checkAll(immediateSelection: Boolean){
+
+                        var isAnyNotSelected = false
+
+                        if (!immediateSelection) {
+                            extrasContainer.extras_select_all.apply {
+                                setOnCheckedChangeListener(null)
+                                isChecked = false
+                                setOnCheckedChangeListener(extrasAllListener)
+                            }
+                        }
+                        else {
+                            for (i in 0 until extrasContainer.restore_selector_extras_container.childCount) {
+                                commonTools.tryIt {
+                                    val item = extrasContainer.restore_selector_extras_container.getChildAt(i)
+                                    if (!item.findViewById<CheckBox>(R.id.extras_item_select).isChecked)
+                                        isAnyNotSelected = true
+                                }
+                                if (isAnyNotSelected) break
+                            }
+                            extrasContainer.extras_select_all.isChecked = !isAnyNotSelected
+                        }
+                    }
+
+                    var c = EXTRA_VIEW_COUNT
+
+                    val allExtras: ArrayList<GetterMarker> = ArrayList(0)
+                    allExtras.addAll(contactDataPackets)
+                    allExtras.addAll(smsDataPackets)
+                    allExtras.addAll(callsDataPackets)
+                    wifiPacket?.let { allExtras.add(it) }
+                    settingsPacket?.let { allExtras.addAll(it.internalPackets) }
+
+                    for (item in allExtras) {
+
+                        val v = View.inflate(this, R.layout.extra_item, null)
+                        v.id = c++
+                        v.extras_item_select.apply {
+                            isChecked = item.isSelected
+                            setOnCheckedChangeListener { _, isChecked ->
+                                checkAll(isChecked)
+                                item.isSelected = isChecked
+                            }
+                        }
+
+                        v.extra_item_icon.setImageResource(when (item) {
+                            is ContactsPacketKotlin -> R.drawable.ic_contact_icon
+                            is SmsPacketKotlin -> R.drawable.ic_sms_icon
+                            is CallsPacketKotlin -> R.drawable.ic_call_log_icon
+                            is WifiPacketKotlin -> R.drawable.ic_wifi_icon
+                            is SettingsPacketKotlin.DpiInternalPacket -> R.drawable.ic_dpi_icon
+                            is SettingsPacketKotlin.AdbInternalPacket -> R.drawable.ic_adb_icon
+                            is SettingsPacketKotlin.FontScaleInternalPacket -> R.drawable.ic_font_scale_icon
+                            is SettingsPacketKotlin.KeyboardInternalPacket -> R.drawable.ic_keyboard_icon
+                            else -> R.drawable.ic_app
+                        })
+
+                        v.extra_item_name.text = when (item) {
+                            is ContactsPacketKotlin -> item.vcfFile.name
+                            is SmsPacketKotlin -> item.smsDBFile.name
+                            is CallsPacketKotlin -> item.callDBFile.name
+                            is WifiPacketKotlin -> getString(R.string.wifi)
+                            is SettingsPacketKotlin.DpiInternalPacket -> getString(R.string.dpi)
+                            is SettingsPacketKotlin.AdbInternalPacket -> getString(R.string.adb_state)
+                            is SettingsPacketKotlin.FontScaleInternalPacket -> getString(R.string.font_scale)
+                            is SettingsPacketKotlin.KeyboardInternalPacket -> getString(R.string.keyboard)
+                            else -> ""
+                        }
+
+                        v.setOnClickListener { v.extras_item_select.apply { isChecked = !isChecked } }
+
+                        extrasContainer.restore_selector_extras_container.addView(v)
+                    }
+
+                    checkAll(true)
+                }
+
                 adapter = AppRestoreAdapter(this, appAllSelect, dataAllSelect, permissionsAllSelect)
             } catch (e: Exception){
                 e.printStackTrace()
-                showError(getString(R.string.code_error), e.message.toString())
+                error = e.message.toString()
             }
         }, {
-            if (adapter != null) { app_list.adapter = adapter }
-            else showError(getString(R.string.code_error), getString(R.string.null_adapter))
+            when {
+                error != "" -> showError(getString(R.string.code_error), error)
+                adapter == null -> showError(getString(R.string.code_error), getString(R.string.null_adapter))
+                else -> {
+                    selector_contents.visibility = View.VISIBLE
+                    waiting_layout.visibility = View.GONE
+                    app_list.adapter = adapter
+                }
+            }
+            commonTools.tryIt {
+                if (extrasContainer.restore_selector_extras_container.childCount == 0) {
+                    commonTools.tryIt { app_list.removeHeaderView(extrasContainer) }
+                    extrasContainer.visibility = View.GONE
+                }
+            }
         })
     }
 

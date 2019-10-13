@@ -32,14 +32,14 @@ class GetSettingsKotlin(jobCode: Int,
 
                 val jsonObject = JSONObject(contents.toString())
 
-                val dpiValue = SettingsFields.JSON_FIELD_DPI_TEXT.let { if (jsonObject.has(it)) jsonObject.getString(it) else null }
+                val dpiText = SettingsFields.JSON_FIELD_DPI_TEXT.let { if (jsonObject.has(it)) jsonObject.getString(it) else null }
                 val adbState = SettingsFields.JSON_FIELD_ADB_TEXT.let { if (jsonObject.has(it)) jsonObject.getInt(it) else null }
                 val fontScale = SettingsFields.JSON_FIELD_FONT_SCALE.let { if (jsonObject.has(it)) jsonObject.getDouble(it) else null }
                 val keyboardText = SettingsFields.JSON_FIELD_KEYBOARD_TEXT.let { if (jsonObject.has(it)) jsonObject.getString(it) else null }
 
                 Thread.sleep(CommonToolsKotlin.DUMMY_WAIT_TIME)
 
-                return SettingsPacketKotlin(dpiValue, adbState, fontScale, keyboardText)
+                return SettingsPacketKotlin(dpiText, adbState, fontScale, keyboardText)
 
             }
         } catch (e: Exception) {

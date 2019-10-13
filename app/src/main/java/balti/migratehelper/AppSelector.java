@@ -134,7 +134,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
         appCheckboxBar = findViewById(R.id.app_checkbox_bar);
         appList = findViewById(R.id.app_list);
         extrasBar = findViewById(R.id.extras_bar);
-        extrasSelect = findViewById(R.id.extras_select);
+        //extrasSelect = findViewById(R.id.extras_select);
 
         if (getIntent().getExtras() != null && getIntent().getExtras().getBoolean("all?", true)) {
             title.setText(R.string.everything);
@@ -649,7 +649,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             super.onPreExecute();
             masterView = View.inflate(AppSelector.this, R.layout.extras_picker, null);
             holder = masterView.findViewById(R.id.extras_picker_item_holder);
-            progressBar = masterView.findViewById(R.id.extra_picker_round_progress);
+            //progressBar = masterView.findViewById(R.id.extra_picker_round_progress);
 
             ad = new AlertDialog.Builder(AppSelector.this)
                     .setView(masterView)
@@ -678,7 +678,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 tempContactPackets[j] = new ContactsPacket(contactsPackets[j].vcfFile, contactsPackets[j].selected);
             }
 
-            for (final ContactsPacket packet : tempContactPackets) {
+            /*for (final ContactsPacket packet : tempContactPackets) {
                 View cView = View.inflate(AppSelector.this, R.layout.extra_item, null);
                 ImageView icon = cView.findViewById(R.id.extra_item_icon);
                 icon.setImageResource(R.drawable.ic_contact_icon);
@@ -744,7 +744,9 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             KeyboardPacket tempKeyboardPacket = new KeyboardPacket(keyboardPacket.keyboardFile, keyboardPacket.selected);
 
             return new Object[]{tempContactPackets, contactsViewItems, tempSmsPackets, smsViewItems, tempCallsPackets, callsViewItems, tempDpiPacket, dpiViewItem,
-                    tempKeyboardPacket, keyboardViewItem};
+                    tempKeyboardPacket, keyboardViewItem};*/
+
+            return new Object[]{null};
         }
 
         @Override
@@ -855,10 +857,10 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
             holder.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
 
-            Button ok = masterView.findViewById(R.id.extras_picker_ok);
-            Button cancel = masterView.findViewById(R.id.extras_picker_cancel);
+            //Button ok = masterView.findViewById(R.id.extras_picker_ok);
+            //Button cancel = masterView.findViewById(R.id.extras_picker_cancel);
 
-            ok.setOnClickListener(new View.OnClickListener() {
+            /*ok.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
@@ -931,7 +933,7 @@ public class AppSelector extends AppCompatActivity implements OnConvertMetadataT
                 public void onClick(View view) {
                     ad.dismiss();
                 }
-            });
+            });*/
         }
     }
 

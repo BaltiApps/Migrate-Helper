@@ -4,59 +4,59 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:fillViewport="true">
 
-        <ScrollView
+        <LinearLayout
+            android:id="@+id/extras_picker_item_holder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fillViewport="true">
+            android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/extras_picker_item_holder"
+                android:id="@+id/extras_bar"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                android:background="@color/colorPrimary"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/large_padding_width"
+                android:paddingEnd="@dimen/large_padding_width">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/extras"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:padding="@dimen/small_padding_width" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <CheckBox
+                    android:id="@+id/extras_select_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/small_padding_width" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/small_padding_width"
-                android:orientation="vertical" />
+                android:id="@+id/restore_selector_extras_container"
+                android:orientation="vertical"
+                />
 
-        </ScrollView>
+        </LinearLayout>
 
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:orientation="horizontal"
-            android:padding="@dimen/small_padding_width">
-
-            <Button
-                android:id="@+id/extras_picker_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorPrimary"
-                android:text="@android:string/cancel" />
-
-            <Button
-                android:id="@+id/extras_picker_ok"
-                android:layout_width="@dimen/button_width"
-                android:layout_height="@dimen/button_height"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/next"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:text="@android:string/ok" />
-
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/extra_picker_round_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+    </ScrollView>
 
 </RelativeLayout>
