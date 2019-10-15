@@ -7,4 +7,5 @@
     <dimen name="small_padding_width">5dp</dimen>
     <dimen name="large_padding_width">10dp</dimen>
     <dimen name="extra_item_done_wh">24dp</dimen>
+    <dimen name="extra_large_padding_width">20dp</dimen>
 </resources>

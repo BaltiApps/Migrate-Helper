@@ -229,6 +229,10 @@
     <string name="adb_state">ADB state</string>
     <string name="font_scale">Font scale</string>
     <string name="wifi">Wifi config. file</string>
+
+    <!--app_search_layout.xml-->
+    <string name="enter_app_name">App/package name</string>
+    <string name="no_apps">No apps available\nwith the given search!</string>
     
     <!--uninstall_activity.xml-->
     <string name="uninstall_desc">Completely removes this helper app.\n\n

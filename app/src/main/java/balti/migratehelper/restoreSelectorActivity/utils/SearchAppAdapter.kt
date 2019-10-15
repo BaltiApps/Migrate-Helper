@@ -2,7 +2,6 @@ package balti.migratehelper.restoreSelectorActivity.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.database.DataSetObserver
 import android.graphics.Color
 import android.support.v7.app.AlertDialog
 import android.view.View
@@ -12,7 +11,6 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import balti.migratehelper.R
-import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin.Companion.appPackets
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
@@ -26,68 +24,14 @@ import kotlinx.android.synthetic.main.app_info.view.*
 import kotlinx.android.synthetic.main.app_item.view.*
 import java.io.File
 
-class AppRestoreAdapter(val context: Context,
-                        val allAppSelect: CheckBox,
-                        val allDataSelect: CheckBox,
-                        val allPermissionSelect: CheckBox): BaseAdapter() {
+class SearchAppAdapter(val tmpList: ArrayList<AppPacketsKotlin>, val context: Context): BaseAdapter() {
 
-    private var appAllChangeFromScanning = false
-    private var dataAllChangeFromScanning = false
-    private var permissionAllChangeFromScanning = false
-    private var externalDataSetChanged = true
     private val iconTools by lazy { IconTools() }
-
     private val commonTools by lazy { CommonToolsKotlin(context) }
 
     init {
-        appPackets.sortWith(Comparator { o1, o2 ->
+        tmpList.sortWith(Comparator { o1, o2 ->
             String.CASE_INSENSITIVE_ORDER.compare(o1.appName, o2.appName)
-        })
-    }
-
-    init {
-
-        fun listener(property: String, isChecked: Boolean) {
-            when (property){
-                PROPERTY_APP_SELECTION -> {
-                    if (appAllChangeFromScanning) appAllChangeFromScanning = false
-                    else for (dp in appPackets) {
-                        dp.APP = isChecked && dp.apkName != null
-                    }
-                }
-
-                PROPERTY_DATA_SELECTION -> {
-                    if (dataAllChangeFromScanning) dataAllChangeFromScanning = false
-                    else for (dp in appPackets) {
-                        dp.DATA = isChecked && dp.dataName != null
-                    }
-                }
-
-                PROPERTY_PERMISSION_SELECTION -> {
-                    if (permissionAllChangeFromScanning) permissionAllChangeFromScanning = false
-                    else for (dp in appPackets) {
-                        dp.PERMISSION = isChecked && dp.isPermission
-                    }
-                }
-            }
-            externalDataSetChanged = false
-            notifyDataSetChanged()
-        }
-
-        allAppSelect.setOnCheckedChangeListener { _, isChecked -> listener(PROPERTY_APP_SELECTION, isChecked) }
-        allDataSelect.setOnCheckedChangeListener { _, isChecked -> listener(PROPERTY_DATA_SELECTION, isChecked) }
-        allPermissionSelect.setOnCheckedChangeListener { _, isChecked -> listener(PROPERTY_PERMISSION_SELECTION, isChecked) }
-
-        this.registerDataSetObserver(object : DataSetObserver(){
-            override fun onChanged() {
-                super.onChanged()
-                if (externalDataSetChanged) {
-                    updateAllCheckbox(PROPERTY_APP_SELECTION, allAppSelect.isChecked)
-                    updateAllCheckbox(PROPERTY_DATA_SELECTION, allDataSelect.isChecked)
-                    updateAllCheckbox(PROPERTY_PERMISSION_SELECTION, allPermissionSelect.isChecked)
-                }
-                else externalDataSetChanged = true
-            }
         })
     }
 
@@ -113,7 +57,7 @@ class AppRestoreAdapter(val context: Context,
         }
         else viewHolder = view.tag as ViewHolder
 
-        val appItem = appPackets[position]
+        val appItem = tmpList[position]
 
         viewHolder.appName.text = appItem.appName
         appItem.iconFileName?.run{
@@ -170,62 +114,6 @@ class AppRestoreAdapter(val context: Context,
         return view!!
     }
 
-
-    private fun updateAllCheckbox(property: String, allSelected: Boolean, immediateSelection: Boolean = true) {
-        if (!immediateSelection) {
-            if (allSelected) {
-                when (property) {
-                    PROPERTY_APP_SELECTION -> {
-                        appAllChangeFromScanning = true
-                        allAppSelect.isChecked = false
-                    }
-                    PROPERTY_DATA_SELECTION -> {
-                        dataAllChangeFromScanning = true
-                        allDataSelect.isChecked = false
-                    }
-                    PROPERTY_PERMISSION_SELECTION -> {
-                        permissionAllChangeFromScanning = true
-                        allPermissionSelect.isChecked = false
-                    }
-                }
-            }
-        }
-        else {
-            loop@ for (i in 0 until appPackets.size) {
-                val dp = appPackets[i]
-                when (property) {
-                    PROPERTY_APP_SELECTION ->
-                        if (dp.APP || dp.apkName == null) {
-                            if (i == appPackets.size - 1) if (!allSelected) appAllChangeFromScanning = true
-                        } else {
-                            if (allSelected) appAllChangeFromScanning = true
-                            break@loop
-                        }
-
-                    PROPERTY_DATA_SELECTION ->
-                        if (dp.DATA || dp.dataName == null) {
-                            if (i == appPackets.size - 1) if (!allSelected) dataAllChangeFromScanning = true
-                        } else {
-                            if (allSelected) dataAllChangeFromScanning = true
-                            break@loop
-                        }
-
-                    PROPERTY_PERMISSION_SELECTION ->
-                        if (dp.PERMISSION || !dp.isPermission) {
-                            if (i == appPackets.size - 1) if (!allSelected) permissionAllChangeFromScanning = true
-                        } else {
-                            if (allSelected) permissionAllChangeFromScanning = true
-                            break@loop
-                        }
-                }
-            }
-
-            if (appAllChangeFromScanning) allAppSelect.isChecked = !allAppSelect.isChecked
-            if (dataAllChangeFromScanning) allDataSelect.isChecked = !allDataSelect.isChecked
-            if (permissionAllChangeFromScanning) allPermissionSelect.isChecked = !allPermissionSelect.isChecked
-        }
-    }
-
     private fun CheckBox.setFromProperty(appItem: AppPacketsKotlin){
 
         val property = when (this.id){
@@ -237,18 +125,9 @@ class AppRestoreAdapter(val context: Context,
 
         this.setOnCheckedChangeListener {_, isChecked ->
             when (property) {
-                PROPERTY_APP_SELECTION -> {
-                    appItem.APP = isChecked
-                    updateAllCheckbox(property, allAppSelect.isChecked, isChecked)
-                }
-                PROPERTY_DATA_SELECTION -> {
-                    appItem.DATA = isChecked
-                    updateAllCheckbox(property, allDataSelect.isChecked, isChecked)
-                }
-                PROPERTY_PERMISSION_SELECTION -> {
-                    appItem.PERMISSION = isChecked
-                    updateAllCheckbox(property, allPermissionSelect.isChecked, isChecked)
-                }
+                PROPERTY_APP_SELECTION -> appItem.APP = isChecked
+                PROPERTY_DATA_SELECTION -> appItem.DATA = isChecked
+                PROPERTY_PERMISSION_SELECTION -> appItem.PERMISSION = isChecked
             }
         }
 
@@ -264,9 +143,9 @@ class AppRestoreAdapter(val context: Context,
         }
     }
 
-    override fun getItem(position: Int): Any = appPackets[position]
+    override fun getItem(position: Int): Any = tmpList[position]
     override fun getItemId(position: Int): Long = 0
-    override fun getCount(): Int = appPackets.size
+    override fun getCount(): Int = tmpList.size
     override fun getViewTypeCount(): Int = count
     override fun getItemViewType(position: Int): Int = position
 
