@@ -237,30 +237,8 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                                 }
                             }
 
-                            v.extra_item_icon.setImageResource(when (item) {
-                                is ContactsPacketKotlin -> R.drawable.ic_contact_icon
-                                is SmsPacketKotlin -> R.drawable.ic_sms_icon
-                                is CallsPacketKotlin -> R.drawable.ic_call_log_icon
-                                is WifiPacketKotlin -> R.drawable.ic_wifi_icon
-                                is SettingsPacketKotlin.DpiInternalPacket -> R.drawable.ic_dpi_icon
-                                is SettingsPacketKotlin.AdbInternalPacket -> R.drawable.ic_adb_icon
-                                is SettingsPacketKotlin.FontScaleInternalPacket -> R.drawable.ic_font_scale_icon
-                                is SettingsPacketKotlin.KeyboardInternalPacket -> R.drawable.ic_keyboard_icon
-                                else -> R.drawable.ic_app
-                            })
-
-                            v.extra_item_name.text = when (item) {
-                                is ContactsPacketKotlin -> item.vcfFile.name
-                                is SmsPacketKotlin -> item.smsDBFile.name
-                                is CallsPacketKotlin -> item.callDBFile.name
-                                is WifiPacketKotlin -> getString(R.string.wifi)
-                                is SettingsPacketKotlin.DpiInternalPacket -> getString(R.string.dpi)
-                                is SettingsPacketKotlin.AdbInternalPacket -> getString(R.string.adb_state)
-                                is SettingsPacketKotlin.FontScaleInternalPacket -> getString(R.string.font_scale)
-                                is SettingsPacketKotlin.KeyboardInternalPacket -> getString(R.string.keyboard)
-                                else -> ""
-                            }
-
+                            v.extra_item_icon.setImageResource(item.iconResource)
+                            v.extra_item_name.text = item.displayText
                             v.setOnClickListener { v.extras_item_select.apply { isChecked = !isChecked } }
 
                             extrasContainer.restore_selector_extras_container.addView(v)
