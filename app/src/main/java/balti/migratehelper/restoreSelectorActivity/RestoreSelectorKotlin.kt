@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.CheckBox
 import android.widget.CompoundButton
+import android.widget.Toast
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.restoreEngines.RestoreServiceKotlin
@@ -37,11 +39,14 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import kotlinx.android.synthetic.main.app_search_layout.view.*
 import kotlinx.android.synthetic.main.app_selector_header.view.*
 import kotlinx.android.synthetic.main.extra_item.view.*
 import kotlinx.android.synthetic.main.extras_picker.view.*
 import kotlinx.android.synthetic.main.restore_selector.*
+import java.io.BufferedWriter
+import java.io.OutputStreamWriter
 
 class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
@@ -67,6 +72,8 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
     private var adapter: AppRestoreAdapter? = null
 
+    private lateinit var forceStopDialog: AlertDialog
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.restore_selector)
@@ -82,14 +89,50 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             background = getDrawable(R.drawable.cancel_root_request)
 
             setOnClickListener {
-                currentTask?.run {
-                    if (this is RootCopyTask) {
-                        commonTools.tryIt { cancelTask() }
-                    }
+
+                if (text == getString(R.string.force_stop)){
+
+                    forceStopDialog = AlertDialog.Builder(this@RestoreSelectorKotlin).apply {
+
+                        this.setTitle(getString(R.string.force_stop_alert_title))
+                        this.setMessage(getString(R.string.force_stop_alert_desc))
+
+                        setPositiveButton(R.string.kill_app) { _, _ ->
+
+                            Runtime.getRuntime().exec("su").apply {
+                                BufferedWriter(OutputStreamWriter(this.outputStream)).run {
+                                    this.write("am force-stop $packageName\n")
+                                    this.write("exit\n")
+                                    this.flush()
+                                }
+                            }
+
+                            val handler = Handler()
+                            handler.postDelayed({
+                                Toast.makeText(this@RestoreSelectorKotlin, R.string.killing_programmatically, Toast.LENGTH_SHORT).show()
+                                android.os.Process.killProcess(android.os.Process.myPid())
+                            }, TIMEOUT_WAITING_TO_KILL)
+                        }
+
+                        setNegativeButton(R.string.wait_to_cancel, null)
+
+                    }.create()
+
+                    forceStopDialog.show()
+
                 }
-                cancelAll = true
+                else {
+                    text = getString(R.string.force_stop)
+                    currentTask?.run {
+                        if (this is RootCopyTask) {
+                            commonTools.tryIt { cancelTask() }
+                        }
+                    }
+                    cancelAll = true
+                }
             }
         }
+
         doJob(JOBCODE_ROOT_COPY)
     }
 
@@ -456,6 +499,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             if (cancelAll) {
                 showError(getString(R.string.cancelled_loading), "")
                 commonTools.tryIt { Thread.sleep(DUMMY_WAIT_TIME) }
+                commonTools.tryIt { forceStopDialog.dismiss() }
                 finish()
             }
             else showError(getString(R.string.nothing_to_restore), getString(R.string.no_metadata_found))
@@ -464,6 +508,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
     override fun onDestroy() {
         cancelAll = false
+        commonTools.tryIt { forceStopDialog.dismiss() }
         super.onDestroy()
     }
 

@@ -97,6 +97,8 @@ class CommonToolsKotlin(val context: Context) {
 
         val EXTRA_VIEW_COUNT = 500
 
+        val TIMEOUT_WAITING_TO_KILL = 3000L
+
         val BACKUP_NAME_SETTINGS = "settings.json"
         val WIFI_FILE_NAME = "WifiConfigStore.xml"
 
