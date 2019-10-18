@@ -4,8 +4,10 @@ import android.content.Context
 import android.widget.ProgressBar
 import android.widget.TextView
 import balti.migratehelper.R
+import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_SETTINGS_GET_TRY_CATCH
 import balti.migratehelper.utilities.constants.SettingsFields
 import org.json.JSONObject
@@ -37,7 +39,7 @@ class GetSettingsKotlin(jobCode: Int,
                 val fontScale = SettingsFields.JSON_FIELD_FONT_SCALE.let { if (jsonObject.has(it)) jsonObject.getDouble(it) else null }
                 val keyboardText = SettingsFields.JSON_FIELD_KEYBOARD_TEXT.let { if (jsonObject.has(it)) jsonObject.getString(it) else null }
 
-                Thread.sleep(CommonToolsKotlin.DUMMY_WAIT_TIME)
+                if (!RestoreSelectorKotlin.cancelAll) Thread.sleep(DUMMY_WAIT_TIME)
 
                 return SettingsPacketKotlin(dpiText, adbState, fontScale, keyboardText)
 

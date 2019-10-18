@@ -4,8 +4,9 @@ import android.content.Context
 import android.widget.ProgressBar
 import android.widget.TextView
 import balti.migratehelper.R
+import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.CallsPacketKotlin
-import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_CALLS_GET_TRY_CATCH
 import java.io.FileFilter
 
@@ -27,11 +28,15 @@ class GetCallsPackets(jobCode: Int,
 
                 var c = 0
                 files.forEach {
-                    contactPackets.add(CallsPacketKotlin(it, true))
-                    publishProgress(++c)
+                    if (!RestoreSelectorKotlin.cancelAll) {
+                        if (!RestoreSelectorKotlin.cancelAll) {
+                            contactPackets.add(CallsPacketKotlin(it, true))
+                            publishProgress(++c)
+                        }
+                    }
                 }
 
-                Thread.sleep(CommonToolsKotlin.DUMMY_WAIT_TIME)
+                if (!RestoreSelectorKotlin.cancelAll) Thread.sleep(DUMMY_WAIT_TIME)
 
                 return contactPackets
             }

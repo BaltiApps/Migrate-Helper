@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.ProgressBar
 import android.widget.TextView
 import balti.migratehelper.R
+import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.ContactsPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_CONTACTS_GET_TRY_CATCH
@@ -27,11 +28,13 @@ class GetContactPackets(jobCode: Int,
 
                 var c = 0
                 files.forEach {
-                    contactPackets.add(ContactsPacketKotlin(it, true))
-                    publishProgress(++c)
+                    if (!RestoreSelectorKotlin.cancelAll) {
+                        contactPackets.add(ContactsPacketKotlin(it, true))
+                        publishProgress(++c)
+                    }
                 }
 
-                Thread.sleep(DUMMY_WAIT_TIME)
+                if (!RestoreSelectorKotlin.cancelAll) Thread.sleep(DUMMY_WAIT_TIME)
 
                 return contactPackets
             }

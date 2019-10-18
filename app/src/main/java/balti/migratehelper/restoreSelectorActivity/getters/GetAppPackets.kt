@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.ProgressBar
 import android.widget.TextView
 import balti.migratehelper.R
+import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.BACKUP_NAME_SETTINGS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_APP_JSON
@@ -29,17 +30,18 @@ class GetAppPackets(jobCode: Int,
 
                 var c = 0
                 files.forEach {
-                    try {
-                        val contents = StringBuffer("")
-                        it.readLines().forEach { line ->
-                            contents.append("$line\n")
+                    if (!RestoreSelectorKotlin.cancelAll) {
+                        try {
+                            val contents = StringBuffer("")
+                            it.readLines().forEach { line ->
+                                contents.append("$line\n")
+                            }
+                            appPackets.add(AppPacketsKotlin(JSONObject(contents.toString())))
+                        } catch (e: Exception) {
+                            errors.add("$ERROR_APP_JSON: ${it.name} - ${e.message.toString()}")
                         }
-                        appPackets.add(AppPacketsKotlin(JSONObject(contents.toString())))
+                        publishProgress(++c)
                     }
-                    catch (e: Exception){
-                        errors.add("$ERROR_APP_JSON: ${it.name} - ${e.message.toString()}")
-                    }
-                    publishProgress(++c)
                 }
 
                 return appPackets

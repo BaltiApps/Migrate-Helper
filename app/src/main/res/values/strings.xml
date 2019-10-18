@@ -229,6 +229,7 @@
     <string name="adb_state">ADB state</string>
     <string name="font_scale">Font scale</string>
     <string name="wifi">Wifi config. file</string>
+    <string name="cancelled_loading">Cancelled loading</string>
 
     <!--app_search_layout.xml-->
     <string name="enter_app_name">App/package name</string>

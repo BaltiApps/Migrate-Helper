@@ -1,6 +1,8 @@
 package balti.migratehelper.restoreSelectorActivity
 
+import android.content.Intent
 import android.os.AsyncTask
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -12,6 +14,7 @@ import android.widget.CheckBox
 import android.widget.CompoundButton
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
+import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.*
 import balti.migratehelper.restoreSelectorActivity.getters.*
 import balti.migratehelper.restoreSelectorActivity.utils.AppRestoreAdapter
@@ -19,6 +22,7 @@ import balti.migratehelper.restoreSelectorActivity.utils.OnReadComplete
 import balti.migratehelper.restoreSelectorActivity.utils.RootCopyTask
 import balti.migratehelper.restoreSelectorActivity.utils.SearchAppAdapter
 import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_MAIN_READ_TRY_CATCH
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_VIEW_COUNT
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_END_ALL
@@ -48,6 +52,9 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         val callsDataPackets by lazy { ArrayList<CallsPacketKotlin>(0) }
         var settingsPacket: SettingsPacketKotlin? = null
         var wifiPacket: WifiPacketKotlin? = null
+
+        var cancelAll: Boolean = false
+        private set
     }
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
@@ -56,15 +63,33 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
     private val extrasContainer by lazy { layoutInflater.inflate(R.layout.extras_picker, app_list, false) }
     private val appBar by lazy { layoutInflater.inflate(R.layout.app_selector_header, app_list, false) }
 
+    private var currentTask : AsyncTask<Any, Any, Any>? = null
+
     private var adapter: AppRestoreAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.restore_selector)
 
+        cancelAll = false
+
         waiting_layout.visibility = View.VISIBLE
         app_list.visibility = View.GONE
 
+        restore_selector_action_button.apply {
+
+            setText(android.R.string.cancel)
+            background = getDrawable(R.drawable.cancel_root_request)
+
+            setOnClickListener {
+                currentTask?.run {
+                    if (this is RootCopyTask) {
+                        commonTools.tryIt { cancelTask() }
+                    }
+                }
+                cancelAll = true
+            }
+        }
         doJob(JOBCODE_ROOT_COPY)
     }
 
@@ -77,9 +102,10 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         restore_selector_error_icon.visibility = View.VISIBLE
         waiting_status_text.text = mainMessage
         waiting_desc.text = description
-        restore_selector_action_button.setText(R.string.close)
-        restore_selector_action_button.background = getDrawable(R.drawable.next)
-        restore_selector_action_button.visibility = View.VISIBLE
+        restore_selector_action_button.apply {
+            setText(R.string.close)
+            background = getDrawable(R.drawable.next)
+        }
     }
 
     private fun doJob(jCode: Int){
@@ -94,6 +120,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             else -> null
         }
 
+        currentTask = task
         task?.execute()
     }
 
@@ -102,6 +129,12 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         try {
 
             fun handleResults(nextJob: Int, func: () -> Unit) {
+
+                if (cancelAll) {
+                    displayAllData()
+                    return
+                }
+
                 if (nextJob == JOBCODE_END_ALL){
                     if (jobResult !is Int) func()
                     displayAllData()
@@ -122,7 +155,8 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             when (jobCode) {
 
                 JOBCODE_ROOT_COPY -> {
-                    if (!jobSuccess)
+                    if (cancelAll) displayAllData()
+                    else if (!jobSuccess)
                         showError(getString(R.string.are_you_rooted), "${getString(R.string.are_you_rooted_desc)}\n\n$jobResult".trim())
                     else doJob(JOBCODE_GET_APP_JSON)
                 }
@@ -177,7 +211,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         wifiPacket?.let { allExtras.add(it) }
         settingsPacket?.let { allExtras.addAll(it.internalPackets) }
 
-        if (appPackets.isNotEmpty() || allExtras.isNotEmpty()) {
+        if (!cancelAll && (appPackets.isNotEmpty() || allExtras.isNotEmpty())) {
 
             if (allExtras.isNotEmpty())
                 extrasContainer.visibility = View.VISIBLE
@@ -282,112 +316,155 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                     }
                 }
 
-                fun toggleCheckbox(cb: CheckBox, isChecked: Boolean? = null) {
-                    if (isChecked == null) {
-                        cb.isChecked = true
-                        cb.isChecked = false
-                    } else cb.isChecked = isChecked
-                }
+                if (error == "") {
 
-                clear_all.setOnClickListener {
-                    toggleCheckbox(extrasContainer.extras_select_all)
-                    toggleCheckbox(appBar.appAllSelect)
-                    toggleCheckbox(appBar.dataAllSelect)
-                    toggleCheckbox(appBar.permissionsAllSelect)
-                }
-
-                select_all.setOnClickListener {
-                    toggleCheckbox(extrasContainer.extras_select_all, true)
-                    toggleCheckbox(appBar.appAllSelect, true)
-                    toggleCheckbox(appBar.dataAllSelect, true)
-                    toggleCheckbox(appBar.permissionsAllSelect, true)
-                }
-
-                appSearch.setOnClickListener {
-
-                    val searchAD = AlertDialog.Builder(this)
-                            .setCancelable(false)
-                            .create()
-
-                    val searchView = View.inflate(this, R.layout.app_search_layout, null)
-
-                    searchView.app_search_close.setOnClickListener {
-                        searchAD.dismiss()
-                        adapter?.notifyDataSetChanged()
+                    fun toggleCheckbox(cb: CheckBox, isChecked: Boolean? = null) {
+                        if (isChecked == null) {
+                            cb.isChecked = true
+                            cb.isChecked = false
+                        } else cb.isChecked = isChecked
                     }
 
-                    searchView.app_search_editText.addTextChangedListener(object : TextWatcher {
+                    clear_all.setOnClickListener {
+                        toggleCheckbox(extrasContainer.extras_select_all)
+                        toggleCheckbox(appBar.appAllSelect)
+                        toggleCheckbox(appBar.dataAllSelect)
+                        toggleCheckbox(appBar.permissionsAllSelect)
+                    }
 
-                        var loadApps: LoadSearchApps? = null
+                    select_all.setOnClickListener {
+                        toggleCheckbox(extrasContainer.extras_select_all, true)
+                        toggleCheckbox(appBar.appAllSelect, true)
+                        toggleCheckbox(appBar.dataAllSelect, true)
+                        toggleCheckbox(appBar.permissionsAllSelect, true)
+                    }
 
-                        override fun afterTextChanged(s: Editable?) {
-                            try {
-                                loadApps?.cancel(true)
-                            } catch (_: Exception){}
+                    appSearch.setOnClickListener {
 
-                            loadApps = LoadSearchApps(s.toString())
-                            loadApps?.let { it.execute() }
+                        val searchAD = AlertDialog.Builder(this)
+                                .setCancelable(false)
+                                .create()
+
+                        val searchView = View.inflate(this, R.layout.app_search_layout, null)
+
+                        searchView.app_search_close.setOnClickListener {
+                            searchAD.dismiss()
+                            adapter?.notifyDataSetChanged()
                         }
 
-                        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                        searchView.app_search_editText.addTextChangedListener(object : TextWatcher {
 
-                        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                            var loadApps: LoadSearchApps? = null
 
+                            override fun afterTextChanged(s: Editable?) {
+                                try {
+                                    loadApps?.cancel(true)
+                                } catch (_: Exception) {
+                                }
 
-                        inner class LoadSearchApps(val term: String) : AsyncTask<Any, Any, Any>(){
-
-                            lateinit var adapter: SearchAppAdapter
-                            var tmpList = ArrayList<AppPacketsKotlin>(0)
-
-                            override fun onPreExecute() {
-                                super.onPreExecute()
-                                searchView.app_search_list.adapter = null
-                                searchView.app_search_loading.visibility = View.VISIBLE
-                                searchView.app_search_app_unavailable.visibility = View.GONE
+                                loadApps = LoadSearchApps(s.toString())
+                                loadApps?.let { it.execute() }
                             }
 
-                            override fun doInBackground(vararg params: Any?): Any? {
+                            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-                                if (term.trim() != "") makeTmpList(term)
-                                else tmpList.clear()
+                            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
-                                if (tmpList.size > 0) adapter = SearchAppAdapter(tmpList, this@RestoreSelectorKotlin)
 
-                                return null
-                            }
+                            inner class LoadSearchApps(val term: String) : AsyncTask<Any, Any, Any>() {
 
-                            override fun onPostExecute(result: Any?) {
-                                super.onPostExecute(result)
-                                searchView.app_search_loading.visibility = View.GONE
-                                if (tmpList.size > 0) searchView.app_search_list.adapter = adapter
-                                else {
-                                    searchView.app_search_list.invalidate()
-                                    if (term.trim() != "") searchView.app_search_app_unavailable.visibility = View.VISIBLE
+                                lateinit var adapter: SearchAppAdapter
+                                var tmpList = ArrayList<AppPacketsKotlin>(0)
+
+                                override fun onPreExecute() {
+                                    super.onPreExecute()
+                                    searchView.app_search_list.adapter = null
+                                    searchView.app_search_loading.visibility = View.VISIBLE
+                                    searchView.app_search_app_unavailable.visibility = View.GONE
+                                }
+
+                                override fun doInBackground(vararg params: Any?): Any? {
+
+                                    if (term.trim() != "") makeTmpList(term)
+                                    else tmpList.clear()
+
+                                    if (tmpList.size > 0) adapter = SearchAppAdapter(tmpList, this@RestoreSelectorKotlin)
+
+                                    return null
+                                }
+
+                                override fun onPostExecute(result: Any?) {
+                                    super.onPostExecute(result)
+                                    searchView.app_search_loading.visibility = View.GONE
+                                    if (tmpList.size > 0) searchView.app_search_list.adapter = adapter
+                                    else {
+                                        searchView.app_search_list.invalidate()
+                                        if (term.trim() != "") searchView.app_search_app_unavailable.visibility = View.VISIBLE
+                                    }
+                                }
+
+                                fun makeTmpList(term: String) {
+                                    tmpList.clear()
+                                    for (dp in appPackets) {
+                                        if (dp.packageName.let { it?.contains(term) == true } || dp.appName.let { it?.contains(term) == true })
+                                            tmpList.add(dp)
+                                    }
                                 }
                             }
+                        })
 
-                            fun makeTmpList(term: String){
-                                tmpList.clear()
-                                for (dp in appPackets){
-                                    if (dp.packageName.let { it?.contains(term) == true } || dp.appName.let { it?.contains(term) == true })
-                                        tmpList.add(dp)
-                                }
-                            }
+                        searchAD.setView(searchView)
+                        searchAD.window?.run { setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE) }
+                        searchAD.show()
+
+                    }
+
+                    restore_selector_action_button.apply {
+
+                        setText(R.string.restore)
+                        background = getDrawable(R.drawable.next)
+
+                        setOnClickListener {
+                            AlertDialog.Builder(this@RestoreSelectorKotlin)
+                                    .setTitle(R.string.turn_off_internet_and_updates)
+                                    .setMessage(R.string.do_not_use_desc)
+                                    .setPositiveButton(R.string.goAhead) { _, _ ->
+
+                                        Intent(this@RestoreSelectorKotlin, RestoreServiceKotlin::class.java).run {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                                startForegroundService(this)
+                                            } else {
+                                                startService(this)
+                                            }
+                                        }
+
+                                    }
+                                    .setNegativeButton(R.string.later, null)
+                                    .show()
                         }
-                    })
-
-                    searchAD.setView(searchView)
-                    searchAD.window?.run { setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE) }
-                    searchAD.show()
+                    }
 
                 }
             })
+
         }
         else {
+
             waiting_layout.visibility = View.VISIBLE
             app_list.visibility = View.GONE
-            showError(getString(R.string.nothing_to_restore), getString(R.string.no_metadata_found))
+
+            if (cancelAll) {
+                showError(getString(R.string.cancelled_loading), "")
+                commonTools.tryIt { Thread.sleep(DUMMY_WAIT_TIME) }
+                finish()
+            }
+            else showError(getString(R.string.nothing_to_restore), getString(R.string.no_metadata_found))
         }
+    }
+
+    override fun onDestroy() {
+        cancelAll = false
+        super.onDestroy()
     }
 
 }

@@ -4,8 +4,11 @@ import android.content.Context
 import android.os.AsyncTask
 import android.os.Build
 import balti.migratehelper.R
+import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.BACKUP_NAME_SETTINGS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_NAME
 import balti.migratehelper.utilities.ViewOperations
 import java.io.BufferedReader
@@ -21,6 +24,10 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
     private val vOp by lazy { ViewOperations(context) }
     private val errors by lazy { ArrayList<String>(0) }
     private var scriptOutput = ""
+
+    private var SU_TASK_PID = -999
+
+    private var masterSuProcess: Process? = null
 
     private lateinit var busyboxBinaryPath: String
 
@@ -44,42 +51,46 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
                 return 1
             }
 
+            val scripFile = commonTools.unpackAssetToInternal("suScript.sh", "suScript.sh")
+
             Runtime.getRuntime().exec("su").let {
+
+                masterSuProcess = it
 
                 BufferedWriter(OutputStreamWriter(it.outputStream)).run {
 
-                    CommonToolsKotlin.METADATA_HOLDER_DIR.let { mtd ->
+                    write("chmod +x $scripFile\n")
+                    write("sh $scripFile ${context.packageName} $METADATA_HOLDER_DIR $MIGRATE_CACHE $BACKUP_NAME_SETTINGS $WIFI_FILE_NAME\n")
+                    write("exit\n")
+                    flush()
 
-                        write("#!sbin/sh\n\n")
-
-                        write("echo \" \"\n")
-                        write("pm grant ${context.packageName} android.permission.PACKAGE_USAGE_STATS\n")
-                        write("pm grant ${context.packageName} android.permission.WRITE_SECURE_SETTINGS\n")
-
-                        write("rm -rf $mtd/* 2>/dev/null\n")
-                        write("cp -f $tempDir/*.json $mtd 2>/dev/null\n")
-                        write("cp -f $tempDir/*.icon $mtd 2>/dev/null\n")
-                        write("cp -f $tempDir/*.vcf $mtd 2>/dev/null\n")
-                        write("cp -f $tempDir/*.sms.db $mtd 2>/dev/null\n")
-                        write("cp -f $tempDir/*.calls.db $mtd 2>/dev/null\n")
-                        write("cp -f $tempDir/*.perm $mtd 2>/dev/null\n")
-                        write("cp -f $tempDir/$BACKUP_NAME_SETTINGS $mtd 2>/dev/null\n")
-                        write("cp -f $tempDir/$WIFI_FILE_NAME $mtd 2>/dev/null\n")
-                        write("echo --- END_OF_COPY ---\n")
-                        write("exit\n")
-
-                        flush()
-                    }
                 }
 
                 val outputReader = BufferedReader(InputStreamReader(it.inputStream))
                 var line: String?
                 while (true) {
+
+                    if (RestoreSelectorKotlin.cancelAll)
+                    {
+                        cancelTask()
+                        return 0
+                    }
+
                     line = outputReader.readLine()
                     if (line == null) break
                     else {
                         line = line.trim()
-                        scriptOutput += "$line\n"
+
+                        if (line.startsWith("--- PID:"))
+                            commonTools.tryIt {
+                                line?.run {
+                                    SU_TASK_PID = substring(lastIndexOf(" ") + 1).toInt()
+                                }
+                            }
+                        else {
+                            scriptOutput += "$line\n"
+                        }
+
                         if (line == "--- END_OF_COPY ---") break
                     }
                 }
@@ -103,6 +114,26 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
 
             return 1
         }
+    }
+
+    fun cancelTask() {
+
+        commonTools.tryIt {
+            val killProcess = Runtime.getRuntime().exec("su")
+            val writer = BufferedWriter(OutputStreamWriter(killProcess.outputStream))
+
+            if (SU_TASK_PID != -999) {
+                writer.write("kill -9 $SU_TASK_PID\n")
+                writer.write("kill -15 $SU_TASK_PID\n")
+            }
+
+            writer.write("exit\n")
+            writer.flush()
+
+            commonTools.tryIt { killProcess.waitFor() }
+            commonTools.tryIt { masterSuProcess?.waitFor() }
+        }
+
     }
 
     override fun onPostExecute(result: Any?) {

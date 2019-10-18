@@ -4,8 +4,10 @@ import android.content.Context
 import android.widget.ProgressBar
 import android.widget.TextView
 import balti.migratehelper.R
+import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.WifiPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_WIFI_GET_TRY_CATCH
 import java.io.FileFilter
 
@@ -22,8 +24,10 @@ class GetWifiPacketKotlin(jobCode: Int,
     override fun doInBackground(vararg params: Any?): Any {
         try {
             if (files.isNotEmpty()) {
-                Thread.sleep(CommonToolsKotlin.DUMMY_WAIT_TIME)
-                return WifiPacketKotlin(files[0], true)
+                if (!RestoreSelectorKotlin.cancelAll) {
+                    Thread.sleep(DUMMY_WAIT_TIME)
+                    return WifiPacketKotlin(files[0], true)
+                }
             }
         }
         catch (e: Exception){
