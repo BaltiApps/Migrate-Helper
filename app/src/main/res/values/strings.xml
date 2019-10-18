@@ -169,6 +169,10 @@
     <!--RootCopyTask.kt-->
     <string name="no_busybox">Busybox not found!</string>
 
+    <!--ParentRestoreClass.kt-->
+    <string name="loading">Loading…</string>
+    <string name="cancelling">Cancelling…</string>
+
     <!--AppRestoreAdapter.kt-->
     <string name="packageName">Package :</string>
     <string name="versionName">Version name :</string>

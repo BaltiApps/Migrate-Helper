@@ -58,7 +58,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         var settingsPacket: SettingsPacketKotlin? = null
         var wifiPacket: WifiPacketKotlin? = null
 
-        var cancelAll: Boolean = false
+        var cancelLoading: Boolean = false
         private set
     }
 
@@ -78,7 +78,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.restore_selector)
 
-        cancelAll = false
+        cancelLoading = false
 
         waiting_layout.visibility = View.VISIBLE
         app_list.visibility = View.GONE
@@ -128,7 +128,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                             commonTools.tryIt { cancelTask() }
                         }
                     }
-                    cancelAll = true
+                    cancelLoading = true
                 }
             }
         }
@@ -173,7 +173,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
             fun handleResults(nextJob: Int, func: () -> Unit) {
 
-                if (cancelAll) {
+                if (cancelLoading) {
                     displayAllData()
                     return
                 }
@@ -198,7 +198,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             when (jobCode) {
 
                 JOBCODE_ROOT_COPY -> {
-                    if (cancelAll) displayAllData()
+                    if (cancelLoading) displayAllData()
                     else if (!jobSuccess)
                         showError(getString(R.string.are_you_rooted), "${getString(R.string.are_you_rooted_desc)}\n\n$jobResult".trim())
                     else doJob(JOBCODE_GET_APP_JSON)
@@ -254,7 +254,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         wifiPacket?.let { allExtras.add(it) }
         settingsPacket?.let { allExtras.addAll(it.internalPackets) }
 
-        if (!cancelAll && (appPackets.isNotEmpty() || allExtras.isNotEmpty())) {
+        if (!cancelLoading && (appPackets.isNotEmpty() || allExtras.isNotEmpty())) {
 
             if (allExtras.isNotEmpty())
                 extrasContainer.visibility = View.VISIBLE
@@ -496,7 +496,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             waiting_layout.visibility = View.VISIBLE
             app_list.visibility = View.GONE
 
-            if (cancelAll) {
+            if (cancelLoading) {
                 showError(getString(R.string.cancelled_loading), "")
                 commonTools.tryIt { Thread.sleep(DUMMY_WAIT_TIME) }
                 commonTools.tryIt { forceStopDialog.dismiss() }
@@ -507,7 +507,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
     }
 
     override fun onDestroy() {
-        cancelAll = false
+        cancelLoading = false
         commonTools.tryIt { forceStopDialog.dismiss() }
         super.onDestroy()
     }

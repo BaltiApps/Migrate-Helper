@@ -24,7 +24,7 @@ class GetWifiPacketKotlin(jobCode: Int,
     override fun doInBackground(vararg params: Any?): Any {
         try {
             if (files.isNotEmpty()) {
-                if (!RestoreSelectorKotlin.cancelAll) {
+                if (!RestoreSelectorKotlin.cancelLoading) {
                     Thread.sleep(DUMMY_WAIT_TIME)
                     return WifiPacketKotlin(files[0], true)
                 }

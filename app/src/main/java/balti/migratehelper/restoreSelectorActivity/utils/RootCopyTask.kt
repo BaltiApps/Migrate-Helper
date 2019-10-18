@@ -70,7 +70,7 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
                 var line: String?
                 while (true) {
 
-                    if (RestoreSelectorKotlin.cancelAll)
+                    if (RestoreSelectorKotlin.cancelLoading)
                     {
                         cancelTask()
                         return 0

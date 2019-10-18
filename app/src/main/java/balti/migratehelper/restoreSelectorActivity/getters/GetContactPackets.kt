@@ -28,13 +28,13 @@ class GetContactPackets(jobCode: Int,
 
                 var c = 0
                 files.forEach {
-                    if (!RestoreSelectorKotlin.cancelAll) {
+                    if (!RestoreSelectorKotlin.cancelLoading) {
                         contactPackets.add(ContactsPacketKotlin(it, true))
                         publishProgress(++c)
                     }
                 }
 
-                if (!RestoreSelectorKotlin.cancelAll) Thread.sleep(DUMMY_WAIT_TIME)
+                if (!RestoreSelectorKotlin.cancelLoading) Thread.sleep(DUMMY_WAIT_TIME)
 
                 return contactPackets
             }

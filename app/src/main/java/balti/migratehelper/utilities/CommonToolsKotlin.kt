@@ -26,6 +26,13 @@ class CommonToolsKotlin(val context: Context) {
 
         val DEBUG_TAG = "migrate_helper_tag"
 
+        val PENDING_INTENT_REQUEST_ID = 914
+        val PENDING_INTENT_RESTORE_ABORT_ID = 916
+
+        val NOTIFICATION_ID_ONGOING = 229
+        val NOTIFICATION_ID_FINISHED = 230
+        val NOTIFICATION_ID_CANCELLING = 231
+
         val FILE_MAIN_PREF = "main"
 
         val FILE_PROGRESSLOG = "progressLog.txt"
@@ -46,6 +53,12 @@ class CommonToolsKotlin(val context: Context) {
         val ACTION_TRIGGER_RESTORE = "trigger restore"
         val ACTION_RESTORE_SERVICE_STARTED = "restore service started"
         val ACTION_END_ALL = "helper_end_all"
+
+        val EXTRA_PROGRESS_TYPE = "type"
+        val EXTRA_TITLE = "title"
+        val EXTRA_SUBTASK = "subtask"
+        val EXTRA_TASKLOG = "tasklog"
+        val EXTRA_PROGRESS_PERCENTAGE = "progress"
 
         val ERROR_APP_JSON_TRY_CATCH = "APP_JSON_TRY_CATCH"
         val ERROR_APP_JSON = "APP_JSON"

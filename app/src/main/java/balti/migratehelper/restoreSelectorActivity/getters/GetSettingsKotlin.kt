@@ -39,7 +39,7 @@ class GetSettingsKotlin(jobCode: Int,
                 val fontScale = SettingsFields.JSON_FIELD_FONT_SCALE.let { if (jsonObject.has(it)) jsonObject.getDouble(it) else null }
                 val keyboardText = SettingsFields.JSON_FIELD_KEYBOARD_TEXT.let { if (jsonObject.has(it)) jsonObject.getString(it) else null }
 
-                if (!RestoreSelectorKotlin.cancelAll) Thread.sleep(DUMMY_WAIT_TIME)
+                if (!RestoreSelectorKotlin.cancelLoading) Thread.sleep(DUMMY_WAIT_TIME)
 
                 return SettingsPacketKotlin(dpiText, adbState, fontScale, keyboardText)
 

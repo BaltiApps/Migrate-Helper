@@ -30,7 +30,7 @@ class GetAppPackets(jobCode: Int,
 
                 var c = 0
                 files.forEach {
-                    if (!RestoreSelectorKotlin.cancelAll) {
+                    if (!RestoreSelectorKotlin.cancelLoading) {
                         try {
                             val contents = StringBuffer("")
                             it.readLines().forEach { line ->
