@@ -4,8 +4,9 @@
     <dimen name="button_height">45dp</dimen>
     <dimen name="log_button_width">180dp</dimen>
     <dimen name="small_icon_wh">40dp</dimen>
+    <dimen name="erp_icon_wh">35dp</dimen>
     <dimen name="small_padding_width">5dp</dimen>
     <dimen name="large_padding_width">10dp</dimen>
-    <dimen name="extra_item_done_wh">24dp</dimen>
+    <dimen name="extra_small_icon_wh">24dp</dimen>
     <dimen name="extra_large_padding_width">20dp</dimen>
 </resources>

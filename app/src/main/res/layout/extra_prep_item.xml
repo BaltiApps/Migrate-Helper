@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:padding="@dimen/small_padding_width"
+    >
+
+    <ImageView
+        android:layout_width="@dimen/erp_icon_wh"
+        android:layout_height="@dimen/erp_icon_wh"
+        android:id="@+id/erp_item_icon"
+        tools:src="@drawable/ic_call_log_icon"
+        />
+
+    <Space
+        android:layout_width="@dimen/large_padding_width"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/erp_text"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            tools:text="Extra item"
+            />
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/erp_desc"
+            tools:text="Extra desc"
+            android:visibility="gone"
+            />
+
+    </LinearLayout>
+
+
+    <Space
+        android:layout_width="@dimen/large_padding_width"
+        android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        >
+
+        <ProgressBar
+            android:layout_width="@dimen/extra_small_icon_wh"
+            android:layout_height="@dimen/extra_small_icon_wh"
+            android:id="@+id/erp_item_progressBar"/>
+
+        <ImageView
+            android:layout_width="@dimen/extra_small_icon_wh"
+            android:layout_height="@dimen/extra_small_icon_wh"
+            android:id="@+id/erp_state_icon"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

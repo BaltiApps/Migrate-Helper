@@ -77,22 +77,22 @@
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_contacts_done"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:src="@drawable/ic_item_done"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_contacts_cancel"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:src="@drawable/ic_item_cancel"
                     android:visibility="gone" />
 
                 <ProgressBar
                     android:id="@+id/extra_backup_progress_item_contacts_progress"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:visibility="gone" />
 
             </LinearLayout>
@@ -161,16 +161,16 @@
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_sms_done"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:layout_margin="@dimen/large_padding_width"
                     android:src="@drawable/ic_item_done"
                     android:visibility="invisible" />
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_sms_cancel"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:layout_margin="@dimen/large_padding_width"
                     android:src="@drawable/ic_item_cancel"
                     android:visibility="gone" />
@@ -241,16 +241,16 @@
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_calls_done"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:layout_margin="@dimen/large_padding_width"
                     android:src="@drawable/ic_item_done"
                     android:visibility="invisible" />
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_calls_cancel"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:layout_margin="@dimen/large_padding_width"
                     android:src="@drawable/ic_item_cancel"
                     android:visibility="gone" />
@@ -322,16 +322,16 @@
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_dpi_done"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:layout_margin="@dimen/large_padding_width"
                     android:src="@drawable/ic_item_done"
                     android:visibility="invisible" />
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_dpi_cancel"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:layout_margin="@dimen/large_padding_width"
                     android:src="@drawable/ic_item_cancel"
                     android:visibility="gone" />
@@ -403,16 +403,16 @@
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_keyboard_done"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:layout_margin="@dimen/large_padding_width"
                     android:src="@drawable/ic_item_done"
                     android:visibility="invisible" />
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_keyboard_cancel"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:layout_margin="@dimen/large_padding_width"
                     android:src="@drawable/ic_item_cancel"
                     android:visibility="gone" />
@@ -484,8 +484,8 @@
 
                 <ImageView
                     android:id="@+id/extra_backup_progress_item_app_done"
-                    android:layout_width="@dimen/extra_item_done_wh"
-                    android:layout_height="@dimen/extra_item_done_wh"
+                    android:layout_width="@dimen/extra_small_icon_wh"
+                    android:layout_height="@dimen/extra_small_icon_wh"
                     android:layout_margin="@dimen/large_padding_width"
                     android:src="@drawable/ic_item_done"
                     android:visibility="invisible" />

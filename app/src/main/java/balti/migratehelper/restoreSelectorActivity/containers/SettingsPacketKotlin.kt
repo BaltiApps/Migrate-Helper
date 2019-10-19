@@ -6,6 +6,11 @@ import balti.migratehelper.R
 data class SettingsPacketKotlin(val dpiText: String?, val adbState: Int?,
                                 val fontScale: Double?, val keyboardText: String?) {
 
+    var dpiItem: DpiInternalPacket? = null
+    var adbItem: AdbInternalPacket? = null
+    var fontScaleItem: FontScaleInternalPacket? = null
+    var keyboardItem: KeyboardInternalPacket? = null
+
     class DpiInternalPacket(val dpiText: String?): GetterMarker() {
         override var iconResource: Int = R.drawable.ic_dpi_icon
         override var displayText: String = AppInstance.appContext.getString(R.string.dpi)
@@ -33,10 +38,10 @@ data class SettingsPacketKotlin(val dpiText: String?, val adbState: Int?,
     val internalPackets: ArrayList<GetterMarker> = ArrayList(0)
 
     init {
-        dpiText?.let { internalPackets.add(DpiInternalPacket(dpiText)) }
-        adbState?.let { internalPackets.add(AdbInternalPacket(adbState)) }
-        fontScale?.let { internalPackets.add(FontScaleInternalPacket(fontScale)) }
-        keyboardText?.let { internalPackets.add(KeyboardInternalPacket(keyboardText)) }
+        dpiText?.let { internalPackets.add(DpiInternalPacket(it).apply { dpiItem = this }) }
+        adbState?.let { internalPackets.add(AdbInternalPacket(adbState).apply { adbItem = this }) }
+        fontScale?.let { internalPackets.add(FontScaleInternalPacket(fontScale).apply { fontScaleItem = this }) }
+        keyboardText?.let { internalPackets.add(KeyboardInternalPacket(keyboardText).apply { keyboardItem = this }) }
     }
 
 }
