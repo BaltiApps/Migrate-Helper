@@ -4,21 +4,20 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import balti.migratehelper.AppInstance
 import balti.migratehelper.R
-import balti.migratehelper.restoreSelectorActivity.containers.*
 import balti.migratehelper.utilities.CommonToolsKotlin
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
 
 class ExtraRestorePrepare: AppCompatActivity() {
 
-    companion object{
-        var appPackets = ArrayList<AppPacketsKotlin>(0)
-        var contactsPackets = ArrayList<ContactsPacketKotlin>(0)
-        var smsPackets = ArrayList<SmsPacketKotlin>(0)
-        var callsPackets = ArrayList<CallsPacketKotlin>(0)
-        var settingsPacket: SettingsPacketKotlin? = null
-        var wifiPacket: WifiPacketKotlin? = null
-    }
+
+    private val appPackets = AppInstance.appPackets
+    private val contactDataPackets = AppInstance.contactDataPackets
+    private val smsDataPackets = AppInstance.smsDataPackets
+    private val callsDataPackets = AppInstance.callsDataPackets
+    private var settingsPacket = AppInstance.settingsPacket
+    private var wifiPacket = AppInstance.wifiPacket
 
     private var erpItemContacts : View? = null
     private var erpItemSms : View? = null
@@ -39,9 +38,9 @@ class ExtraRestorePrepare: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (contactsPackets.isNotEmpty()) erpItemContacts = getERPItem(R.drawable.ic_contact_icon, R.string.contacts)
-        if (smsPackets.isNotEmpty()) erpItemSms = getERPItem(R.drawable.ic_sms_icon, R.string.sms)
-        if (callsPackets.isNotEmpty()) erpItemCalls = getERPItem(R.drawable.ic_call_log_icon, R.string.calls)
+        if (contactDataPackets.isNotEmpty()) erpItemContacts = getERPItem(R.drawable.ic_contact_icon, R.string.contacts)
+        if (smsDataPackets.isNotEmpty()) erpItemSms = getERPItem(R.drawable.ic_sms_icon, R.string.sms)
+        if (callsDataPackets.isNotEmpty()) erpItemCalls = getERPItem(R.drawable.ic_call_log_icon, R.string.calls)
         if (settingsPacket?.dpiItem != null) erpItemDpi = getERPItem(R.drawable.ic_dpi_icon, R.string.dpi)
         if (settingsPacket?.adbItem != null) erpItemAdb = getERPItem(R.drawable.ic_adb_icon, R.string.adb_state)
         if (settingsPacket?.fontScale != null) erpItemFontScale = getERPItem(R.drawable.ic_font_scale_icon, R.string.font_scale)

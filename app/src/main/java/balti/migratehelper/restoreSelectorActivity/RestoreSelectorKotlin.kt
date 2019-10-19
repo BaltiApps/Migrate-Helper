@@ -51,16 +51,16 @@ import java.io.OutputStreamWriter
 class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
     companion object {
-        val appPackets by lazy { ArrayList<AppPacketsKotlin>(0) }
-        val contactDataPackets by lazy { ArrayList<ContactsPacketKotlin>(0) }
-        val smsDataPackets by lazy { ArrayList<SmsPacketKotlin>(0) }
-        val callsDataPackets by lazy { ArrayList<CallsPacketKotlin>(0) }
-        var settingsPacket: SettingsPacketKotlin? = null
-        var wifiPacket: WifiPacketKotlin? = null
-
         var cancelLoading: Boolean = false
         private set
     }
+
+    private val appPackets = AppInstance.appPackets
+    private val contactDataPackets = AppInstance.contactDataPackets
+    private val smsDataPackets = AppInstance.smsDataPackets
+    private val callsDataPackets = AppInstance.callsDataPackets
+    private var settingsPacket = AppInstance.settingsPacket
+    private var wifiPacket = AppInstance.wifiPacket
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val allErrors by lazy { ArrayList<String>(0) }
