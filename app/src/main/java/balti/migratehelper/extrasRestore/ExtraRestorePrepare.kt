@@ -93,7 +93,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
     }
 
-    private fun toggleERPItemStatusIcon(erpView: View?, isDone: Int, doneMessage: Int? = null){
+    private fun toggleERPItemStatusIcon(erpView: View?, isDone: Int, doneMessage: String? = null){
 
         if (erpView == null) return
 
@@ -116,7 +116,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         commonTools.tryIt {
             doneMessage?.let {
-                erpView.erp_desc.setText(it)
+                erpView.erp_desc.text = it
                 erpView.erp_desc.visibility = View.VISIBLE
             }
         }
@@ -177,7 +177,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                     .setView(contactsView)
                     .setPositiveButton(R.string.proceed) { _, _ -> nextContact() }
                     .setNegativeButton(android.R.string.cancel) { _, _ ->
-                        toggleERPItemStatusIcon(erpItemContacts, CANCEL, R.string.cancelled)
+                        toggleERPItemStatusIcon(erpItemContacts, CANCEL, getString(R.string.cancelled))
                         doFallThroughJob(JOBCODE_PREP_SMS)
                     }
                     .setCancelable(false)
@@ -191,19 +191,24 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
     private fun nextContact(){
         if (contactsCount < contactDataPackets.size) {
-            startActivityForResult(Intent(Intent.ACTION_VIEW).apply {
+            try {
+                startActivityForResult(Intent(Intent.ACTION_VIEW).apply {
 
-                val packet = contactDataPackets[contactsCount]
+                    val packet = contactDataPackets[contactsCount]
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                    setDataAndType(FileProvider.getUriForFile(this@ExtraRestorePrepare,
-                            "migrate.helper.provider", packet.vcfFile), "text/x-vcard")
-                else setDataAndType(Uri.fromFile(packet.vcfFile), "text/x-vcard")
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                        setDataAndType(FileProvider.getUriForFile(this@ExtraRestorePrepare,
+                                "migrate.helper.provider", packet.vcfFile), "text/x-vcard")
+                    else setDataAndType(Uri.fromFile(packet.vcfFile), "text/x-vcard")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-                contactsCount++
+                    contactsCount++
 
-            }, JOBCODE_RESTORE_CONTACTS)
+                }, JOBCODE_RESTORE_CONTACTS)
+            } catch (e: Exception){
+                e.printStackTrace()
+                toggleERPItemStatusIcon(erpItemContacts, CANCEL, e.message.toString())
+            }
         }
         else {
             toggleERPItemStatusIcon(erpItemContacts, DONE)
