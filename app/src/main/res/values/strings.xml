@@ -244,6 +244,7 @@
     <string name="font_scale">Font scale</string>
     <string name="wifi">Wifi config. file</string>
     <string name="cancelled_loading">Cancelled loading</string>
+    <string name="cancelled">Cancelled</string>
 
     <!--app_search_layout.xml-->
     <string name="enter_app_name">App/package name</string>

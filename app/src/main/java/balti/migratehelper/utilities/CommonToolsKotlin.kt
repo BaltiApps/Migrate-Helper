@@ -90,6 +90,23 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_GET_WIFI = 70000
         val JOBCODE_END_ALL = 80000
 
+        val JOBCODE_PREP_CONTACTS = 35000
+        val JOBCODE_PREP_SMS = 45000
+        val JOBCODE_PREP_CALLS = 55000
+        val JOBCODE_PREP_DPI = 62000
+        val JOBCODE_PREP_ADB = 64000
+        val JOBCODE_PREP_FONT_SCALE = 66000
+        val JOBCODE_PREP_KEYBOARD = 68000
+        val JOBCODE_PREP_WIFI = 75000
+        val JOBCODE_PREP_APP = 85000
+
+        val JOBCODE_RESTORE_CONTACTS = 35001
+        val JOBCODE_RESTORE_SMS = 45001
+        val JOBCODE_RESTORE_CALLS = 55001
+        val JOBCODE_RESTORE_SETTINGS = 62001
+        val JOBCODE_RESTORE_WIFI = 75000
+        val JOBCODE_RESTORE_APP = 85001
+
         val EXTRA_DPI_VALUE = "dpiValue"
         val EXTRA_DO_REBOOT = "doReboot"
         val EXTRA_DO_UNINSTALL = "doUninstall"
