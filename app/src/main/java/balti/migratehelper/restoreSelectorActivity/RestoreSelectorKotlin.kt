@@ -15,6 +15,12 @@ import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.Toast
 import balti.migratehelper.AppInstance
+import balti.migratehelper.AppInstance.Companion.appPackets
+import balti.migratehelper.AppInstance.Companion.callsDataPackets
+import balti.migratehelper.AppInstance.Companion.contactDataPackets
+import balti.migratehelper.AppInstance.Companion.settingsPacket
+import balti.migratehelper.AppInstance.Companion.smsDataPackets
+import balti.migratehelper.AppInstance.Companion.wifiPacket
 import balti.migratehelper.R
 import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.*
@@ -54,13 +60,6 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         var cancelLoading: Boolean = false
         private set
     }
-
-    private val appPackets = AppInstance.appPackets
-    private val contactDataPackets = AppInstance.contactDataPackets
-    private val smsDataPackets = AppInstance.smsDataPackets
-    private val callsDataPackets = AppInstance.callsDataPackets
-    private var settingsPacket = AppInstance.settingsPacket
-    private var wifiPacket = AppInstance.wifiPacket
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val allErrors by lazy { ArrayList<String>(0) }
