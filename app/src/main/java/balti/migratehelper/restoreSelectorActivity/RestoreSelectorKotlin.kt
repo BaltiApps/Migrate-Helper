@@ -245,6 +245,10 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
         var error = ""
 
+        restore_selecter_back_button.setOnClickListener {
+            onBackPressed()
+        }
+
         val allExtras: ArrayList<GetterMarker> = ArrayList(0)
         allExtras.addAll(contactDataPackets)
         allExtras.addAll(smsDataPackets)
@@ -471,6 +475,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                                     .setMessage(R.string.do_not_use_desc)
                                     .setPositiveButton(R.string.goAhead) { _, _ ->
                                         startActivity(Intent(this@RestoreSelectorKotlin, ExtraRestorePrepare::class.java))
+                                        finish()
                                     }
                                     .setNegativeButton(R.string.later, null)
                                     .show()

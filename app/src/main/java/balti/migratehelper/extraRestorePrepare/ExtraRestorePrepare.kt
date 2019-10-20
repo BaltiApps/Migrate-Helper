@@ -28,6 +28,7 @@ import balti.migratehelper.AppInstance.Companion.wifiPacket
 import balti.migratehelper.R
 import balti.migratehelper.extraRestorePrepare.utils.AppsNotInstalledViewManager
 import balti.migratehelper.restoreEngines.RestoreServiceKotlin
+import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.GetterMarker
 import balti.migratehelper.utilities.CommonToolsKotlin
@@ -43,7 +44,6 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_KE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_SMS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_WIFI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CONTACTS
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_SET_THIS_AS_DEFAULT_SMS_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
@@ -104,6 +104,15 @@ class ExtraRestorePrepare: AppCompatActivity() {
             if (wifiPacket != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_wifi_icon, R.string.wifi).apply { erpItemWifi = this })
 
         if (appPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_app, R.string.apps).apply { erpItemApps = this })
+
+        erp_close_button.setOnClickListener {
+            finishThis()
+        }
+
+        extra_restore_prep_cancel_button.setOnClickListener {
+            cancelChecks = true
+            doFallThroughJob(JOBCODE_PREP_END)
+        }
 
         doFallThroughJob(JOBCODE_PREP_CONTACTS)
     }
@@ -231,7 +240,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                         .setMessage(getText(R.string.smsPermission_desc))
                         .setPositiveButton(android.R.string.ok) { _, _ ->
                             actualDefaultSmsAppName = getDefaultSmsApp()
-                            commonTools.setDefaultSms(packageName, JOBCODE_SET_THIS_AS_DEFAULT_SMS_APP)
+                            commonTools.setDefaultSms(packageName, JOBCODE_PREP_SMS)
                         }
                         .setNegativeButton(android.R.string.cancel) { _, _ ->
                             toggleERPItemStatusIcon(erpItemSms, CANCEL, getString(R.string.cancelled))
@@ -287,6 +296,11 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         doJob(JOBCODE_PREP_KEYBOARD) {
             toggleERPItemStatusIcon(erpItemKeyboard, DONE, getString(R.string.will_be_restored_later))
+            doFallThroughJob(JOBCODE_PREP_WIFI)
+        }
+
+        doJob(JOBCODE_PREP_WIFI) {
+            toggleERPItemStatusIcon(erpItemWifi, DONE, getString(R.string.ready_to_be_restored))
             doFallThroughJob(JOBCODE_PREP_APP)
         }
 
@@ -335,15 +349,19 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
 
         doJob(JOBCODE_PREP_END) {
-            if (!cancelChecks){
 
-                fun startService(){
+            fun act(){
+                if (cancelChecks) finishThis()
+                else {
                     Intent(this, RestoreServiceKotlin::class.java).run {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                             startForegroundService(this)
                         else startService(this)
                     }
                 }
+            }
+
+            if (!cancelChecks){
 
                 if (AppInstance.sharedPrefs.getBoolean(PREF_RESTORE_START_ANIMATION, true)) {
 
@@ -373,7 +391,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                                 runnable = Runnable {
                                     if (c == 0) {
                                         commonTools.tryIt { handler.removeCallbacks(runnable) }
-                                        startService()
+                                        act()
                                     } else {
                                         restore_countdown_text.startAnimation(slideOut)
                                         handler.postDelayed(runnable, 1000)
@@ -388,10 +406,10 @@ class ExtraRestorePrepare: AppCompatActivity() {
                     restore_countdown_text.startAnimation(slideIn)
                 }
                 else {
-                    startService()
+                    act()
                 }
             }
-            else finish()
+            else act()
         }
     }
 
@@ -432,13 +450,25 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode){
+
+        when (requestCode) {
             JOBCODE_RESTORE_CONTACTS -> nextContact()
             JOBCODE_PREP_SMS -> doFallThroughJob(JOBCODE_PREP_SMS)
         }
     }
 
+    private fun finishThis(){
+        commonTools.tryIt { handler.removeCallbacks(runnable) }
+        startActivity(Intent(this, RestoreSelectorKotlin::class.java))
+        finish()
+    }
+
+    override fun onBackPressed() {
+        finishThis()
+    }
+
     override fun onDestroy() {
+        commonTools.tryIt { handler.removeCallbacks(runnable) }
         super.onDestroy()
     }
 }

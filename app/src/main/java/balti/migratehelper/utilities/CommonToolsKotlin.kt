@@ -109,8 +109,6 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_RESTORE_WIFI = 75000
         val JOBCODE_RESTORE_APP = 85001
 
-        val JOBCODE_SET_THIS_AS_DEFAULT_SMS_APP = 332
-
         val EXTRA_DPI_VALUE = "dpiValue"
         val EXTRA_DO_REBOOT = "doReboot"
         val EXTRA_DO_UNINSTALL = "doUninstall"
@@ -413,7 +411,7 @@ class CommonToolsKotlin(val context: Context) {
 
 
 
-    fun tryIt(f: () -> Unit, showError: Boolean = false, isCancelable: Boolean = true, title: String = ""){
+    fun tryIt(f: () -> Unit, showError: Boolean = false, isCancelable: Boolean = true, title: String = "", printStackTrace : Boolean = true){
         try {
             f()
         }
@@ -421,18 +419,18 @@ class CommonToolsKotlin(val context: Context) {
             if (showError)
             {
                 showErrorDialog(e.message.toString(), title, isCancelable)
-                e.printStackTrace()
+                if (printStackTrace) e.printStackTrace()
             }
-            else e.printStackTrace()
+            else if (printStackTrace) e.printStackTrace()
         }
     }
 
-    fun tryIt(f: () -> Unit, title: String = ""){
-        tryIt(f, false, true, title)
+    fun tryIt(f: () -> Unit, title: String = "", printStackTrace : Boolean = true){
+        tryIt(f, false, true, title, printStackTrace)
     }
 
     fun tryIt(f: () -> Unit){
-        tryIt(f, "")
+        tryIt(f, "", false)
     }
 
     fun showErrorDialog(message: String, title: String = "", isCancelable: Boolean = true){

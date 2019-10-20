@@ -64,7 +64,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:fillViewport="true"
         android:layout_margin="@dimen/large_padding_width"
         >
@@ -77,5 +78,28 @@
             />
 
     </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/extra_restore_prep_cancel_button"
+            android:layout_width="@dimen/button_width"
+            android:layout_height="@dimen/button_height"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/cancel_root_request"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:padding="@dimen/large_padding_width"
+            android:textAllCaps="true"
+            android:text="@android:string/cancel"
+            android:textColor="@android:color/white" />
+
+    </RelativeLayout>
 
 </LinearLayout>

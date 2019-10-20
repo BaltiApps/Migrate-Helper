@@ -15,6 +15,14 @@ if [[ -e ${TEMP_DIR_NAME}/${apk_dir_name} ]]; then
     chmod 777 "$full_apk_dir"
     cd ${full_apk_dir}
 
+    # store package verification state
+    verification_state="$(settings get global package_verifier_enable)"
+
+    # disable package verification if the above field exists or if it not 0 by default
+    if [[ ${verification_state} != "null" && ${verification_state} !="0" ]]; then
+        settings put global package_verifier_enable 0
+    fi
+
     #install main app
     if [[ -n ${installer_name} && ${installer_name} != "NULL" ]]; then
         pm install -r -d -t -i ${installer_name} ${base_apk_name}
@@ -54,6 +62,11 @@ if [[ -e ${TEMP_DIR_NAME}/${apk_dir_name} ]]; then
         else
             echo "No split apks. Split count: $split_count"
         fi
+    fi
+
+    # restore package verification state
+    if [[ ${verification_state} != "null" && ${verification_state} != "0" ]]; then
+        settings put global package_verifier_enable ${verification_state}
     fi
 
     rm -rf "$full_apk_dir"
