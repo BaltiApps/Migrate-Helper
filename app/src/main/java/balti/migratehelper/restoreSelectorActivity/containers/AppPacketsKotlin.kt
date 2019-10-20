@@ -39,6 +39,9 @@ class AppPacketsKotlin(jsonObject: JSONObject) {
         MtdConstants.MTD_ICON_FILE_NAME.let {if (jsonObject.has(it)) iconFileName = jsonObject.getString(it)}
         MtdConstants.MTD_INSTALLER_NAME.let {if (jsonObject.has(it)) installerName = jsonObject.getString(it)}
 
+        apkName = apkName?.let { if (it == "" || it == "NULL") null else it}
+        dataName = dataName?.let { if (it == "" || it == "NULL") null else it}
+
         APP = apkName != null
         DATA = dataName != null
         PERMISSION = isPermission
