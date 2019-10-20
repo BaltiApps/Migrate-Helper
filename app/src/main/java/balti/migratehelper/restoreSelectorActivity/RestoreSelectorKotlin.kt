@@ -2,7 +2,6 @@ package balti.migratehelper.restoreSelectorActivity
 
 import android.content.Intent
 import android.os.AsyncTask
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AlertDialog
@@ -22,7 +21,7 @@ import balti.migratehelper.AppInstance.Companion.settingsPacket
 import balti.migratehelper.AppInstance.Companion.smsDataPackets
 import balti.migratehelper.AppInstance.Companion.wifiPacket
 import balti.migratehelper.R
-import balti.migratehelper.restoreEngines.RestoreServiceKotlin
+import balti.migratehelper.extrasRestore.ExtraRestorePrepare
 import balti.migratehelper.restoreSelectorActivity.containers.*
 import balti.migratehelper.restoreSelectorActivity.getters.*
 import balti.migratehelper.restoreSelectorActivity.utils.AppRestoreAdapter
@@ -471,15 +470,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                                     .setTitle(R.string.turn_off_internet_and_updates)
                                     .setMessage(R.string.do_not_use_desc)
                                     .setPositiveButton(R.string.goAhead) { _, _ ->
-
-                                        Intent(this@RestoreSelectorKotlin, RestoreServiceKotlin::class.java).run {
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                                startForegroundService(this)
-                                            } else {
-                                                startService(this)
-                                            }
-                                        }
-
+                                        startActivity(Intent(this@RestoreSelectorKotlin, ExtraRestorePrepare::class.java))
                                     }
                                     .setNegativeButton(R.string.later, null)
                                     .show()

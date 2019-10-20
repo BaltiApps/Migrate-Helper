@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Telephony
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -22,18 +23,21 @@ import balti.migratehelper.AppInstance.Companion.settingsPacket
 import balti.migratehelper.AppInstance.Companion.smsDataPackets
 import balti.migratehelper.AppInstance.Companion.wifiPacket
 import balti.migratehelper.R
+import balti.migratehelper.restoreEngines.RestoreServiceKotlin
+import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.GetterMarker
 import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_ADB
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_CALLS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_CONTACTS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_DPI
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_END
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_FONT_SCALE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_KEYBOARD
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_SMS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_WIFI
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CALLS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CONTACTS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_SET_THIS_AS_DEFAULT_SMS_APP
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
@@ -132,13 +136,19 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
     private fun <T : GetterMarker> filterSelected(packets: ArrayList<T>) {
         val selected = ArrayList<T>(0)
-        for (p in packets) if (p.isSelected) selected.add(p)
-        packets.clear()
-        packets.addAll(selected)
+        for (p in packets) {
+            if (cancelChecks) break
+            if (p.isSelected) selected.add(p)
+        }
+        if (!cancelChecks) {
+            packets.clear()
+            packets.addAll(selected)
+        }
     }
 
     private fun <T : GetterMarker> filterSelected(packet: T?): T? {
-        return if (packet != null && packet.isSelected) packet
+        return if (cancelChecks) packet
+        else if (packet != null && packet.isSelected) packet
         else null
     }
 
@@ -148,7 +158,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         fun doJob(jCode: Int, func: () -> Unit) {
 
-            if (!cancelChecks && (fallThrough || jobCode == jCode)) {
+            if (!cancelChecks && fallThrough || jobCode == jCode) {
 
                 val view : View? = when (jCode) {
                     JOBCODE_PREP_CONTACTS -> erpItemContacts
@@ -163,9 +173,10 @@ class ExtraRestorePrepare: AppCompatActivity() {
                     else -> null
                 }
 
-                fallThrough = if (view != null){
+                fallThrough = if (view != null || jCode == JOBCODE_PREP_END){
                     toggleERPItemStatusIcon(view, WAIT)
-                    func(); false
+                    Handler().postDelayed({func()}, DUMMY_WAIT_TIME)
+                    false
                 }
                 else true
 
@@ -216,7 +227,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                             doFallThroughJob(JOBCODE_PREP_CALLS)
                         }
                         .setCancelable(false)
-                        .create()
+                        .show()
             }
             else {
                 toggleERPItemStatusIcon(erpItemSms, DONE, getString(R.string.ready_to_be_restored))
@@ -232,14 +243,14 @@ class ExtraRestorePrepare: AppCompatActivity() {
                         .setTitle(R.string.callsPermission)
                         .setMessage(getText(R.string.callsPermission_desc))
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_CALL_LOG), JOBCODE_RESTORE_CALLS)
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_CALL_LOG), JOBCODE_PREP_CALLS)
                         }
                         .setNegativeButton(android.R.string.cancel) { _, _ ->
                             toggleERPItemStatusIcon(erpItemCalls, CANCEL, getString(R.string.cancelled))
                             doFallThroughJob(JOBCODE_PREP_DPI)
                         }
                         .setCancelable(false)
-                        .create()
+                        .show()
 
             }
             else {
@@ -267,11 +278,40 @@ class ExtraRestorePrepare: AppCompatActivity() {
             toggleERPItemStatusIcon(erpItemKeyboard, DONE, getString(R.string.will_be_restored_later))
             doFallThroughJob(JOBCODE_PREP_APP)
         }
+
+        doJob(JOBCODE_PREP_APP) {
+            commonTools.doBackgroundTask({
+                val appFiltered = ArrayList<AppPacketsKotlin>(0)
+                for (p in appPackets){
+                    if (cancelChecks) break
+                    if (p.IS_SELECTED) appFiltered.add(p)
+                }
+                if (!cancelChecks) {
+                    appPackets.clear()
+                    appPackets.addAll(appFiltered)
+                }
+            }, {
+                toggleERPItemStatusIcon(erpItemApps, DONE)
+                doFallThroughJob(JOBCODE_PREP_END)
+            })
+        }
+
+        doJob(JOBCODE_PREP_END) { end() }
+    }
+
+    private fun end(){
+        if (!cancelChecks) Intent(this, RestoreServiceKotlin::class.java).run {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                startForegroundService(this)
+            else startService(this)
+        }
+        else finish()
     }
 
     private fun nextContact(){
-        if (contactsCount < contactDataPackets.size) {
-            try {
+        when {
+            cancelChecks -> end()
+            contactsCount < contactDataPackets.size -> try {
                 startActivityForResult(Intent(Intent.ACTION_VIEW).apply {
 
                     val packet = contactDataPackets[contactsCount]
@@ -289,15 +329,18 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 e.printStackTrace()
                 toggleERPItemStatusIcon(erpItemContacts, CANCEL, e.message.toString())
             }
-        }
-        else {
-            toggleERPItemStatusIcon(erpItemContacts, DONE)
-            doFallThroughJob(JOBCODE_PREP_SMS)
+            else -> {
+                toggleERPItemStatusIcon(erpItemContacts, DONE)
+                doFallThroughJob(JOBCODE_PREP_SMS)
+            }
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            JOBCODE_PREP_CALLS -> doFallThroughJob(JOBCODE_PREP_CALLS)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -305,7 +348,10 @@ class ExtraRestorePrepare: AppCompatActivity() {
         when (requestCode){
             JOBCODE_RESTORE_CONTACTS -> nextContact()
             JOBCODE_PREP_SMS -> doFallThroughJob(JOBCODE_PREP_SMS)
-            JOBCODE_PREP_CALLS -> doFallThroughJob(JOBCODE_PREP_DPI)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }

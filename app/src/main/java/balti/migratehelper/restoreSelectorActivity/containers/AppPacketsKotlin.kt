@@ -22,6 +22,9 @@ class AppPacketsKotlin(jsonObject: JSONObject) {
     var DATA = false
     var PERMISSION = false
 
+    var IS_SELECTED: Boolean = false
+        get() = APP || DATA || PERMISSION
+
     init {
         MtdConstants.MTD_APP_NAME.let {if (jsonObject.has(it)) appName = jsonObject.getString(it)}
         MtdConstants.MTD_IS_SYSTEM.let {if (jsonObject.has(it)) isSystemApp = jsonObject.getBoolean(it)}
@@ -40,5 +43,4 @@ class AppPacketsKotlin(jsonObject: JSONObject) {
         DATA = dataName != null
         PERMISSION = isPermission
     }
-
 }

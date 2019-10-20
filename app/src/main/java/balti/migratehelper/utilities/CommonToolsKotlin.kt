@@ -100,6 +100,7 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_PREP_KEYBOARD = 68000
         val JOBCODE_PREP_WIFI = 75000
         val JOBCODE_PREP_APP = 85000
+        val JOBCODE_PREP_END = 95000
 
         val JOBCODE_RESTORE_CONTACTS = 35001
         val JOBCODE_RESTORE_SMS = 45001
