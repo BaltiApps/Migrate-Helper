@@ -1,14 +1,20 @@
 package balti.migratehelper.extrasRestore
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Telephony
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.TextView
+import balti.migratehelper.AppInstance.Companion.actualDefaultSmsAppName
 import balti.migratehelper.AppInstance.Companion.appPackets
 import balti.migratehelper.AppInstance.Companion.callsDataPackets
 import balti.migratehelper.AppInstance.Companion.contactDataPackets
@@ -27,7 +33,9 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_FO
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_KEYBOARD
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_SMS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_WIFI
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CALLS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CONTACTS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_SET_THIS_AS_DEFAULT_SMS_APP
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
 import kotlinx.android.synthetic.main.extra_restore_prepare.*
@@ -75,7 +83,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
         if (callsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_call_log_icon, R.string.calls).apply { erpItemCalls = this })
         if (settingsPacket?.dpiItem != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_dpi_icon, R.string.dpi).apply { erpItemDpi = this })
         if (settingsPacket?.adbItem != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_adb_icon, R.string.adb_state).apply { erpItemAdb = this })
-        if (settingsPacket?.fontScale != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_font_scale_icon, R.string.font_scale).apply { erpItemFontScale = this })
+        if (settingsPacket?.fontScaleItem != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_font_scale_icon, R.string.font_scale).apply { erpItemFontScale = this })
         if (settingsPacket?.keyboardItem != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_keyboard_icon, R.string.keyboard).apply { erpItemKeyboard = this })
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
@@ -186,6 +194,78 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         doJob(JOBCODE_PREP_SMS) {
 
+            fun getDefaultSmsApp(): String {
+                return Telephony.Sms.getDefaultSmsPackage(this)
+            }
+
+            fun areWeDefaultSmsApp(): Boolean {
+                return getDefaultSmsApp() == packageName
+            }
+
+            if (!areWeDefaultSmsApp()) {
+
+                AlertDialog.Builder(this)
+                        .setTitle(R.string.smsPermission)
+                        .setMessage(getText(R.string.smsPermission_desc))
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            actualDefaultSmsAppName = getDefaultSmsApp()
+                            commonTools.setDefaultSms(packageName, JOBCODE_SET_THIS_AS_DEFAULT_SMS_APP)
+                        }
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            toggleERPItemStatusIcon(erpItemSms, CANCEL, getString(R.string.cancelled))
+                            doFallThroughJob(JOBCODE_PREP_CALLS)
+                        }
+                        .setCancelable(false)
+                        .create()
+            }
+            else {
+                toggleERPItemStatusIcon(erpItemSms, DONE, getString(R.string.ready_to_be_restored))
+                doFallThroughJob(JOBCODE_PREP_CALLS)
+            }
+        }
+
+        doJob(JOBCODE_PREP_CALLS) {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED){
+
+                AlertDialog.Builder(this)
+                        .setTitle(R.string.callsPermission)
+                        .setMessage(getText(R.string.callsPermission_desc))
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_CALL_LOG), JOBCODE_RESTORE_CALLS)
+                        }
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            toggleERPItemStatusIcon(erpItemCalls, CANCEL, getString(R.string.cancelled))
+                            doFallThroughJob(JOBCODE_PREP_DPI)
+                        }
+                        .setCancelable(false)
+                        .create()
+
+            }
+            else {
+                toggleERPItemStatusIcon(erpItemCalls, DONE, getString(R.string.ready_to_be_restored))
+                doFallThroughJob(JOBCODE_PREP_DPI)
+            }
+        }
+
+        doJob(JOBCODE_PREP_DPI) {
+            toggleERPItemStatusIcon(erpItemDpi, DONE, getString(R.string.will_be_restored_later))
+            doFallThroughJob(JOBCODE_PREP_ADB)
+        }
+
+        doJob(JOBCODE_PREP_ADB) {
+            toggleERPItemStatusIcon(erpItemAdb, DONE, getString(R.string.ready_to_be_restored))
+            doFallThroughJob(JOBCODE_PREP_FONT_SCALE)
+        }
+
+        doJob(JOBCODE_PREP_FONT_SCALE) {
+            toggleERPItemStatusIcon(erpItemFontScale, DONE, getString(R.string.ready_to_be_restored))
+            doFallThroughJob(JOBCODE_PREP_KEYBOARD)
+        }
+
+        doJob(JOBCODE_PREP_KEYBOARD) {
+            toggleERPItemStatusIcon(erpItemKeyboard, DONE, getString(R.string.will_be_restored_later))
+            doFallThroughJob(JOBCODE_PREP_APP)
         }
     }
 
@@ -224,6 +304,8 @@ class ExtraRestorePrepare: AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode){
             JOBCODE_RESTORE_CONTACTS -> nextContact()
+            JOBCODE_PREP_SMS -> doFallThroughJob(JOBCODE_PREP_SMS)
+            JOBCODE_PREP_CALLS -> doFallThroughJob(JOBCODE_PREP_DPI)
         }
     }
 }

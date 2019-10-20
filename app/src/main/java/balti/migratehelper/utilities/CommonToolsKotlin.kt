@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
+import android.provider.Telephony
 import android.support.v4.content.FileProvider
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
@@ -107,6 +108,8 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_RESTORE_WIFI = 75000
         val JOBCODE_RESTORE_APP = 85001
 
+        val JOBCODE_SET_THIS_AS_DEFAULT_SMS_APP = 332
+
         val EXTRA_DPI_VALUE = "dpiValue"
         val EXTRA_DO_REBOOT = "doReboot"
         val EXTRA_DO_UNINSTALL = "doUninstall"
@@ -125,11 +128,11 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_IGNORE_READ_ERRORS = "ignore_read_errors"
         val PREF_IGNORE_EXTRAS = "ignore_extras"
 
-        val PACKAGE_NAME_PLAY_STORE = "com.android.vending"
-        val PACKAGE_NAME_FDROID = "org.fdroid.fdroid.privileged"
-
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migratehelper/cache/"
+
+        val PACKAGE_NAME_PLAY_STORE = "com.android.vending"
+        val PACKAGE_NAME_FDROID = "org.fdroid.fdroid.privileged"
 
         val EXTRA_VIEW_COUNT = 500
 
@@ -479,5 +482,13 @@ class CommonToolsKotlin(val context: Context) {
             }
         }
         Class().execute()
+    }
+
+    fun setDefaultSms(packageName: String, requestCode: Int) {
+        if (context is AppCompatActivity) {
+            val intent = Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT)
+            intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName)
+            context.startActivityForResult(intent, requestCode)
+        }
     }
 }
