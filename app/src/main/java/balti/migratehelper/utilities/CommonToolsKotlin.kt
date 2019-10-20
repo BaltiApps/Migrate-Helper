@@ -128,6 +128,7 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_ANDROID_VERSION_WARNING = "android_version_warning"
         val PREF_IGNORE_READ_ERRORS = "ignore_read_errors"
         val PREF_IGNORE_EXTRAS = "ignore_extras"
+        val PREF_RESTORE_START_ANIMATION = "restore_start_animation"
 
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migratehelper/cache/"

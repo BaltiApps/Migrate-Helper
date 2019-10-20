@@ -14,7 +14,10 @@ import android.support.v4.content.FileProvider
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.TextView
+import balti.migratehelper.AppInstance
 import balti.migratehelper.AppInstance.Companion.actualDefaultSmsAppName
 import balti.migratehelper.AppInstance.Companion.appPackets
 import balti.migratehelper.AppInstance.Companion.callsDataPackets
@@ -41,6 +44,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_SM
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_WIFI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CONTACTS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_SET_THIS_AS_DEFAULT_SMS_APP
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
 import kotlinx.android.synthetic.main.extra_restore_prepare.*
@@ -67,9 +71,14 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
     private var contactsCount = 0
 
+    private lateinit var runnable: Runnable
+    private lateinit var handler: Handler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.extra_restore_prepare)
+
+        restore_countdown.visibility = View.GONE
 
         filterSelected(contactDataPackets)
         filterSelected(smsDataPackets)
@@ -176,6 +185,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
                 fallThrough = if (view != null || jCode == JOBCODE_PREP_END){
                     toggleERPItemStatusIcon(view, WAIT)
+                    restore_countdown.visibility = View.GONE
                     Handler().postDelayed({func()}, DUMMY_WAIT_TIME)
                     false
                 }
@@ -325,10 +335,61 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
 
         doJob(JOBCODE_PREP_END) {
-            if (!cancelChecks) Intent(this, RestoreServiceKotlin::class.java).run {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    startForegroundService(this)
-                else startService(this)
+            if (!cancelChecks){
+
+                fun startService(){
+                    Intent(this, RestoreServiceKotlin::class.java).run {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            startForegroundService(this)
+                        else startService(this)
+                    }
+                }
+
+                if (AppInstance.sharedPrefs.getBoolean(PREF_RESTORE_START_ANIMATION, true)) {
+
+                    restore_countdown.visibility = View.VISIBLE
+                    var c = 3
+                    var firstSlideIn = true
+                    restore_countdown_text.text = c.toString()
+
+                    val slideOut = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right)
+                    val slideIn = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left)
+
+                    slideOut.setAnimationListener(object : Animation.AnimationListener {
+                        override fun onAnimationRepeat(animation: Animation?) {}
+                        override fun onAnimationStart(animation: Animation?) {}
+                        override fun onAnimationEnd(animation: Animation?) {
+                            restore_countdown_text.text = (--c).toString()
+                            restore_countdown_text.startAnimation(slideIn)
+                        }
+                    })
+
+                    slideIn.setAnimationListener(object : Animation.AnimationListener {
+                        override fun onAnimationRepeat(animation: Animation?) {}
+                        override fun onAnimationStart(animation: Animation?) {}
+                        override fun onAnimationEnd(animation: Animation?) {
+                            if (firstSlideIn) {
+                                handler = Handler()
+                                runnable = Runnable {
+                                    if (c == 0) {
+                                        commonTools.tryIt { handler.removeCallbacks(runnable) }
+                                        startService()
+                                    } else {
+                                        restore_countdown_text.startAnimation(slideOut)
+                                        handler.postDelayed(runnable, 1000)
+                                    }
+                                }
+                                handler.post(runnable)
+                                firstSlideIn = false
+                            }
+                        }
+                    })
+
+                    restore_countdown_text.startAnimation(slideIn)
+                }
+                else {
+                    startService()
+                }
             }
             else finish()
         }

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_list_bg"
-    >
+    android:background="@drawable/app_list_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,6 +29,36 @@
             android:paddingStart="10dp"
             android:text="@string/erp_title"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/restore_countdown_height"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:id="@+id/restore_countdown"
+        android:visibility="gone"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="3"
+            android:textSize="@dimen/countdown_text_size"
+            android:id="@+id/restore_countdown_text"
+            />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/small_padding_width"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/restore_starting_in"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            />
 
     </LinearLayout>
 

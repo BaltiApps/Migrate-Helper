@@ -70,6 +70,7 @@
     <string name="erp_title">Preparing to restore</string>
     <string name="will_be_restored_later">To be restored after applications</string>
     <string name="ready_to_be_restored">Ready to restore</string>
+    <string name="restore_starting_in">Restore starting in…</string>
 
     <!--progress.xml-->
     <string name="close">CLOSE</string>
