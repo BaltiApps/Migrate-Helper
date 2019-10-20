@@ -21,13 +21,13 @@ import balti.migratehelper.AppInstance.Companion.settingsPacket
 import balti.migratehelper.AppInstance.Companion.smsDataPackets
 import balti.migratehelper.AppInstance.Companion.wifiPacket
 import balti.migratehelper.R
-import balti.migratehelper.extrasRestore.ExtraRestorePrepare
 import balti.migratehelper.restoreSelectorActivity.containers.*
 import balti.migratehelper.restoreSelectorActivity.getters.*
 import balti.migratehelper.restoreSelectorActivity.utils.AppRestoreAdapter
 import balti.migratehelper.restoreSelectorActivity.utils.OnReadComplete
 import balti.migratehelper.restoreSelectorActivity.utils.RootCopyTask
 import balti.migratehelper.restoreSelectorActivity.utils.SearchAppAdapter
+import balti.migratehelper.simpleActivities.ExtraRestorePrepare
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_MAIN_READ_TRY_CATCH

@@ -1,4 +1,4 @@
-package balti.migratehelper.extrasRestore
+package balti.migratehelper.simpleActivities
 
 import android.Manifest
 import android.content.Intent
