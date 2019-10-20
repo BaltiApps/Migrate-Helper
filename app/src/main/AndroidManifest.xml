@@ -40,7 +40,7 @@
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".simpleActivities.ExtraRestorePrepare"
+        <activity android:name=".extraRestorePrepare.ExtraRestorePrepare"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             />

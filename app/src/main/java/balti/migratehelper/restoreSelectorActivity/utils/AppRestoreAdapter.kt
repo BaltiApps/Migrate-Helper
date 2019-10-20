@@ -11,8 +11,8 @@ import android.widget.BaseAdapter
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import balti.migratehelper.AppInstance.Companion.appPackets
 import balti.migratehelper.R
-import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin.Companion.appPackets
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR

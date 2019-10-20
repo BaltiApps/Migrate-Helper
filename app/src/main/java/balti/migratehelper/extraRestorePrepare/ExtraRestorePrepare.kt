@@ -1,4 +1,4 @@
-package balti.migratehelper.simpleActivities
+package balti.migratehelper.extraRestorePrepare
 
 import android.Manifest
 import android.content.Intent
@@ -23,6 +23,7 @@ import balti.migratehelper.AppInstance.Companion.settingsPacket
 import balti.migratehelper.AppInstance.Companion.smsDataPackets
 import balti.migratehelper.AppInstance.Companion.wifiPacket
 import balti.migratehelper.R
+import balti.migratehelper.extraRestorePrepare.utils.AppsNotInstalledViewManager
 import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.GetterMarker
@@ -158,7 +159,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         fun doJob(jCode: Int, func: () -> Unit) {
 
-            if (!cancelChecks && fallThrough || jobCode == jCode) {
+            if ((jCode == JOBCODE_PREP_END || !cancelChecks) && (fallThrough || jobCode == jCode)) {
 
                 val view : View? = when (jCode) {
                     JOBCODE_PREP_CONTACTS -> erpItemContacts
@@ -280,37 +281,62 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
 
         doJob(JOBCODE_PREP_APP) {
+
+            val appsNotInstalled = ArrayList<AppPacketsKotlin>(0)
+
             commonTools.doBackgroundTask({
                 val appFiltered = ArrayList<AppPacketsKotlin>(0)
+
                 for (p in appPackets){
                     if (cancelChecks) break
                     if (p.IS_SELECTED) appFiltered.add(p)
+                    p.packageName?.let {
+                        if (p.IS_SELECTED && !(commonTools.isPackageInstalled(it) || p.apkName != null))
+                            appsNotInstalled.add(p)
+                    }
                 }
                 if (!cancelChecks) {
                     appPackets.clear()
                     appPackets.addAll(appFiltered)
                 }
             }, {
-                toggleERPItemStatusIcon(erpItemApps, DONE)
-                doFallThroughJob(JOBCODE_PREP_END)
+                if (appsNotInstalled.isEmpty()) {
+                    toggleERPItemStatusIcon(erpItemApps, DONE)
+                    doFallThroughJob(JOBCODE_PREP_END)
+                }
+                else {
+                    AppsNotInstalledViewManager(appsNotInstalled, this).run {
+                        AlertDialog.Builder(this@ExtraRestorePrepare)
+                                .setView(this.getView())
+                                .setPositiveButton(R.string.continue_) {_, _ ->
+                                    toggleERPItemStatusIcon(erpItemApps, DONE)
+                                    doFallThroughJob(JOBCODE_PREP_END)
+                                }
+                                .setNegativeButton(android.R.string.cancel) {_, _ ->
+                                    toggleERPItemStatusIcon(erpItemApps, CANCEL)
+                                    cancelChecks = true
+                                    doFallThroughJob(JOBCODE_PREP_END)
+                                }
+                                .setCancelable(false)
+                                .show()
+                    }
+                }
             })
         }
 
-        doJob(JOBCODE_PREP_END) { end() }
-    }
-
-    private fun end(){
-        if (!cancelChecks) Intent(this, RestoreServiceKotlin::class.java).run {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                startForegroundService(this)
-            else startService(this)
+        doJob(JOBCODE_PREP_END) {
+            if (!cancelChecks) Intent(this, RestoreServiceKotlin::class.java).run {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                    startForegroundService(this)
+                else startService(this)
+            }
+            else finish()
         }
-        else finish()
     }
 
     private fun nextContact(){
         when {
-            cancelChecks -> end()
+            cancelChecks -> doFallThroughJob(JOBCODE_PREP_END)
             contactsCount < contactDataPackets.size -> try {
                 startActivityForResult(Intent(Intent.ACTION_VIEW).apply {
 

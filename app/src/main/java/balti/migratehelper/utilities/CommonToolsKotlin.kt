@@ -371,7 +371,7 @@ class CommonToolsKotlin(val context: Context) {
         }
     }
 
-    private fun isPackageInstalled(packageName: String): Boolean{
+    fun isPackageInstalled(packageName: String): Boolean{
         return try {
             context.packageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA)
             true

@@ -154,6 +154,10 @@
     <string name="filtering">Filtering\n</string>
     <string name="please_do_not_press_back_button">Please do not press back button.</string>
 
+    <!--apps_not_installed_layout.xml-->
+    <string name="apps_not_installed_title">Following apps are chosen to be restored but was not backed up, nor is currently installed on the device.</string>
+    <string name="apps_not_installed_desc">If you continue, these apps will be ignored. However, you will not lose your data. You will have to download the apps from Google Play Store (or elsewhere) and can retry restoring them later. You need not flash the backup again.</string>
+
     <!--UninstallService.java-->
     <string name="reboot_recommended">!!!!!!! Changing DPI. Reboot recommended. !!!!!!!</string>
 
@@ -231,7 +235,8 @@
     <string name="use_email_instead">Use old email</string>
 
 
-    <!--extra_backups_progress.xml-->
+    <!--ExtraRestorePrepare.kt-->
+    <string name="continue_">Continue</string>
 
     <!--RestoreSelectorKotlin.kt-->
     <string name="contacts">Contacts</string>
