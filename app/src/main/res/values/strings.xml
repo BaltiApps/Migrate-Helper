@@ -235,6 +235,8 @@
     <string name="join_group">Join group</string>
     <string name="use_email_instead">Use old email</string>
 
+    <!--Restore engines-->
+    <string name="restoring_sms">Restoring sms</string>
 
     <!--ExtraRestorePrepare.kt-->
     <string name="continue_">Continue</string>

@@ -2,9 +2,7 @@ package balti.migratehelper.restoreEngines
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.database.sqlite.SQLiteDatabase
 import android.os.AsyncTask
-import android.os.Build
 import android.support.v4.app.NotificationCompat
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
@@ -22,7 +20,6 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_TITLE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_ID_ONGOING
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PENDING_INTENT_REQUEST_ID
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PENDING_INTENT_RESTORE_ABORT_ID
-import java.io.File
 
 abstract class ParentRestoreClass(private val intentType: String): AsyncTask<Any, Any, Any>() {
 
@@ -53,14 +50,6 @@ abstract class ParentRestoreClass(private val intentType: String): AsyncTask<Any
     }
 
     private val activityIntent by lazy { Intent(serviceContext, ProgressShowActivity::class.java) }
-
-
-    fun getDataBase(dataBaseFile: File): SQLiteDatabase {
-        var dataBase: SQLiteDatabase = SQLiteDatabase.openOrCreateDatabase(dataBaseFile.absolutePath, null)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1)
-            dataBase = SQLiteDatabase.openDatabase(dataBaseFile.absolutePath, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS or SQLiteDatabase.OPEN_READWRITE)
-        return dataBase
-    }
 
     private fun updateNotification(subTask: String, progressPercent: Int){
 

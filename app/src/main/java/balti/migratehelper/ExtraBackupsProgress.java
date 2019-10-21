@@ -479,7 +479,6 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 {Telephony.Sms.SERVICE_CENTER, "s"},
                 {Telephony.Sms.STATUS, "s"},
                 {Telephony.Sms.SUBJECT, "s"},
-
                 {Telephony.Sms.ERROR_CODE, "i"},
                 {Telephony.Sms.READ, "i"},
                 {Telephony.Sms.LOCKED, "i"},

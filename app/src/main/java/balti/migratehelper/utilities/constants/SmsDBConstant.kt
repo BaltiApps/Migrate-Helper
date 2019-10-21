@@ -17,7 +17,6 @@ class SmsDBConstant {
         val SMS_SERVICE_CENTER = "smsServiceCenter"
         val SMS_STATUS = "smsStatus"
         val SMS_SUBJECT = "smsSubject"
-        val SMS_THREAD_ID = "smsThreadId"
         val SMS_ERROR = "smsError"
         val SMS_READ = "smsRead"
         val SMS_LOCKED = "smsLocked"

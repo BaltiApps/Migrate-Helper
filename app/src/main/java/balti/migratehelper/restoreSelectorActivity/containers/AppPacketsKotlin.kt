@@ -22,7 +22,7 @@ class AppPacketsKotlin(jsonObject: JSONObject) {
     var DATA = false
     var PERMISSION = false
 
-    var IS_SELECTED: Boolean = false
+    val IS_SELECTED: Boolean
         get() = APP || DATA || PERMISSION
 
     init {
