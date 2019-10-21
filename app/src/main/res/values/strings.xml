@@ -238,6 +238,8 @@
     <!--Restore engines-->
     <string name="restoring_sms">Restoring sms</string>
     <string name="restoring_calls">Restoring calls</string>
+    <string name="restoring_adb">Restoring ADB state</string>
+    <string name="restoring_font_scale">Restoring font scale</string>
 
     <!--ExtraRestorePrepare.kt-->
     <string name="continue_">Continue</string>

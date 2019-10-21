@@ -56,11 +56,11 @@ class CommonToolsKotlin(val context: Context) {
         val ACTION_END_ALL = "helper_end_all"
 
         val EXTRA_PROGRESS_TYPE = "type"
-        val EXTRA_PROGRESS_TYPE_CONTACTS = "contacts_progress"
         val EXTRA_PROGRESS_TYPE_SMS = "sms_progress"
         val EXTRA_PROGRESS_TYPE_CALLS = "calls_progress"
         val EXTRA_PROGRESS_TYPE_WIFI = "wifi_progress"
-        val EXTRA_PROGRESS_TYPE_SETTINGS = "settings_progress"
+        val EXTRA_PROGRESS_TYPE_ADB = "adb_progress"
+        val EXTRA_PROGRESS_TYPE_FONT_SCALE = "font_scale_progress"
 
         val EXTRA_TITLE = "title"
         val EXTRA_SUBTASK = "subtask"
