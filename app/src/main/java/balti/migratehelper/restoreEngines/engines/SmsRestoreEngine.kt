@@ -26,14 +26,16 @@ import balti.migratehelper.utilities.constants.SmsDBConstant.Companion.SMS_TABLE
 import balti.migratehelper.utilities.constants.SmsDBConstant.Companion.SMS_TYPE
 
 class SmsRestoreEngine(private val jobcode: Int,
-                       private val smsPackets: ArrayList<SmsPacketKotlin>,
-                       private val smsTableName: String): ParentRestoreClass(EXTRA_PROGRESS_TYPE_SMS) {
+                       private val smsPackets: ArrayList<SmsPacketKotlin>): ParentRestoreClass(EXTRA_PROGRESS_TYPE_SMS) {
 
     private val errors by lazy { ArrayList<String>(0) }
     private lateinit var currentPacket: SmsPacketKotlin
     private val dbTools by lazy { DBTools() }
 
     private var maxCount = 0
+
+    private val tableName = SMS_TABLE_NAME
+    private val uri = Telephony.Sms.CONTENT_URI
 
     private val projection = arrayOf(
             SMS_ADDRESS,
@@ -57,7 +59,7 @@ class SmsRestoreEngine(private val jobcode: Int,
             SMS_REPLY_PATH_PRESENT
     )
 
-    val mirror = arrayOf(
+    private val mirror = arrayOf(
             "${Telephony.Sms.ADDRESS}:s",
             "${Telephony.Sms.BODY}:s",
             "${Telephony.Sms.TYPE}:s",
@@ -84,7 +86,7 @@ class SmsRestoreEngine(private val jobcode: Int,
         publishProgress(true, "", "")
 
         val database = dbTools.getDataBase(currentPacket.smsDBFile)
-        val cursor = dbTools.getTableRestoreCursor(database, SMS_TABLE_NAME, projection) {
+        val cursor = dbTools.getTableRestoreCursor(database, tableName, projection) {
             maxCount = it
         }
 
@@ -93,7 +95,7 @@ class SmsRestoreEngine(private val jobcode: Int,
 
         cursor?.let {
             errors.addAll(dbTools.restoreTable(engineContext.contentResolver,
-                    it, Telephony.Sms.CONTENT_URI, SMS_TABLE_NAME, mirror, projection,
+                    it, uri, tableName, mirror, projection,
                     0, ERROR_SMS_RESTORE) { progress, taskLog ->
                 publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
             })

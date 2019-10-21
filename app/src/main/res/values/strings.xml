@@ -237,6 +237,7 @@
 
     <!--Restore engines-->
     <string name="restoring_sms">Restoring sms</string>
+    <string name="restoring_calls">Restoring calls</string>
 
     <!--ExtraRestorePrepare.kt-->
     <string name="continue_">Continue</string>

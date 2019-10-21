@@ -562,12 +562,15 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 "callsDataUsage",
                 "callsFeatures",
                 "callsGeocodedLocation",
+
                 "callsIsRead",
                 "callsNumber",
                 "callsNumberPresentation",
+
                 "callsPhoneAccountComponentName",
                 "callsType",
                 "callsVoicemailUri",
+
                 "callsDate",
                 "callsDuration",
                 "callsNew"
@@ -578,9 +581,11 @@ public class ExtraBackupsProgress extends AppCompatActivity implements OnDBResto
                 {CallLog.Calls.DATA_USAGE, "s"},
                 {CallLog.Calls.FEATURES, "s"},
                 {CallLog.Calls.GEOCODED_LOCATION, "s"},
+
                 {CallLog.Calls.IS_READ, "s"},
                 {CallLog.Calls.NUMBER, "s"},
                 {CallLog.Calls.NUMBER_PRESENTATION, "s"},
+
                 {CallLog.Calls.PHONE_ACCOUNT_COMPONENT_NAME, "s"},
                 {CallLog.Calls.TYPE, "s"},
                 {CallLog.Calls.VOICEMAIL_URI, "s"},
