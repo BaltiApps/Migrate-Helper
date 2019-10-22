@@ -44,6 +44,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_KE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_SMS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_WIFI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CONTACTS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
@@ -88,7 +89,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
             it.adbItem = filterSelected(it.adbItem)
             it.fontScaleItem = filterSelected(it.fontScaleItem)
             it.keyboardItem = filterSelected(it.keyboardItem)
-            filterSelected(it.internalPackets)
+            it.refreshInternalPackets()
         }
         wifiPacket = filterSelected(wifiPacket)
 
@@ -295,8 +296,64 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
 
         doJob(JOBCODE_PREP_KEYBOARD) {
-            toggleERPItemStatusIcon(erpItemKeyboard, DONE, getString(R.string.will_be_restored_later))
-            doFallThroughJob(JOBCODE_PREP_WIFI)
+
+            fun proceed(){
+                toggleERPItemStatusIcon(erpItemKeyboard, DONE, getString(R.string.will_be_restored_later))
+                doFallThroughJob(JOBCODE_PREP_WIFI)
+            }
+
+            var executed = false
+            settingsPacket?.keyboardItem?.keyboardText?.let {
+
+                val kPackageName =
+                if (it.contains('/')) it.split('/')[0]
+                else it
+
+                if (!commonTools.isPackageInstalled(kPackageName)){
+                    var isPresent = false
+                    for (app in appPackets){
+                        if (app.packageName.toString() == kPackageName && app.APP){
+                            isPresent = true
+                            break
+                        }
+                    }
+
+                    if (!isPresent) {
+                        AlertDialog.Builder(this)
+                                .setTitle(R.string.keyboard_not_present)
+                                .setMessage("$kPackageName\n${getString(R.string.keyboard_not_present_desc)}")
+                                .setPositiveButton(R.string.skip_keyboard){_, _ ->
+                                    settingsPacket?.run {
+                                        keyboardItem = null
+                                        refreshInternalPackets()
+                                    }
+                                    toggleERPItemStatusIcon(erpItemKeyboard, CANCEL, getString(R.string.cancelled))
+                                    doFallThroughJob(JOBCODE_PREP_WIFI)
+                                }
+                                .setNegativeButton(R.string.abort){_, _ ->
+                                    finishThis()
+                                }
+                                .setCancelable(false)
+                                .apply {
+                                    if (commonTools.isPackageInstalled(PACKAGE_NAME_PLAY_STORE)){
+                                        setNeutralButton(R.string.install_from_playstore) {_, _ ->
+                                            commonTools.openWebLink("market://details?id=$kPackageName")
+                                            finishThis()
+                                        }
+                                    }
+                                }
+                                .show()
+                    }
+                    else proceed()
+                } else proceed()
+
+                executed = true
+            }
+
+            if (!executed) {
+                toggleERPItemStatusIcon(erpItemKeyboard, CANCEL, "null")
+                doFallThroughJob(JOBCODE_PREP_WIFI)
+            }
         }
 
         doJob(JOBCODE_PREP_WIFI) {

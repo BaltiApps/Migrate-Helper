@@ -59,8 +59,10 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_PROGRESS_TYPE_SMS = "sms_progress"
         val EXTRA_PROGRESS_TYPE_CALLS = "calls_progress"
         val EXTRA_PROGRESS_TYPE_WIFI = "wifi_progress"
+        val EXTRA_PROGRESS_TYPE_DPI = "dpi_progress"
         val EXTRA_PROGRESS_TYPE_ADB = "adb_progress"
         val EXTRA_PROGRESS_TYPE_FONT_SCALE = "font_scale_progress"
+        val EXTRA_PROGRESS_TYPE_KEYBOARD = "keyboard_progress"
 
         val EXTRA_TITLE = "title"
         val EXTRA_SUBTASK = "subtask"
@@ -77,6 +79,8 @@ class CommonToolsKotlin(val context: Context) {
         val ERROR_MAIN_READ_TRY_CATCH = "MAIN_READ_TRY_CATCH"
         val ERROR_SMS_RESTORE = "SMS_RESTORE_ERROR"
         val ERROR_CALLS_RESTORE = "CALLS_RESTORE_ERROR"
+        val ERROR_DPI_READ = "DPI_READ_ERROR"
+        val ERROR_GENERIC_SETTINGS = "SETTINGS_ERROR"
 
         val DUMMY_WAIT_TIME = 100L
 

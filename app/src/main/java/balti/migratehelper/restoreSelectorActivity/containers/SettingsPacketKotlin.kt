@@ -37,11 +37,16 @@ data class SettingsPacketKotlin(val dpiText: String?, val adbState: Int?,
 
     val internalPackets: ArrayList<GetterMarker> = ArrayList(0)
 
-    init {
+    fun refreshInternalPackets(){
+        internalPackets.clear()
         dpiText?.let { internalPackets.add(DpiInternalPacket(it).apply { dpiItem = this }) }
         adbState?.let { internalPackets.add(AdbInternalPacket(adbState).apply { adbItem = this }) }
         fontScale?.let { internalPackets.add(FontScaleInternalPacket(fontScale).apply { fontScaleItem = this }) }
         keyboardText?.let { internalPackets.add(KeyboardInternalPacket(keyboardText).apply { keyboardItem = this }) }
+    }
+
+    init {
+        refreshInternalPackets()
     }
 
 }

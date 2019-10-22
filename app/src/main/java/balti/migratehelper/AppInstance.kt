@@ -22,6 +22,8 @@ class AppInstance: Application() {
         var settingsPacket: SettingsPacketKotlin? = null
         var wifiPacket: WifiPacketKotlin? = null
 
+        var DPIint : Int? = null
+        var keyBoardText : String? = null
         var actualDefaultSmsAppName = ""
     }
 

@@ -240,9 +240,15 @@
     <string name="restoring_calls">Restoring calls</string>
     <string name="restoring_adb">Restoring ADB state</string>
     <string name="restoring_font_scale">Restoring font scale</string>
+    <string name="processing_dpi">Processing DPI</string>
+    <string name="processing_keyboard">Processing keyboard</string>
 
     <!--ExtraRestorePrepare.kt-->
     <string name="continue_">Continue</string>
+    <string name="keyboard_not_present">Keyboard app not available</string>
+    <string name="keyboard_not_present_desc">The keyboard app is not installed and is neither present in the restore. You can install the app from Play Store or elsewhere.</string>
+    <string name="install_from_playstore">Play Store</string>
+    <string name="skip_keyboard">Skip keyboard and continue</string>
 
     <!--RestoreSelectorKotlin.kt-->
     <string name="contacts">Contacts</string>
