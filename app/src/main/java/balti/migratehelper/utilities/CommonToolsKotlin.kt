@@ -81,6 +81,7 @@ class CommonToolsKotlin(val context: Context) {
         val ERROR_CALLS_RESTORE = "CALLS_RESTORE_ERROR"
         val ERROR_DPI_READ = "DPI_READ_ERROR"
         val ERROR_GENERIC_SETTINGS = "SETTINGS_ERROR"
+        val ERROR_WIFI = "WIFI_ERROR"
 
         val DUMMY_WAIT_TIME = 100L
 
@@ -146,6 +147,7 @@ class CommonToolsKotlin(val context: Context) {
 
         val BACKUP_NAME_SETTINGS = "settings.json"
         val WIFI_FILE_NAME = "WifiConfigStore.xml"
+        val WIFI_FILE_PATH = "/data/misc/wifi/$WIFI_FILE_NAME"
 
         val HELPER_STATUS = "HELPER_STATUS"
 

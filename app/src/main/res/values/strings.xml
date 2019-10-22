@@ -242,6 +242,7 @@
     <string name="restoring_font_scale">Restoring font scale</string>
     <string name="processing_dpi">Processing DPI</string>
     <string name="processing_keyboard">Processing keyboard</string>
+    <string name="restoring_wifi">Restoring Wifi</string>
 
     <!--ExtraRestorePrepare.kt-->
     <string name="continue_">Continue</string>
