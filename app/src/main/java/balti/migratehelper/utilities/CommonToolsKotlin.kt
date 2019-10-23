@@ -63,6 +63,9 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_PROGRESS_TYPE_ADB = "adb_progress"
         val EXTRA_PROGRESS_TYPE_FONT_SCALE = "font_scale_progress"
         val EXTRA_PROGRESS_TYPE_KEYBOARD = "keyboard_progress"
+        val EXTRA_PROGRESS_APP_RESTORE = "app_restore_progress"
+        val EXTRA_PROGRESS_MAKING_SCRIPTS = "app_making_script_progress"
+        val EXTRA_PROGRESS_WAITING_FOR_VCF = "waiting_for_vcf_progress"
 
         val EXTRA_TITLE = "title"
         val EXTRA_SUBTASK = "subtask"
@@ -77,11 +80,17 @@ class CommonToolsKotlin(val context: Context) {
         val ERROR_SETTINGS_GET_TRY_CATCH = "SETTINGS_GET_TRY_CATCH"
         val ERROR_WIFI_GET_TRY_CATCH = "WIFI_GET_TRY_CATCH"
         val ERROR_MAIN_READ_TRY_CATCH = "MAIN_READ_TRY_CATCH"
+
         val ERROR_SMS_RESTORE = "SMS_RESTORE_ERROR"
         val ERROR_CALLS_RESTORE = "CALLS_RESTORE_ERROR"
         val ERROR_DPI_READ = "DPI_READ_ERROR"
         val ERROR_GENERIC_SETTINGS = "SETTINGS_ERROR"
         val ERROR_WIFI = "WIFI_ERROR"
+        val ERROR_APP_MAKING_SCRIPT = "RESTORE_SCRIPT_ERROR"
+        val ERROR_APP_MAKING_SCRIPT_TRY_CATCH = "RESTORE_SCRIPT_TRY_CATCH"
+        val ERROR_APP_RESTORE_TRY_CATCH = "RUN_TRY_CATCH"
+        val ERROR_APP_RESTORE = "RUN"
+        val ERROR_APP_RESTORE_SUPPRESSED = "RUN_SUPPRESSED"
 
         val DUMMY_WAIT_TIME = 100L
 
@@ -171,6 +180,10 @@ class CommonToolsKotlin(val context: Context) {
                     }
                 }
             }
+
+        val KNOWN_CONTACT_APPS = arrayOf("com.google.android.contacts", "com.android.contacts")
+
+        val MIGRATE_STATUS = "MIGRATE_STATUS"
 
         val REPORTING_EMAIL = "help.baltiapps@gmail.com"
         val TG_LINK = "https://t.me/migrateApp"
@@ -408,6 +421,9 @@ class CommonToolsKotlin(val context: Context) {
         }
     }
 
+    fun playStoreLink(packageName: String){
+        openWebLink("market://details?id=$packageName")
+    }
 
     fun makeNotificationChannel(channelId: String, channelDesc: CharSequence, importance: Int){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -498,5 +514,30 @@ class CommonToolsKotlin(val context: Context) {
             intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName)
             context.startActivityForResult(intent, requestCode)
         }
+    }
+
+
+
+    fun cancelTask(suProcess: Process?, vararg pids: Int) {
+
+        tryIt {
+            val killProcess = Runtime.getRuntime().exec("su")
+
+            val writer = BufferedWriter(OutputStreamWriter(killProcess.outputStream))
+            fun killId(pid: Int) {
+                writer.write("kill -9 $pid\n")
+                writer.write("kill -15 $pid\n")
+            }
+
+            for (pid in pids)
+                if (pid != -999) killId(pid)
+
+            writer.write("exit\n")
+            writer.flush()
+
+            tryIt { killProcess.waitFor() }
+            tryIt { suProcess?.waitFor() }
+        }
+
     }
 }

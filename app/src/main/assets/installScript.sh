@@ -2,15 +2,15 @@
 
 # parameters:
 
-TEMP_DIR_NAME=$1
+MIGRATE_CACHE=$1
 apk_dir_name=$2
 base_apk_name=$3
 package_name=$4
 installer_name=$5
 
-if [[ -e ${TEMP_DIR_NAME}/${apk_dir_name} ]]; then
+if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
 
-    full_apk_dir=${TEMP_DIR_NAME}/${apk_dir_name}
+    full_apk_dir=${MIGRATE_CACHE}/${apk_dir_name}
 
     chmod 777 "$full_apk_dir"
     cd ${full_apk_dir}
@@ -24,7 +24,7 @@ if [[ -e ${TEMP_DIR_NAME}/${apk_dir_name} ]]; then
     fi
 
     #install main app
-    if [[ -n ${installer_name} && ${installer_name} != "NULL" ]]; then
+    if [[ -n ${installer_name} && ${installer_name} != "NULL" && -n "$(pm list packages ${installer_name})" ]]; then
         pm install -r -d -t -i ${installer_name} ${base_apk_name}
     else
         pm install -r -d -t ${base_apk_name}

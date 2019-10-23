@@ -243,6 +243,10 @@
     <string name="processing_dpi">Processing DPI</string>
     <string name="processing_keyboard">Processing keyboard</string>
     <string name="restoring_wifi">Restoring Wifi</string>
+    <string name="making_scripts">Making scripts</string>
+    <string name="waiting_for_vcf">Waiting for contacts restore</string>
+    <string name="restoring_apps">Restoring apps</string>
+    <string name="script_file_does_not_exist">Script file does not exist</string>
 
     <!--ExtraRestorePrepare.kt-->
     <string name="continue_">Continue</string>

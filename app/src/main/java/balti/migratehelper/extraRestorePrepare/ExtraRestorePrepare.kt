@@ -337,7 +337,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                                 .apply {
                                     if (commonTools.isPackageInstalled(PACKAGE_NAME_PLAY_STORE)){
                                         setNeutralButton(R.string.install_from_playstore) {_, _ ->
-                                            commonTools.openWebLink("market://details?id=$kPackageName")
+                                            commonTools.playStoreLink(kPackageName)
                                             finishThis()
                                         }
                                     }

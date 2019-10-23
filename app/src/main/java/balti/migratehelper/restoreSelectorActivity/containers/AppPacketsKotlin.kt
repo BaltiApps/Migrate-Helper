@@ -41,6 +41,8 @@ class AppPacketsKotlin(jsonObject: JSONObject) {
 
         apkName = apkName?.let { if (it == "" || it == "NULL") null else it}
         dataName = dataName?.let { if (it == "" || it == "NULL") null else it}
+        appIcon = appIcon?.let { if (it == "" || it == "NULL") null else it}
+        iconFileName = iconFileName?.let { if (it == "" || it == "NULL") null else it}
 
         APP = apkName != null
         DATA = dataName != null

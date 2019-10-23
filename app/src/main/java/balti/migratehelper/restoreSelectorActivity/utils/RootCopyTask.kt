@@ -72,7 +72,7 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
 
                     if (RestoreSelectorKotlin.cancelLoading)
                     {
-                        cancelTask()
+                        commonTools.cancelTask(it, SU_TASK_PID)
                         return 0
                     }
 
@@ -114,26 +114,6 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
 
             return 1
         }
-    }
-
-    fun cancelTask() {
-
-        commonTools.tryIt {
-            val killProcess = Runtime.getRuntime().exec("su")
-            val writer = BufferedWriter(OutputStreamWriter(killProcess.outputStream))
-
-            if (SU_TASK_PID != -999) {
-                writer.write("kill -9 $SU_TASK_PID\n")
-                writer.write("kill -15 $SU_TASK_PID\n")
-            }
-
-            writer.write("exit\n")
-            writer.flush()
-
-            commonTools.tryIt { killProcess.waitFor() }
-            commonTools.tryIt { masterSuProcess?.waitFor() }
-        }
-
     }
 
     override fun onPostExecute(result: Any?) {

@@ -2,7 +2,7 @@
 
 # parameters:
 
-TEMP_DIR_NAME=$1
+busybox_file=$1
 tar_gz_file=$2
 package_name=$3
 
@@ -24,15 +24,20 @@ else
     if [[ -e /data/data/${tar_gz_file} ]]; then
 
         cd /data/data/
-        busybox_file=${TEMP_DIR_NAME}/busybox
 
         if [[ -e ${busybox_file} ]]; then
-            ${busybox_file} tar -xzpf ${tar_gz_file}
+            tarCmd="${busybox_file} tar"
+        elif [[ -n "$(command -v tar)" ]]; then
+            tarCmd="tar"
         else
-            echo "${tar_gz_file} not found under /data/data/"
+            tarCmd=""
         fi
 
-        rm ${tar_gz_file}
+        if [[ -n ${tarCmd} ]]; then
+            ${tarCmd} -xzpf ${tar_gz_file} && rm ${tar_gz_file}
+        else
+            echo "busybox not found under ${busybox_file}. Tar not installed."
+        fi
 
         if [[ -e ${dataDir} ]]; then
             chmod 755 ${dataDir}
