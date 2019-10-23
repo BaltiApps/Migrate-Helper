@@ -14,6 +14,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_MAKING_SCRIPTS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_PACKAGE_DATA
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_RESTORE_SCRIPT
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.KNOWN_CONTACTS_ELEMENTS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.KNOWN_CONTACT_APPS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
@@ -259,9 +260,53 @@ class AppRestoreEngine(private val jobcode: Int,
         }
     }
 
+    private fun waitForContactsRestore(): String?{
+
+        if (isContactAppPresent){
+            try {
+
+                Runtime.getRuntime().exec("su").let {
+                    val writer = BufferedWriter(OutputStreamWriter(it.outputStream))
+                    val reader = BufferedReader(InputStreamReader(it.inputStream))
+
+                    var output: String
+
+                    do {
+                        output = ""
+
+                        KNOWN_CONTACTS_ELEMENTS.forEach { ele ->
+                            writer.write("dumpsys activity services | $ele\n")
+                        }
+                        writer.write("echo DONE\n")
+                        writer.flush()
+
+                        iterateBufferedReader(reader, { line ->
+                            if (line.trim() != "DONE") output += "$line\n"
+                            return@iterateBufferedReader line.trim() == "DONE"
+                        })
+
+                        output = output.trim()
+                        if (output != "") Thread.sleep(1000)
+
+                    } while (output != "")
+
+                    writer.write("exit\n")
+                    writer.flush()
+                }
+
+                return null
+            }
+            catch (e: Exception){
+                e.printStackTrace()
+                return e.message.toString()
+            }
+        }
+        else return null
+    }
 
     override fun doInBackground(vararg params: Any?): Any {
         val scriptLocation = makingScripts()
+        waitForContactsRestore()?.run { addToActualErrors(this) }
         if (!RestoreServiceKotlin.cancelAll) scriptLocation?.let { runRestoreScript(it) }
         return 0
     }

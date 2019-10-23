@@ -182,6 +182,11 @@ class CommonToolsKotlin(val context: Context) {
             }
 
         val KNOWN_CONTACT_APPS = arrayOf("com.google.android.contacts", "com.android.contacts")
+        val KNOWN_CONTACTS_ELEMENTS = arrayOf(
+                "com.google.android.contacts/com.google.android.apps.contacts.vcard.VCardService",
+                "com.android.contacts/.vcard.VCardService",
+                "com.android.contacts/.common.vcard.VCardService"
+                )
 
         val MIGRATE_STATUS = "MIGRATE_STATUS"
 
