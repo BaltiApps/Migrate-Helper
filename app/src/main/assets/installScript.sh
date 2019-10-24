@@ -19,11 +19,12 @@ if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
     verification_state="$(settings get global package_verifier_enable)"
 
     # disable package verification if the above field exists or if it not 0 by default
-    if [[ ${verification_state} != "null" && ${verification_state} !="0" ]]; then
+    if [[ ${verification_state} != "null" && ${verification_state} != "0" ]]; then
         settings put global package_verifier_enable 0
     fi
 
     #install main app
+    echo "Installing APK"
     if [[ -n ${installer_name} && ${installer_name} != "NULL" && -n "$(pm list packages ${installer_name})" ]]; then
         pm install -r -d -t -i ${installer_name} ${base_apk_name}
     else
@@ -49,8 +50,9 @@ if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
 
             # add split apks
             echo "Split: Adding Split Apks to Session"
-            for filename in ${full_apk_dir}/split_*.apk; do
-                pm install-write ${session} ${filename} ${full_apk_dir}/${filename} 2>/dev/null && echo "Split: Added ${filename}"
+            for filename in split_*.apk; do
+                size="$(wc -c < ${filename})"
+                pm install-write -S ${size} ${session} ${filename} ${full_apk_dir}/${filename} 2>/dev/null && echo "Split: Added ${filename}"
             done
 
             echo "Split: Installing Split Session (Be patient, it may take longer)"
