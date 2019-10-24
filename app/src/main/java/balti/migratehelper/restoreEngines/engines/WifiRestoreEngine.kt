@@ -3,6 +3,7 @@ package balti.migratehelper.restoreEngines.engines
 import android.os.Build
 import balti.migratehelper.R
 import balti.migratehelper.restoreEngines.ParentRestoreClass
+import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.WifiPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_WIFI
@@ -43,7 +44,7 @@ class WifiRestoreEngine(private val jobcode: Int,
 
     override fun doInBackground(vararg params: Any?): Any {
         try {
-            restoreWifi()
+            if (!RestoreServiceKotlin.cancelAll) restoreWifi()
         }
         catch (e: Exception){
             e.printStackTrace()

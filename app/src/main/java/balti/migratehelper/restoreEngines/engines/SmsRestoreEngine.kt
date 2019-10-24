@@ -3,6 +3,7 @@ package balti.migratehelper.restoreEngines.engines
 import android.provider.Telephony
 import balti.migratehelper.R
 import balti.migratehelper.restoreEngines.ParentRestoreClass
+import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreEngines.utils.DBTools
 import balti.migratehelper.restoreSelectorActivity.containers.SmsPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_SMS_RESTORE
@@ -96,14 +97,17 @@ class SmsRestoreEngine(private val jobcode: Int,
         cursor?.let {
             errors.addAll(dbTools.restoreTable(engineContext.contentResolver,
                     it, uri, tableName, mirror, projection,
-                    0, ERROR_SMS_RESTORE) { progress, taskLog ->
-                publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
-            })
+                    0, ERROR_SMS_RESTORE, {return@restoreTable RestoreServiceKotlin.cancelAll},
+                    { progress, taskLog ->
+                        publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
+                    }
+            ))
         }
     }
 
     override fun doInBackground(vararg params: Any?): Any {
-        for (packet in smsPackets){
+        for (packet in smsPackets) {
+            if (RestoreServiceKotlin.cancelAll) break
             currentPacket = packet
             restoreSms()
         }

@@ -32,19 +32,23 @@ class DBTools {
 
     fun restoreTable(cr: ContentResolver, cursor: Cursor, uri: Uri,
                      tableName: String, mirror: Array<String>, projection: Array<String>,
-                     columnToGetTaskLog:Int, errorTag: String, updateFunc: (Int, String) -> Unit): ArrayList<String> {
+                     columnToGetTaskLog:Int, errorTag: String, breakFunc: () -> Boolean, updateFunc: (Int, String) -> Unit): ArrayList<String> {
 
         val errors = ArrayList<String>(0)
 
         try {
+
             var c = 0
             cursor.moveToFirst()
-            do {
+
+            outerLoop@ do {
                 var taskLog = ""
                 try {
                     val contentValues = ContentValues()
 
                     for (i in mirror.indices){
+
+                        if (breakFunc()) break@outerLoop
 
                         fun setTaskLog(content: Any){
                             if (i == columnToGetTaskLog)
@@ -71,7 +75,7 @@ class DBTools {
                 updateFunc(c, taskLog)
                 c++
 
-            } while (cursor.moveToNext())
+            } while (cursor.moveToNext() && !breakFunc())
 
             try { cursor.close() } catch (_: Exception){}
         }

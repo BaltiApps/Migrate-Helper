@@ -3,6 +3,7 @@ package balti.migratehelper.restoreEngines.engines
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.restoreEngines.ParentRestoreClass
+import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_DPI_READ
@@ -22,6 +23,12 @@ class PreliminarySettingsRestoreEngine(private val jobcode: Int,
     private val errors by lazy { ArrayList<String>(0) }
     private val suProcess by lazy { Runtime.getRuntime().exec("su") }
     private val suWriter by lazy { BufferedWriter(OutputStreamWriter(suProcess.outputStream)) }
+    private fun flushToSu(cmd: String, ignoreCancel: Boolean = false){
+        if (RestoreServiceKotlin.cancelAll || ignoreCancel){
+            suWriter.write("$cmd\n")
+            suWriter.flush()
+        }
+    }
 
     private fun restoreAdb(){
         settingsPacket.adbItem?.let {
@@ -29,10 +36,7 @@ class PreliminarySettingsRestoreEngine(private val jobcode: Int,
                 resetBroadcast(true, engineContext.getString(R.string.restoring_adb),
                         EXTRA_PROGRESS_TYPE_ADB)
 
-                suWriter.run {
-                    write("settings put global adb_enabled ${it.adbState}\n")
-                    flush()
-                }
+                flushToSu("settings put global adb_enabled ${it.adbState}")
                 Thread.sleep(DUMMY_WAIT_TIME)
             }
         }
@@ -44,10 +48,7 @@ class PreliminarySettingsRestoreEngine(private val jobcode: Int,
                 resetBroadcast(true, engineContext.getString(R.string.restoring_font_scale),
                         EXTRA_PROGRESS_TYPE_FONT_SCALE)
 
-                suWriter.run {
-                    write("settings put system font_scale ${it.fontScale}\n")
-                    flush()
-                }
+                flushToSu("settings put system font_scale ${it.fontScale}")
                 Thread.sleep(DUMMY_WAIT_TIME)
             }
         }
@@ -105,13 +106,12 @@ class PreliminarySettingsRestoreEngine(private val jobcode: Int,
         try {
             settingsPacket.refreshInternalPackets()
             if (settingsPacket.internalPackets.isNotEmpty()) {
-                restoreAdb()
-                restoreFontScale()
-                readDPI()
-                readKeyboard()
+                if (!RestoreServiceKotlin.cancelAll) restoreAdb()
+                if (!RestoreServiceKotlin.cancelAll) restoreFontScale()
+                if (!RestoreServiceKotlin.cancelAll) readDPI()
+                if (!RestoreServiceKotlin.cancelAll) readKeyboard()
             }
-            suWriter.write("exit\n")
-            suWriter.flush()
+            flushToSu("exit", true)
         }
         catch (e: Exception){
             e.printStackTrace()

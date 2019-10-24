@@ -3,6 +3,7 @@ package balti.migratehelper.restoreEngines.engines
 import android.provider.CallLog
 import balti.migratehelper.R
 import balti.migratehelper.restoreEngines.ParentRestoreClass
+import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreEngines.utils.DBTools
 import balti.migratehelper.restoreSelectorActivity.containers.CallsPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_CALLS_RESTORE
@@ -87,14 +88,17 @@ class CallsRestoreEngine(private val jobcode: Int,
         cursor?.let {
             errors.addAll(dbTools.restoreTable(engineContext.contentResolver,
                     it, uri, tableName, mirror, projection,
-                    0, ERROR_CALLS_RESTORE) { progress, taskLog ->
-                publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
-            })
+                    0, ERROR_CALLS_RESTORE, {return@restoreTable RestoreServiceKotlin.cancelAll},
+                    { progress, taskLog ->
+                        publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
+                    }
+            ))
         }
     }
 
     override fun doInBackground(vararg params: Any?): Any {
         for (packet in callsPackets){
+            if (RestoreServiceKotlin.cancelAll) break
             currentPacket = packet
             restoreCalls()
         }
