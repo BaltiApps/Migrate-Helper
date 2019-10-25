@@ -521,8 +521,6 @@ class CommonToolsKotlin(val context: Context) {
         }
     }
 
-
-
     fun cancelTask(suProcess: Process?, vararg pids: Int) {
 
         tryIt {

@@ -24,6 +24,7 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
     private val vOp by lazy { ViewOperations(context) }
     private val errors by lazy { ArrayList<String>(0) }
     private var scriptOutput = ""
+    private var suProcess: Process? = null
 
     private var SU_TASK_PID = -999
 
@@ -53,7 +54,8 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
 
             val scripFile = commonTools.unpackAssetToInternal("suScript.sh", "suScript.sh")
 
-            Runtime.getRuntime().exec("su").let {
+            suProcess = Runtime.getRuntime().exec("su")
+            suProcess?.let {
 
                 masterSuProcess = it
 
@@ -72,7 +74,7 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
 
                     if (RestoreSelectorKotlin.cancelLoading)
                     {
-                        commonTools.cancelTask(it, SU_TASK_PID)
+                        cancelTask()
                         return 0
                     }
 
@@ -123,5 +125,9 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
                 onReadComplete.onComplete(jobCode, true, scriptOutput)
             else onReadComplete.onComplete(jobCode, false, errors)
         }
+    }
+
+    fun cancelTask(){
+        suProcess?.let { commonTools.cancelTask(it, SU_TASK_PID) }
     }
 }
