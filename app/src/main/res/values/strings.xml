@@ -124,6 +124,7 @@
     <string name="kill_app">OK, kill it!</string>
     <string name="wait_to_cancel">Wait…</string>
     <string name="killing_programmatically">Killing programmatically</string>
+    <string name="use_notification_fix">Notification fix by deleting gms files</string>
 
     <!--ExtraBackupsProgress.java-->
     <string name="do_not_close">Please do not press back/home/recents or close this app.</string>

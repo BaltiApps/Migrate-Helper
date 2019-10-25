@@ -5,6 +5,7 @@
 busybox_file=$1
 tar_gz_file=$2
 package_name=$3
+notification_fix=$4
 
 dataDir=$(dumpsys package ${package_name} | grep dataDir | head -n 1 | cut -d '=' -f2)
 app_uid=$(dumpsys package ${package_name} | grep userId= | head -n 1 | cut -d '=' -f2 | cut -d ' ' -f1)
@@ -18,8 +19,6 @@ if [[ -z "$app_uid" && -n "$(pm list packages ${package_name})" ]]; then
 else
 
     rm -rf ${dataDir} 2>/dev/null
-
-    # adding legacy support in v2.0
 
     if [[ -e /data/data/${tar_gz_file} ]]; then
 
@@ -43,6 +42,13 @@ else
             chmod 755 ${dataDir}
             chown ${app_uid}:${app_uid} -Rf ${dataDir}
             restorecon -RF ${dataDir} 2>/dev/null
+
+            # notification fix added in v3.0
+            if [[ "${notification_fix}" == "true" ]]; then
+                cd ${package_name}
+                rm -f shared_prefs/com.google.android.gms.appid.xml
+            fi
+
         else
             echo "Data dir $dataDir for package $package_name not found!"
             echo "Data file was: $tar_gz_file"

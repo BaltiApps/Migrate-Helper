@@ -31,6 +31,7 @@ import balti.migratehelper.restoreSelectorActivity.utils.SearchAppAdapter
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_MAIN_READ_TRY_CATCH
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_VIEW_COUNT
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_END_ALL
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_GET_APP_JSON
@@ -208,6 +209,12 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                             else JOBCODE_END_ALL) {
                         appPackets.clear()
                         appPackets.addAll(jobResult as ArrayList<AppPacketsKotlin>)
+
+                        if (appPackets.isEmpty())
+                            notification_check_toggle.visibility = View.GONE
+                        else notification_check_toggle.visibility = View.VISIBLE
+
+                        notification_check_toggle.isChecked = appPackets.isNotEmpty()
                     }
 
                 JOBCODE_GET_CONTACTS ->
@@ -474,7 +481,10 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                                     .setTitle(R.string.turn_off_internet_and_updates)
                                     .setMessage(R.string.do_not_use_desc)
                                     .setPositiveButton(R.string.goAhead) { _, _ ->
-                                        startActivity(Intent(this@RestoreSelectorKotlin, ExtraRestorePrepare::class.java))
+                                        startActivity(
+                                                Intent(this@RestoreSelectorKotlin, ExtraRestorePrepare::class.java)
+                                                        .putExtra(EXTRA_NOTIFICATION_FIX, notification_check_toggle.isChecked)
+                                        )
                                         finish()
                                     }
                                     .setNegativeButton(R.string.later, null)

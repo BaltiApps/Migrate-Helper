@@ -72,6 +72,8 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_TASKLOG = "tasklog"
         val EXTRA_PROGRESS_PERCENTAGE = "progress"
 
+        val EXTRA_NOTIFICATION_FIX = "notification_fix"
+
         val ERROR_APP_JSON_TRY_CATCH = "APP_JSON_TRY_CATCH"
         val ERROR_APP_JSON = "APP_JSON"
         val ERROR_CONTACTS_GET_TRY_CATCH = "CONTACTS_GET_TRY_CATCH"

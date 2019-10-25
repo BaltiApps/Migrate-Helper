@@ -125,6 +125,15 @@
 
     </RelativeLayout>
 
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:text="@string/use_notification_fix"
+        android:visibility="gone"
+        android:id="@+id/notification_check_toggle"
+        />
+
     <RelativeLayout
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"

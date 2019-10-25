@@ -22,7 +22,8 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_STATUS
 import java.io.*
 
 class AppRestoreEngine(private val jobcode: Int,
-                       private val appPackets: ArrayList<AppPacketsKotlin>): ParentRestoreClass("") {
+                       private val appPackets: ArrayList<AppPacketsKotlin>,
+                       private val doNotificationFix: Boolean): ParentRestoreClass("") {
 
     companion object {
         var ICON_STRING = ""
@@ -143,7 +144,7 @@ class AppRestoreEngine(private val jobcode: Int,
                                 writeNext("sh $installScriptPath $MIGRATE_CACHE ${appPacket.packageName}.app ${appPacket.apkName} ${appPacket.packageName} ${appPacket.installerName}")
 
                             if (isData)
-                                writeNext("sh $restoreDataScriptPath $busyboxBinaryPath ${appPacket.dataName} ${appPacket.packageName}")
+                                writeNext("sh $restoreDataScriptPath $busyboxBinaryPath ${appPacket.dataName} ${appPacket.packageName} $doNotificationFix")
 
                             if (isPermission) {
                                 BufferedReader(FileReader(permFile)).readLines().forEach { it1 ->

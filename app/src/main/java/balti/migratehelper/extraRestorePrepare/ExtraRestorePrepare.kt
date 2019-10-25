@@ -34,6 +34,7 @@ import balti.migratehelper.restoreSelectorActivity.containers.GetterMarker
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_ADB
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_CALLS
@@ -77,10 +78,13 @@ class ExtraRestorePrepare: AppCompatActivity() {
     private lateinit var handler: Handler
 
     private var keyboardSettingsItem : SettingsPacketKotlin.SettingsItem? = null
+    private var notificationFix = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.extra_restore_prepare)
+
+        notificationFix = intent.getBooleanExtra(EXTRA_NOTIFICATION_FIX, false)
 
         restore_countdown.visibility = View.GONE
 
@@ -423,11 +427,13 @@ class ExtraRestorePrepare: AppCompatActivity() {
             fun act(){
                 if (cancelChecks) finishThis()
                 else {
-                    Intent(this, RestoreServiceKotlin::class.java).run {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            startForegroundService(this)
-                        else startService(this)
-                    }
+                    Intent(this, RestoreServiceKotlin::class.java)
+                            .putExtra(EXTRA_NOTIFICATION_FIX, notificationFix)
+                            .run {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                                    startForegroundService(this)
+                                else startService(this)
+                            }
                 }
             }
 
