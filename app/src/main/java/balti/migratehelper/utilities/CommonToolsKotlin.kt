@@ -83,7 +83,6 @@ class CommonToolsKotlin(val context: Context) {
 
         val ERROR_SMS_RESTORE = "SMS_RESTORE_ERROR"
         val ERROR_CALLS_RESTORE = "CALLS_RESTORE_ERROR"
-        val ERROR_DPI_READ = "DPI_READ_ERROR"
         val ERROR_GENERIC_SETTINGS = "SETTINGS_ERROR"
         val ERROR_WIFI = "WIFI_ERROR"
         val ERROR_APP_MAKING_SCRIPT = "RESTORE_SCRIPT_ERROR"

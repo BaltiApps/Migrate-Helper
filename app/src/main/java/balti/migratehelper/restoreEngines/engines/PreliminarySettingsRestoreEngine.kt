@@ -1,17 +1,15 @@
 package balti.migratehelper.restoreEngines.engines
 
-import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.restoreEngines.ParentRestoreClass
 import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin
+import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_ADB
+import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_FONT_SCALE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_DPI_READ
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_GENERIC_SETTINGS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_ADB
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_DPI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_FONT_SCALE
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_KEYBOARD
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
@@ -30,73 +28,18 @@ class PreliminarySettingsRestoreEngine(private val jobcode: Int,
         }
     }
 
-    private fun restoreAdb(){
-        settingsPacket.adbItem?.let {
+    private fun restorePacket(packet: SettingsPacketKotlin.SettingsItem){
+        packet.let {
             if (it.isSelected) {
-                resetBroadcast(true, engineContext.getString(R.string.restoring_adb),
-                        EXTRA_PROGRESS_TYPE_ADB)
-
-                flushToSu("settings put global adb_enabled ${it.adbState}")
-                Thread.sleep(DUMMY_WAIT_TIME)
-            }
-        }
-    }
-
-    private fun restoreFontScale(){
-        settingsPacket.fontScaleItem?.let {
-            if (it.isSelected) {
-                resetBroadcast(true, engineContext.getString(R.string.restoring_font_scale),
-                        EXTRA_PROGRESS_TYPE_FONT_SCALE)
-
-                flushToSu("settings put system font_scale ${it.fontScale}")
-                Thread.sleep(DUMMY_WAIT_TIME)
-            }
-        }
-    }
-
-    private fun readDPI(){
-        settingsPacket.dpiItem?.let {
-            if (it.isSelected) {
-                resetBroadcast(true, engineContext.getString(R.string.processing_dpi),
-                        EXTRA_PROGRESS_TYPE_DPI)
-
-                try {
-                    it.dpiText?.run {
-                        val lines = this.split("\\n")
-                        var oDensity = 0
-                        var pDensity = 0
-                        for (line in lines) {
-                            line.trim().let { l ->
-                                if (l.startsWith("Physical density:")) {
-                                    pDensity = Integer.parseInt(l.substring(l.lastIndexOf(' ')).trim())
-                                } else if (l.startsWith("Override density:")) {
-                                    oDensity = Integer.parseInt(l.substring(l.lastIndexOf(' ')).trim())
-                                }
-                            }
-                        }
-                        AppInstance.DPIint = when {
-                            oDensity > 0 -> oDensity
-                            pDensity > 0 -> pDensity
-                            else -> null
-                        }
-                    }
-
-                    Thread.sleep(DUMMY_WAIT_TIME)
+                when(it.settingsType) {
+                    SETTINGS_TYPE_ADB -> resetBroadcast(true, engineContext.getString(R.string.restoring_adb), EXTRA_PROGRESS_TYPE_ADB)
+                    SETTINGS_TYPE_FONT_SCALE ->
+                        resetBroadcast(true, engineContext.getString(R.string.restoring_font_scale), EXTRA_PROGRESS_TYPE_FONT_SCALE)
                 }
-                catch (e: Exception){
-                    e.printStackTrace()
-                    errors.add("$ERROR_DPI_READ: ${e.message}")
-                }
-            }
-        }
-    }
 
-    private fun readKeyboard(){
-        settingsPacket.keyboardItem?.let {
-            if (it.isSelected) {
-                resetBroadcast(true, engineContext.getString(R.string.processing_keyboard),
-                        EXTRA_PROGRESS_TYPE_KEYBOARD)
-                AppInstance.keyBoardText = it.keyboardText
+                it.commandsToRestore.forEach { cmd ->
+                    flushToSu(cmd)
+                }
                 Thread.sleep(DUMMY_WAIT_TIME)
             }
         }
@@ -104,18 +47,21 @@ class PreliminarySettingsRestoreEngine(private val jobcode: Int,
 
     override fun doInBackground(vararg params: Any?): Any {
         try {
-            settingsPacket.refreshInternalPackets()
-            if (settingsPacket.internalPackets.isNotEmpty()) {
-                if (!RestoreServiceKotlin.cancelAll) restoreAdb()
-                if (!RestoreServiceKotlin.cancelAll) restoreFontScale()
-                if (!RestoreServiceKotlin.cancelAll) readDPI()
-                if (!RestoreServiceKotlin.cancelAll) readKeyboard()
+            settingsPacket.internalPackets.forEach {
+                if (!RestoreServiceKotlin.cancelAll) {
+                    if (it.settingsType in arrayOf(SETTINGS_TYPE_ADB, SETTINGS_TYPE_FONT_SCALE))
+                        restorePacket(it)
+                }
             }
             flushToSu("exit", true)
         }
         catch (e: Exception){
             e.printStackTrace()
             errors.add("${ERROR_GENERIC_SETTINGS}: ${e.message}")
+        }
+
+        BufferedReader(InputStreamReader(suProcess.inputStream)).readLines().forEach {
+            broadcastProgress("", it, false)
         }
 
         BufferedReader(InputStreamReader(suProcess.errorStream)).readLines().forEach {

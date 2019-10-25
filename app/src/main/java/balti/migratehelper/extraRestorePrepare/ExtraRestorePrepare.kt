@@ -31,6 +31,7 @@ import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.GetterMarker
+import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_ADB
@@ -75,6 +76,8 @@ class ExtraRestorePrepare: AppCompatActivity() {
     private lateinit var runnable: Runnable
     private lateinit var handler: Handler
 
+    private var keyboardSettingsItem : SettingsPacketKotlin.SettingsItem? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.extra_restore_prepare)
@@ -84,25 +87,35 @@ class ExtraRestorePrepare: AppCompatActivity() {
         filterSelected(contactDataPackets)
         filterSelected(smsDataPackets)
         filterSelected(callsDataPackets)
-        settingsPacket?.let {
-            it.dpiItem = filterSelected(it.dpiItem)
-            it.adbItem = filterSelected(it.adbItem)
-            it.fontScaleItem = filterSelected(it.fontScaleItem)
-            it.keyboardItem = filterSelected(it.keyboardItem)
-            it.refreshInternalPackets()
-        }
-        wifiPacket = filterSelected(wifiPacket)
 
         if (contactDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_contact_icon, R.string.contacts).apply { erpItemContacts = this })
         if (smsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_sms_icon, R.string.sms).apply { erpItemSms = this })
         if (callsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_call_log_icon, R.string.calls).apply { erpItemCalls = this })
-        if (settingsPacket?.dpiItem != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_dpi_icon, R.string.dpi).apply { erpItemDpi = this })
-        if (settingsPacket?.adbItem != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_adb_icon, R.string.adb_state).apply { erpItemAdb = this })
-        if (settingsPacket?.fontScaleItem != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_font_scale_icon, R.string.font_scale).apply { erpItemFontScale = this })
-        if (settingsPacket?.keyboardItem != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_keyboard_icon, R.string.keyboard).apply { erpItemKeyboard = this })
+        settingsPacket?.let{
+            for (p in it.internalPackets){
+                if (p.isSelected) {
+                    val view = getERPItem(p.iconResource, p.displayText)
+                    when(p.settingsType) {
+                        SettingsPacketKotlin.SETTINGS_TYPE_DPI -> erpItemDpi = view
+                        SettingsPacketKotlin.SETTINGS_TYPE_ADB -> erpItemAdb = view
+                        SettingsPacketKotlin.SETTINGS_TYPE_FONT_SCALE -> erpItemFontScale = view
+                        SettingsPacketKotlin.SETTINGS_TYPE_KEYBOARD -> {
+                            erpItemKeyboard = view
+                            keyboardSettingsItem = p
+                        }
+                    }
+                    extra_perm_check_holder.addView(view)
+                }
+            }
+        }
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
-            if (wifiPacket != null) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_wifi_icon, R.string.wifi).apply { erpItemWifi = this })
+        wifiPacket?.let {
+            if (it.isSelected) {
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
+                    extra_perm_check_holder.addView(getERPItem(R.drawable.ic_wifi_icon, R.string.wifi).apply { erpItemWifi = this })
+                else it.isSelected = false
+            }
+        }
 
         if (appPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_app, R.string.apps).apply { erpItemApps = this })
 
@@ -119,9 +132,13 @@ class ExtraRestorePrepare: AppCompatActivity() {
     }
 
     private fun getERPItem(iconResource: Int, textResource: Int): View {
+        return getERPItem(iconResource, getString(textResource))
+    }
+
+    private fun getERPItem(iconResource: Int, text: String): View {
         return View.inflate(this, R.layout.extra_prep_item, null).apply {
             commonTools.tryIt { this.erp_item_icon.setImageResource(iconResource) }
-            commonTools.tryIt { this.erp_text.setText(textResource) }
+            commonTools.tryIt { this.erp_text.text = text }
         }
     }
 
@@ -166,11 +183,11 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
     }
 
-    private fun <T : GetterMarker> filterSelected(packet: T?): T? {
+    /*private fun <T : GetterMarker> filterSelected(packet: T?): T? {
         return if (cancelChecks) packet
         else if (packet != null && packet.isSelected) packet
         else null
-    }
+    }*/
 
     private fun doFallThroughJob(jobCode: Int) {
 
@@ -303,11 +320,11 @@ class ExtraRestorePrepare: AppCompatActivity() {
             }
 
             var executed = false
-            settingsPacket?.keyboardItem?.keyboardText?.let {
+            keyboardSettingsItem?.value.toString().let {
 
                 val kPackageName =
-                if (it.contains('/')) it.split('/')[0]
-                else it
+                        if (it.contains('/')) it.split('/')[0]
+                        else it
 
                 if (!commonTools.isPackageInstalled(kPackageName)){
                     var isPresent = false
@@ -323,10 +340,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                                 .setTitle(R.string.keyboard_not_present)
                                 .setMessage("$kPackageName\n${getString(R.string.keyboard_not_present_desc)}")
                                 .setPositiveButton(R.string.skip_keyboard){_, _ ->
-                                    settingsPacket?.run {
-                                        keyboardItem = null
-                                        refreshInternalPackets()
-                                    }
+                                    keyboardSettingsItem?.isSelected = false
                                     toggleERPItemStatusIcon(erpItemKeyboard, CANCEL, getString(R.string.cancelled))
                                     doFallThroughJob(JOBCODE_PREP_WIFI)
                                 }
@@ -343,8 +357,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                                     }
                                 }
                                 .show()
-                    }
-                    else proceed()
+                    } else proceed()
                 } else proceed()
 
                 executed = true
