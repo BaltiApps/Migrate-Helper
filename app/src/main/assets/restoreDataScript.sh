@@ -45,6 +45,7 @@ else
 
             # notification fix added in v3.0
             if [[ "${notification_fix}" == "true" ]]; then
+                echo "Removing gms file under $package_name/shared_prefs"
                 cd ${package_name}
                 rm -f shared_prefs/com.google.android.gms.appid.xml
             fi
