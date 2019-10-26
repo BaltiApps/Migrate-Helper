@@ -45,12 +45,7 @@
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".ProgressActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            />
-
-        <activity android:name=".ExtraBackupsProgress"
+        <activity android:name=".simpleActivities.ProgressShowActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             />
@@ -74,7 +69,7 @@
         <service android:name=".utilities.StupidStartupServiceKotlin"
             android:exported="false"/>
 
-        <service android:name=".RestoreService"
+        <service android:name=".restoreEngines.RestoreServiceKotlin"
             android:exported="false"/>
 
         <service android:name=".utilities.UninstallServiceKotlin"/>

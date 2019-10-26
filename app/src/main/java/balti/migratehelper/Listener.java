@@ -16,8 +16,8 @@ import android.os.Build;
 
 public class Listener extends BroadcastReceiver {
 
-    static String PROGRESS_CHANNEL = "App restore progress";
-    static String INIT_CHANNEL = "Initial progress";
+    static String PROGRESS_CHANNEL = "App restore restore_progress_layout";
+    static String INIT_CHANNEL = "Initial restore_progress_layout";
 
     @Override
     public void onReceive(Context context, Intent intent) {

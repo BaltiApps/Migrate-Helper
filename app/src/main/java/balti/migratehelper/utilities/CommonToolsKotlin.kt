@@ -41,6 +41,7 @@ class CommonToolsKotlin(val context: Context) {
         val FILE_DEVICE_INFO = "device_info.txt"
         val FILE_RESTORE_SCRIPT = "the_restore_script.sh"
         val FILE_PACKAGE_DATA = "package-data"
+        val FILE_FILE_LIST_NAME = "fileList"
 
         val CHANNEL_INIT = "Initializing"
         val CHANNEL_RESTORE_END = "Restore finished notification"
@@ -48,7 +49,7 @@ class CommonToolsKotlin(val context: Context) {
         val CHANNEL_RESTORE_ABORTING = "Aborting restore"
         val CHANNEL_UNINSTALLING = "Uninstalling helper"
 
-        val ACTION_RESTORE_PROGRESS = "Helper restore progress broadcast"
+        val ACTION_RESTORE_PROGRESS = "Helper restore restore_progress_layout broadcast"
         val ACTION_RESTORE_ABORT = "Helper abort broadcast"
         val ACTION_REQUEST_RESTORE_DATA = "get data"
         val ACTION_TRIGGER_RESTORE = "trigger restore"
@@ -71,7 +72,7 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_TITLE = "title"
         val EXTRA_SUBTASK = "subtask"
         val EXTRA_TASKLOG = "tasklog"
-        val EXTRA_PROGRESS_PERCENTAGE = "progress"
+        val EXTRA_PROGRESS_PERCENTAGE = "restore_progress_layout"
         val EXTRA_ERRORS = "errors"
         val EXTRA_IS_CANCELLED = "isCancelled"
         val EXTRA_TOTAL_TIME = "total_time"
@@ -269,8 +270,16 @@ class CommonToolsKotlin(val context: Context) {
         val errorLog = File(context.externalCacheDir, FILE_ERRORLOG)
         val theRestoreScript = File(context.externalCacheDir, FILE_RESTORE_SCRIPT)
 
-        val packageDatas = context.externalCacheDir.listFiles { f: File ->
-            f.name.startsWith(FILE_PACKAGE_DATA) && f.name.endsWith(".txt")
+        val packageDatas = context.externalCacheDir.let {
+            if (it != null) it.listFiles { f: File ->
+                f.name.startsWith(FILE_PACKAGE_DATA) && f.name.endsWith(".txt")
+            } else emptyArray<File>()
+        }
+
+        val fileLists = context.externalCacheDir.let {
+            if (it != null) it.listFiles { f: File ->
+                f.name.startsWith(FILE_FILE_LIST_NAME) && f.name.endsWith(".txt")
+            } else emptyArray<File>()
         }
 
         if (isErrorLogMandatory && !errorLog.exists()) {
@@ -280,18 +289,21 @@ class CommonToolsKotlin(val context: Context) {
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
         }
-        else if (errorLog.exists() || progressLog.exists() || theRestoreScript.exists() || packageDatas.isNotEmpty()){
+        else if (errorLog.exists() || progressLog.exists() || theRestoreScript.exists() || packageDatas.isNotEmpty() || fileLists.isNotEmpty()){
 
             val eView = View.inflate(context, R.layout.error_report_layout, null)
 
-            eView.share_progress_checkbox.isChecked = progressLog.exists()
-            eView.share_progress_checkbox.isEnabled = progressLog.exists()
+            eView.share_package_data.isChecked = packageDatas.isNotEmpty()
+            eView.share_package_data.isEnabled = packageDatas.isNotEmpty()
+
+            eView.share_fileLists_checkbox.isChecked = fileLists.isNotEmpty()
+            eView.share_fileLists_checkbox.isEnabled = fileLists.isNotEmpty()
 
             eView.share_script_checkbox.isChecked = theRestoreScript.exists()
             eView.share_script_checkbox.isEnabled = theRestoreScript.exists()
 
-            eView.share_package_data.isChecked = packageDatas.isNotEmpty()
-            eView.share_package_data.isEnabled = packageDatas.isNotEmpty()
+            eView.share_progress_checkbox.isChecked = progressLog.exists()
+            eView.share_progress_checkbox.isEnabled = progressLog.exists()
 
             eView.share_errors_checkbox.isChecked = errorLog.exists()
             eView.share_errors_checkbox.isEnabled = errorLog.exists() && !isErrorLogMandatory
@@ -317,6 +329,7 @@ class CommonToolsKotlin(val context: Context) {
                     if (eView.share_progress_checkbox.isChecked) uris.add(getUri(progressLog))
                     if (eView.share_script_checkbox.isChecked) uris.add(getUri(theRestoreScript))
                     if (eView.share_package_data.isChecked) for (f in packageDatas) uris.add(getUri(f))
+                    if (eView.share_fileLists_checkbox.isChecked) for (f in fileLists) uris.add(getUri(f))
 
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -341,7 +354,7 @@ class CommonToolsKotlin(val context: Context) {
             if (!isTgClientInstalled){
                 eView.report_button_telegram.apply {
                     text = context.getString(R.string.install_tg)
-                    setOnClickListener { openWebLink("market://details?id=${TG_CLIENTS[0]}") }
+                    setOnClickListener { playStoreLink(TG_CLIENTS[0]) }
                 }
             }
             else {
@@ -358,7 +371,9 @@ class CommonToolsKotlin(val context: Context) {
 
             val msg = context.getString(R.string.progress_log_does_not_exist) + "\n" +
                     context.getString(R.string.error_log_does_not_exist) + "\n" +
-                    context.getString(R.string.restore_script_does_not_exist) + "\n"
+                    context.getString(R.string.restore_script_does_not_exist) + "\n" +
+                    context.getString(R.string.package_data_does_not_exist) + "\n" +
+                    context.getString(R.string.file_lists_does_not_exist)
 
             AlertDialog.Builder(context)
                     .setTitle(R.string.log_files_do_not_exist)
@@ -371,7 +386,7 @@ class CommonToolsKotlin(val context: Context) {
 
     private fun getUri(file: File) =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                FileProvider.getUriForFile(context, "migrate.provider", file)
+                FileProvider.getUriForFile(context, "migrate.helper.provider", file)
             else Uri.fromFile(file)
 
     private fun sendIntent(uris: ArrayList<Uri>, isEmail: Boolean = false){

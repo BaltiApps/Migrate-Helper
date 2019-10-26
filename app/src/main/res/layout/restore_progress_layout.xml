@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/log_bg_portrait"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding_width">
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/large_padding_width"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/large_padding_width"
+            android:paddingEnd="@dimen/large_padding_width"
+            android:paddingTop="@dimen/large_padding_width"
+            >
+
+            <ImageView
+                android:id="@+id/app_icon"
+                android:layout_width="@dimen/app_icon_dimen"
+                android:layout_height="@dimen/app_icon_dimen"
+                android:src="@drawable/ic_waiting" />
+
+            <Space
+                android:layout_width="@dimen/large_padding_width"
+                android:layout_height="wrap_content"/>
+
+            <Space
+                android:layout_width="@dimen/small_padding_width"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:id="@+id/progressTask"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="@string/please_wait"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/subTask"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorAccent"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    tools:text="Subtask"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/large_padding_width"
+            android:paddingEnd="@dimen/large_padding_width"
+            >
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/large_padding_width"
+                android:layout_marginBottom="@dimen/large_padding_width"
+                android:layout_weight="1"
+                android:max="100" />
+
+            <TextView
+                android:id="@+id/progressPercent"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:gravity="end"
+                android:text=""
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding_width">
+
+        <TextView
+            android:id="@+id/progressLogTextView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/log_message"
+            android:fontFamily="monospace"
+            android:padding="@dimen/large_padding_width"
+            android:scrollbars="vertical"
+            android:textColor="@android:color/white" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/errorLogTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:paddingTop="@dimen/small_padding_width"
+                android:scrollbars="vertical"
+                android:textColor="@android:color/holo_red_dark" />
+
+        </ScrollView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_warning"
+            android:drawablePadding="@dimen/small_padding_width"
+            android:gravity="center_vertical"
+            android:text="@string/minimizing_may_decrease_speed"
+            android:textSize="13sp"
+            android:id="@+id/closeWarning"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/large_padding_width"
+        android:gravity="end"
+        >
+
+        <Button
+            android:id="@+id/reportLogButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimary"
+            android:text="@string/report"
+            android:textColor="@color/colorAccent"
+            android:visibility="gone"
+            />
+
+        <Button
+            android:id="@+id/progressAbortButton"
+            android:layout_width="@dimen/log_button_width"
+            android:layout_height="@dimen/button_height"
+            android:background="@drawable/cancel_restore"
+            android:text="@string/abort"
+            android:foreground="?android:attr/selectableItemBackground" />
+
+        <Button
+            android:id="@+id/progressActionButton"
+            android:layout_width="@dimen/log_button_width"
+            android:layout_height="@dimen/button_height"
+            android:background="@drawable/log_action_button"
+            android:text="@string/minimize"
+            android:foreground="?android:attr/selectableItemBackground" />
+
+    </LinearLayout>
+
+
+    <!--<com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/backups_progress_activity_adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        />-->
+
+</LinearLayout>

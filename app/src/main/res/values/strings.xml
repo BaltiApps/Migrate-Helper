@@ -72,7 +72,7 @@
     <string name="ready_to_be_restored">Ready to restore</string>
     <string name="restore_starting_in">Restore starting in…</string>
 
-    <!--progress.xml-->
+    <!--restore_progress_layout.xml-->
     <string name="close">CLOSE</string>
     <string name="abort">Abort!</string>
     <string name="minimize">Minimize</string>
@@ -207,6 +207,7 @@
     <string name="report_header">Report via Telegram</string>
     <string name="share_progress_logs">Share progress logs</string>
     <string name="share_error_logs">Share error logs</string>
+    <string name="share_file_lists">Share list of files in backup</string>
     <string name="share_script">Share script</string>
     <string name="share_package_data">Share package-data</string>
     <string name="send_to_tg">Send to Telegram</string>
@@ -233,6 +234,7 @@
     <string name="progress_log_does_not_exist">\"progressLog\" does not exist</string>
     <string name="error_log_does_not_exist">\"errorLog\" does not exist</string>
     <string name="package_data_does_not_exist">\"package-data\" does not exist</string>
+    <string name="file_lists_does_not_exist">File lists do not exist</string>
     <string name="tg_not_installed">Our Telegram group helps to get quick resolutions to problems.</string>
     <string name="tg_not_installed_desc">Please install Telegram and join our group.</string>
     <string name="install_tg">Install Telegram</string>

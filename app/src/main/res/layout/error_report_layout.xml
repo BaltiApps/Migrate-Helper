@@ -56,11 +56,11 @@
             android:text="@string/share_package_data" />
 
         <CheckBox
-            android:id="@+id/share_progress_checkbox"
+            android:id="@+id/share_fileLists_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="@string/share_progress_logs" />
+            android:text="@string/share_file_lists" />
 
         <CheckBox
             android:id="@+id/share_script_checkbox"
@@ -68,6 +68,13 @@
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="@string/share_script" />
+
+        <CheckBox
+            android:id="@+id/share_progress_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/share_progress_logs" />
 
         <CheckBox
             android:id="@+id/share_errors_checkbox"

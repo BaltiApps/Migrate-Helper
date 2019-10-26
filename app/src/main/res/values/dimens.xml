@@ -11,4 +11,5 @@
     <dimen name="extra_large_padding_width">20dp</dimen>
     <dimen name="restore_countdown_height">130dp</dimen>
     <dimen name="countdown_text_size">40sp</dimen>
+    <dimen name="app_icon_dimen">50dp</dimen>
 </resources>

@@ -126,7 +126,7 @@ class AppRestoreEngine(private val jobcode: Int,
                         if (RestoreServiceKotlin.cancelAll) break
                         try {
 
-                            appPacket.appName?.let { an -> broadcastProgress(an, an, false) }
+                            appPacket.appName?.let { name -> broadcastProgress(name, name, false) }
 
                             writeNext("echo \"$MIGRATE_STATUS ${appPacket.appName} icon: ${appPacket.iconFileName
                                     ?: appPacket.appIcon}")

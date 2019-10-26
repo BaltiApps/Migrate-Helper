@@ -52,11 +52,11 @@ public class ProgressActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.progress);
+        setContentView(R.layout.restore_progress_layout);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        iconHolder = findViewById(R.id.logoIcon);
+        /*iconHolder = findViewById(R.id.logoIcon);
         messageHead = findViewById(R.id.messageHead);
         messageView = findViewById(R.id.messageView);
         errorView = findViewById(R.id.errorLogTextView);
@@ -65,7 +65,7 @@ public class ProgressActivity extends AppCompatActivity {
         okOnFinish = findViewById(R.id.okOnFinish);
         close = findViewById(R.id.close);
         reportLog = findViewById(R.id.reportLogButton);
-        cancelButton = findViewById(R.id.cancelRestore);
+        cancelButton = findViewById(R.id.cancelRestore);*/
 
         reportLog.setVisibility(View.GONE);
 
@@ -212,7 +212,7 @@ public class ProgressActivity extends AppCompatActivity {
             }
 
             cancelButton.setText(R.string.abort);
-            iconHolder.setImageResource(R.drawable.ic_cancelled);
+            iconHolder.setImageResource(R.drawable.ic_cancelled_icon);
             messageHead.setText(intent.getStringExtra("head"));
 
             if (intent.hasExtra("total_time"))
@@ -252,7 +252,7 @@ public class ProgressActivity extends AppCompatActivity {
             } catch (Exception ignored) {
             }
 
-            iconHolder.setImageResource(R.drawable.ic_finished);
+            iconHolder.setImageResource(R.drawable.ic_finished_icon);
             messageHead.setText(intent.getStringExtra("head"));
 
             if (intent.hasExtra("total_time"))
