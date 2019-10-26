@@ -97,7 +97,7 @@ class SmsRestoreEngine(private val jobcode: Int,
         cursor?.let {
             errors.addAll(dbTools.restoreTable(engineContext.contentResolver,
                     it, uri, tableName, mirror, projection,
-                    0, ERROR_SMS_RESTORE, {return@restoreTable RestoreServiceKotlin.cancelAll},
+                    SMS_ADDRESS, ERROR_SMS_RESTORE, {return@restoreTable RestoreServiceKotlin.cancelAll},
                     { progress, taskLog ->
                         publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
                     }

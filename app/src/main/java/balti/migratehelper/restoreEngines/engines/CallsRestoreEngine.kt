@@ -88,7 +88,7 @@ class CallsRestoreEngine(private val jobcode: Int,
         cursor?.let {
             errors.addAll(dbTools.restoreTable(engineContext.contentResolver,
                     it, uri, tableName, mirror, projection,
-                    0, ERROR_CALLS_RESTORE, {return@restoreTable RestoreServiceKotlin.cancelAll},
+                    CALLS_NUMBER, ERROR_CALLS_RESTORE, {return@restoreTable RestoreServiceKotlin.cancelAll},
                     { progress, taskLog ->
                         publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
                     }

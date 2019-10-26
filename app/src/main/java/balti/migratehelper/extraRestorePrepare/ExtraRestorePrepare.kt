@@ -1,7 +1,10 @@
 package balti.migratehelper.extraRestorePrepare
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -32,7 +35,9 @@ import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.GetterMarker
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin
+import balti.migratehelper.simpleActivities.ProgressShowActivity
 import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_ADB
@@ -79,6 +84,23 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
     private var keyboardSettingsItem : SettingsPacketKotlin.SettingsItem? = null
     private var notificationFix = false
+
+    private val progressReceiver by lazy {
+        object : BroadcastReceiver(){
+            override fun onReceive(context: Context?, intent: Intent?) {
+                startActivity(Intent(this@ExtraRestorePrepare, ProgressShowActivity::class.java)
+                        .apply {
+                            intent?.let {
+                                this.putExtras(it)
+                                this.action = it.action
+                            }
+                        }
+                )
+                commonTools.tryIt { commonTools.LBM?.unregisterReceiver(this) }
+                finish()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,6 +153,8 @@ class ExtraRestorePrepare: AppCompatActivity() {
             cancelChecks = true
             doFallThroughJob(JOBCODE_PREP_END)
         }
+
+        commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
 
         doFallThroughJob(JOBCODE_PREP_CONTACTS)
     }
@@ -465,7 +489,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                             if (firstSlideIn) {
                                 handler = Handler()
                                 runnable = Runnable {
-                                    if (c == 0) {
+                                    if (c == 1) {
                                         commonTools.tryIt { handler.removeCallbacks(runnable) }
                                         act()
                                     } else {
@@ -544,7 +568,8 @@ class ExtraRestorePrepare: AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        commonTools.tryIt { handler.removeCallbacks(runnable) }
         super.onDestroy()
+        commonTools.tryIt { handler.removeCallbacks(runnable) }
+        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
     }
 }

@@ -32,7 +32,7 @@ class DBTools {
 
     fun restoreTable(cr: ContentResolver, cursor: Cursor, uri: Uri,
                      tableName: String, mirror: Array<String>, projection: Array<String>,
-                     columnToGetTaskLog:Int, errorTag: String, breakFunc: () -> Boolean, updateFunc: (Int, String) -> Unit): ArrayList<String> {
+                     projectionToGetTaskLog:String, errorTag: String, breakFunc: () -> Boolean, updateFunc: (Int, String) -> Unit): ArrayList<String> {
 
         val errors = ArrayList<String>(0)
 
@@ -50,25 +50,26 @@ class DBTools {
 
                         if (breakFunc()) break@outerLoop
 
-                        fun setTaskLog(content: Any){
-                            if (i == columnToGetTaskLog)
-                                taskLog = content.toString()
+                        fun setTaskLog(projection: String, data: Any?){
+                            if (projection == projectionToGetTaskLog)
+                                taskLog = data.toString()
                         }
 
                         val m = mirror[i]
                         val k = m.split(":")[0]
                         when (m.split(":")[1]) {
-                            "s" -> contentValues.put(k, cursor.getString(cursor.getColumnIndex(projection[i])).apply { setTaskLog(this) })
-                            "i" -> contentValues.put(k, cursor.getInt(cursor.getColumnIndex(projection[i])).apply { setTaskLog(this) })
-                            "l" -> contentValues.put(k, cursor.getLong(cursor.getColumnIndex(projection[i])).apply { setTaskLog(this) })
-                            "d" -> contentValues.put(k, cursor.getDouble(cursor.getColumnIndex(projection[i])).apply { setTaskLog(this) })
-                            "f" -> contentValues.put(k, cursor.getFloat(cursor.getColumnIndex(projection[i])).apply { setTaskLog(this) })
+                            "s" -> contentValues.put(k, cursor.getString(cursor.getColumnIndex(projection[i])).apply { setTaskLog(projection[i], this) })
+                            "i" -> contentValues.put(k, cursor.getInt(cursor.getColumnIndex(projection[i])).apply { setTaskLog(projection[i], this) })
+                            "l" -> contentValues.put(k, cursor.getLong(cursor.getColumnIndex(projection[i])).apply { setTaskLog(projection[i], this) })
+                            "d" -> contentValues.put(k, cursor.getDouble(cursor.getColumnIndex(projection[i])).apply { setTaskLog(projection[i], this) })
+                            "f" -> contentValues.put(k, cursor.getFloat(cursor.getColumnIndex(projection[i])).apply { setTaskLog(projection[i], this) })
                         }
                     }
 
                     cr.insert(uri, contentValues)
 
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     errors.add("$errorTag: $tableName:$c - ${e.message.toString()}")
                 }
 
