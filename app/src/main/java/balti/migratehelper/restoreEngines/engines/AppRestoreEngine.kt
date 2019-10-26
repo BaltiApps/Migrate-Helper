@@ -128,7 +128,7 @@ class AppRestoreEngine(private val jobcode: Int,
 
                             appPacket.appName?.let { name -> broadcastProgress(name, name, false) }
 
-                            writeNext("echo \"$MIGRATE_STATUS ${appPacket.appName} icon: ${appPacket.iconFileName
+                            writeNext("echo \"$MIGRATE_STATUS: ${appPacket.appName} icon: ${appPacket.iconFileName
                                     ?: appPacket.appIcon}\"")
 
                             val permFile = File(METADATA_HOLDER_DIR, "${appPacket.packageName}.perm")
