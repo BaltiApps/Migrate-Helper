@@ -99,8 +99,10 @@ class CallsRestoreEngine(private val jobcode: Int,
     override fun doInBackground(vararg params: Any?): Any {
         for (packet in callsPackets){
             if (RestoreServiceKotlin.cancelAll) break
-            currentPacket = packet
-            restoreCalls()
+            if (packet.isSelected) {
+                currentPacket = packet
+                restoreCalls()
+            }
         }
         return 0
     }

@@ -44,7 +44,7 @@ class WifiRestoreEngine(private val jobcode: Int,
 
     override fun doInBackground(vararg params: Any?): Any {
         try {
-            if (!RestoreServiceKotlin.cancelAll) restoreWifi()
+            if (!RestoreServiceKotlin.cancelAll && wifiPacket.isSelected) restoreWifi()
         }
         catch (e: Exception){
             e.printStackTrace()

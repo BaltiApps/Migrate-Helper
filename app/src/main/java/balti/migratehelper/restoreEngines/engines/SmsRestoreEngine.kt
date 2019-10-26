@@ -108,8 +108,10 @@ class SmsRestoreEngine(private val jobcode: Int,
     override fun doInBackground(vararg params: Any?): Any {
         for (packet in smsPackets) {
             if (RestoreServiceKotlin.cancelAll) break
-            currentPacket = packet
-            restoreSms()
+            if (packet.isSelected) {
+                currentPacket = packet
+                restoreSms()
+            }
         }
         return 0
     }

@@ -43,12 +43,12 @@ data class SettingsPacketKotlin(private val dpiText: String?, private val adbSta
                     }
                 }
             }
-            val valueToRetore = if (oDensity > 0) oDensity
+            val valueToRestore = if (oDensity > 0) oDensity
             else if (pDensity > 0) pDensity
             else -1
 
-            if (valueToRetore > 0){
-                listOf("wm density $valueToRetore")
+            if (valueToRestore > 0){
+                listOf("wm density $valueToRestore")
             }
             else listOf("")
         }

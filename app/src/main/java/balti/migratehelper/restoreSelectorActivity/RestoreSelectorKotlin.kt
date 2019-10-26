@@ -1,6 +1,9 @@
 package balti.migratehelper.restoreSelectorActivity
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
@@ -28,7 +31,10 @@ import balti.migratehelper.restoreSelectorActivity.utils.AppRestoreAdapter
 import balti.migratehelper.restoreSelectorActivity.utils.OnReadComplete
 import balti.migratehelper.restoreSelectorActivity.utils.RootCopyTask
 import balti.migratehelper.restoreSelectorActivity.utils.SearchAppAdapter
+import balti.migratehelper.simpleActivities.ProgressShowActivity
 import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_RESTORE_DATA
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_MAIN_READ_TRY_CATCH
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
@@ -72,6 +78,23 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
     private var adapter: AppRestoreAdapter? = null
 
     private lateinit var forceStopDialog: AlertDialog
+
+    private val progressReceiver by lazy {
+        object : BroadcastReceiver(){
+            override fun onReceive(context: Context?, intent: Intent?) {
+                startActivity(Intent(this@RestoreSelectorKotlin, ProgressShowActivity::class.java)
+                        .apply {
+                            intent?.let {
+                                this.putExtras(it)
+                                this.action = it.action
+                            }
+                        }
+                )
+                commonTools.tryIt { commonTools.LBM?.unregisterReceiver(this) }
+                finish()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,6 +154,9 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                 }
             }
         }
+
+        commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
+        commonTools.LBM?.sendBroadcast(Intent(ACTION_REQUEST_RESTORE_DATA))
 
         doJob(JOBCODE_ROOT_COPY)
     }
@@ -513,6 +539,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
     override fun onDestroy() {
         cancelLoading = false
+        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
         commonTools.tryIt { forceStopDialog.dismiss() }
         super.onDestroy()
     }

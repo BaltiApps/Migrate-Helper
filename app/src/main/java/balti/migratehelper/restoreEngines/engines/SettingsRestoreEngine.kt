@@ -6,17 +6,19 @@ import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_ADB
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_FONT_SCALE
+import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_KEYBOARD
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_GENERIC_SETTINGS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_ADB
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_FONT_SCALE
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_KEYBOARD
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 
-class PreliminarySettingsRestoreEngine(private val jobcode: Int,
-                                       private val settingsPacket: SettingsPacketKotlin): ParentRestoreClass("") {
+class SettingsRestoreEngine(private val jobcode: Int,
+                            private val settingsPacket: SettingsPacketKotlin): ParentRestoreClass("") {
 
     private val errors by lazy { ArrayList<String>(0) }
     private val suProcess by lazy { Runtime.getRuntime().exec("su") }
@@ -35,6 +37,8 @@ class PreliminarySettingsRestoreEngine(private val jobcode: Int,
                     SETTINGS_TYPE_ADB -> resetBroadcast(true, engineContext.getString(R.string.restoring_adb), EXTRA_PROGRESS_TYPE_ADB)
                     SETTINGS_TYPE_FONT_SCALE ->
                         resetBroadcast(true, engineContext.getString(R.string.restoring_font_scale), EXTRA_PROGRESS_TYPE_FONT_SCALE)
+                    SETTINGS_TYPE_KEYBOARD ->
+                        resetBroadcast(true, engineContext.getString(R.string.restoring_keyboard), EXTRA_PROGRESS_TYPE_KEYBOARD)
                 }
 
                 it.commandsToRestore.forEach { cmd ->
@@ -49,7 +53,7 @@ class PreliminarySettingsRestoreEngine(private val jobcode: Int,
         try {
             settingsPacket.internalPackets.forEach {
                 if (!RestoreServiceKotlin.cancelAll) {
-                    if (it.settingsType in arrayOf(SETTINGS_TYPE_ADB, SETTINGS_TYPE_FONT_SCALE))
+                    if (it.settingsType in arrayOf(SETTINGS_TYPE_ADB, SETTINGS_TYPE_FONT_SCALE, SETTINGS_TYPE_KEYBOARD) && it.isSelected)
                         restorePacket(it)
                 }
             }

@@ -59,18 +59,22 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_PROGRESS_TYPE_SMS = "sms_progress"
         val EXTRA_PROGRESS_TYPE_CALLS = "calls_progress"
         val EXTRA_PROGRESS_TYPE_WIFI = "wifi_progress"
-        val EXTRA_PROGRESS_TYPE_DPI = "dpi_progress"
         val EXTRA_PROGRESS_TYPE_ADB = "adb_progress"
         val EXTRA_PROGRESS_TYPE_FONT_SCALE = "font_scale_progress"
         val EXTRA_PROGRESS_TYPE_KEYBOARD = "keyboard_progress"
         val EXTRA_PROGRESS_APP_RESTORE = "app_restore_progress"
         val EXTRA_PROGRESS_MAKING_SCRIPTS = "app_making_script_progress"
         val EXTRA_PROGRESS_WAITING_FOR_VCF = "waiting_for_vcf_progress"
+        val EXTRA_PROGRESS_TYPE_WAITING_TO_CANCEL = "waiting_to_cancel"
+        val EXTRA_PROGRESS_TYPE_FINISHED = "finished"
 
         val EXTRA_TITLE = "title"
         val EXTRA_SUBTASK = "subtask"
         val EXTRA_TASKLOG = "tasklog"
         val EXTRA_PROGRESS_PERCENTAGE = "progress"
+        val EXTRA_ERRORS = "errors"
+        val EXTRA_IS_CANCELLED = "isCancelled"
+        val EXTRA_TOTAL_TIME = "total_time"
 
         val EXTRA_NOTIFICATION_FIX = "notification_fix"
 
@@ -92,6 +96,10 @@ class CommonToolsKotlin(val context: Context) {
         val ERROR_APP_RESTORE_TRY_CATCH = "RUN_TRY_CATCH"
         val ERROR_APP_RESTORE = "RUN"
         val ERROR_APP_RESTORE_SUPPRESSED = "RUN_SUPPRESSED"
+
+        val ERROR_RESTORE_SERVICE_ERROR = "RESTORE_SERVICE"
+
+        val ALL_SUPPRESSED_ERRORS = arrayOf(ERROR_APP_RESTORE_SUPPRESSED)
 
         val DUMMY_WAIT_TIME = 100L
 
@@ -125,6 +133,10 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_RESTORE_SETTINGS = 62001
         val JOBCODE_RESTORE_WIFI = 75000
         val JOBCODE_RESTORE_APP = 85001
+        val JOBCODE_RESTORE_END = 95001
+
+        val TIMEOUT_WAITING_TO_CANCEL_TASK = 500L
+        val TIMEOUT_WAITING_TO_KILL = 3000L
 
         val EXTRA_DPI_VALUE = "dpiValue"
         val EXTRA_DO_REBOOT = "doReboot"
@@ -152,8 +164,6 @@ class CommonToolsKotlin(val context: Context) {
         val PACKAGE_NAME_FDROID = "org.fdroid.fdroid.privileged"
 
         val EXTRA_VIEW_COUNT = 500
-
-        val TIMEOUT_WAITING_TO_KILL = 3000L
 
         val BACKUP_NAME_SETTINGS = "settings.json"
         val WIFI_FILE_NAME = "WifiConfigStore.xml"

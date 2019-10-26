@@ -80,7 +80,7 @@
     <string name="minimizing_may_decrease_speed">Minimizing this screen may decrease restore speed!</string>
 
     <!--RootRestoreTask.java-->
-    <string name="finished">Finished!</string>
+    <string name="finished">Finished! No errors.</string>
     <string name="finished_with_errors">Finished with errors!</string>
     <string name="uninstall_prompt">Click FINISH to uninstall this app</string>
     <string name="change_dpi_and_reboot_prompt">Click FINISH to change DPI and reboot</string>
@@ -181,7 +181,10 @@
 
     <!--ParentRestoreClass.kt-->
     <string name="loading">Loading…</string>
+
+    <!--RestoreServiceKotlin.kt-->
     <string name="cancelling">Cancelling…</string>
+    <string name="errorStartingRestore">Error starting Restore (onStartCommand).</string>
 
     <!--AppRestoreAdapter.kt-->
     <string name="packageName">Package :</string>
@@ -241,6 +244,7 @@
     <string name="restoring_calls">Restoring calls</string>
     <string name="restoring_adb">Restoring ADB state</string>
     <string name="restoring_font_scale">Restoring font scale</string>
+    <string name="restoring_keyboard">Restoring keyboard</string>
     <string name="processing_dpi">Processing DPI</string>
     <string name="processing_keyboard">Processing keyboard</string>
     <string name="restoring_wifi">Restoring Wifi</string>

@@ -204,8 +204,8 @@ class MainActivityKotlin: AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        commonTools.LBM?.unregisterReceiver(progressReceiver)
-        commonTools.LBM?.unregisterReceiver(endOnDisable)
+        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(endOnDisable) }
     }
 
 }

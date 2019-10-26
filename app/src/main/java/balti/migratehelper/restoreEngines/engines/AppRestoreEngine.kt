@@ -12,6 +12,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_APP_RESTO
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_APP_RESTORE_TRY_CATCH
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_APP_RESTORE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_MAKING_SCRIPTS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_WAITING_FOR_VCF
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_PACKAGE_DATA
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_RESTORE_SCRIPT
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.KNOWN_CONTACTS_ELEMENTS
@@ -265,6 +266,9 @@ class AppRestoreEngine(private val jobcode: Int,
 
         if (isContactAppPresent){
             try {
+
+                resetBroadcast(true, engineContext.getString(R.string.waiting_for_contacts), EXTRA_PROGRESS_WAITING_FOR_VCF)
+                broadcastProgress("", engineContext.getString(R.string.waiting_for_contacts_desc), false)
 
                 Runtime.getRuntime().exec("su").let {
                     val writer = BufferedWriter(OutputStreamWriter(it.outputStream))
