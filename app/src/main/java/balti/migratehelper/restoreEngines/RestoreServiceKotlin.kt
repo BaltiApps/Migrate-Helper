@@ -209,16 +209,9 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         startTime = timeInMillis()
 
         isBackupInitiated = true
-
         cancelAll = false
 
         AppInstance.notificationManager.cancelAll()
-
-        var isExtrasBackup = true
-
-        if (!isSettingsNull || smsDataPackets.isNotEmpty() || callsDataPackets.isNotEmpty() || wifiPacket != null){
-            isExtrasBackup = true
-        }
 
         doFallThroughJob(JOBCODE_RESTORE_SMS)
     }
