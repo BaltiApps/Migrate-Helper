@@ -310,7 +310,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         doJob(JOBCODE_RESTORE_CALLS, callsDataPackets.let { if (it.isNotEmpty()) it else null })
         doJob(JOBCODE_RESTORE_WIFI, wifiPacket)
 
-        doJob(JOBCODE_RESTORE_APP, appPackets)
+        doJob(JOBCODE_RESTORE_APP, appPackets.let { if (it.isNotEmpty()) it else null })
 
         // restore all settings after restoring apps
         doJob(JOBCODE_RESTORE_SETTINGS, if (isSettingsNull) null else settingsPacket)
