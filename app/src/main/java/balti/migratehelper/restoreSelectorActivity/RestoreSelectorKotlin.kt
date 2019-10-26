@@ -173,6 +173,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         restore_selector_action_button.apply {
             setText(R.string.close)
             background = getDrawable(R.drawable.next)
+            setOnClickListener { finish() }
         }
     }
 
