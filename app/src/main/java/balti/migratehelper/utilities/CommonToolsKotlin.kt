@@ -41,7 +41,7 @@ class CommonToolsKotlin(val context: Context) {
         val FILE_DEVICE_INFO = "device_info.txt"
         val FILE_RESTORE_SCRIPT = "the_restore_script.sh"
         val FILE_PACKAGE_DATA = "package-data"
-        val FILE_FILE_LIST_NAME = "fileList"
+        val FILE_FILE_LIST = "fileList.txt"
 
         val CHANNEL_INIT = "Initializing"
         val CHANNEL_RESTORE_END = "Restore finished notification"
@@ -278,7 +278,7 @@ class CommonToolsKotlin(val context: Context) {
 
         val fileLists = context.externalCacheDir.let {
             if (it != null) it.listFiles { f: File ->
-                f.name.startsWith(FILE_FILE_LIST_NAME) && f.name.endsWith(".txt")
+                f.name.startsWith(FILE_FILE_LIST) && f.name.endsWith(".txt")
             } else emptyArray<File>()
         }
 
