@@ -78,7 +78,8 @@
                     android:layout_width="300dp"
                     android:layout_height="60dp"
                     android:background="@drawable/uninstall_button"
-                    android:text="@string/uninstall_or_disable" />
+                    android:text="@string/uninstall_or_finalize"
+                    />
 
 
                 <TextView

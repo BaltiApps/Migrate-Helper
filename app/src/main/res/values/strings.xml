@@ -15,7 +15,7 @@
     <!--activity_main.xml-->
     <string name="restore_main">Restore apps and data</string>
     <string name="uninstallFromSystem">Uninstall from system</string>
-    <string name="uninstall_or_disable">Uninstall/Disable this app</string>
+    <string name="uninstall_or_finalize">Uninstall/Disable app\norFinalize restore</string>
     <string name="temporary_disable">Temporary disable</string>
     <string name="selective_restore">Choose what to restore</string>
     <string name="please_use_magisk">Make sure to use Magisk</string>
@@ -80,13 +80,14 @@
     <string name="minimizing_may_decrease_speed">Minimizing this screen may decrease restore speed!</string>
 
     <!--RootRestoreTask.java-->
-    <string name="finished">Finished! Click to finalise.</string>
+    <string name="finished">Finished! No errors.</string>
     <string name="finished_with_errors">Finished with errors!</string>
     <string name="uninstall_prompt">Click FINISH to uninstall this app</string>
-    <string name="some_post_jobs_left">Some post restore operations are left. Please click to open.</string>
+    <string name="some_post_jobs_left">Some post restore operations are left. Click to open.</string>
     <string name="change_dpi_and_reboot_prompt">Click FINISH to change DPI and reboot</string>
     <string name="making_script">Making script</string>
     <string name="finish">Finish</string>
+    <string name="finalize">Finalize</string>
     <string name="restoreCancelled">Restore cancelled.</string>
 
     <!--app_selector.xml-->

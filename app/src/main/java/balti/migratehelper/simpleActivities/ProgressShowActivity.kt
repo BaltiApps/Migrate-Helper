@@ -193,7 +193,7 @@ class ProgressShowActivity: AppCompatActivity() {
                     progressAbortButton.visibility = View.GONE
 
                     progressActionButton.apply {
-                        text = getString(R.string.finish)
+                        text = getString(R.string.finalize)
                         setOnClickListener {
                             startActivity(Intent(this@ProgressShowActivity, PostJobsActivity::class.java))
                         }
@@ -330,6 +330,7 @@ class ProgressShowActivity: AppCompatActivity() {
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
         commonTools.LBM?.registerReceiver(onPostJobsStart, IntentFilter(ACTION_POST_JOBS_STARTED))
 
+        if (intent.extras != null) handleProgress(intent)
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -345,7 +346,8 @@ class ProgressShowActivity: AppCompatActivity() {
                 if (AppInstance.sharedPrefs.getBoolean(PREF_IS_POST_JOBS_NEEDED, false))
                     startActivity(Intent(this@ProgressShowActivity, PostJobsActivity::class.java))
             }
-            handleProgress(Intent().putExtras(savedInstanceState))
+            if (this.getString(EXTRA_PROGRESS_TYPE) != null)
+                handleProgress(Intent().putExtras(this))
         }
     }
 
