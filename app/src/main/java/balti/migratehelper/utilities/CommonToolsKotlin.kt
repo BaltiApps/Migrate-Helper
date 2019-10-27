@@ -56,6 +56,7 @@ class CommonToolsKotlin(val context: Context) {
         val ACTION_TRIGGER_RESTORE = "trigger restore"
         val ACTION_RESTORE_SERVICE_STARTED = "restore service started"
         val ACTION_END_ALL = "helper_end_all"
+        val ACTION_POST_JOBS_STARTED = "post_jobs_started_action"
 
         val EXTRA_PROGRESS_TYPE = "type"
         val EXTRA_PROGRESS_TYPE_SMS = "sms_progress"
@@ -69,6 +70,7 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_PROGRESS_WAITING_FOR_VCF = "waiting_for_vcf_progress"
         val EXTRA_PROGRESS_TYPE_WAITING_TO_CANCEL = "waiting_to_cancel"
         val EXTRA_PROGRESS_TYPE_FINISHED = "finished"
+        val EXTRA_POST_JOBS_STARTED = "post_jobs_started"
 
         val EXTRA_TITLE = "title"
         val EXTRA_SUBTASK = "subtask"
@@ -79,6 +81,8 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_TOTAL_TIME = "total_time"
 
         val EXTRA_NOTIFICATION_FIX = "notification_fix"
+
+        val EXTRA_POST_JOBS_ON_FINISH = "post_jobs_on_finish"
 
         val ERROR_APP_JSON_TRY_CATCH = "APP_JSON_TRY_CATCH"
         val ERROR_APP_JSON = "APP_JSON"

@@ -15,6 +15,7 @@
     <!--activity_main.xml-->
     <string name="restore_main">Restore apps and data</string>
     <string name="uninstallFromSystem">Uninstall from system</string>
+    <string name="uninstall_or_disable">Uninstall/Disable this app</string>
     <string name="temporary_disable">Temporary disable</string>
     <string name="selective_restore">Choose what to restore</string>
     <string name="please_use_magisk">Make sure to use Magisk</string>
@@ -49,6 +50,7 @@
     <string name="select_mail">Select mailing app, example Gmail.</string>
     <string name="select_telegram">Open Telegram and select the Migrate group</string>
     <string name="contact">Contact via Telegram</string>
+    <string name="default_sms_app_must_be_changed">Default SMS app must be changed before uninstalling this helper app.</string>
 
     <!--ProgressActivity.java-->
     <string name="please_wait">Please wait</string>
@@ -288,15 +290,16 @@
     <string name="uninstall_app">Uninstall this app</string>
     <string name="disable_app">Disable this app</string>
     <string name="do_nothing">Do nothing</string>
+    <string name="change_to">Change to: </string>
     
     <!--uninstall_activity.xml-->
-    <string name="uninstall_desc">If doesn\'t work, delete <b>/system/app/MigrateHelper</b>
+    <string name="uninstall_desc">If doesn\'t work, delete <b>/system/app/MigrateHelper</b>. Also deletes migrate_cache.
     </string>
     <string name="temporary_disable_desc">App will stop giving notifications, but remain installed.</string>
     <string name="reboot">Reboot (recommended)</string>
 
     <!--UninstallService.java-->
-    <string name="finishing">Finishing...</string>
+    <string name="finishing">Finishing…</string>
 
     <!--contacts_dialog_view.xml-->
     <string name="select_provider">Please select <b>Contacts</b> app if asked to make a selection.</string>

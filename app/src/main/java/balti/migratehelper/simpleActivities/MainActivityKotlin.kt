@@ -17,19 +17,19 @@ import balti.migratehelper.R
 import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_POST_JOBS_STARTED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_RESTORE_DATA
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_POST_JOBS_ON_FINISH
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_POST_JOBS_STARTED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_ERRORLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_PROGRESSLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.LAST_SUPPORTED_ANDROID_API
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_ANDROID_VERSION_WARNING
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_TEMPORARY_DISABLE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_FILEPATH
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_HEAD
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.TG_LINK
-import balti.migratehelper.utilities.StupidStartupServiceKotlin
-import balti.migratehelper.utilities.UninstallServiceKotlin
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.last_log_report.view.*
 import java.io.File
@@ -39,6 +39,8 @@ class MainActivityKotlin: AppCompatActivity() {
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val main by lazy { AppInstance.sharedPrefs }
     private val editor by lazy { main.edit() }
+
+    private var wasPostJobStarted = false
 
     private val progressReceiver by lazy {
         object : BroadcastReceiver(){
@@ -60,6 +62,14 @@ class MainActivityKotlin: AppCompatActivity() {
     private val endOnDisable by lazy {
         object : BroadcastReceiver(){
             override fun onReceive(context: Context?, intent: Intent?) = finish()
+        }
+    }
+
+    private val onPostJobsStart by lazy {
+        object : BroadcastReceiver(){
+            override fun onReceive(context: Context?, intent: Intent?) {
+                wasPostJobStarted = true
+            }
         }
     }
 
@@ -118,42 +128,19 @@ class MainActivityKotlin: AppCompatActivity() {
 
         uninstall_from_system.setOnClickListener {
 
-            if (main.getBoolean(PREF_IS_POST_JOBS_NEEDED, false)){
-                startActivity(Intent(this, PostJobsActivity::class.java))
-            }
-            else {
+            val uIntent = Intent(this, PostJobsActivity::class.java)
+                    .putExtra(EXTRA_POST_JOBS_ON_FINISH, false)
+
+            if (commonTools.areWeDefaultSmsApp()) {
                 AlertDialog.Builder(this)
-                        .setTitle(R.string.sure)
-                        .setMessage(R.string.howToRestore)
-                        .setPositiveButton(R.string.goAhead) { _, _ ->
-
-                            val uninstallIntent = Intent(this, UninstallServiceKotlin::class.java)
-
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(uninstallIntent)
-                            else startService(uninstallIntent)
-
-                            finishAffinity()
+                        .setMessage(R.string.default_sms_app_must_be_changed)
+                        .setPositiveButton(R.string.proceed) {_, _ ->
+                            startActivity(uIntent)
                         }
-                        .setNegativeButton(getString(android.R.string.cancel), null)
+                        .setNegativeButton(android.R.string.cancel, null)
                         .show()
             }
-        }
-
-        temporary_disable.setOnClickListener {
-
-            AlertDialog.Builder(this)
-                    .setMessage(R.string.temporary_disable_desc)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-
-                        stopService(Intent(this, StupidStartupServiceKotlin::class.java))
-                        editor.putBoolean(PREF_TEMPORARY_DISABLE, true)
-                        editor.commit()
-                        sendBroadcast(Intent(ACTION_END_ALL))
-
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
-
+            else startActivity(uIntent)
         }
 
         last_logs_textView.apply {
@@ -165,8 +152,24 @@ class MainActivityKotlin: AppCompatActivity() {
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
         commonTools.LBM?.registerReceiver(endOnDisable, IntentFilter(ACTION_END_ALL))
+        commonTools.LBM?.registerReceiver(onPostJobsStart, IntentFilter(ACTION_POST_JOBS_STARTED))
 
         commonTools.LBM?.sendBroadcast(Intent(ACTION_REQUEST_RESTORE_DATA))
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putBoolean(EXTRA_POST_JOBS_STARTED, wasPostJobStarted)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        savedInstanceState?.run {
+            if (getBoolean(EXTRA_POST_JOBS_STARTED, false)){
+                if (AppInstance.sharedPrefs.getBoolean(PREF_IS_POST_JOBS_NEEDED, false))
+                    startActivity(Intent(this@MainActivityKotlin, PostJobsActivity::class.java))
+            }
+        }
     }
 
     private fun showLog(){
@@ -213,6 +216,7 @@ class MainActivityKotlin: AppCompatActivity() {
         super.onDestroy()
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(endOnDisable) }
+        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(onPostJobsStart) }
     }
 
 }

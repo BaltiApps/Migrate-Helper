@@ -78,18 +78,7 @@
                     android:layout_width="300dp"
                     android:layout_height="60dp"
                     android:background="@drawable/uninstall_button"
-                    android:text="@string/uninstallFromSystem" />
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp" />
-
-                <Button
-                    android:id="@+id/temporary_disable"
-                    android:layout_width="300dp"
-                    android:layout_height="60dp"
-                    android:background="@drawable/uninstall_button"
-                    android:text="@string/temporary_disable" />
+                    android:text="@string/uninstall_or_disable" />
 
 
                 <TextView

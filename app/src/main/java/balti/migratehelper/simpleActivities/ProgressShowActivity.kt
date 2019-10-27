@@ -14,13 +14,16 @@ import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.restoreEngines.engines.AppRestoreEngine
 import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_POST_JOBS_STARTED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_ABORT
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_ERRORS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_IS_CANCELLED
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_POST_JOBS_STARTED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_APP_RESTORE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_MAKING_SCRIPTS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_PERCENTAGE
@@ -38,6 +41,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_TASKLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_TITLE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_TOTAL_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import balti.migratehelper.utilities.IconTools
 import kotlinx.android.synthetic.main.restore_progress_layout.*
@@ -53,11 +57,14 @@ class ProgressShowActivity: AppCompatActivity() {
 
     private var lastLog = ""
     private var lastIcon = ""
+    private val lastIntent by lazy { Intent() }
 
     private var lastTitle = ""
 
     private var forceStopDialog: AlertDialog? = null
     private var abortDialog: AlertDialog? = null
+
+    private var wasPostJobStarted = false
 
     private fun setImageIcon(intent: Intent, type: String){
 
@@ -115,6 +122,8 @@ class ProgressShowActivity: AppCompatActivity() {
     private fun handleProgress(intent: Intent?){
 
         if (intent != null){
+
+            lastIntent.putExtras(intent)
 
             intent.getIntExtra(EXTRA_PROGRESS_PERCENTAGE, -1).let {
                 if (it != -1) {
@@ -200,6 +209,14 @@ class ProgressShowActivity: AppCompatActivity() {
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 handleProgress(intent)
+            }
+        }
+    }
+
+    private val onPostJobsStart by lazy {
+        object : BroadcastReceiver(){
+            override fun onReceive(context: Context?, intent: Intent?) {
+                wasPostJobStarted = true
             }
         }
     }
@@ -311,11 +328,31 @@ class ProgressShowActivity: AppCompatActivity() {
         }
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
+        commonTools.LBM?.registerReceiver(onPostJobsStart, IntentFilter(ACTION_POST_JOBS_STARTED))
+
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putBoolean(EXTRA_POST_JOBS_STARTED, wasPostJobStarted)
+        outState?.putAll(lastIntent.extras)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        savedInstanceState?.run {
+            if (getBoolean(EXTRA_POST_JOBS_STARTED, false)){
+                if (AppInstance.sharedPrefs.getBoolean(PREF_IS_POST_JOBS_NEEDED, false))
+                    startActivity(Intent(this@ProgressShowActivity, PostJobsActivity::class.java))
+            }
+            handleProgress(Intent().putExtras(savedInstanceState))
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(onPostJobsStart) }
         commonTools.tryIt { abortDialog?.dismiss() }
         commonTools.tryIt { forceStopDialog?.dismiss() }
     }

@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        temporaryDisable = findViewById(R.id.temporary_disable);
+        //temporaryDisable = findViewById(R.id.temporary_disable);
         temporaryDisable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
