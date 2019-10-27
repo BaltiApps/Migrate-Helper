@@ -15,7 +15,7 @@
     <!--activity_main.xml-->
     <string name="restore_main">Restore apps and data</string>
     <string name="uninstallFromSystem">Uninstall from system</string>
-    <string name="uninstall_or_finalize">Uninstall/Disable app\norFinalize restore</string>
+    <string name="uninstall_or_finalize">Uninstall/Disable app\nor Finalize restore</string>
     <string name="temporary_disable">Temporary disable</string>
     <string name="selective_restore">Choose what to restore</string>
     <string name="please_use_magisk">Make sure to use Magisk</string>
