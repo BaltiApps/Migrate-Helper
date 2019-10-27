@@ -12,9 +12,11 @@ import android.os.AsyncTask
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.app.NotificationCompat
+import android.util.Log
 import balti.migratehelper.AppInstance
 import balti.migratehelper.AppInstance.Companion.appPackets
 import balti.migratehelper.AppInstance.Companion.callsDataPackets
+import balti.migratehelper.AppInstance.Companion.contactDataPackets
 import balti.migratehelper.AppInstance.Companion.settingsPacket
 import balti.migratehelper.AppInstance.Companion.sharedPrefs
 import balti.migratehelper.AppInstance.Companion.smsDataPackets
@@ -32,6 +34,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ALL_SUPPRESSED_
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_ABORTING
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_END
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_RUNNING
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DEBUG_TAG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_RESTORE_SERVICE_ERROR
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_ERRORS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_IS_CANCELLED
@@ -100,7 +103,6 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
     private var notificationFix = false
     private val isSettingsNull : Boolean
         get() = if (settingsPacket == null) true else settingsPacket!!.internalPackets.isEmpty()
-
 
     private val toReturnIntent by lazy { Intent(ACTION_RESTORE_PROGRESS) }
 
@@ -275,6 +277,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
         fun doJob(jCode: Int, workingObject: Any?){
 
+            Log.d(DEBUG_TAG, "jCode: $jCode")
             if (!cancelAll && (fallThrough || jobCode == jCode)) {
 
                 fallThrough = true
@@ -308,6 +311,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
                 }
             }
+            Log.d(DEBUG_TAG, "ft: $fallThrough")
         }
 
         doJob(JOBCODE_RESTORE_SMS, smsDataPackets.let { if (it.isNotEmpty()) it else null })
@@ -327,6 +331,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         when (jobCode) {
 
             JOBCODE_RESTORE_SMS -> {
+                Log.d(DEBUG_TAG, "received")
                 if (!jobSuccess) jobResults?.let { addError(it) }
                 doFallThroughJob(JOBCODE_RESTORE_CALLS)
             }
@@ -414,6 +419,13 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
             putBoolean(PREF_IS_POST_JOBS_NEEDED, true)
             putBoolean(PREF_WAS_CANCELLED, cancelAll)
         }.commit()
+
+        appPackets.clear()
+        contactDataPackets.clear()
+        smsDataPackets.clear()
+        callsDataPackets.clear()
+        settingsPacket = null
+        wifiPacket = null
 
         stopSelf()
     }

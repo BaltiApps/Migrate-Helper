@@ -21,6 +21,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_ERRORLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_PROGRESSLOG
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.LAST_SUPPORTED_ANDROID_API
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_ANDROID_VERSION_WARNING
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_TEMPORARY_DISABLE
@@ -69,7 +70,7 @@ class MainActivityKotlin: AppCompatActivity() {
         val cpuAbi = Build.SUPPORTED_ABIS[0]
 
         if (cpuAbi == "armeabi-v7a" || cpuAbi == "arm64-v8a" || cpuAbi == "x86" || cpuAbi == "x86_64") {
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P && !main.getBoolean(PREF_ANDROID_VERSION_WARNING, false)) {
+            if (Build.VERSION.SDK_INT > LAST_SUPPORTED_ANDROID_API && !main.getBoolean(PREF_ANDROID_VERSION_WARNING, false)) {
                 AlertDialog.Builder(this)
                         .setTitle(R.string.too_fast)
                         .setMessage(R.string.too_fast_desc)

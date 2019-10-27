@@ -52,7 +52,6 @@
 
         <activity android:name=".simpleActivities.PostJobsActivity"
             android:launchMode="singleTask"
-            android:theme="@style/PostJobsActivityTheme"
             android:exported="true"
             />
 

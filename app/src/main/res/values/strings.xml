@@ -7,7 +7,7 @@
 
     -->
 
-    <!--please also update last tested version in MainActivity-->
+    <!--please also update LAST_SUPPORTED_ANDROID_API in CommonToolsKotlin.kt-->
 
     <string name="app_name">Migrate helper</string>
     <string name="current_version_name">3.0</string>

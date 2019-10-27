@@ -350,6 +350,20 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                                 }
                             }
 
+                            when (item) {
+                                is SettingsPacketKotlin.SettingsItem -> when(item.settingsType){
+                                    SettingsPacketKotlin.SETTINGS_TYPE_DPI -> v.extra_item_desc.apply {
+                                        visibility = View.VISIBLE
+                                        text = getString(R.string.reboot_is_necessary)
+                                    }
+                                }
+                                is WifiPacketKotlin -> v.extra_item_desc.apply {
+                                    visibility = View.VISIBLE
+                                    text = getString(R.string.reboot_is_necessary)
+                                }
+                                else -> v.extra_item_desc.visibility = View.VISIBLE
+                            }
+
                             v.extra_item_icon.setImageResource(item.iconResource)
                             v.extra_item_name.text = item.displayText
                             v.setOnClickListener { v.extras_item_select.apply { isChecked = !isChecked } }

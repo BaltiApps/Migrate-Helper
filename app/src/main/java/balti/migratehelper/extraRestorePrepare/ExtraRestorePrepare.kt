@@ -118,20 +118,23 @@ class ExtraRestorePrepare: AppCompatActivity() {
         if (smsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_sms_icon, R.string.sms).apply { erpItemSms = this })
         if (callsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_call_log_icon, R.string.calls).apply { erpItemCalls = this })
         settingsPacket?.let{
-            for (p in it.internalPackets){
-                if (p.isSelected) {
-                    val view = getERPItem(p.iconResource, p.displayText)
-                    when(p.settingsType) {
-                        SettingsPacketKotlin.SETTINGS_TYPE_DPI -> erpItemDpi = view
-                        SettingsPacketKotlin.SETTINGS_TYPE_ADB -> erpItemAdb = view
-                        SettingsPacketKotlin.SETTINGS_TYPE_FONT_SCALE -> erpItemFontScale = view
-                        SettingsPacketKotlin.SETTINGS_TYPE_KEYBOARD -> {
-                            erpItemKeyboard = view
-                            keyboardSettingsItem = p
-                        }
+
+            filterSelected(it.internalPackets)
+
+            for (p in it.internalPackets) {
+
+                val view = getERPItem(p.iconResource, p.displayText)
+                when (p.settingsType) {
+                    SettingsPacketKotlin.SETTINGS_TYPE_DPI -> erpItemDpi = view
+                    SettingsPacketKotlin.SETTINGS_TYPE_ADB -> erpItemAdb = view
+                    SettingsPacketKotlin.SETTINGS_TYPE_FONT_SCALE -> erpItemFontScale = view
+                    SettingsPacketKotlin.SETTINGS_TYPE_KEYBOARD -> {
+                        erpItemKeyboard = view
+                        keyboardSettingsItem = p
                     }
-                    extra_perm_check_holder.addView(view)
                 }
+                extra_perm_check_holder.addView(view)
+
             }
         }
 
@@ -139,8 +142,9 @@ class ExtraRestorePrepare: AppCompatActivity() {
             if (it.isSelected) {
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
                     extra_perm_check_holder.addView(getERPItem(R.drawable.ic_wifi_icon, R.string.wifi).apply { erpItemWifi = this })
-                else it.isSelected = false
+                else wifiPacket = null
             }
+            else wifiPacket = null
         }
 
         if (appPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_app, R.string.apps).apply { erpItemApps = this })

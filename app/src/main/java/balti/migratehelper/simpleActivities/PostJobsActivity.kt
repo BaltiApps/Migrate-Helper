@@ -3,10 +3,9 @@ package balti.migratehelper.simpleActivities
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Telephony
 import android.support.v7.app.AppCompatActivity
-import android.view.Gravity
 import android.view.View
-import android.view.WindowManager
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.utilities.CommonToolsKotlin
@@ -31,11 +30,6 @@ class PostJobsActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.post_restore_jobs)
-
-        window.setGravity(Gravity.BOTTOM)
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
-
-        setFinishOnTouchOutside(false)
         execute()
     }
 
@@ -52,16 +46,21 @@ class PostJobsActivity: AppCompatActivity() {
         }
 
         if (smsAppName != "") {
+
             post_jobs_reset_sms_app_layout.visibility = View.VISIBLE
             post_jobs_change_dpi_layout.visibility = View.GONE
             post_jobs_uninstall_layout.visibility = View.GONE
 
+
             post_jobs_default_sms_name.text = packageManager.let { it.getApplicationLabel(it.getApplicationInfo(smsAppName, 0)) }
+
 
             post_jobs_action_button.apply {
                 text = getString(R.string.next)
                 setOnClickListener {
-                    commonTools.setDefaultSms(smsAppName, JOBCODE_RESET_SMS_APP)
+
+                    startActivityForResult(Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT)
+                            .putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, smsAppName), 334)
                 }
             }
         } else {
@@ -70,13 +69,14 @@ class PostJobsActivity: AppCompatActivity() {
             post_jobs_uninstall_layout.visibility = View.VISIBLE
 
             val dpiInt = AppInstance.sharedPrefs.getInt(PREF_LAST_DPI, -1)
+
             if (dpiInt > 0) {
 
                 post_jobs_change_dpi_layout.visibility = View.VISIBLE
-
                 post_jobs_change_dpi_value.text = "${getString(R.string.display_density)} $dpiInt"
 
                 do_change_dpi_checkbox.setOnCheckedChangeListener { _, isChecked ->
+
                     if (isChecked) post_jobs_reboot.isChecked = true
                     post_jobs_reboot.isEnabled = !isChecked
                 }
@@ -87,13 +87,13 @@ class PostJobsActivity: AppCompatActivity() {
             }
             else do_change_dpi_checkbox.isChecked = false
 
+
             if (AppInstance.sharedPrefs.getBoolean(PREF_WAS_CANCELLED, false)) {
                 post_jobs_do_nothing.isChecked = true
                 do_change_dpi_checkbox.isChecked = false
             } else {
                 if (dpiInt > 0) do_change_dpi_checkbox.isChecked = true
             }
-
             post_jobs_action_button.apply {
                 text = getString(R.string.finish)
                 setOnClickListener {
@@ -121,7 +121,7 @@ class PostJobsActivity: AppCompatActivity() {
                     else startService(finishIntent)
 
                     commonTools.LBM?.sendBroadcast(Intent(ACTION_END_ALL))
-                    finish()
+                    finishAffinity()
                 }
             }
         }
@@ -129,7 +129,10 @@ class PostJobsActivity: AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == JOBCODE_RESET_SMS_APP) execute()
+        if (requestCode == JOBCODE_RESET_SMS_APP) {
+
+            execute()
+        }
     }
 
 }

@@ -26,6 +26,7 @@ class CommonToolsKotlin(val context: Context) {
     companion object {
 
         val DEBUG_TAG = "migrate_helper_tag"
+        val LAST_SUPPORTED_ANDROID_API = 29
 
         val PENDING_INTENT_REQUEST_ID = 914
         val PENDING_INTENT_RESTORE_ABORT_ID = 916

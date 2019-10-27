@@ -32,9 +32,13 @@ class WifiRestoreEngine(private val jobcode: Int,
                     EXTRA_PROGRESS_TYPE_WIFI)
             suWriter.run {
                 write("if [[ -e $WIFI_FILE_PATH ]]; then\n")
-                write("    cp $WIFI_FILE_PATH $WIFI_FILE_PATH.bak\n")
+                write("    rm $WIFI_FILE_PATH\n")
                 write("fi\n")
-                write("cp ${it.absolutePath} $WIFI_FILE_PATH\n")
+                write("cp -a ${it.absolutePath} $WIFI_FILE_PATH\n")
+                write("rm $WIFI_FILE_PATH.encrypted-checksum 2>/dev/null\n")
+                write("chmod 600 $WIFI_FILE_PATH\n")
+                write("chown system:system $WIFI_FILE_PATH\n")
+                write("restorecon -f $WIFI_FILE_PATH 2>/dev/null\n")
                 write("exit\n")
                 flush()
             }

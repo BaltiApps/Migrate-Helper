@@ -134,6 +134,7 @@
             android:layout_height="wrap_content"
             android:text="@string/reboot"
             android:id="@+id/post_jobs_reboot"
+            android:checked="true"
             />
 
         <Space

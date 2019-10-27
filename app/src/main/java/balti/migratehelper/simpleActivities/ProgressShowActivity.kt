@@ -186,7 +186,7 @@ class ProgressShowActivity: AppCompatActivity() {
                     progressActionButton.apply {
                         text = getString(R.string.finish)
                         setOnClickListener {
-                            //TODO(Finish)
+                            startActivity(Intent(this@ProgressShowActivity, PostJobsActivity::class.java))
                         }
                     }
                 }
