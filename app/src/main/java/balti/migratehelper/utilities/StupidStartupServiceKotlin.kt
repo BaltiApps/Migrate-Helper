@@ -35,7 +35,7 @@ class StupidStartupServiceKotlin: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        if (AppInstance.sharedPrefs.getBoolean(PREF_TEMPORARY_DISABLE, false)) {
+        if (!AppInstance.sharedPrefs.getBoolean(PREF_TEMPORARY_DISABLE, false)) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 commonTools.makeNotificationChannel(CHANNEL_INIT, CHANNEL_INIT, NotificationManager.IMPORTANCE_HIGH)

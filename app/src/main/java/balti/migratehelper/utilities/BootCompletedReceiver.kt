@@ -20,7 +20,7 @@ class BootCompletedReceiver: BroadcastReceiver() {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED){
 
             val main = AppInstance.sharedPrefs
-            if (main.getBoolean(PREF_TEMPORARY_DISABLE, false)){
+            if (!main.getBoolean(PREF_TEMPORARY_DISABLE, false)){
 
                 val packageManager = context.packageManager
                 val componentName = ComponentName(context.packageName, MainActivityKotlin::class.java.name)

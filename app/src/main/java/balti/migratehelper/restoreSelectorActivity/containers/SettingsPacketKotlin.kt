@@ -26,11 +26,10 @@ data class SettingsPacketKotlin(private val dpiText: String?, private val adbSta
 
     private inner class DpiInternalPacket(dpiText: String): SettingsItem() {
         override var settingsType = SETTINGS_TYPE_DPI
-        override var value: Any = dpiText
         override var iconResource: Int = R.drawable.ic_dpi_icon
         override var displayText: String = AppInstance.appContext.getString(R.string.dpi)
         override var isSelected: Boolean = true
-        override var commandsToRestore = dpiText.let {
+        override var value: Any = dpiText.let {
             val lines = it.split("\\n")
             var oDensity = 0
             var pDensity = 0
@@ -43,15 +42,17 @@ data class SettingsPacketKotlin(private val dpiText: String?, private val adbSta
                     }
                 }
             }
-            val valueToRestore = if (oDensity > 0) oDensity
-            else if (pDensity > 0) pDensity
-            else -1
-
-            if (valueToRestore > 0){
-                listOf("wm density $valueToRestore")
+            val valueToRestore = when {
+                oDensity > 0 -> oDensity
+                pDensity > 0 -> pDensity
+                else -> -1
             }
-            else listOf("")
+
+            valueToRestore
         }
+        override var commandsToRestore = if (value as Int > 0)
+            listOf("wm density $value")
+        else listOf("")
     }
 
     private inner class AdbInternalPacket(adbState: Int): SettingsItem() {

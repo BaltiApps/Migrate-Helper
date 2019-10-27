@@ -5,6 +5,7 @@ import balti.migratehelper.restoreEngines.ParentRestoreClass
 import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_ADB
+import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_DPI
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_FONT_SCALE
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_KEYBOARD
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
@@ -12,6 +13,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_GENERIC_S
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_ADB
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_FONT_SCALE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_KEYBOARD
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_LAST_DPI
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
@@ -39,6 +41,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
                         resetBroadcast(true, engineContext.getString(R.string.restoring_font_scale), EXTRA_PROGRESS_TYPE_FONT_SCALE)
                     SETTINGS_TYPE_KEYBOARD ->
                         resetBroadcast(true, engineContext.getString(R.string.restoring_keyboard), EXTRA_PROGRESS_TYPE_KEYBOARD)
+                    SETTINGS_TYPE_DPI -> commonTools.tryIt { sharedPreferences.edit().putInt(PREF_LAST_DPI, it.value as Int).commit() }
                 }
 
                 it.commandsToRestore.forEach { cmd ->
@@ -53,8 +56,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
         try {
             settingsPacket.internalPackets.forEach {
                 if (!RestoreServiceKotlin.cancelAll) {
-                    if (it.settingsType in arrayOf(SETTINGS_TYPE_ADB, SETTINGS_TYPE_FONT_SCALE, SETTINGS_TYPE_KEYBOARD) && it.isSelected)
-                        restorePacket(it)
+                    if (it.isSelected) restorePacket(it)
                 }
             }
             flushToSu("exit", true)

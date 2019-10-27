@@ -64,31 +64,34 @@ class UninstallServiceKotlin: Service() {
 
     private fun finishTasks(dpiValue: Int, doUninstall: Boolean, doReboot: Boolean){
 
-        val sourceDir = applicationInfo.sourceDir.let {
-            it.substring(0, it.lastIndexOf('/'))
-        }
+        if (dpiValue > 0 || doUninstall || doReboot) {
 
-        val fullProcess = Runtime.getRuntime().exec("su")
-        BufferedWriter(OutputStreamWriter(fullProcess.outputStream)).run {
+            val sourceDir = applicationInfo.sourceDir.let {
+                it.substring(0, it.lastIndexOf('/'))
+            }
 
-            if (dpiValue > 0) write("wm density $dpiValue\n")
+            val fullProcess = Runtime.getRuntime().exec("su")
+            BufferedWriter(OutputStreamWriter(fullProcess.outputStream)).run {
 
-            if (doUninstall) {
+                if (dpiValue > 0) write("wm density $dpiValue\n")
 
-                write("mount -o rw,remount /data\n")
-                write("rm -rf $MIGRATE_CACHE\n")
-                write("rm -rf $METADATA_HOLDER_DIR\n")
-                write("rm -rf /data/data/*.tar.gz\n")
+                if (doUninstall) {
 
-                if (sourceDir.startsWith("/system")){
-                    disableApp()
-                    write("mount -o rw,remount /system\n")
-                    write("mount -o rw,remount /system/app/MigrateHelper\n")
-                    write("rm -rf ${applicationInfo.dataDir} $sourceDir\n")
+                    write("mount -o rw,remount /data\n")
+                    write("rm -rf $MIGRATE_CACHE\n")
+                    write("rm -rf $METADATA_HOLDER_DIR\n")
+                    write("rm -rf /data/data/*.tar.gz\n")
+
+                    if (sourceDir.startsWith("/system")) {
+                        disableApp()
+                        write("mount -o rw,remount /system\n")
+                        write("mount -o rw,remount /system/app/MigrateHelper\n")
+                        write("rm -rf ${applicationInfo.dataDir} $sourceDir\n")
+                    } else write("pm uninstall $packageName\n")
+
+                    write("rm -rf /sdcard/Android/data/$packageName/helper\n")
+
                 }
-                else write("pm uninstall $packageName\n")
-
-                write("rm -rf /sdcard/Android/data/$packageName/helper\n")
 
                 if (doReboot) write("reboot\n")
 
@@ -97,9 +100,10 @@ class UninstallServiceKotlin: Service() {
                 stopService(Intent(this@UninstallServiceKotlin, StupidStartupServiceKotlin::class.java))
                 flush()
                 fullProcess.waitFor()
-                stopSelf()
             }
         }
+
+        stopSelf()
     }
 
 

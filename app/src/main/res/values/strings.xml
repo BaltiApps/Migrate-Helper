@@ -10,7 +10,7 @@
     <!--please also update last tested version in MainActivity-->
 
     <string name="app_name">Migrate helper</string>
-    <string name="current_version_name">2.1</string>
+    <string name="current_version_name">3.0</string>
 
     <!--activity_main.xml-->
     <string name="restore_main">Restore apps and data</string>
@@ -130,7 +130,6 @@
     <string name="do_not_close">Please do not press back/home/recents or close this app.</string>
     <string name="smsPermission">Sms permission needed</string>
     <string name="smsPermission_desc">Please allow this app to be default sms app temporarily.\n<b>You will be prompted to change to the original sms app after restoration</b>
-    \n\nAfter opening Messages app, <b><u>please wait for a few seconds</u></b> for the app to read all restored the messages.
     </string>
     <string name="you_will_not_be_able_to_receive_sms">
         Migrate helper cannot be set as an SMS app.\n\n
@@ -278,14 +277,22 @@
     <!--app_search_layout.xml-->
     <string name="enter_app_name">App/package name</string>
     <string name="no_apps">No apps available\nwith the given search!</string>
+
+    <!--post_restore_jobs.xml-->
+    <string name="next">Next</string>
+    <string name="reset_sms_app">Reset default SMS app</string>
+    <string name="reboot_for_sms">You may need to reboot your phone for the restored messages to appear. <b>You may also need to clear data of the sms app.</b></string>
+    <string name="uninstall_helper_app">Uninstall/disable</string>
+    <string name="change_dpi">Change DPI value</string>
+    <string name="display_density">Display density</string>
+    <string name="reboot_is_necessary">Reboot is necessary!</string>
+    <string name="uninstall_app">Uninstall this app</string>
+    <string name="disable_app">Disable this app</string>
     
     <!--uninstall_activity.xml-->
-    <string name="uninstall_desc">Completely removes this helper app.\n\n
-    In case the app is not removed, please manually delete the <b>/system/app/MigrateHelper</b> directory.
+    <string name="uninstall_desc">If doesn\'t work, delete <b>/system/app/MigrateHelper</b>
     </string>
-    <string name="temporary_disable_desc">This will leave the app installed and also usable from the app drawer, but will stop giving you notification to restore backup on boot.\n\n
-    This is useful if you want to restore some apps later without flashing the whole migrate zip package again.</string>
-    <string name="change_dpi">Change DPI value</string>
+    <string name="temporary_disable_desc">App will stop giving notifications, but remain installed.</string>
     <string name="reboot">Reboot (recommended)</string>
 
     <!--UninstallService.java-->

@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.provider.Telephony
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
@@ -21,11 +20,11 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.TextView
 import balti.migratehelper.AppInstance
-import balti.migratehelper.AppInstance.Companion.actualDefaultSmsAppName
 import balti.migratehelper.AppInstance.Companion.appPackets
 import balti.migratehelper.AppInstance.Companion.callsDataPackets
 import balti.migratehelper.AppInstance.Companion.contactDataPackets
 import balti.migratehelper.AppInstance.Companion.settingsPacket
+import balti.migratehelper.AppInstance.Companion.sharedPrefs
 import balti.migratehelper.AppInstance.Companion.smsDataPackets
 import balti.migratehelper.AppInstance.Companion.wifiPacket
 import balti.migratehelper.R
@@ -52,6 +51,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_SM
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_WIFI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CONTACTS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
@@ -262,6 +262,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                     .setView(contactsView)
                     .setPositiveButton(R.string.proceed) { _, _ -> nextContact() }
                     .setNegativeButton(android.R.string.cancel) { _, _ ->
+                        contactDataPackets.clear()
                         toggleERPItemStatusIcon(erpItemContacts, CANCEL, getString(R.string.cancelled))
                         doFallThroughJob(JOBCODE_PREP_SMS)
                     }
@@ -271,24 +272,17 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         doJob(JOBCODE_PREP_SMS) {
 
-            fun getDefaultSmsApp(): String {
-                return Telephony.Sms.getDefaultSmsPackage(this)
-            }
-
-            fun areWeDefaultSmsApp(): Boolean {
-                return getDefaultSmsApp() == packageName
-            }
-
-            if (!areWeDefaultSmsApp()) {
+            if (!commonTools.areWeDefaultSmsApp()) {
 
                 AlertDialog.Builder(this)
                         .setTitle(R.string.smsPermission)
                         .setMessage(getText(R.string.smsPermission_desc))
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                            actualDefaultSmsAppName = getDefaultSmsApp()
+                            sharedPrefs.edit().putString(PREF_DEFAULT_SMS_APP, commonTools.getDefaultSmsApp()).apply()
                             commonTools.setDefaultSms(packageName, JOBCODE_PREP_SMS)
                         }
                         .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            smsDataPackets.clear()
                             toggleERPItemStatusIcon(erpItemSms, CANCEL, getString(R.string.cancelled))
                             doFallThroughJob(JOBCODE_PREP_CALLS)
                         }
@@ -312,6 +306,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_CALL_LOG), JOBCODE_PREP_CALLS)
                         }
                         .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            callsDataPackets.clear()
                             toggleERPItemStatusIcon(erpItemCalls, CANCEL, getString(R.string.cancelled))
                             doFallThroughJob(JOBCODE_PREP_DPI)
                         }

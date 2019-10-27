@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/large_padding_width"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding_width"
+        android:id="@+id/post_jobs_reset_sms_app_layout"
+        android:layout_marginBottom="@dimen/large_padding_width"
+        android:visibility="gone"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reset_sms_app"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/small_padding_width"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Messaging app name"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="italic"
+            android:textColor="@color/colorAccent"
+            android:id="@+id/post_jobs_default_sms_name"
+            />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/large_padding_width"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reboot_for_sms"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding_width"
+        android:id="@+id/post_jobs_change_dpi_layout"
+        android:layout_marginBottom="@dimen/large_padding_width"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:visibility="gone"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="@string/change_dpi"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/do_change_dpi_checkbox"
+                android:padding="@dimen/small_padding_width"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/display_density"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="italic"
+            android:textColor="@color/colorAccent"
+            android:id="@+id/post_jobs_change_dpi_value"
+            />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/small_padding_width"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reboot_is_necessary"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding_width"
+        android:id="@+id/post_jobs_uninstall_layout"
+        android:layout_marginBottom="@dimen/large_padding_width"
+        android:visibility="gone"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/uninstall_helper_app"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/large_padding_width"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reboot"
+            android:id="@+id/post_jobs_reboot"
+            />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/large_padding_width"/>
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/post_jobs_uninstall_radio"
+                android:text="@string/uninstall_app"
+                android:checked="true"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/uninstall_desc"
+                android:textSize="12sp"
+                android:paddingStart="@dimen/large_padding_width"
+                android:paddingEnd="@dimen/large_padding_width"
+                />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/small_padding_width"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/post_jobs_disable_radio"
+                android:text="@string/disable_app"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/temporary_disable_desc"
+                android:textSize="12sp"
+                android:paddingStart="@dimen/large_padding_width"
+                android:paddingEnd="@dimen/large_padding_width"
+                />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/post_jobs_action_button"
+        android:layout_width="@dimen/button_width"
+        android:layout_height="@dimen/button_height"
+        android:background="@drawable/next"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:padding="@dimen/large_padding_width"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:layout_gravity="end"
+        android:text="@string/next"
+        />
+
+</LinearLayout>

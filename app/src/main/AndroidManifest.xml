@@ -50,9 +50,10 @@
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".UninstallActivity"
+        <activity android:name=".simpleActivities.PostJobsActivity"
             android:launchMode="singleTask"
-            android:theme="@style/UninstallActivityTheme"
+            android:theme="@style/PostJobsActivityTheme"
+            android:exported="true"
             />
 
         <activity android:name=".simpleActivities.SimpleLogViewer"

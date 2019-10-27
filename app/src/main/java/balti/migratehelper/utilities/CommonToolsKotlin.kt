@@ -136,6 +136,8 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_RESTORE_APP = 85001
         val JOBCODE_RESTORE_END = 95001
 
+        val JOBCODE_RESET_SMS_APP = 45010
+
         val TIMEOUT_WAITING_TO_CANCEL_TASK = 500L
         val TIMEOUT_WAITING_TO_KILL = 3000L
 
@@ -157,6 +159,9 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_IGNORE_READ_ERRORS = "ignore_read_errors"
         val PREF_IGNORE_EXTRAS = "ignore_extras"
         val PREF_RESTORE_START_ANIMATION = "restore_start_animation"
+
+        val PREF_DEFAULT_SMS_APP = "default_sms_app"
+        val PREF_LAST_DPI = "last_read_dpi"
 
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migratehelper/cache/"
@@ -537,6 +542,14 @@ class CommonToolsKotlin(val context: Context) {
             }
         }
         Class().execute()
+    }
+
+    fun getDefaultSmsApp(): String {
+        return Telephony.Sms.getDefaultSmsPackage(context)
+    }
+
+    fun areWeDefaultSmsApp(): Boolean {
+        return getDefaultSmsApp() == context.packageName
     }
 
     fun setDefaultSms(packageName: String, requestCode: Int) {

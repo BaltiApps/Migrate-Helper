@@ -21,10 +21,6 @@ class AppInstance: Application() {
         val callsDataPackets by lazy { ArrayList<CallsPacketKotlin>(0) }
         var settingsPacket: SettingsPacketKotlin? = null
         var wifiPacket: WifiPacketKotlin? = null
-
-        var DPIint : Int? = null
-        var keyBoardText : String? = null
-        var actualDefaultSmsAppName = ""
     }
 
     override fun onCreate() {
