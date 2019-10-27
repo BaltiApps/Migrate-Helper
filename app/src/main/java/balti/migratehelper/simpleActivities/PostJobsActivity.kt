@@ -16,8 +16,10 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_UNINST
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DPI_VALUE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESET_SMS_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_LAST_DPI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_TEMPORARY_DISABLE
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_WAS_CANCELLED
 import balti.migratehelper.utilities.UninstallServiceKotlin
 import kotlinx.android.synthetic.main.post_restore_jobs.*
 
@@ -85,6 +87,12 @@ class PostJobsActivity: AppCompatActivity() {
             }
             else do_change_dpi_checkbox.isChecked = false
 
+            if (AppInstance.sharedPrefs.getBoolean(PREF_WAS_CANCELLED, false)) {
+                post_jobs_do_nothing.isChecked = true
+                do_change_dpi_checkbox.isChecked = false
+            } else {
+                if (dpiInt > 0) do_change_dpi_checkbox.isChecked = true
+            }
 
             post_jobs_action_button.apply {
                 text = getString(R.string.finish)
@@ -96,8 +104,16 @@ class PostJobsActivity: AppCompatActivity() {
                         putExtra(EXTRA_DO_REBOOT, post_jobs_reboot.isChecked)
                     }
 
-                    if (post_jobs_disable_radio.isChecked) {
-                        editor.putBoolean(PREF_TEMPORARY_DISABLE, true).commit()
+                    editor.run {
+
+                        if (post_jobs_disable_radio.isChecked) putBoolean(PREF_TEMPORARY_DISABLE, true)
+
+                        putString(PREF_DEFAULT_SMS_APP, "")
+                        putInt(PREF_LAST_DPI, -1)
+                        putBoolean(PREF_WAS_CANCELLED, false)
+                        putBoolean(PREF_IS_POST_JOBS_NEEDED, false)
+
+                        commit()
                     }
 
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)

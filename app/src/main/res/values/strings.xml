@@ -41,9 +41,7 @@
         \n\nAlso, using apps while restoration is going on will result in random crashes.\n\nYou will get an option to minimize the app restore window, but it is not recommended.</string>
     <string name="later">Nevermind, I will restore later.</string>
     <string name="sure">Are you sure?</string>
-    <string name="howToRestore">If you change your mind later,\n\nIf you are not rooted: Clear data of this app\n(Settings -> Apps -> Migrate helper -> Storage -> Clear data)\nand reboot.\n\n
-    If you are rooted: reflash the backup zip file.
-    </string>
+    <string name="howToRestore">Uninstalling requires root. You will also need to re-flash migrate zips to restore data later on.</string>
     <string name="goAhead">Go ahead</string>
     <string name="unsupported_device">Unsupported device.</string>
     <string name="cpu_arch_is">Your CPU arch is:</string>
@@ -80,9 +78,10 @@
     <string name="minimizing_may_decrease_speed">Minimizing this screen may decrease restore speed!</string>
 
     <!--RootRestoreTask.java-->
-    <string name="finished">Finished! No errors.</string>
+    <string name="finished">Finished! Click to finalise.</string>
     <string name="finished_with_errors">Finished with errors!</string>
     <string name="uninstall_prompt">Click FINISH to uninstall this app</string>
+    <string name="some_post_jobs_left">Some post restore operations are left. Please click to open.</string>
     <string name="change_dpi_and_reboot_prompt">Click FINISH to change DPI and reboot</string>
     <string name="making_script">Making script</string>
     <string name="finish">Finish</string>
@@ -102,8 +101,8 @@
     <string name="failed">Failed</string>
     <string name="failed_desc">Please grant root permission.</string>
     <string name="everything">Everything selected!</string>
-    <string name="reading_metadata">Reading metadata...</string>
-    <string name="initMessageShort">This can take upto 3 minutes.\n\nIn case you have waited more than 5 minutes\nClick CANCEL\nOpen Magisk app\nClose the Magisk app\nOpen this app and retry restoring</string>
+    <string name="reading_metadata">Reading metadata…</string>
+    <string name="initMessageShort">This can take up to 3 minutes.\n\nIn case you have waited more than 5 minutes\nClick CANCEL\nOpen Magisk app\nClose the Magisk app\nOpen this app and retry restoring</string>
     <string name="are_you_rooted">Are you rooted?</string>
     <string name="are_you_rooted_desc">Make sure to grant root. Root with Magisk if needed.</string>
     <string name="code_error">Code error!</string>
@@ -288,6 +287,7 @@
     <string name="reboot_is_necessary">Reboot is necessary!</string>
     <string name="uninstall_app">Uninstall this app</string>
     <string name="disable_app">Disable this app</string>
+    <string name="do_nothing">Do nothing</string>
     
     <!--uninstall_activity.xml-->
     <string name="uninstall_desc">If doesn\'t work, delete <b>/system/app/MigrateHelper</b>

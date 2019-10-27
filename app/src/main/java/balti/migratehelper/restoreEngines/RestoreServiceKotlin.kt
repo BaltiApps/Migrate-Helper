@@ -1,5 +1,6 @@
 package balti.migratehelper.restoreEngines
 
+import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
@@ -15,6 +16,7 @@ import balti.migratehelper.AppInstance
 import balti.migratehelper.AppInstance.Companion.appPackets
 import balti.migratehelper.AppInstance.Companion.callsDataPackets
 import balti.migratehelper.AppInstance.Companion.settingsPacket
+import balti.migratehelper.AppInstance.Companion.sharedPrefs
 import balti.migratehelper.AppInstance.Companion.smsDataPackets
 import balti.migratehelper.AppInstance.Companion.wifiPacket
 import balti.migratehelper.R
@@ -55,6 +57,8 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_ID
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_ID_FINISHED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_ID_ONGOING
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PENDING_INTENT_REQUEST_ID
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_WAS_CANCELLED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_CANCEL_TASK
 import java.io.BufferedWriter
 import java.io.File
@@ -349,6 +353,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         }
     }
 
+    @SuppressLint("ApplySharedPref")
     private fun restoreFinished(errorTitle: String){
 
         val title = when {
@@ -357,8 +362,10 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
             else -> getString(R.string.finished)
         }
 
+        val isAnyError = allErrors.size == 0 && errorTitle == ""
+
         try {
-            if (allErrors.size == 0 && errorTitle == "") {
+            if (isAnyError) {
                 errorWriter?.write("--- No errors! ---\n")
             } else {
                 if (errorTitle != "") errorWriter?.write("$errorTitle\n\n")
@@ -391,14 +398,22 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         AppInstance.notificationManager.cancel(NOTIFICATION_ID_CANCELLING)
 
         AppInstance.notificationManager.notify(NOTIFICATION_ID_FINISHED,
-                NotificationCompat.Builder(this, CHANNEL_RESTORE_END)
-                        .setContentTitle(title)
-                        .setSmallIcon(R.drawable.ic_notification_icon)
-                        .setContentIntent(
+                NotificationCompat.Builder(this, CHANNEL_RESTORE_END).apply {
+                        setContentTitle(title)
+                        setContentText(getString(R.string.some_post_jobs_left))
+                        setSmallIcon(R.drawable.ic_notification_icon)
+                        setContentIntent(
                                 PendingIntent.getActivity(serviceContext, PENDING_INTENT_REQUEST_ID,
-                                        Intent(this, ProgressShowActivity::class.java).putExtras(returnIntent),
+                                        Intent(this@RestoreServiceKotlin, ProgressShowActivity::class.java).putExtras(returnIntent),
                                         PendingIntent.FLAG_UPDATE_CURRENT))
-                        .build())
+
+                }.build()
+        )
+
+        sharedPrefs.edit().apply {
+            putBoolean(PREF_IS_POST_JOBS_NEEDED, true)
+            putBoolean(PREF_WAS_CANCELLED, cancelAll)
+        }.commit()
 
         stopSelf()
     }

@@ -162,6 +162,8 @@ class CommonToolsKotlin(val context: Context) {
 
         val PREF_DEFAULT_SMS_APP = "default_sms_app"
         val PREF_LAST_DPI = "last_read_dpi"
+        val PREF_WAS_CANCELLED = "was_cancelled"
+        val PREF_IS_POST_JOBS_NEEDED = "is_post_jobs_needed"
 
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migratehelper/cache/"

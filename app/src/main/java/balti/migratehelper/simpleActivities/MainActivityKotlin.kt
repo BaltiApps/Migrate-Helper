@@ -22,6 +22,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_ERRORLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_PROGRESSLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_ANDROID_VERSION_WARNING
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_TEMPORARY_DISABLE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_FILEPATH
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_HEAD
@@ -116,20 +117,25 @@ class MainActivityKotlin: AppCompatActivity() {
 
         uninstall_from_system.setOnClickListener {
 
-            AlertDialog.Builder(this)
-                    .setTitle(R.string.sure)
-                    .setMessage(R.string.howToRestore)
-                    .setPositiveButton(R.string.goAhead) { _, _ ->
+            if (main.getBoolean(PREF_IS_POST_JOBS_NEEDED, false)){
+                startActivity(Intent(this, PostJobsActivity::class.java))
+            }
+            else {
+                AlertDialog.Builder(this)
+                        .setTitle(R.string.sure)
+                        .setMessage(R.string.howToRestore)
+                        .setPositiveButton(R.string.goAhead) { _, _ ->
 
-                        val uninstallIntent = Intent(this, UninstallServiceKotlin::class.java)
+                            val uninstallIntent = Intent(this, UninstallServiceKotlin::class.java)
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(uninstallIntent)
-                        else startService(uninstallIntent)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(uninstallIntent)
+                            else startService(uninstallIntent)
 
-                        finishAffinity()
-                    }
-                    .setNegativeButton(getString(android.R.string.cancel), null)
-                    .show()
+                            finishAffinity()
+                        }
+                        .setNegativeButton(getString(android.R.string.cancel), null)
+                        .show()
+            }
         }
 
         temporary_disable.setOnClickListener {

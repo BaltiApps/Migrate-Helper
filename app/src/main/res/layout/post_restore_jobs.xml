@@ -116,7 +116,6 @@
         android:padding="@dimen/large_padding_width"
         android:id="@+id/post_jobs_uninstall_layout"
         android:layout_marginBottom="@dimen/large_padding_width"
-        android:visibility="gone"
         >
 
         <TextView
@@ -179,6 +178,17 @@
                 android:textSize="12sp"
                 android:paddingStart="@dimen/large_padding_width"
                 android:paddingEnd="@dimen/large_padding_width"
+                />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/small_padding_width"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/post_jobs_do_nothing"
+                android:text="@string/do_nothing"
                 />
 
         </RadioGroup>
