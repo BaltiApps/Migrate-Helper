@@ -46,6 +46,9 @@ class PostJobsActivity: AppCompatActivity() {
             post_jobs_reset_sms_app_desc.visibility = View.VISIBLE
         }
 
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P)
+            post_jobs_reset_sms_app_android10.visibility = View.VISIBLE
+
         execute()
         commonTools.LBM?.sendBroadcast(Intent(ACTION_POST_JOBS_STARTED))
     }

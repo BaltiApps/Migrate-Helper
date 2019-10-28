@@ -15,7 +15,7 @@
     <!--activity_main.xml-->
     <string name="restore_main">Restore apps and data</string>
     <string name="uninstallFromSystem">Uninstall from system</string>
-    <string name="uninstall_or_finalize">Uninstall/Disable app\nor Finalize restore</string>
+    <string name="uninstall_or_finalize">Uninstall app\nor Finalize restore</string>
     <string name="temporary_disable">Temporary disable</string>
     <string name="selective_restore">Choose what to restore</string>
     <string name="please_use_magisk">Make sure to use Magisk</string>
@@ -284,6 +284,7 @@
     <string name="next">Next</string>
     <string name="reset_sms_app">Reset default SMS app</string>
     <string name="reboot_for_sms">You may need to reboot your phone for the restored messages to appear. <b>You may also need to clear data of the sms app.</b></string>
+    <string name="android_10_sms_message">For Android 10+ users, changing the SMS app might close this app. Please reopen the app to continue.</string>
     <string name="uninstall_helper_app">Uninstall/disable</string>
     <string name="change_dpi">Change DPI value</string>
     <string name="display_density">Display density</string>

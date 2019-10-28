@@ -14,6 +14,7 @@
         android:padding="@dimen/large_padding_width"
         android:id="@+id/post_jobs_reset_sms_app_layout"
         android:layout_marginBottom="@dimen/large_padding_width"
+        android:visibility="gone"
         >
 
         <TextView
@@ -56,6 +57,18 @@
                 />
 
         </LinearLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/large_padding_width"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/android_10_sms_message"
+            android:id="@+id/post_jobs_reset_sms_app_android10"
+            android:visibility="gone"
+            />
 
         <Space
             android:layout_width="wrap_content"
