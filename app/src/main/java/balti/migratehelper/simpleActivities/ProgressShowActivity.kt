@@ -14,16 +14,15 @@ import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import balti.migratehelper.AppInstance
 import balti.migratehelper.R
+import balti.migratehelper.postJobs.PostJobsActivity
 import balti.migratehelper.restoreEngines.engines.AppRestoreEngine
 import balti.migratehelper.utilities.CommonToolsKotlin
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_POST_JOBS_STARTED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_ABORT
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_START_POST_JOBS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_ERRORS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_IS_CANCELLED
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_POST_JOBS_STARTED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_APP_RESTORE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_MAKING_SCRIPTS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_PERCENTAGE
@@ -41,7 +40,6 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_TASKLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_TITLE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_TOTAL_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import balti.migratehelper.utilities.IconTools
 import kotlinx.android.synthetic.main.restore_progress_layout.*
@@ -63,8 +61,6 @@ class ProgressShowActivity: AppCompatActivity() {
 
     private var forceStopDialog: AlertDialog? = null
     private var abortDialog: AlertDialog? = null
-
-    private var wasPostJobStarted = false
 
     private fun setImageIcon(intent: Intent, type: String){
 
@@ -119,13 +115,13 @@ class ProgressShowActivity: AppCompatActivity() {
                 })
     }
 
-    private fun handleProgress(intent: Intent?){
+    private fun handleProgress(handlingIntent: Intent?){
 
-        if (intent != null){
+        if (handlingIntent != null){
 
-            lastIntent.putExtras(intent)
+            lastIntent.putExtras(handlingIntent)
 
-            intent.getIntExtra(EXTRA_PROGRESS_PERCENTAGE, -1).let {
+            handlingIntent.getIntExtra(EXTRA_PROGRESS_PERCENTAGE, -1).let {
                 if (it != -1) {
                     progressBar.progress = it
                     progressBar.isIndeterminate = false
@@ -136,8 +132,8 @@ class ProgressShowActivity: AppCompatActivity() {
                 }
             }
 
-            if (intent.hasExtra(EXTRA_TITLE)) {
-                intent.getStringExtra(EXTRA_TITLE).trim().run {
+            if (handlingIntent.hasExtra(EXTRA_TITLE)) {
+                handlingIntent.getStringExtra(EXTRA_TITLE).trim().run {
                     if (this != lastTitle && this != ""){
                         progressTask.text = this
                         progressLogTextView.append("\n$this\n")
@@ -146,11 +142,11 @@ class ProgressShowActivity: AppCompatActivity() {
                 }
             }
 
-            if (intent.hasExtra(EXTRA_SUBTASK))
-                subTask.text = intent.getStringExtra(EXTRA_SUBTASK)
+            if (handlingIntent.hasExtra(EXTRA_SUBTASK))
+                subTask.text = handlingIntent.getStringExtra(EXTRA_SUBTASK)
 
-            if (intent.hasExtra(EXTRA_TASKLOG)){
-                intent.getStringExtra(EXTRA_TASKLOG).run {
+            if (handlingIntent.hasExtra(EXTRA_TASKLOG)){
+                handlingIntent.getStringExtra(EXTRA_TASKLOG).run {
                     if (this != lastLog && this != ""){
                         progressLogTextView.append("$this\n")
                         lastLog = this
@@ -158,9 +154,9 @@ class ProgressShowActivity: AppCompatActivity() {
                 }
             }
 
-            if (intent.hasExtra(EXTRA_PROGRESS_TYPE)){
+            if (handlingIntent.hasExtra(EXTRA_PROGRESS_TYPE)){
 
-                val type = intent.getStringExtra(EXTRA_PROGRESS_TYPE)
+                val type = handlingIntent.getStringExtra(EXTRA_PROGRESS_TYPE)
 
                 if (type == EXTRA_PROGRESS_TYPE_FINISHED) {
 
@@ -170,8 +166,8 @@ class ProgressShowActivity: AppCompatActivity() {
                     window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     closeWarning.visibility = View.GONE
 
-                    if (intent.hasExtra(EXTRA_ERRORS))
-                        errors.addAll(intent.getStringArrayListExtra(EXTRA_ERRORS))
+                    if (handlingIntent.hasExtra(EXTRA_ERRORS))
+                        errors.addAll(handlingIntent.getStringArrayListExtra(EXTRA_ERRORS))
 
                     if (errors.size > 0) {
                         reportLogButton.visibility = View.VISIBLE
@@ -181,12 +177,12 @@ class ProgressShowActivity: AppCompatActivity() {
                         }
                     }
 
-                    if (errors.size != 0 || intent.getBooleanExtra(EXTRA_IS_CANCELLED, false)) {
+                    if (errors.size != 0 || handlingIntent.getBooleanExtra(EXTRA_IS_CANCELLED, false)) {
                         progressTask.setTextColor(resources.getColor(R.color.error_color))
                         subTask.setTextColor(resources.getColor(R.color.error_color))
                     }
 
-                    intent.getLongExtra(EXTRA_TOTAL_TIME, -1).let {
+                    handlingIntent.getLongExtra(EXTRA_TOTAL_TIME, -1).let {
                         if (it != -1L) subTask.text = calendarDifference(it)
                     }
 
@@ -195,12 +191,14 @@ class ProgressShowActivity: AppCompatActivity() {
                     progressActionButton.apply {
                         text = getString(R.string.finalize)
                         setOnClickListener {
-                            startActivity(Intent(this@ProgressShowActivity, PostJobsActivity::class.java))
+                            startActivity(Intent(this@ProgressShowActivity, PostJobsActivity::class.java)
+                                    .putExtras(handlingIntent)
+                            )
                         }
                     }
                 }
 
-                setImageIcon(intent, type)
+                setImageIcon(handlingIntent, type)
             }
         }
     }
@@ -209,14 +207,6 @@ class ProgressShowActivity: AppCompatActivity() {
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 handleProgress(intent)
-            }
-        }
-    }
-
-    private val onPostJobsStart by lazy {
-        object : BroadcastReceiver(){
-            override fun onReceive(context: Context?, intent: Intent?) {
-                wasPostJobStarted = true
             }
         }
     }
@@ -328,33 +318,20 @@ class ProgressShowActivity: AppCompatActivity() {
         }
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
-        commonTools.LBM?.registerReceiver(onPostJobsStart, IntentFilter(ACTION_POST_JOBS_STARTED))
 
-        if (intent.extras != null) handleProgress(intent)
-    }
+        if (intent.extras != null){
+            handleProgress(intent)
+            Handler().postDelayed({
+                if (intent.getBooleanExtra(EXTRA_DO_START_POST_JOBS, false))
+                    startActivity(Intent(this, PostJobsActivity::class.java))
+            }, 100)
 
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        outState?.putBoolean(EXTRA_POST_JOBS_STARTED, wasPostJobStarted)
-        outState?.putAll(lastIntent.extras)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
-        savedInstanceState?.run {
-            if (getBoolean(EXTRA_POST_JOBS_STARTED, false)){
-                if (AppInstance.sharedPrefs.getBoolean(PREF_IS_POST_JOBS_NEEDED, false))
-                    startActivity(Intent(this@ProgressShowActivity, PostJobsActivity::class.java))
-            }
-            if (this.getString(EXTRA_PROGRESS_TYPE) != null)
-                handleProgress(Intent().putExtras(this))
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(onPostJobsStart) }
         commonTools.tryIt { abortDialog?.dismiss() }
         commonTools.tryIt { forceStopDialog?.dismiss() }
     }

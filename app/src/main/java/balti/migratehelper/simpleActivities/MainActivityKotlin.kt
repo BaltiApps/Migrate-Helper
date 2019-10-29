@@ -1,5 +1,6 @@
 package balti.migratehelper.simpleActivities
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,14 +15,14 @@ import android.view.View
 import android.widget.Toast
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
+import balti.migratehelper.postJobs.PostJobsActivity
 import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_POST_JOBS_STARTED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_RESTORE_DATA
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_START_POST_JOBS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_POST_JOBS_ON_FINISH
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_POST_JOBS_STARTED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_ERRORLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_PROGRESSLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.LAST_SUPPORTED_ANDROID_API
@@ -39,8 +40,6 @@ class MainActivityKotlin: AppCompatActivity() {
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val main by lazy { AppInstance.sharedPrefs }
     private val editor by lazy { main.edit() }
-
-    private var wasPostJobStarted = false
 
     private val progressReceiver by lazy {
         object : BroadcastReceiver(){
@@ -65,14 +64,7 @@ class MainActivityKotlin: AppCompatActivity() {
         }
     }
 
-    private val onPostJobsStart by lazy {
-        object : BroadcastReceiver(){
-            override fun onReceive(context: Context?, intent: Intent?) {
-                wasPostJobStarted = true
-            }
-        }
-    }
-
+    @SuppressLint("ApplySharedPref")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -128,6 +120,8 @@ class MainActivityKotlin: AppCompatActivity() {
 
         uninstall_from_system.setOnClickListener {
 
+            AppInstance.sharedPrefs.edit().putBoolean(PREF_IS_POST_JOBS_NEEDED, true).commit()
+
             val uIntent = Intent(this, PostJobsActivity::class.java)
                     .putExtra(EXTRA_POST_JOBS_ON_FINISH, false)
 
@@ -152,23 +146,12 @@ class MainActivityKotlin: AppCompatActivity() {
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
         commonTools.LBM?.registerReceiver(endOnDisable, IntentFilter(ACTION_END_ALL))
-        commonTools.LBM?.registerReceiver(onPostJobsStart, IntentFilter(ACTION_POST_JOBS_STARTED))
 
         commonTools.LBM?.sendBroadcast(Intent(ACTION_REQUEST_RESTORE_DATA))
-    }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        outState?.putBoolean(EXTRA_POST_JOBS_STARTED, wasPostJobStarted)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
-        savedInstanceState?.run {
-            if (getBoolean(EXTRA_POST_JOBS_STARTED, false)){
-                if (AppInstance.sharedPrefs.getBoolean(PREF_IS_POST_JOBS_NEEDED, false))
-                    startActivity(Intent(this@MainActivityKotlin, PostJobsActivity::class.java))
-            }
+        intent?.run {
+            if (getBooleanExtra(EXTRA_DO_START_POST_JOBS, false))
+                startActivity(Intent(this@MainActivityKotlin, PostJobsActivity::class.java))
         }
     }
 
@@ -216,7 +199,6 @@ class MainActivityKotlin: AppCompatActivity() {
         super.onDestroy()
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(endOnDisable) }
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(onPostJobsStart) }
     }
 
 }

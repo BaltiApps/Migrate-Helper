@@ -50,7 +50,7 @@
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".simpleActivities.PostJobsActivity"
+        <activity android:name=".postJobs.PostJobsActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/PostJobsActivityTheme"
@@ -60,10 +60,26 @@
             android:screenOrientation="portrait"
             />
 
+        <activity android:name=".postJobs.utils.ResurrectorActivity"
+            android:theme="@style/AppTheme.Blank"
+            android:launchMode="singleInstance"
+            >
+            <intent-filter>
+                <action android:name="balti.migratehelper.RESURRECTOR"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
         <receiver android:name=".utilities.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" android:priority="999"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".postJobs.utils.AliveCheckReceiver">
+            <intent-filter>
+                <action android:name="balti.migratehelper.RECEIVER"/>
             </intent-filter>
         </receiver>
 

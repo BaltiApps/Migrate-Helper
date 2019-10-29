@@ -1,4 +1,4 @@
-package balti.migratehelper.simpleActivities
+package balti.migratehelper.postJobs
 
 import android.content.Intent
 import android.os.Build
@@ -9,13 +9,14 @@ import android.view.View
 import android.view.WindowManager
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
+import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.restartWatcher
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_POST_JOBS_STARTED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_UNINSTALL
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DPI_VALUE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_POST_JOBS_ON_FINISH
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESET_SMS_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
@@ -27,12 +28,18 @@ import kotlinx.android.synthetic.main.post_restore_jobs.*
 
 class PostJobsActivity: AppCompatActivity() {
 
+    companion object {
+        var IS_ALIVE = false
+    }
+
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val editor by lazy { AppInstance.sharedPrefs.edit() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.post_restore_jobs)
+
+        IS_ALIVE = true
 
         window.setGravity(Gravity.BOTTOM)
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
@@ -50,7 +57,8 @@ class PostJobsActivity: AppCompatActivity() {
             post_jobs_reset_sms_app_android10.visibility = View.VISIBLE
 
         execute()
-        commonTools.LBM?.sendBroadcast(Intent(ACTION_POST_JOBS_STARTED))
+
+        restartWatcher(this)
     }
 
     private fun execute() {
@@ -78,6 +86,10 @@ class PostJobsActivity: AppCompatActivity() {
             post_jobs_action_button.apply {
                 text = getString(R.string.next)
                 setOnClickListener {
+                    restartWatcher(this@PostJobsActivity, true,
+                            if (intent.hasExtra(EXTRA_PROGRESS_TYPE)) intent
+                            else null
+                    )
                     commonTools.setDefaultSms(smsAppName, JOBCODE_RESET_SMS_APP)
                 }
             }
@@ -174,8 +186,13 @@ class PostJobsActivity: AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == JOBCODE_RESET_SMS_APP) {
+            if (resultCode != RESULT_OK) restartWatcher(this)
             execute()
         }
     }
 
+    override fun onDestroy() {
+        restartWatcher(this)
+        super.onDestroy()
+    }
 }
