@@ -20,6 +20,7 @@
     <string name="selective_restore">Choose what to restore</string>
     <string name="please_use_magisk">Make sure to use Magisk</string>
     <string name="lastLog">Last logs</string>
+    <string name="preferences">Preferences</string>
 
     <!--last_log_report.xml-->
     <string name="seeProgressLog">See Progress log</string>
@@ -254,6 +255,7 @@
     <string name="making_scripts">Making scripts</string>
     <string name="waiting_for_vcf">Waiting for contacts restore</string>
     <string name="restoring_apps">Restoring apps</string>
+    <string name="cleaning_up">Cleaning up files</string>
     <string name="script_file_does_not_exist">Script file does not exist</string>
 
     <!--ExtraRestorePrepare.kt-->
@@ -293,6 +295,20 @@
     <string name="disable_app">Disable this app</string>
     <string name="do_nothing">Do nothing</string>
     <string name="change_to">Change to: </string>
+
+    <!--preferences.xml-->
+    <string name="ignore_read_errors">Ignore read errors</string>
+    <string name="ignore_read_errors_desc">This will ignore all errors during reading of metadata files</string>
+    <string name="ignore_extras">Ignore extras</string>
+    <string name="ignore_extras_desc">This will completely ignore reading and restoring extras like contacts, sms, calls, DPI etc</string>
+    <string name="restore_start_animation">Show restore start countdown</string>
+    <string name="restore_start_animation_desc">Show/hide the countdown animation before restore starts.</string>
+    <string name="use_watcher">Use watcher (Android 10+)</string>
+    <string name="use_watcher_desc">A plugin app (installed and uninstalled with this helper app). Android 10 system closes this app after changing default SMS app. Watcher re-opens this helper app.</string>
+    <string name="advanced">Advanced</string>
+    <string name="clear_to_reset">Clear and press OK to reset to default value</string>
+    <string name="manual_cache">Specify path to migrate_cache</string>
+    <string name="manual_metadata_holder">Specify path to metadata holder</string>
     
     <!--uninstall_activity.xml-->
     <string name="uninstall_desc">If doesn\'t work, delete <b>/system/app/MigrateHelper</b>. Also deletes migrate_cache.

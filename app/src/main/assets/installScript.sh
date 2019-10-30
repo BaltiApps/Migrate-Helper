@@ -7,6 +7,7 @@ apk_dir_name=$2
 base_apk_name=$3
 package_name=$4
 installer_name=$5
+METADATA_HOLDER=$6
 
 if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
 
@@ -71,7 +72,11 @@ if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
         settings put global package_verifier_enable ${verification_state}
     fi
 
-    rm -rf "$full_apk_dir"
+    if [[ -n "$(pm list packages ${package_name})" ]]; then
+        echo "Clearing apks"
+        rm -rf "$full_apk_dir"
+        echo "ok" > ${METADATA_HOLDER}/${package_name}.app.marker
+    fi
 
 else
     echo "Apk(s) for ${package_name} not found!"

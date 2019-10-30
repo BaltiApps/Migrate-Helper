@@ -29,6 +29,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_ADB
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_CALLS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_CLEANING
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_FINISHED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_FONT_SCALE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_KEYBOARD
@@ -110,6 +111,7 @@ class ProgressShowActivity: AppCompatActivity() {
                     EXTRA_PROGRESS_MAKING_SCRIPTS -> R.drawable.ic_app_scripts_icon
 
                     EXTRA_PROGRESS_TYPE_WAITING_TO_CANCEL -> R.drawable.ic_canceling_icon
+                    EXTRA_PROGRESS_TYPE_CLEANING -> R.drawable.ic_app_cleaner_icon
 
                     else -> R.drawable.ic_waiting
                 })

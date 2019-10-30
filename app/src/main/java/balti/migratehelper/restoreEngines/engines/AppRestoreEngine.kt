@@ -142,10 +142,10 @@ class AppRestoreEngine(private val jobcode: Int,
                                 isContactAppPresent = true
 
                             if (isApp)
-                                writeNext("sh $installScriptPath $MIGRATE_CACHE ${appPacket.packageName}.app ${appPacket.apkName} ${appPacket.packageName} ${appPacket.installerName}")
+                                writeNext("sh $installScriptPath $MIGRATE_CACHE ${appPacket.packageName}.app ${appPacket.apkName} ${appPacket.packageName} ${appPacket.installerName} $METADATA_HOLDER_DIR")
 
                             if (isData)
-                                writeNext("sh $restoreDataScriptPath $busyboxBinaryPath ${appPacket.dataName} ${appPacket.packageName} $doNotificationFix")
+                                writeNext("sh $restoreDataScriptPath $busyboxBinaryPath ${appPacket.dataName} ${appPacket.packageName} $doNotificationFix $METADATA_HOLDER_DIR")
 
                             if (isPermission) {
                                 BufferedReader(FileReader(permFile)).readLines().forEach { it1 ->

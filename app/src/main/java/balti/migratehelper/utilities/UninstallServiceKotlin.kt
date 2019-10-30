@@ -11,6 +11,7 @@ import android.support.v4.app.NotificationCompat
 import android.widget.Toast
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
+import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migratehelper.simpleActivities.MainActivityKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.CHANNEL_UNINSTALLING
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
@@ -72,6 +73,8 @@ class UninstallServiceKotlin: Service() {
 
             val fullProcess = Runtime.getRuntime().exec("su")
             BufferedWriter(OutputStreamWriter(fullProcess.outputStream)).run {
+
+                write("pm uninstall $WATCHER_PACKAGE_NAME 2>/dev/null\n")
 
                 if (dpiValue > 0) write("wm density $dpiValue\n")
 

@@ -2,9 +2,10 @@ package balti.migratehelper.restoreSelectorActivity.containers
 
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
+import java.io.File
 
 data class SettingsPacketKotlin(private val dpiText: String?, private val adbState: Int?,
-                                private val fontScale: Double?, private val keyboardText: String?) {
+                                private val fontScale: Double?, private val keyboardText: String?, val settingsFile: File) {
 
     companion object {
         val SETTINGS_TYPE_DPI = "TYPE_DPI"

@@ -16,6 +16,7 @@ import android.widget.Toast
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.postJobs.PostJobsActivity
+import balti.migratehelper.preferences.MainPreferencesActivity
 import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
@@ -140,6 +141,11 @@ class MainActivityKotlin: AppCompatActivity() {
         last_logs_textView.apply {
             paintFlags = Paint.UNDERLINE_TEXT_FLAG
             setOnClickListener { showLog() }
+        }
+
+        preferences_textView.apply {
+            paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            setOnClickListener { startActivity(Intent(this@MainActivityKotlin, MainPreferencesActivity::class.java)) }
         }
 
         close_button.setOnClickListener { finish() }

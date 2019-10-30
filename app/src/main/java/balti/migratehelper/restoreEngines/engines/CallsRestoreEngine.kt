@@ -7,6 +7,7 @@ import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreEngines.utils.DBTools
 import balti.migratehelper.restoreSelectorActivity.containers.CallsPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_CALLS_RESTORE
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_CALLS
 import balti.migratehelper.utilities.constants.CallsDBConstants.Companion.CALLS_COUNTRY_ISO
 import balti.migratehelper.utilities.constants.CallsDBConstants.Companion.CALLS_DATA_USAGE
@@ -22,6 +23,7 @@ import balti.migratehelper.utilities.constants.CallsDBConstants.Companion.CALLS_
 import balti.migratehelper.utilities.constants.CallsDBConstants.Companion.CALLS_TABLE_NAME
 import balti.migratehelper.utilities.constants.CallsDBConstants.Companion.CALLS_TYPE
 import balti.migratehelper.utilities.constants.CallsDBConstants.Companion.CALLS_VOICEMAIL_URI
+import java.io.File
 
 class CallsRestoreEngine(private val jobcode: Int,
                          private val callsPackets: ArrayList<CallsPacketKotlin>): ParentRestoreClass(EXTRA_PROGRESS_TYPE_CALLS) {
@@ -92,7 +94,9 @@ class CallsRestoreEngine(private val jobcode: Int,
                     { progress, taskLog ->
                         publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
                     }
-            ))
+            ).apply {
+                if (this.size == 0) File("${currentPacket.callDBFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
+            })
         }
     }
 

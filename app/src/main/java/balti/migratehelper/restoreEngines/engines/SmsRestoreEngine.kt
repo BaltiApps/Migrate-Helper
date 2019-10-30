@@ -7,6 +7,7 @@ import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreEngines.utils.DBTools
 import balti.migratehelper.restoreSelectorActivity.containers.SmsPacketKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_SMS_RESTORE
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_SMS
 import balti.migratehelper.utilities.constants.SmsDBConstant.Companion.SMS_ADDRESS
 import balti.migratehelper.utilities.constants.SmsDBConstant.Companion.SMS_BODY
@@ -25,6 +26,7 @@ import balti.migratehelper.utilities.constants.SmsDBConstant.Companion.SMS_STATU
 import balti.migratehelper.utilities.constants.SmsDBConstant.Companion.SMS_SUBJECT
 import balti.migratehelper.utilities.constants.SmsDBConstant.Companion.SMS_TABLE_NAME
 import balti.migratehelper.utilities.constants.SmsDBConstant.Companion.SMS_TYPE
+import java.io.File
 
 class SmsRestoreEngine(private val jobcode: Int,
                        private val smsPackets: ArrayList<SmsPacketKotlin>): ParentRestoreClass(EXTRA_PROGRESS_TYPE_SMS) {
@@ -101,7 +103,9 @@ class SmsRestoreEngine(private val jobcode: Int,
                     { progress, taskLog ->
                         publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
                     }
-            ))
+            ).apply {
+                if (this.size == 0) File("${currentPacket.smsDBFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
+            })
         }
     }
 

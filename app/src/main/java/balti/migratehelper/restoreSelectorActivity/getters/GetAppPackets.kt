@@ -36,7 +36,7 @@ class GetAppPackets(jobCode: Int,
                             it.readLines().forEach { line ->
                                 contents.append("$line\n")
                             }
-                            appPackets.add(AppPacketsKotlin(JSONObject(contents.toString())))
+                            appPackets.add(AppPacketsKotlin(JSONObject(contents.toString()), it))
                         } catch (e: Exception) {
                             errors.add("$ERROR_APP_JSON: ${it.name} - ${e.message.toString()}")
                         }

@@ -57,10 +57,9 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/colorAccent" />
 
-
                 <Space
                     android:layout_width="wrap_content"
-                    android:layout_height="20dp" />
+                    android:layout_height="@dimen/xlarge_padding_width" />
 
                 <Button
                     android:id="@+id/restoreButton"
@@ -81,12 +80,14 @@
                     android:text="@string/uninstall_or_finalize"
                     />
 
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/large_padding_width"/>
 
                 <TextView
                     android:id="@+id/last_logs_textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/large_padding_width"
                     android:clickable="true"
                     android:drawableStart="@drawable/ic_log"
                     android:focusable="true"
@@ -94,6 +95,26 @@
                     android:text="@string/lastLog"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/colorAccent" />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/small_padding_width"/>
+
+                <TextView
+                    android:id="@+id/preferences_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableStart="@drawable/ic_preferences"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:text="@string/preferences"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/colorAccent" />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xlarge_padding_width" />
 
                 <TextView
                     android:layout_width="wrap_content"

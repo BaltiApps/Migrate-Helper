@@ -41,7 +41,7 @@ class GetSettingsKotlin(jobCode: Int,
 
                 if (!RestoreSelectorKotlin.cancelLoading) Thread.sleep(DUMMY_WAIT_TIME)
 
-                return SettingsPacketKotlin(dpiText, adbState, fontScale, keyboardText)
+                return SettingsPacketKotlin(dpiText, adbState, fontScale, keyboardText, files[0])
 
             }
         } catch (e: Exception) {

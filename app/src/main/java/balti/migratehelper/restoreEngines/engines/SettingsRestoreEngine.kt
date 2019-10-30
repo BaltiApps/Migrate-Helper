@@ -8,16 +8,14 @@ import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotl
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_DPI
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_FONT_SCALE
 import balti.migratehelper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_KEYBOARD
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME_LONGER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_GENERIC_SETTINGS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_ADB
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_FONT_SCALE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_KEYBOARD
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_LAST_DPI
-import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.*
 
 class SettingsRestoreEngine(private val jobcode: Int,
                             private val settingsPacket: SettingsPacketKotlin): ParentRestoreClass("") {
@@ -47,7 +45,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
                 it.commandsToRestore.forEach { cmd ->
                     flushToSu(cmd)
                 }
-                Thread.sleep(DUMMY_WAIT_TIME)
+                Thread.sleep(DUMMY_WAIT_TIME_LONGER)
             }
         }
     }
@@ -78,6 +76,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
     }
 
     override fun postExecuteFunction() {
+        if (errors.size == 0) File("${settingsPacket.settingsFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
         onRestoreComplete.onRestoreComplete(jobcode, errors.size == 0, errors)
     }
 

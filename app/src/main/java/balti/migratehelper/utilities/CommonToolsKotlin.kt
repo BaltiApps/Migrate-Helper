@@ -66,6 +66,7 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_PROGRESS_TYPE_KEYBOARD = "keyboard_progress"
         val EXTRA_PROGRESS_APP_RESTORE = "app_restore_progress"
         val EXTRA_PROGRESS_MAKING_SCRIPTS = "app_making_script_progress"
+        val EXTRA_PROGRESS_TYPE_CLEANING = "cleaning_progress"
         val EXTRA_PROGRESS_WAITING_FOR_VCF = "waiting_for_vcf_progress"
         val EXTRA_PROGRESS_TYPE_WAITING_TO_CANCEL = "waiting_to_cancel"
         val EXTRA_PROGRESS_TYPE_FINISHED = "finished"
@@ -101,12 +102,14 @@ class CommonToolsKotlin(val context: Context) {
         val ERROR_APP_RESTORE_TRY_CATCH = "RUN_TRY_CATCH"
         val ERROR_APP_RESTORE = "RUN"
         val ERROR_APP_RESTORE_SUPPRESSED = "RUN_SUPPRESSED"
+        val ERROR_CLEANING_SUPPRESSED = "CLEANING_ERROR_SUPPRESSED"
 
         val ERROR_RESTORE_SERVICE_ERROR = "RESTORE_SERVICE"
 
-        val ALL_SUPPRESSED_ERRORS = arrayOf(ERROR_APP_RESTORE_SUPPRESSED)
+        val ALL_SUPPRESSED_ERRORS = arrayOf(ERROR_APP_RESTORE_SUPPRESSED, ERROR_CLEANING_SUPPRESSED)
 
         val DUMMY_WAIT_TIME = 100L
+        val DUMMY_WAIT_TIME_LONGER = 500L
 
         val PROPERTY_APP_SELECTION = "app"        // used to set property in AppRestoreAdapter
         val PROPERTY_DATA_SELECTION = "data"        // used to set property in AppRestoreAdapter
@@ -138,7 +141,8 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_RESTORE_SETTINGS = 62001
         val JOBCODE_RESTORE_WIFI = 75000
         val JOBCODE_RESTORE_APP = 85001
-        val JOBCODE_RESTORE_END = 95001
+        val JOBCODE_RESTORE_CLEAN = 95001
+        val JOBCODE_RESTORE_END = 95002
 
         val JOBCODE_RESET_SMS_APP = 45010
 
@@ -163,6 +167,7 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_IGNORE_READ_ERRORS = "ignore_read_errors"
         val PREF_IGNORE_EXTRAS = "ignore_extras"
         val PREF_RESTORE_START_ANIMATION = "restore_start_animation"
+        val PREF_USE_WATCHER = "use_watcher"
 
         val PREF_DEFAULT_SMS_APP = "default_sms_app"
         val PREF_LAST_DPI = "last_read_dpi"
@@ -180,6 +185,10 @@ class CommonToolsKotlin(val context: Context) {
         val BACKUP_NAME_SETTINGS = "settings.json"
         val WIFI_FILE_NAME = "WifiConfigStore.xml"
         val WIFI_FILE_PATH = "/data/misc/wifi/$WIFI_FILE_NAME"
+
+        val APP_MARKER = "app.marker"
+        val DATA_MARKER = "data.marker"
+        val EXTRAS_MARKER = "extras.marker"
 
         val HELPER_STATUS = "HELPER_STATUS"
 

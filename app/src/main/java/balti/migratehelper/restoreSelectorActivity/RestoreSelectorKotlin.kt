@@ -177,6 +177,14 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         }
     }
 
+    private fun showError(mainMessage: String, messages: ArrayList<String>){
+        val builder = StringBuilder("")
+        messages.forEach {
+            builder.append("$it\n")
+        }
+        showError(mainMessage, builder.toString())
+    }
+
     private fun doJob(jCode: Int){
         val task = when (jCode){
             JOBCODE_ROOT_COPY -> RootCopyTask(jCode, MIGRATE_CACHE, this)
@@ -213,7 +221,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                         if (AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_READ_ERRORS, false)) {
                             allErrors.add(jobResult.toString())
                             doJob(nextJob)
-                        } else showError(getString(R.string.code_error), jobResult.toString())
+                        }
                     } else {
                         if (jobResult !is Int) func()
                         doJob(nextJob)
@@ -281,6 +289,11 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
         restore_selecter_back_button.setOnClickListener {
             onBackPressed()
+        }
+
+        if (!AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_READ_ERRORS, false) && allErrors.isNotEmpty()){
+            showError(getString(R.string.code_error), allErrors)
+            return
         }
 
         val allExtras: ArrayList<GetterMarker> = ArrayList(0)
@@ -538,9 +551,6 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
         }
         else {
-
-            waiting_layout.visibility = View.VISIBLE
-            app_list.visibility = View.GONE
 
             if (cancelLoading) {
                 showError(getString(R.string.cancelled_loading), "")

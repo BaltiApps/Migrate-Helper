@@ -2,8 +2,9 @@ package balti.migratehelper.restoreSelectorActivity.containers
 
 import balti.migratehelper.utilities.constants.MtdConstants
 import org.json.JSONObject
+import java.io.File
 
-class AppPacketsKotlin(jsonObject: JSONObject) {
+class AppPacketsKotlin(jsonObject: JSONObject, val jsonFile: File) {
 
     var appName: String? = null
     var isSystemApp: Boolean = false

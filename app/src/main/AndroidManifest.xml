@@ -60,6 +60,10 @@
             android:screenOrientation="portrait"
             />
 
+        <activity android:name=".preferences.MainPreferencesActivity"
+            android:screenOrientation="portrait"
+            />
+
         <activity android:name=".postJobs.utils.ResurrectorActivity"
             android:theme="@style/AppTheme.Blank"
             android:launchMode="singleInstance"

@@ -50,6 +50,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_ERRORLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_PROGRESSLOG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CALLS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CLEAN
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_END
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_SETTINGS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_SMS
@@ -294,6 +295,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                                 JOBCODE_RESTORE_WIFI -> WifiRestoreEngine(jCode, workingObject as WifiPacketKotlin)
                                 JOBCODE_RESTORE_APP -> AppRestoreEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, notificationFix)
                                 JOBCODE_RESTORE_SETTINGS -> SettingsRestoreEngine(jCode, workingObject as SettingsPacketKotlin)
+                                JOBCODE_RESTORE_CLEAN -> CleanerEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>)
                                 else -> null
                             }
                         } catch (e: Exception) {
@@ -319,6 +321,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         // restore all settings after restoring apps
         doJob(JOBCODE_RESTORE_SETTINGS, if (isSettingsNull) null else settingsPacket)
 
+        doJob(JOBCODE_RESTORE_CLEAN, appPackets)
         doJob(JOBCODE_RESTORE_END, Any())
     }
 
@@ -348,6 +351,11 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
             JOBCODE_RESTORE_SETTINGS -> {
                 jobResults?.let { addError(it) }
+                doFallThroughJob(JOBCODE_RESTORE_CLEAN)
+            }
+
+            JOBCODE_RESTORE_CLEAN -> {
+                jobResults?.let { addError(it, false) }
                 restoreFinished("")
             }
         }

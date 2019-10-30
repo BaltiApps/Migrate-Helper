@@ -6,6 +6,7 @@ busybox_file=$1
 tar_gz_file=$2
 package_name=$3
 notification_fix=$4
+METADATA_HOLDER=$5
 
 dataDir=$(dumpsys package ${package_name} | grep dataDir | head -n 1 | cut -d '=' -f2)
 app_uid=$(dumpsys package ${package_name} | grep userId= | head -n 1 | cut -d '=' -f2 | cut -d ' ' -f1)
@@ -33,7 +34,7 @@ else
         fi
 
         if [[ -n ${tarCmd} ]]; then
-            ${tarCmd} -xzpf ${tar_gz_file} && rm ${tar_gz_file}
+            ${tarCmd} -xzpf ${tar_gz_file} && rm ${tar_gz_file} && echo "ok" > ${METADATA_HOLDER}/${package_name}.data.marker
         else
             echo "busybox not found under ${busybox_file}. Tar not installed."
         fi
@@ -57,6 +58,7 @@ else
 
     else
         echo "Data file $tar_gz_file was not found!"
+        echo "ok" > ${METADATA_HOLDER}/${package_name}.data.marker
     fi
 
 fi

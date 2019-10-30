@@ -7,6 +7,7 @@
     <dimen name="erp_icon_wh">35dp</dimen>
     <dimen name="small_padding_width">5dp</dimen>
     <dimen name="large_padding_width">10dp</dimen>
+    <dimen name="xlarge_padding_width">18dp</dimen>
     <dimen name="extra_small_icon_wh">24dp</dimen>
     <dimen name="extra_large_padding_width">20dp</dimen>
     <dimen name="restore_countdown_height">130dp</dimen>
