@@ -50,14 +50,14 @@ class PostJobsActivity: AppCompatActivity() {
         // this intent extra is used to mark if the activity is being called
         // after finishing restore jobs or simply for uninstalling the app.
         if (!intent.getBooleanExtra(EXTRA_POST_JOBS_ON_FINISH, true)) {
-            post_jobs_reset_sms_app_desc.visibility = View.GONE
+            pj_resetSmsAppDesc.visibility = View.GONE
         }
         else {
-            post_jobs_reset_sms_app_desc.visibility = View.VISIBLE
+            pj_resetSmsAppDesc.visibility = View.VISIBLE
         }
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P)
-            post_jobs_reset_sms_app_android10.visibility = View.VISIBLE
+            pj_resetSmsAppAndroid10.visibility = View.VISIBLE
 
         execute()
 
@@ -79,15 +79,15 @@ class PostJobsActivity: AppCompatActivity() {
         if (smsAppPakageName != "") {
 
             // display only SMS reset layout
-            post_jobs_reset_sms_app_layout.visibility = View.VISIBLE
-            post_jobs_change_dpi_layout.visibility = View.GONE
-            post_jobs_uninstall_layout.visibility = View.GONE
+            pj_resetSmsAppLayout.visibility = View.VISIBLE
+            pj_changeDpiLayout.visibility = View.GONE
+            pj_uninstallLayout.visibility = View.GONE
 
-            post_jobs_default_sms_name.text = packageManager.let { it.getApplicationLabel(it.getApplicationInfo(smsAppPakageName, 0)) }
+            pj_defaultSmsName.text = packageManager.let { it.getApplicationLabel(it.getApplicationInfo(smsAppPakageName, 0)) }
 
             fun android10ManualSet(){
-                post_jobs_reset_sms_app_android10.setText(R.string.set_manually_desc)
-                post_jobs_action_button.apply {
+                pj_resetSmsAppAndroid10.setText(R.string.set_manually_desc)
+                pj_actionButton.apply {
                     text = getString(R.string.set_manually)
                     setOnClickListener {
                         try {
@@ -106,9 +106,9 @@ class PostJobsActivity: AppCompatActivity() {
                 if (AppInstance.sharedPrefs.getBoolean(PREF_USE_WATCHER, true)){
                     if(commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)){
 
-                        post_jobs_reset_sms_app_android10.setText(R.string.android_10_sms_message)
+                        pj_resetSmsAppAndroid10.setText(R.string.android_10_sms_message)
 
-                        post_jobs_action_button.apply {
+                        pj_actionButton.apply {
                             text = getString(R.string.next)
                             setOnClickListener {
                                 restartWatcher(this@PostJobsActivity, true,
@@ -128,7 +128,7 @@ class PostJobsActivity: AppCompatActivity() {
 
 
             } else {
-                post_jobs_action_button.apply {
+                pj_actionButton.apply {
                     text = getString(R.string.next)
                     setOnClickListener {
                         commonTools.setDefaultSms(smsAppPakageName, JOBCODE_RESET_SMS_APP)
@@ -139,66 +139,66 @@ class PostJobsActivity: AppCompatActivity() {
         } else {
 
             // hide SMS layout and display uninstall layout
-            post_jobs_reset_sms_app_layout.visibility = View.GONE
-            post_jobs_uninstall_layout.visibility = View.VISIBLE
+            pj_resetSmsAppLayout.visibility = View.GONE
+            pj_uninstallLayout.visibility = View.VISIBLE
 
             val dpiInt = AppInstance.sharedPrefs.getInt(PREF_LAST_DPI, -1)
 
             if (dpiInt > 0) {
 
                 // if DPI is present, then display DPI layout
-                post_jobs_change_dpi_layout.visibility = View.VISIBLE
-                post_jobs_change_dpi_value.text = "${getString(R.string.display_density)} $dpiInt"
+                pj_changeDpiLayout.visibility = View.VISIBLE
+                pj_changeDpiValue.text = "${getString(R.string.display_density)} $dpiInt"
 
                 // if DPI checkbox is checked, check reboot checkbox and disable it
-                do_change_dpi_checkbox.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) post_jobs_reboot.isChecked = true
-                    post_jobs_reboot.isEnabled = !isChecked
+                pj_doChangeDpiCheckbox.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) pj_reboot.isChecked = true
+                    pj_reboot.isEnabled = !isChecked
                 }
 
                 // if DPI layout is clicked, toggle DPI checkbox state
-                post_jobs_change_dpi_layout.setOnClickListener {
-                    do_change_dpi_checkbox.run { this.isChecked = !this.isChecked }
+                pj_changeDpiLayout.setOnClickListener {
+                    pj_doChangeDpiCheckbox.run { this.isChecked = !this.isChecked }
                 }
 
                 // by default set DPI checked
-                do_change_dpi_checkbox.isChecked = true
+                pj_doChangeDpiCheckbox.isChecked = true
             }
             else {
                 // no DPI data. uncheck checkbox.
-                do_change_dpi_checkbox.isChecked = false
+                pj_doChangeDpiCheckbox.isChecked = false
             }
 
             // If nothing is to be done, try to uncheck the reboot option
             // (because nothing is to be done)
             // Only uncheck reboot checkbox if DPI checkbox is unchecked
-            post_jobs_do_nothing.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked && !do_change_dpi_checkbox.isChecked)
-                    post_jobs_reboot.isChecked = false
+            pj_doNothing.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked && !pj_doChangeDpiCheckbox.isChecked)
+                    pj_reboot.isChecked = false
             }
 
             // If restoration was cancelled, don't restore DPI
             // "Do nothing"
             if (AppInstance.sharedPrefs.getBoolean(PREF_WAS_CANCELLED, false)) {
-                post_jobs_do_nothing.isChecked = true
-                do_change_dpi_checkbox.isChecked = false
+                pj_doNothing.isChecked = true
+                pj_doChangeDpiCheckbox.isChecked = false
             }
 
-            post_jobs_action_button.apply {
+            pj_actionButton.apply {
                 text = getString(R.string.finish)
                 setOnClickListener {
 
                     // send intent to uninstall service
                     val finishIntent = Intent(this@PostJobsActivity, UninstallServiceKotlin::class.java).apply {
-                        if (do_change_dpi_checkbox.isChecked) putExtra(EXTRA_DPI_VALUE, dpiInt)
-                        putExtra(EXTRA_DO_UNINSTALL, post_jobs_uninstall_radio.isChecked)
-                        putExtra(EXTRA_DO_REBOOT, post_jobs_reboot.isChecked)
+                        if (pj_doChangeDpiCheckbox.isChecked) putExtra(EXTRA_DPI_VALUE, dpiInt)
+                        putExtra(EXTRA_DO_UNINSTALL, pj_uninstallRadio.isChecked)
+                        putExtra(EXTRA_DO_REBOOT, pj_reboot.isChecked)
                     }
 
                     editor.run {
 
                         // disable the app if selected
-                        if (post_jobs_disable_radio.isChecked) putBoolean(PREF_TEMPORARY_DISABLE, true)
+                        if (pj_disableRadio.isChecked) putBoolean(PREF_TEMPORARY_DISABLE, true)
 
                         // reset all data fed to this activity via sharedPreference
                         putString(PREF_DEFAULT_SMS_APP, "")
@@ -215,7 +215,7 @@ class PostJobsActivity: AppCompatActivity() {
                     else startService(finishIntent)
 
                     // close all activities if "Do nothing" is not selected
-                    if (!post_jobs_do_nothing.isChecked) {
+                    if (!pj_doNothing.isChecked) {
                         commonTools.LBM?.sendBroadcast(Intent(ACTION_END_ALL))
                         finishAffinity()
                     }
