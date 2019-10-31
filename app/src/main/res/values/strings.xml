@@ -172,7 +172,7 @@
     <!--MmsBroadcastReceiver.java-->
     <string name="new_sms_received">New sms received! Please change to your default messaging app.</string>
 
-    <!--ComposeSmsActivity.java-->
+    <!--ComposeSmsActivity.kt-->
     <string name="please_change_sms_app">\"Migrate helper\" is not meant to be used as an sms app. Please change the default sms app</string>
 
     <!--GetAppPackets.kt-->
@@ -323,7 +323,7 @@
     <string name="temporary_disable_desc">App will stop giving notifications, but remain installed.</string>
     <string name="reboot">Reboot (recommended)</string>
 
-    <!--UninstallService.java-->
+    <!--UninstallServiceKotlin.kt-->
     <string name="finishing">Finishing…</string>
 
     <!--contacts_dialog_view.xml-->

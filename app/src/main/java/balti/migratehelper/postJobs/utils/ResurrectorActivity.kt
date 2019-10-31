@@ -24,7 +24,7 @@ class ResurrectorActivity: AppCompatActivity() {
                                 .putExtra(EXTRA_DO_START_POST_JOBS, true)}
 
                     else {
-                        Log.d(CommonToolsKotlin.DEBUG_TAG, "resurrecting MainActivity")
+                        Log.d(CommonToolsKotlin.DEBUG_TAG, "resurrecting MainActivityKotlin")
                         Intent(this, MainActivityKotlin::class.java)
                                 .putExtra(EXTRA_DO_START_POST_JOBS, true)
                     }

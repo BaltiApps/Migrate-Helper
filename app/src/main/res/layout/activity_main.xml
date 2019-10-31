@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/helper_portrait"
     android:orientation="vertical"
-    tools:context="balti.migratehelper.MainActivity">
+    tools:context=".simpleActivities.MainActivityKotlin">
 
     <LinearLayout
         android:layout_width="match_parent"
