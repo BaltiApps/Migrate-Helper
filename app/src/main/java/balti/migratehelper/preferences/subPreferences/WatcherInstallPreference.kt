@@ -16,11 +16,11 @@ import java.io.OutputStreamWriter
 
 class WatcherInstallPreference(context: Context?, attrs: AttributeSet?) : Preference(context, attrs) {
 
-    lateinit var progressBar: ProgressBar
-    lateinit var installButton: Button
-    lateinit var installLabel: TextView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var installButton: Button
+    private lateinit var installLabel: TextView
 
-    lateinit var commonTools : CommonToolsKotlin
+    private lateinit var commonTools : CommonToolsKotlin
 
     override fun onBindView(view: View?) {
         super.onBindView(view)
@@ -33,6 +33,9 @@ class WatcherInstallPreference(context: Context?, attrs: AttributeSet?) : Prefer
         installLabel = view.findViewById(R.id.watcherInstallLabel)
 
         progressBar.visibility = View.GONE
+
+        if (commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME))
+            installLabel.text = context.getString(R.string.installed_watcher)
 
         installButton.setOnClickListener {
 
@@ -58,6 +61,7 @@ class WatcherInstallPreference(context: Context?, attrs: AttributeSet?) : Prefer
                     Toast.makeText(context, R.string.installed_watcher, Toast.LENGTH_SHORT).show()
                     installButton.isEnabled = false
                     installLabel.isEnabled = false
+                    installLabel.text = context.getString(R.string.installed_watcher)
                 }
                 else Toast.makeText(context, R.string.failed_watcher_install, Toast.LENGTH_SHORT).show()
                 progressBar.visibility = View.GONE
