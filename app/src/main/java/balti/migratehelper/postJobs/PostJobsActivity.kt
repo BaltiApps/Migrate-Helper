@@ -7,8 +7,10 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
+import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.restartWatcher
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
@@ -22,6 +24,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SM
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_LAST_DPI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_TEMPORARY_DISABLE
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_WAS_CANCELLED
 import balti.migratehelper.utilities.UninstallServiceKotlin
 import kotlinx.android.synthetic.main.post_restore_jobs.*
@@ -63,9 +66,9 @@ class PostJobsActivity: AppCompatActivity() {
 
     private fun execute() {
 
-        val smsAppName = if (commonTools.areWeDefaultSmsApp())
+        val smsAppPakageName = if (commonTools.areWeDefaultSmsApp())
             AppInstance.sharedPrefs.getString(PREF_DEFAULT_SMS_APP, "").let {
-                if (it == "" || it == packageName) "com.android.messaging"
+                if (it == null || it == "" || it == packageName) "com.android.messaging"
                 else if (commonTools.isPackageInstalled(it)) it else "com.android.messaging"
             }
         else {
@@ -73,24 +76,63 @@ class PostJobsActivity: AppCompatActivity() {
             ""
         }
 
-        if (smsAppName != "") {
+        if (smsAppPakageName != "") {
 
             // display only SMS reset layout
             post_jobs_reset_sms_app_layout.visibility = View.VISIBLE
             post_jobs_change_dpi_layout.visibility = View.GONE
             post_jobs_uninstall_layout.visibility = View.GONE
 
-            post_jobs_default_sms_name.text = packageManager.let { it.getApplicationLabel(it.getApplicationInfo(smsAppName, 0)) }
+            post_jobs_default_sms_name.text = packageManager.let { it.getApplicationLabel(it.getApplicationInfo(smsAppPakageName, 0)) }
+
+            fun android10ManualSet(){
+                post_jobs_reset_sms_app_android10.setText(R.string.set_manually_desc)
+                post_jobs_action_button.apply {
+                    text = getString(R.string.set_manually)
+                    setOnClickListener {
+                        try {
+                            startActivity(packageManager.getLaunchIntentForPackage(smsAppPakageName))
+                        } catch (e: Exception){
+                            e.printStackTrace()
+                            Toast.makeText(this@PostJobsActivity, e.message.toString(), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
 
             // on pressing NEXT, change SMS app
-            post_jobs_action_button.apply {
-                text = getString(R.string.next)
-                setOnClickListener {
-                    restartWatcher(this@PostJobsActivity, true,
-                            if (intent.hasExtra(EXTRA_PROGRESS_TYPE)) intent
-                            else null
-                    )
-                    commonTools.setDefaultSms(smsAppName, JOBCODE_RESET_SMS_APP)
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+
+                if (AppInstance.sharedPrefs.getBoolean(PREF_USE_WATCHER, true)){
+                    if(commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)){
+
+                        post_jobs_reset_sms_app_android10.setText(R.string.android_10_sms_message)
+
+                        post_jobs_action_button.apply {
+                            text = getString(R.string.next)
+                            setOnClickListener {
+                                restartWatcher(this@PostJobsActivity, true,
+                                        if (intent.hasExtra(EXTRA_PROGRESS_TYPE)) intent
+                                        else null
+                                )
+                                commonTools.setDefaultSms(smsAppPakageName, JOBCODE_RESET_SMS_APP)
+                            }
+                        }
+                    }
+                    else {
+                        AppInstance.sharedPrefs.edit().putBoolean(PREF_USE_WATCHER, false).apply()
+                        android10ManualSet()
+                    }
+                }
+                else android10ManualSet()
+
+
+            } else {
+                post_jobs_action_button.apply {
+                    text = getString(R.string.next)
+                    setOnClickListener {
+                        commonTools.setDefaultSms(smsAppPakageName, JOBCODE_RESET_SMS_APP)
+                    }
                 }
             }
 

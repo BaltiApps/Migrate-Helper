@@ -1,4 +1,4 @@
-package balti.migratehelper.preferences
+package balti.migratehelper.preferences.subPreferences
 
 import android.content.Context
 import android.preference.Preference

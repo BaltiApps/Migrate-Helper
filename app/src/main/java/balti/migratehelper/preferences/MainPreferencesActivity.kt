@@ -1,11 +1,15 @@
 package balti.migratehelper.preferences
 
+import android.os.Build
 import android.os.Bundle
 import android.preference.CheckBoxPreference
 import android.preference.Preference
 import android.preference.PreferenceActivity
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
+import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
+import balti.migratehelper.preferences.subPreferences.WatcherInstallPreference
+import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
@@ -16,7 +20,12 @@ class MainPreferencesActivity: PreferenceActivity() {
     private val ignoreReadErrors: CheckBoxPreference by lazy { findPreference("ignoreReadErrors") as CheckBoxPreference }
     private val ignoreExtras: CheckBoxPreference by lazy { findPreference("ignoreExtras") as CheckBoxPreference }
     private val restoreStartAnimation: CheckBoxPreference by lazy { findPreference("restoreStartAnimation") as CheckBoxPreference }
+
     private val useWatcher: CheckBoxPreference by lazy { findPreference("useWatcher") as CheckBoxPreference }
+    private val installWatcherLayout: WatcherInstallPreference by lazy { findPreference("installWatcherLayout") as WatcherInstallPreference }
+
+    private val commonTools by lazy { CommonToolsKotlin(this) }
+    private val isAbove10 = Build.VERSION.SDK_INT > Build.VERSION_CODES.P
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,11 +35,25 @@ class MainPreferencesActivity: PreferenceActivity() {
 
             val editor = edit()
 
+            fun toggleWatcherInstaller(checkbox: Boolean = true){
+                installWatcherLayout.isEnabled =
+                        if (checkbox)
+                            isAbove10 && !commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)
+                        else false
+            }
+
             fun setValue(checkbox: CheckBoxPreference, field: String, defaultValue: Boolean = false){
-                checkbox.isChecked = getBoolean(field, defaultValue)
+
+                if (checkbox == useWatcher) {
+                    toggleWatcherInstaller()
+                    checkbox.isChecked = if (isAbove10) getBoolean(field, defaultValue) else false
+                }
+                else checkbox.isChecked = getBoolean(field, defaultValue)
+
                 checkbox.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                     editor.putBoolean(field, newValue as Boolean)
                     editor.apply()
+                    if (checkbox == useWatcher) toggleWatcherInstaller(newValue)
                     true
                 }
             }
@@ -39,6 +62,13 @@ class MainPreferencesActivity: PreferenceActivity() {
             setValue(ignoreExtras, PREF_IGNORE_EXTRAS)
             setValue(restoreStartAnimation, PREF_RESTORE_START_ANIMATION, true)
             setValue(useWatcher, PREF_USE_WATCHER, true)
+
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                useWatcher.isEnabled = true
+            } else {
+                setValue(useWatcher, PREF_USE_WATCHER, false)
+                useWatcher.isEnabled = false
+            }
 
         }
     }

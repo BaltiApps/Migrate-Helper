@@ -295,7 +295,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                                 JOBCODE_RESTORE_WIFI -> WifiRestoreEngine(jCode, workingObject as WifiPacketKotlin)
                                 JOBCODE_RESTORE_APP -> AppRestoreEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, notificationFix)
                                 JOBCODE_RESTORE_SETTINGS -> SettingsRestoreEngine(jCode, workingObject as SettingsPacketKotlin)
-                                JOBCODE_RESTORE_CLEAN -> CleanerEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>)
+                                JOBCODE_RESTORE_CLEAN -> CleanerEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, commonTools.areWeDefaultSmsApp())
                                 else -> null
                             }
                         } catch (e: Exception) {

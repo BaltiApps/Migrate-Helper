@@ -17,18 +17,28 @@
         android:title="@string/restore_start_animation"
         android:summary="@string/restore_start_animation_desc"/>
 
-    <CheckBoxPreference
-        android:key="useWatcher"
-        android:title="@string/use_watcher"
-        android:summary="@string/use_watcher_desc"/>
+    <PreferenceCategory
+        android:title="@string/watcher">
+
+        <CheckBoxPreference
+            android:key="useWatcher"
+            android:title="@string/use_watcher"
+            android:summary="@string/use_watcher_desc"/>
+
+        <balti.migratehelper.preferences.subPreferences.WatcherInstallPreference
+            android:layout="@layout/preferences_use_watcher"
+            android:key="installWatcherLayout"
+            />
+
+    </PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/advanced">
 
-        <balti.migratehelper.preferences.ManualCachePref
+        <balti.migratehelper.preferences.subPreferences.ManualCachePref
             android:layout="@layout/preferences_edittext" />
 
-        <balti.migratehelper.preferences.ManualMetadataHolder
+        <balti.migratehelper.preferences.subPreferences.ManualMetadataHolder
             android:layout="@layout/preferences_edittext"/>
 
     </PreferenceCategory>

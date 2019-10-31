@@ -284,9 +284,11 @@
 
     <!--post_restore_jobs.xml-->
     <string name="next">Next</string>
+    <string name="set_manually">Set manually</string>
+    <string name="set_manually_desc">Please open the SMS app by clicking "Set manually" and set the SMS app. Once done, open this app again to do the remaining steps.</string>
     <string name="reset_sms_app">Reset default SMS app</string>
     <string name="reboot_for_sms">You may need to reboot your phone for the restored messages to appear. <b>You may also need to clear data of the sms app.</b></string>
-    <string name="android_10_sms_message">For Android 10+ users, changing the SMS app might close this app. Please reopen the app to continue.</string>
+    <string name="android_10_sms_message">On clicking "Next", Android 10+ will close this app because it is no longer the default SMS app. If the app does not restart, please open this app again to complete the rest of the steps.</string>
     <string name="uninstall_helper_app">Uninstall/disable</string>
     <string name="change_dpi">Change DPI value</string>
     <string name="display_density">Display density</string>
@@ -306,6 +308,11 @@
     <string name="use_watcher">Use watcher (Android 10+)</string>
     <string name="use_watcher_desc">A plugin app (installed and uninstalled with this helper app). Android 10 system closes this app after changing default SMS app. Watcher re-opens this helper app.</string>
     <string name="advanced">Advanced</string>
+    <string name="watcher">Watcher</string>
+    <string name="install_watcher">Install watcher</string>
+    <string name="installed_watcher">Watcher installed successfully</string>
+    <string name="failed_watcher_install">Failed to install watcher</string>
+    <string name="install">Install</string>
     <string name="clear_to_reset">Clear and press OK to reset to default value</string>
     <string name="manual_cache">Specify path to migrate_cache</string>
     <string name="manual_metadata_holder">Specify path to metadata holder</string>

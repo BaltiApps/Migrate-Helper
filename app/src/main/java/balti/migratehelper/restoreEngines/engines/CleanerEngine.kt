@@ -1,7 +1,9 @@
 package balti.migratehelper.restoreEngines.engines
 
 import android.util.Log
+import balti.migratehelper.AppInstance
 import balti.migratehelper.R
+import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migratehelper.restoreEngines.ParentRestoreClass
 import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
@@ -14,13 +16,15 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_CLEANING
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileFilter
 import java.io.OutputStreamWriter
 
 class CleanerEngine(private val jobcode: Int,
-                    private val appPackets: ArrayList<AppPacketsKotlin>): ParentRestoreClass(EXTRA_PROGRESS_TYPE_CLEANING) {
+                    private val appPackets: ArrayList<AppPacketsKotlin>,
+                    private val wasSmsRestored: Boolean): ParentRestoreClass(EXTRA_PROGRESS_TYPE_CLEANING) {
 
     private val errors by lazy { ArrayList<String>(0) }
 
@@ -71,17 +75,28 @@ class CleanerEngine(private val jobcode: Int,
                 // -1 to exclude the first dot "." in ".extras.marker"
             }
 
+            val doInstallWatcher = wasSmsRestored && AppInstance.sharedPrefs.getBoolean(PREF_USE_WATCHER, true)
+                    && !commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)
+
             Runtime.getRuntime().exec("su").run {
                 val writer = BufferedWriter(OutputStreamWriter(outputStream))
                 removableFilesList.forEach {
                     writer.write("rm $MIGRATE_CACHE/$it 2>/dev/null\n")
                 }
+
+                if (doInstallWatcher){
+                    val watcherPath = commonTools.unpackAssetToInternal("watcher.apk", "watcher.apk")
+                    writer.write("mv $watcherPath /data/local/tmp/watcher.apk\n")
+                    writer.write("pm install /data/local/tmp/watcher.apk 2>/dev/null\n")
+                    writer.write("rm /data/local/tmp/watcher.apk\n")
+                }
+
                 writer.write("exit\n")
                 writer.flush()
                 waitFor()
             }
 
-            Thread.sleep(DUMMY_WAIT_TIME_LONGER)
+            if (!doInstallWatcher) Thread.sleep(DUMMY_WAIT_TIME_LONGER)
         }
         catch (e: Exception){
             e.printStackTrace()
