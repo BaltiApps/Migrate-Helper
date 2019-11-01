@@ -296,6 +296,7 @@
     <string name="android_10_sms_message">On clicking "Next", Android 10+ will close this app because it is no longer the default SMS app. If the app does not restart, please open this app again to complete the rest of the steps.</string>
     <string name="uninstall_helper_app">Uninstall/disable</string>
     <string name="change_dpi">Change DPI value</string>
+    <string name="wifi_was_restored">Wifi was restored. Reboot is needed.</string>
     <string name="display_density">Display density</string>
     <string name="reboot_is_necessary">Reboot is necessary!</string>
     <string name="uninstall_app">Uninstall this app</string>

@@ -22,6 +22,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESET_SMS_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_WIFI_RESTORED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_LAST_DPI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_TEMPORARY_DISABLE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
@@ -144,6 +145,14 @@ class PostJobsActivity: AppCompatActivity() {
 
             val dpiInt = AppInstance.sharedPrefs.getInt(PREF_LAST_DPI, -1)
 
+            // check and disable reboot option if wifi was restored
+            if (isWifiRestored()) {
+                pj_reboot.isChecked = true
+                pj_reboot.isEnabled = false
+                pj_wifiRestoredRebootLabel.visibility = View.VISIBLE
+            }
+            else pj_wifiRestoredRebootLabel.visibility = View.GONE
+
             if (dpiInt > 0) {
 
                 // if DPI is present, then display DPI layout
@@ -153,7 +162,7 @@ class PostJobsActivity: AppCompatActivity() {
                 // if DPI checkbox is checked, check reboot checkbox and disable it
                 pj_doChangeDpiCheckbox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) pj_reboot.isChecked = true
-                    pj_reboot.isEnabled = !isChecked
+                    pj_reboot.isEnabled = pj_reboot.isEnabled && !isChecked
                 }
 
                 // if DPI layout is clicked, toggle DPI checkbox state
@@ -173,7 +182,7 @@ class PostJobsActivity: AppCompatActivity() {
             // (because nothing is to be done)
             // Only uncheck reboot checkbox if DPI checkbox is unchecked
             pj_doNothing.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked && !pj_doChangeDpiCheckbox.isChecked)
+                if (isChecked && !pj_doChangeDpiCheckbox.isChecked && !isWifiRestored())
                     pj_reboot.isChecked = false
             }
 
@@ -205,6 +214,7 @@ class PostJobsActivity: AppCompatActivity() {
                         putInt(PREF_LAST_DPI, -1)
                         putBoolean(PREF_WAS_CANCELLED, false)
                         putBoolean(PREF_IS_POST_JOBS_NEEDED, false)
+                        putBoolean(PREF_IS_WIFI_RESTORED, false)
 
                         commit()
                     }
@@ -231,6 +241,10 @@ class PostJobsActivity: AppCompatActivity() {
             if (resultCode != RESULT_OK) restartWatcher(this)
             execute()
         }
+    }
+
+    private fun isWifiRestored(): Boolean{
+        return AppInstance.sharedPrefs.getBoolean(PREF_IS_WIFI_RESTORED, false)
     }
 
     override fun onDestroy() {
