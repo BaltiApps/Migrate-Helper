@@ -7,8 +7,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
-import android.support.v4.app.NotificationCompat
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME

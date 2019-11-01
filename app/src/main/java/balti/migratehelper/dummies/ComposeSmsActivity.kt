@@ -1,8 +1,8 @@
 package balti.migratehelper.dummies
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import balti.migratehelper.R
 
 class ComposeSmsActivity : AppCompatActivity() {

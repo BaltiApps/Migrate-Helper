@@ -3,7 +3,7 @@ package balti.migratehelper.restoreEngines
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.AsyncTask
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.restoreEngines.RestoreServiceKotlin.Companion.serviceContext

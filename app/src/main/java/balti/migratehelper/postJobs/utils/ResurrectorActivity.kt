@@ -2,8 +2,8 @@ package balti.migratehelper.postJobs.utils
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import balti.migratehelper.AppInstance
 import balti.migratehelper.simpleActivities.MainActivityKotlin
 import balti.migratehelper.simpleActivities.ProgressShowActivity

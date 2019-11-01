@@ -7,8 +7,6 @@ import android.content.IntentFilter
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -16,6 +14,8 @@ import android.view.WindowManager
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import balti.migratehelper.AppInstance
 import balti.migratehelper.AppInstance.Companion.appPackets
 import balti.migratehelper.AppInstance.Companion.callsDataPackets
