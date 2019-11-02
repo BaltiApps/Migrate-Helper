@@ -77,6 +77,7 @@
     <string name="will_be_restored_later">To be restored after applications</string>
     <string name="ready_to_be_restored">Ready to restore</string>
     <string name="restore_starting_in">Restore starting in…</string>
+    <string name="number_of_selected_apps">Selected apps</string>
 
     <!--restore_progress_layout.xml-->
     <string name="close">CLOSE</string>

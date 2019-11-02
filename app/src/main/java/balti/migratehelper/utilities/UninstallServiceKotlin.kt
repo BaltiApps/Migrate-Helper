@@ -90,10 +90,23 @@ class UninstallServiceKotlin: Service() {
                         write("mount -o rw,remount /system\n")
                         write("mount -o rw,remount /system/app/MigrateHelper\n")
                         write("rm -rf ${applicationInfo.dataDir} $sourceDir\n")
+
+                        // go advanced if not removed
+
+                        write("if [[ -e $sourceDir ]]; then\n")
+                        write("    cat /proc/mounts | grep system | while read -r line || [[ -n \"\$line\" ]]; do\n")
+                        write("        mp=\"\$(echo \$line | cut -d ' ' -f2)\"\n")
+                        write("        md=\"\$(echo \$line | cut -d ' ' -f1)\"\n")
+                        write("        if [[ \$mp == \"/system\" || \$mp == \"/\" ]]; then\n")
+                        write("            mount -o rw,remount \$md \$mp\n")
+                        write("        fi\n")
+                        write("    done\n")
+                        write("    rm -rf $sourceDir\n")
+                        write("fi\n")
+
                     } else write("pm uninstall $packageName\n")
 
                     write("rm -rf /sdcard/Android/data/$packageName/helper\n")
-
                 }
 
                 if (doReboot) write("reboot\n")

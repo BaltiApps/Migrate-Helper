@@ -62,7 +62,6 @@
 
         <activity android:name=".preferences.MainPreferencesActivity"
             android:screenOrientation="portrait"
-            android:exported="true"
             />
 
         <activity android:name=".postJobs.utils.ResurrectorActivity"
