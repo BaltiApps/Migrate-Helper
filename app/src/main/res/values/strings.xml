@@ -43,9 +43,9 @@
     <string name="too_fast">Whoa, too fast!!</string>
     <string name="too_fast_desc">The app has not been explicitly tested on Android version above 10.\n\nPlease submit your feedback on whether the app works or not.</string>
     <string name="dont_show_again">Don\'t show again</string>
-    <string name="turn_off_internet_and_updates">Please turn off internet and app updates</string>
-    <string name="do_not_use_desc">Please turn off internet and auto app updates temporarily to not interfere with the restore process.
-        \n\nAlso, using apps while restoration is going on will result in random crashes.\n\nYou will get an option to minimize the app restore window, but it is not recommended.</string>
+    <string name="apps_will_be_closed">Apps will be closed</string>
+    <string name="do_not_use_desc">Apps will be closed while restoring. Please do not use the device to avoid random crashes.
+        \n\nYou will get an option to minimize the app restore window, but it is not recommended.</string>
     <string name="later">Nevermind, I will restore later.</string>
     <string name="sure">Are you sure?</string>
     <string name="howToRestore">Uninstalling requires root. You will also need to re-flash migrate zips to restore data later on.</string>
@@ -265,11 +265,16 @@
     <string name="script_file_does_not_exist">Script file does not exist</string>
 
     <!--ExtraRestorePrepare.kt-->
+    <string name="skip_apps">Cancel all apps</string>
     <string name="continue_">Continue</string>
     <string name="keyboard_not_present">Keyboard app not available</string>
     <string name="keyboard_not_present_desc">The keyboard app is not installed and is neither present in the restore. You can install the app from Play Store or elsewhere.</string>
     <string name="install_from_playstore">Play Store</string>
     <string name="skip_keyboard">Skip keyboard and continue</string>
+    <string name="wifiNeedsToBeEnabled">Please enable wifi</string>
+    <string name="wifiNeedsToBeEnabledDesc">To restore Wifi configuration fie, wifi needs to be enabled first. Please do it from the notification panel or from the phone settings.</string>
+    <string name="retry">Retry</string>
+    <string name="skip_wifi">Skip wifi</string>
 
     <!--RestoreSelectorKotlin.kt-->
     <string name="contacts">Contacts</string>
@@ -300,6 +305,7 @@
     <string name="wifi_was_restored">Wifi was restored. Reboot is needed.</string>
     <string name="display_density">Display density</string>
     <string name="reboot_is_necessary">Reboot is necessary!</string>
+    <string name="wifi_reboot_is_necessary">Wifi be enabled. Reboot is necessary!</string>
     <string name="uninstall_app">Uninstall this app</string>
     <string name="disable_app">Disable this app</string>
     <string name="do_nothing">Do nothing</string>

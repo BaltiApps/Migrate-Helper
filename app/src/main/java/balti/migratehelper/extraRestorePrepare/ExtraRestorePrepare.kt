@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -138,11 +139,6 @@ class ExtraRestorePrepare: AppCompatActivity() {
             }
         }
 
-        // add contacts, sms, calls
-        if (contactDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_contact_icon, R.string.contacts).apply { erpItemContacts = this })
-        if (smsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_sms_icon, R.string.sms).apply { erpItemSms = this })
-        if (callsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_call_log_icon, R.string.calls).apply { erpItemCalls = this })
-
         // add wifi
         wifiPacket?.let {
             if (it.isSelected) {
@@ -152,6 +148,11 @@ class ExtraRestorePrepare: AppCompatActivity() {
             }
             else wifiPacket = null
         }
+
+        // add contacts, sms, calls
+        if (contactDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_contact_icon, R.string.contacts).apply { erpItemContacts = this })
+        if (smsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_sms_icon, R.string.sms).apply { erpItemSms = this })
+        if (callsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_call_log_icon, R.string.calls).apply { erpItemCalls = this })
 
         // add other settings
         otherViews.forEach { extra_perm_check_holder.addView(it) }
@@ -234,13 +235,13 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 val view : View? = when (jCode) {
                     JOBCODE_PREP_APP -> erpItemApps
                     JOBCODE_PREP_KEYBOARD -> erpItemKeyboard
+                    JOBCODE_PREP_WIFI -> erpItemWifi
                     JOBCODE_PREP_CONTACTS -> erpItemContacts
                     JOBCODE_PREP_SMS -> erpItemSms
                     JOBCODE_PREP_CALLS -> erpItemCalls
                     JOBCODE_PREP_DPI -> erpItemDpi
                     JOBCODE_PREP_ADB -> erpItemAdb
                     JOBCODE_PREP_FONT_SCALE -> erpItemFontScale
-                    JOBCODE_PREP_WIFI -> erpItemWifi
                     else -> null
                 }
 
@@ -290,8 +291,12 @@ class ExtraRestorePrepare: AppCompatActivity() {
                                 .setPositiveButton(R.string.continue_) {_, _ ->
                                     proceed(DONE, "${getString(R.string.number_of_selected_apps)}: ${appPackets.size}")
                                 }
-                                .setNegativeButton(android.R.string.cancel) {_, _ ->
+                                .setNegativeButton(R.string.abort) {_, _ ->
                                     finishThis()
+                                }
+                                .setNeutralButton(R.string.skip_apps) {_, _ ->
+                                    appPackets.clear()
+                                    proceed(CANCEL, getString(R.string.cancelled))
                                 }
                                 .setCancelable(false)
                                 .show()
@@ -304,7 +309,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
             fun proceed(status: Int, label: String){
                 toggleERPItemStatusIcon(erpItemKeyboard, status, label)
-                doFallThroughJob(JOBCODE_PREP_CONTACTS)
+                doFallThroughJob(JOBCODE_PREP_WIFI)
             }
 
             var executed = false
@@ -351,6 +356,31 @@ class ExtraRestorePrepare: AppCompatActivity() {
             }
 
             if (!executed) proceed(CANCEL, "null")
+        }
+
+        doJob(JOBCODE_PREP_WIFI) {
+
+            fun proceed(status: Int, label: String){
+                toggleERPItemStatusIcon(erpItemWifi, status, label)
+                doFallThroughJob(JOBCODE_PREP_CONTACTS)
+            }
+
+            val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+            if (!wifiManager.isWifiEnabled){
+                AlertDialog.Builder(this).apply {
+                    setTitle(R.string.wifiNeedsToBeEnabled)
+                    setMessage(R.string.wifiNeedsToBeEnabledDesc)
+                    setPositiveButton(R.string.retry) {_, _ -> doFallThroughJob(JOBCODE_PREP_WIFI)}
+                    setNegativeButton(R.string.abort) {_, _ -> finishThis()}
+                    setNeutralButton(R.string.skip_wifi) {_, _ ->
+                        proceed(CANCEL, getString(R.string.cancelled))
+                    }
+                    setCancelable(false)
+                }
+                        .show()
+            }
+            else proceed(DONE, getString(R.string.ready_to_be_restored))
         }
 
         doJob(JOBCODE_PREP_CONTACTS) {
@@ -446,11 +476,6 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         doJob(JOBCODE_PREP_FONT_SCALE) {
             toggleERPItemStatusIcon(erpItemFontScale, DONE, getString(R.string.ready_to_be_restored))
-            doFallThroughJob(JOBCODE_PREP_WIFI)
-        }
-
-        doJob(JOBCODE_PREP_WIFI) {
-            toggleERPItemStatusIcon(erpItemWifi, DONE, getString(R.string.ready_to_be_restored))
             doFallThroughJob(JOBCODE_PREP_END)
         }
 

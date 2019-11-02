@@ -19,6 +19,8 @@ if [[ -z "$app_uid" && -n "$(pm list packages ${package_name})" ]]; then
     echo "Failed to find package $package_name. Cannot restore data."
 else
 
+    am force-stop ${package_name} 2>/dev/null
+
     rm -rf ${dataDir} 2>/dev/null
 
     if [[ -e /data/data/${tar_gz_file} ]]; then

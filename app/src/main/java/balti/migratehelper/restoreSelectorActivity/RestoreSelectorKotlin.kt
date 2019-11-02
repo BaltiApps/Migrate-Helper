@@ -372,7 +372,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                                 }
                                 is WifiPacketKotlin -> v.extra_item_desc.apply {
                                     visibility = View.VISIBLE
-                                    text = getString(R.string.reboot_is_necessary)
+                                    text = getString(R.string.wifi_reboot_is_necessary)
                                 }
                                 else -> v.extra_item_desc.visibility = View.VISIBLE
                             }
@@ -532,7 +532,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
                         setOnClickListener {
                             AlertDialog.Builder(this@RestoreSelectorKotlin)
-                                    .setTitle(R.string.turn_off_internet_and_updates)
+                                    .setTitle(R.string.apps_will_be_closed)
                                     .setMessage(R.string.do_not_use_desc)
                                     .setPositiveButton(R.string.goAhead) { _, _ ->
                                         startActivity(
