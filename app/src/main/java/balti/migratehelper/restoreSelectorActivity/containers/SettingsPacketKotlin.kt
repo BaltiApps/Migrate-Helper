@@ -88,7 +88,10 @@ data class SettingsPacketKotlin(private val dpiText: String?, private val adbSta
         override var iconResource: Int = R.drawable.ic_keyboard_icon
         override var displayText: String = AppInstance.appContext.getString(R.string.keyboard)
         override var isSelected: Boolean = true
-        override var commandsToRestore = listOf("ime enable $keyboardText")
+        override var commandsToRestore = listOf(
+                "ime enable $keyboardText",
+                "ime set $keyboardText"
+        )
     }
 
     val internalPackets: ArrayList<SettingsItem> = ArrayList(0)

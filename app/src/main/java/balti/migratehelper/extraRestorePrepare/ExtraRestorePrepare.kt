@@ -369,8 +369,8 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
             if (!wifiManager.isWifiEnabled){
                 AlertDialog.Builder(this).apply {
-                    setTitle(R.string.wifiNeedsToBeEnabled)
-                    setMessage(R.string.wifiNeedsToBeEnabledDesc)
+                    setTitle(R.string.wifiSearchNeeded)
+                    setMessage(R.string.wifiSearchNeededDesc)
                     setPositiveButton(R.string.retry) {_, _ -> doFallThroughJob(JOBCODE_PREP_WIFI)}
                     setNegativeButton(R.string.abort) {_, _ -> finishThis()}
                     setNeutralButton(R.string.skip_wifi) {_, _ ->

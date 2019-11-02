@@ -249,6 +249,7 @@ class PostJobsActivity: AppCompatActivity() {
 
     override fun onDestroy() {
         restartWatcher(this)
+        IS_ALIVE = false
         super.onDestroy()
     }
 }

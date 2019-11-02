@@ -7,253 +7,269 @@
     android:padding="@dimen/large_padding_width"
     >
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/large_padding_width"
-        android:id="@+id/pj_resetSmsAppLayout"
-        android:layout_marginBottom="@dimen/large_padding_width"
-        android:visibility="gone"
-        >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/reset_sms_app"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/small_padding_width"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/change_to"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                />
-
-            <Space
-                android:layout_width="@dimen/large_padding_width"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Messaging app name"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textStyle="italic"
-                android:textColor="@color/colorAccent"
-                android:id="@+id/pj_defaultSmsName"
-                />
-
-        </LinearLayout>
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/large_padding_width"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/android_10_sms_message"
-            android:id="@+id/pj_resetSmsAppAndroid10"
-            android:visibility="gone"
-            />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/large_padding_width"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/reboot_for_sms"
-            android:id="@+id/pj_resetSmsAppDesc"
-            />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/large_padding_width"
-        android:id="@+id/pj_changeDpiLayout"
-        android:layout_marginBottom="@dimen/large_padding_width"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:visibility="gone"
+        android:fillViewport="true"
         >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:orientation="vertical"
             >
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/change_dpi"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                />
+                android:orientation="vertical"
+                android:padding="@dimen/large_padding_width"
+                android:id="@+id/pj_resetSmsAppLayout"
+                android:layout_marginBottom="@dimen/large_padding_width"
+                android:visibility="gone"
+                >
 
-            <CheckBox
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reset_sms_app"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/small_padding_width"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/change_to"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        />
+
+                    <Space
+                        android:layout_width="@dimen/large_padding_width"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Messaging app name"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textStyle="italic"
+                        android:textColor="@color/colorAccent"
+                        android:id="@+id/pj_defaultSmsName"
+                        />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/large_padding_width"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/android_10_sms_message"
+                    android:id="@+id/pj_resetSmsAppAndroid10"
+                    android:visibility="gone"
+                    />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/large_padding_width"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reboot_for_sms"
+                    android:id="@+id/pj_resetSmsAppDesc"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/pj_doChangeDpiCheckbox"
-                android:padding="@dimen/small_padding_width"
+                android:orientation="vertical"
+                android:padding="@dimen/large_padding_width"
+                android:id="@+id/pj_changeDpiLayout"
+                android:layout_marginBottom="@dimen/large_padding_width"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:visibility="gone"
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/change_dpi"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        />
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/pj_doChangeDpiCheckbox"
+                        android:padding="@dimen/small_padding_width"
+                        />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="@string/display_density"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="italic"
+                    android:textColor="@color/colorAccent"
+                    android:id="@+id/pj_changeDpiValue"
+                    />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/small_padding_width"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reboot_is_necessary"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/large_padding_width"
+                android:id="@+id/pj_uninstallLayout"
+                android:layout_marginBottom="@dimen/large_padding_width"
+                android:visibility="gone"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/uninstall_helper_app"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/large_padding_width"/>
+
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reboot"
+                    android:id="@+id/pj_reboot"
+                    android:checked="true"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/wifi_was_restored"
+                    android:id="@+id/pj_wifiRestoredRebootLabel"
+                    android:paddingStart="@dimen/large_padding_width"
+                    android:paddingEnd="@dimen/large_padding_width"
+                    android:visibility="gone"
+                    />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/large_padding_width"/>
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/pj_uninstallRadio"
+                        android:text="@string/uninstall_app"
+                        android:checked="true"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/uninstall_desc"
+                        android:textSize="12sp"
+                        android:paddingStart="@dimen/large_padding_width"
+                        android:paddingEnd="@dimen/large_padding_width"
+                        />
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/small_padding_width"/>
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/pj_disableRadio"
+                        android:text="@string/disable_app"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/temporary_disable_desc"
+                        android:textSize="12sp"
+                        android:paddingStart="@dimen/large_padding_width"
+                        android:paddingEnd="@dimen/large_padding_width"
+                        />
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/small_padding_width"/>
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/pj_doNothing"
+                        android:text="@string/do_nothing"
+                        />
+
+                </RadioGroup>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/pj_actionButton"
+                android:layout_width="@dimen/button_width"
+                android:layout_height="@dimen/button_height"
+                android:background="@drawable/next"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="@dimen/large_padding_width"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:layout_gravity="end"
+                android:text="@string/next"
                 />
 
         </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="@string/display_density"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="italic"
-            android:textColor="@color/colorAccent"
-            android:id="@+id/pj_changeDpiValue"
-            />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/small_padding_width"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/reboot_is_necessary"
-            />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/large_padding_width"
-        android:id="@+id/pj_uninstallLayout"
-        android:layout_marginBottom="@dimen/large_padding_width"
-        android:visibility="gone"
-        >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/uninstall_helper_app"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/large_padding_width"/>
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/reboot"
-            android:id="@+id/pj_reboot"
-            android:checked="true"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/wifi_was_restored"
-            android:id="@+id/pj_wifiRestoredRebootLabel"
-            android:paddingStart="@dimen/large_padding_width"
-            android:paddingEnd="@dimen/large_padding_width"
-            android:visibility="gone"
-            />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/large_padding_width"/>
-
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/pj_uninstallRadio"
-                android:text="@string/uninstall_app"
-                android:checked="true"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/uninstall_desc"
-                android:textSize="12sp"
-                android:paddingStart="@dimen/large_padding_width"
-                android:paddingEnd="@dimen/large_padding_width"
-                />
-
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/small_padding_width"/>
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/pj_disableRadio"
-                android:text="@string/disable_app"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/temporary_disable_desc"
-                android:textSize="12sp"
-                android:paddingStart="@dimen/large_padding_width"
-                android:paddingEnd="@dimen/large_padding_width"
-                />
-
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/small_padding_width"/>
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/pj_doNothing"
-                android:text="@string/do_nothing"
-                />
-
-        </RadioGroup>
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/pj_actionButton"
-        android:layout_width="@dimen/button_width"
-        android:layout_height="@dimen/button_height"
-        android:background="@drawable/next"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:gravity="center"
-        android:padding="@dimen/large_padding_width"
-        android:textAllCaps="true"
-        android:textColor="@android:color/white"
-        android:layout_gravity="end"
-        android:text="@string/next"
-        />
+    </ScrollView>
 
 </LinearLayout>
