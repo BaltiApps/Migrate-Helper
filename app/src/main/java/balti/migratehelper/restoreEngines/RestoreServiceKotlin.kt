@@ -210,7 +210,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         }
     }
 
-    private fun startBackup(){
+    private fun startRestore(){
         startTime = timeInMillis()
 
         isBackupInitiated = true
@@ -257,7 +257,8 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
             try {
                 if (!isBackupInitiated) {
                     notificationFix = intent.getBooleanExtra(EXTRA_NOTIFICATION_FIX, false)
-                    startBackup()
+                    AppInstance.notificationManager.cancelAll()
+                    startRestore()
                 }
             }
             catch (e: Exception){

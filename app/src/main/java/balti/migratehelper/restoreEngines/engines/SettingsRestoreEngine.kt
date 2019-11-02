@@ -24,7 +24,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
     private val suProcess by lazy { Runtime.getRuntime().exec("su") }
     private val suWriter by lazy { BufferedWriter(OutputStreamWriter(suProcess.outputStream)) }
     private fun flushToSu(cmd: String, ignoreCancel: Boolean = false){
-        if (RestoreServiceKotlin.cancelAll || ignoreCancel){
+        if (!RestoreServiceKotlin.cancelAll || ignoreCancel){
             suWriter.write("$cmd\n")
             suWriter.flush()
         }
@@ -42,10 +42,12 @@ class SettingsRestoreEngine(private val jobcode: Int,
                     SETTINGS_TYPE_DPI -> commonTools.tryIt { sharedPreferences.edit().putInt(PREF_LAST_DPI, it.value as Int).commit() }
                 }
 
-                it.commandsToRestore.forEach { cmd ->
-                    flushToSu(cmd)
+                if (it.settingsType in arrayOf(SETTINGS_TYPE_ADB, SETTINGS_TYPE_FONT_SCALE, SETTINGS_TYPE_KEYBOARD)) {
+                    it.commandsToRestore.forEach { cmd ->
+                        flushToSu(cmd)
+                    }
+                    Thread.sleep(DUMMY_WAIT_TIME_LONGER)
                 }
-                Thread.sleep(DUMMY_WAIT_TIME_LONGER)
             }
         }
     }
@@ -58,6 +60,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
                 }
             }
             flushToSu("exit", true)
+            suProcess.waitFor()
         }
         catch (e: Exception){
             e.printStackTrace()
