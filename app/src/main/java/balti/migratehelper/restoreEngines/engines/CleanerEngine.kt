@@ -1,6 +1,5 @@
 package balti.migratehelper.restoreEngines.engines
 
-import android.util.Log
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
@@ -9,7 +8,6 @@ import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.APP_MARKER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DATA_MARKER
-import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DEBUG_TAG
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME_LONGER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_CLEANING_SUPPRESSED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
@@ -54,8 +52,6 @@ class CleanerEngine(private val jobcode: Int,
                 val isDataClearable = isClearable(packet.dataName, packet.DATA, DATA_MARKER)
                 val isPermissionClearable = packet.PERMISSION && packet.isPermission
 
-                Log.d(DEBUG_TAG, "$isAppClearable $isDataClearable $isPermissionClearable ${packet.jsonFile.absolutePath}")
-
                 if (isAppClearable && isDataClearable && isPermissionClearable) {
                     removableFilesList.add(packet.jsonFile.name)
                     packet.iconFileName?.let { removableFilesList.add(it) }
@@ -73,6 +69,7 @@ class CleanerEngine(private val jobcode: Int,
             allFiles.forEach { f ->
                 removableFilesList.add(f.name.let { it.substring(0, it.indexOf(EXTRAS_MARKER) - 1) })
                 // -1 to exclude the first dot "." in ".extras.marker"
+                f.delete()
             }
 
             val doInstallWatcher = wasSmsRestored && AppInstance.sharedPrefs.getBoolean(PREF_USE_WATCHER, true)

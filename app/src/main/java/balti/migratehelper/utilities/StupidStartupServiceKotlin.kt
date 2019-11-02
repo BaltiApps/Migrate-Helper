@@ -7,7 +7,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.simpleActivities.MainActivityKotlin
@@ -26,7 +26,7 @@ class StupidStartupServiceKotlin: Service() {
             setContentText(getString(R.string.notifBody))
             setContentIntent(PendingIntent.getActivity(this@StupidStartupServiceKotlin, PENDING_INIT_REQUEST_ID,
                     Intent(this@StupidStartupServiceKotlin, MainActivityKotlin::class.java), 0))
-            setVisibility(Notification.VISIBILITY_PUBLIC)
+            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setDefaults(Notification.DEFAULT_ALL)
         }.build()
     }

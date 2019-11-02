@@ -3,13 +3,13 @@ package balti.migratehelper.restoreSelectorActivity.utils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.support.v7.app.AlertDialog
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import balti.migratehelper.R
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin

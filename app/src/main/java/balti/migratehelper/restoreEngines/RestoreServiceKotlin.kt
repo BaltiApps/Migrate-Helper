@@ -11,7 +11,7 @@ import android.content.IntentFilter
 import android.os.AsyncTask
 import android.os.Build
 import android.os.IBinder
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
 import balti.migratehelper.AppInstance
 import balti.migratehelper.AppInstance.Companion.appPackets
 import balti.migratehelper.AppInstance.Companion.callsDataPackets
@@ -210,7 +210,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         }
     }
 
-    private fun startBackup(){
+    private fun startRestore(){
         startTime = timeInMillis()
 
         isBackupInitiated = true
@@ -257,7 +257,8 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
             try {
                 if (!isBackupInitiated) {
                     notificationFix = intent.getBooleanExtra(EXTRA_NOTIFICATION_FIX, false)
-                    startBackup()
+                    AppInstance.notificationManager.cancelAll()
+                    startRestore()
                 }
             }
             catch (e: Exception){

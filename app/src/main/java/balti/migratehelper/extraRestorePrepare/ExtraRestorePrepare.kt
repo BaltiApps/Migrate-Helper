@@ -7,19 +7,19 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.FileProvider
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.TextView
-import balti.migratehelper.AppInstance
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import balti.migratehelper.AppInstance.Companion.appPackets
 import balti.migratehelper.AppInstance.Companion.callsDataPackets
 import balti.migratehelper.AppInstance.Companion.contactDataPackets
@@ -110,17 +110,18 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         restore_countdown.visibility = View.GONE
 
+        // filter data
         filterSelected(contactDataPackets)
         filterSelected(smsDataPackets)
         filterSelected(callsDataPackets)
+        settingsPacket?.run { filterSelected(internalPackets) }
 
-        if (contactDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_contact_icon, R.string.contacts).apply { erpItemContacts = this })
-        if (smsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_sms_icon, R.string.sms).apply { erpItemSms = this })
-        if (callsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_call_log_icon, R.string.calls).apply { erpItemCalls = this })
-        settingsPacket?.let{
+        // add apps
+        if (appPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_app, R.string.apps).apply { erpItemApps = this })
 
-            filterSelected(it.internalPackets)
-
+        // add keyboard first. Store others in an arrayList
+        val otherViews = ArrayList<View>(0)
+        settingsPacket?. let {
             for (p in it.internalPackets) {
 
                 val view = getERPItem(p.iconResource, p.displayText)
@@ -131,13 +132,14 @@ class ExtraRestorePrepare: AppCompatActivity() {
                     SettingsPacketKotlin.SETTINGS_TYPE_KEYBOARD -> {
                         erpItemKeyboard = view
                         keyboardSettingsItem = p
+                        extra_perm_check_holder.addView(view)
                     }
                 }
-                extra_perm_check_holder.addView(view)
-
+                if (p.settingsType != SettingsPacketKotlin.SETTINGS_TYPE_KEYBOARD) otherViews.add(view)
             }
         }
 
+        // add wifi
         wifiPacket?.let {
             if (it.isSelected) {
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
@@ -147,10 +149,17 @@ class ExtraRestorePrepare: AppCompatActivity() {
             else wifiPacket = null
         }
 
-        if (appPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_app, R.string.apps).apply { erpItemApps = this })
+        // add contacts, sms, calls
+        if (contactDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_contact_icon, R.string.contacts).apply { erpItemContacts = this })
+        if (smsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_sms_icon, R.string.sms).apply { erpItemSms = this })
+        if (callsDataPackets.isNotEmpty()) extra_perm_check_holder.addView(getERPItem(R.drawable.ic_call_log_icon, R.string.calls).apply { erpItemCalls = this })
+
+        // add other settings
+        otherViews.forEach { extra_perm_check_holder.addView(it) }
 
         erp_close_button.setOnClickListener {
-            finishThis()
+            cancelChecks = true
+            doFallThroughJob(JOBCODE_PREP_END)
         }
 
         extra_restore_prep_cancel_button.setOnClickListener {
@@ -160,7 +169,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
 
-        doFallThroughJob(JOBCODE_PREP_CONTACTS)
+        doFallThroughJob(JOBCODE_PREP_APP)
     }
 
     private fun getERPItem(iconResource: Int, textResource: Int): View {
@@ -215,12 +224,6 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
     }
 
-    /*private fun <T : GetterMarker> filterSelected(packet: T?): T? {
-        return if (cancelChecks) packet
-        else if (packet != null && packet.isSelected) packet
-        else null
-    }*/
-
     private fun doFallThroughJob(jobCode: Int) {
 
         var fallThrough = false
@@ -230,15 +233,15 @@ class ExtraRestorePrepare: AppCompatActivity() {
             if ((jCode == JOBCODE_PREP_END || !cancelChecks) && (fallThrough || jobCode == jCode)) {
 
                 val view : View? = when (jCode) {
+                    JOBCODE_PREP_APP -> erpItemApps
+                    JOBCODE_PREP_KEYBOARD -> erpItemKeyboard
+                    JOBCODE_PREP_WIFI -> erpItemWifi
                     JOBCODE_PREP_CONTACTS -> erpItemContacts
                     JOBCODE_PREP_SMS -> erpItemSms
                     JOBCODE_PREP_CALLS -> erpItemCalls
                     JOBCODE_PREP_DPI -> erpItemDpi
                     JOBCODE_PREP_ADB -> erpItemAdb
                     JOBCODE_PREP_FONT_SCALE -> erpItemFontScale
-                    JOBCODE_PREP_KEYBOARD -> erpItemKeyboard
-                    JOBCODE_PREP_WIFI -> erpItemWifi
-                    JOBCODE_PREP_APP -> erpItemApps
                     else -> null
                 }
 
@@ -253,96 +256,59 @@ class ExtraRestorePrepare: AppCompatActivity() {
             }
         }
 
-        doJob(JOBCODE_PREP_CONTACTS) {
+        doJob(JOBCODE_PREP_APP) {
 
-            val contactsView = View.inflate(this, R.layout.contacts_dialog_view, null).apply {
-                for (cp in contactDataPackets) {
-                    this.contact_files_display_holder.addView(TextView(this@ExtraRestorePrepare).apply { text = cp.vcfFile.name })
-                }
+            fun proceed(status: Int, label: String){
+                toggleERPItemStatusIcon(erpItemApps, status, label)
+                doFallThroughJob(JOBCODE_PREP_KEYBOARD)
             }
 
-            AlertDialog.Builder(this)
-                    .setTitle(R.string.restore_contacts_dialog_header)
-                    .setView(contactsView)
-                    .setPositiveButton(R.string.proceed) { _, _ -> nextContact() }
-                    .setNegativeButton(android.R.string.cancel) { _, _ ->
-                        contactDataPackets.clear()
-                        toggleERPItemStatusIcon(erpItemContacts, CANCEL, getString(R.string.cancelled))
-                        doFallThroughJob(JOBCODE_PREP_SMS)
+            val appsNotInstalled = ArrayList<AppPacketsKotlin>(0)
+
+            commonTools.doBackgroundTask({
+                val appFiltered = ArrayList<AppPacketsKotlin>(0)
+
+                for (p in appPackets){
+                    if (cancelChecks) break
+                    if (p.IS_SELECTED) appFiltered.add(p)
+                    p.packageName?.let {
+                        if (p.IS_SELECTED && !(commonTools.isPackageInstalled(it) || p.apkName != null))
+                            appsNotInstalled.add(p)
                     }
-                    .setCancelable(false)
-                    .show()
-        }
-
-        doJob(JOBCODE_PREP_SMS) {
-
-            if (!commonTools.areWeDefaultSmsApp()) {
-
-                AlertDialog.Builder(this)
-                        .setTitle(R.string.smsPermission)
-                        .setMessage(getText(R.string.smsPermission_desc))
-                        .setPositiveButton(android.R.string.ok) { _, _ ->
-                            sharedPrefs.edit().putString(PREF_DEFAULT_SMS_APP, commonTools.getDefaultSmsApp()).apply()
-                            commonTools.setDefaultSms(packageName, JOBCODE_PREP_SMS)
-                        }
-                        .setNegativeButton(android.R.string.cancel) { _, _ ->
-                            smsDataPackets.clear()
-                            toggleERPItemStatusIcon(erpItemSms, CANCEL, getString(R.string.cancelled))
-                            doFallThroughJob(JOBCODE_PREP_CALLS)
-                        }
-                        .setCancelable(false)
-                        .show()
-            }
-            else {
-                toggleERPItemStatusIcon(erpItemSms, DONE, getString(R.string.ready_to_be_restored))
-                doFallThroughJob(JOBCODE_PREP_CALLS)
-            }
-        }
-
-        doJob(JOBCODE_PREP_CALLS) {
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED){
-
-                AlertDialog.Builder(this)
-                        .setTitle(R.string.callsPermission)
-                        .setMessage(getText(R.string.callsPermission_desc))
-                        .setPositiveButton(android.R.string.ok) { _, _ ->
-                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_CALL_LOG), JOBCODE_PREP_CALLS)
-                        }
-                        .setNegativeButton(android.R.string.cancel) { _, _ ->
-                            callsDataPackets.clear()
-                            toggleERPItemStatusIcon(erpItemCalls, CANCEL, getString(R.string.cancelled))
-                            doFallThroughJob(JOBCODE_PREP_DPI)
-                        }
-                        .setCancelable(false)
-                        .show()
-
-            }
-            else {
-                toggleERPItemStatusIcon(erpItemCalls, DONE, getString(R.string.ready_to_be_restored))
-                doFallThroughJob(JOBCODE_PREP_DPI)
-            }
-        }
-
-        doJob(JOBCODE_PREP_DPI) {
-            toggleERPItemStatusIcon(erpItemDpi, DONE, getString(R.string.will_be_restored_later))
-            doFallThroughJob(JOBCODE_PREP_ADB)
-        }
-
-        doJob(JOBCODE_PREP_ADB) {
-            toggleERPItemStatusIcon(erpItemAdb, DONE, getString(R.string.ready_to_be_restored))
-            doFallThroughJob(JOBCODE_PREP_FONT_SCALE)
-        }
-
-        doJob(JOBCODE_PREP_FONT_SCALE) {
-            toggleERPItemStatusIcon(erpItemFontScale, DONE, getString(R.string.ready_to_be_restored))
-            doFallThroughJob(JOBCODE_PREP_KEYBOARD)
+                }
+                if (!cancelChecks) {
+                    appPackets.clear()
+                    appPackets.addAll(appFiltered)
+                }
+            }, {
+                if (appsNotInstalled.isEmpty()) {
+                    proceed(DONE, "${getString(R.string.number_of_selected_apps)}: ${appPackets.size}")
+                }
+                else {
+                    AppsNotInstalledViewManager(appsNotInstalled, this).run {
+                        AlertDialog.Builder(this@ExtraRestorePrepare)
+                                .setView(this.getView())
+                                .setPositiveButton(R.string.continue_) {_, _ ->
+                                    proceed(DONE, "${getString(R.string.number_of_selected_apps)}: ${appPackets.size}")
+                                }
+                                .setNegativeButton(R.string.abort) {_, _ ->
+                                    finishThis()
+                                }
+                                .setNeutralButton(R.string.skip_apps) {_, _ ->
+                                    appPackets.clear()
+                                    proceed(CANCEL, getString(R.string.cancelled))
+                                }
+                                .setCancelable(false)
+                                .show()
+                    }
+                }
+            })
         }
 
         doJob(JOBCODE_PREP_KEYBOARD) {
 
-            fun proceed(){
-                toggleERPItemStatusIcon(erpItemKeyboard, DONE, getString(R.string.will_be_restored_later))
+            fun proceed(status: Int, label: String){
+                toggleERPItemStatusIcon(erpItemKeyboard, status, label)
                 doFallThroughJob(JOBCODE_PREP_WIFI)
             }
 
@@ -368,8 +334,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                                 .setMessage("$kPackageName\n${getString(R.string.keyboard_not_present_desc)}")
                                 .setPositiveButton(R.string.skip_keyboard){_, _ ->
                                     keyboardSettingsItem?.isSelected = false
-                                    toggleERPItemStatusIcon(erpItemKeyboard, CANCEL, getString(R.string.cancelled))
-                                    doFallThroughJob(JOBCODE_PREP_WIFI)
+                                    proceed(CANCEL, getString(R.string.cancelled))
                                 }
                                 .setNegativeButton(R.string.abort){_, _ ->
                                     finishThis()
@@ -384,65 +349,134 @@ class ExtraRestorePrepare: AppCompatActivity() {
                                     }
                                 }
                                 .show()
-                    } else proceed()
-                } else proceed()
+                    } else proceed(DONE, getString(R.string.will_be_restored_later))
+                } else proceed(DONE, getString(R.string.will_be_restored_later))
 
                 executed = true
             }
 
-            if (!executed) {
-                toggleERPItemStatusIcon(erpItemKeyboard, CANCEL, "null")
-                doFallThroughJob(JOBCODE_PREP_WIFI)
-            }
+            if (!executed) proceed(CANCEL, "null")
         }
 
         doJob(JOBCODE_PREP_WIFI) {
-            toggleERPItemStatusIcon(erpItemWifi, DONE, getString(R.string.ready_to_be_restored))
-            doFallThroughJob(JOBCODE_PREP_APP)
+
+            fun proceed(status: Int, label: String){
+                toggleERPItemStatusIcon(erpItemWifi, status, label)
+                doFallThroughJob(JOBCODE_PREP_CONTACTS)
+            }
+
+            val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+            if (!wifiManager.isWifiEnabled){
+                AlertDialog.Builder(this).apply {
+                    setTitle(R.string.wifiSearchNeeded)
+                    setMessage(R.string.wifiSearchNeededDesc)
+                    setPositiveButton(R.string.retry) {_, _ -> doFallThroughJob(JOBCODE_PREP_WIFI)}
+                    setNegativeButton(R.string.abort) {_, _ -> finishThis()}
+                    setNeutralButton(R.string.skip_wifi) {_, _ ->
+                        proceed(CANCEL, getString(R.string.cancelled))
+                    }
+                    setCancelable(false)
+                }
+                        .show()
+            }
+            else proceed(DONE, getString(R.string.ready_to_be_restored))
         }
 
-        doJob(JOBCODE_PREP_APP) {
+        doJob(JOBCODE_PREP_CONTACTS) {
 
-            val appsNotInstalled = ArrayList<AppPacketsKotlin>(0)
+            fun proceed(status: Int, label: String){
+                toggleERPItemStatusIcon(erpItemContacts, status, label)
+                doFallThroughJob(JOBCODE_PREP_SMS)
+            }
 
-            commonTools.doBackgroundTask({
-                val appFiltered = ArrayList<AppPacketsKotlin>(0)
+            val contactsView = View.inflate(this, R.layout.contacts_dialog_view, null).apply {
+                for (cp in contactDataPackets) {
+                    this.contact_files_display_holder.addView(TextView(this@ExtraRestorePrepare).apply { text = cp.vcfFile.name })
+                }
+            }
 
-                for (p in appPackets){
-                    if (cancelChecks) break
-                    if (p.IS_SELECTED) appFiltered.add(p)
-                    p.packageName?.let {
-                        if (p.IS_SELECTED && !(commonTools.isPackageInstalled(it) || p.apkName != null))
-                            appsNotInstalled.add(p)
+            AlertDialog.Builder(this)
+                    .setTitle(R.string.restore_contacts_dialog_header)
+                    .setView(contactsView)
+                    .setPositiveButton(R.string.proceed) { _, _ -> nextContact() }
+                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                        contactDataPackets.clear()
+                        proceed(CANCEL, getString(R.string.cancelled))
                     }
-                }
-                if (!cancelChecks) {
-                    appPackets.clear()
-                    appPackets.addAll(appFiltered)
-                }
-            }, {
-                if (appsNotInstalled.isEmpty()) {
-                    toggleERPItemStatusIcon(erpItemApps, DONE)
-                    doFallThroughJob(JOBCODE_PREP_END)
-                }
-                else {
-                    AppsNotInstalledViewManager(appsNotInstalled, this).run {
-                        AlertDialog.Builder(this@ExtraRestorePrepare)
-                                .setView(this.getView())
-                                .setPositiveButton(R.string.continue_) {_, _ ->
-                                    toggleERPItemStatusIcon(erpItemApps, DONE)
-                                    doFallThroughJob(JOBCODE_PREP_END)
-                                }
-                                .setNegativeButton(android.R.string.cancel) {_, _ ->
-                                    toggleERPItemStatusIcon(erpItemApps, CANCEL)
-                                    cancelChecks = true
-                                    doFallThroughJob(JOBCODE_PREP_END)
-                                }
-                                .setCancelable(false)
-                                .show()
-                    }
-                }
-            })
+                    .setCancelable(false)
+                    .show()
+        }
+
+        doJob(JOBCODE_PREP_SMS) {
+
+            fun proceed(status: Int, label: String){
+                toggleERPItemStatusIcon(erpItemSms, status, label)
+                doFallThroughJob(JOBCODE_PREP_CALLS)
+            }
+
+            if (!commonTools.areWeDefaultSmsApp()) {
+
+                AlertDialog.Builder(this)
+                        .setTitle(R.string.smsPermission)
+                        .setMessage(getText(R.string.smsPermission_desc))
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            sharedPrefs.edit().putString(PREF_DEFAULT_SMS_APP, commonTools.getDefaultSmsApp()).apply()
+                            commonTools.setDefaultSms(packageName, JOBCODE_PREP_SMS)
+                        }
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            smsDataPackets.clear()
+                            proceed(CANCEL, getString(R.string.cancelled))
+                        }
+                        .setCancelable(false)
+                        .show()
+            }
+            else {
+                proceed(DONE, getString(R.string.ready_to_be_restored))
+            }
+        }
+
+        doJob(JOBCODE_PREP_CALLS) {
+
+            fun proceed(status: Int, label: String){
+                toggleERPItemStatusIcon(erpItemCalls, status, label)
+                doFallThroughJob(JOBCODE_PREP_DPI)
+            }
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED){
+
+                AlertDialog.Builder(this)
+                        .setTitle(R.string.callsPermission)
+                        .setMessage(getText(R.string.callsPermission_desc))
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_CALL_LOG), JOBCODE_PREP_CALLS)
+                        }
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            callsDataPackets.clear()
+                            proceed(CANCEL, getString(R.string.cancelled))
+                        }
+                        .setCancelable(false)
+                        .show()
+
+            }
+            else {
+                proceed(DONE, getString(R.string.ready_to_be_restored))
+            }
+        }
+
+        doJob(JOBCODE_PREP_DPI) {
+            toggleERPItemStatusIcon(erpItemDpi, DONE, getString(R.string.will_be_restored_later))
+            doFallThroughJob(JOBCODE_PREP_ADB)
+        }
+
+        doJob(JOBCODE_PREP_ADB) {
+            toggleERPItemStatusIcon(erpItemAdb, DONE, getString(R.string.ready_to_be_restored))
+            doFallThroughJob(JOBCODE_PREP_FONT_SCALE)
+        }
+
+        doJob(JOBCODE_PREP_FONT_SCALE) {
+            toggleERPItemStatusIcon(erpItemFontScale, DONE, getString(R.string.ready_to_be_restored))
+            doFallThroughJob(JOBCODE_PREP_END)
         }
 
         doJob(JOBCODE_PREP_END) {
@@ -462,7 +496,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
             if (!cancelChecks){
 
-                if (AppInstance.sharedPrefs.getBoolean(PREF_RESTORE_START_ANIMATION, true)) {
+                if (sharedPrefs.getBoolean(PREF_RESTORE_START_ANIMATION, true)) {
 
                     restore_countdown.visibility = View.VISIBLE
                     var c = 3

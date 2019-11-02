@@ -20,6 +20,8 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.KNOWN_CONTACT_A
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_STATUS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_FDROID
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
 import java.io.*
 
 class AppRestoreEngine(private val jobcode: Int,
@@ -120,6 +122,12 @@ class AppRestoreEngine(private val jobcode: Int,
                     writeNext("echo \"--- RESTORE PID: $$\"")
                     writeNext("cp ${it.absolutePath} ${engineContext.externalCacheDir}/")
                     writeNext("echo \" \"")
+
+                    if (commonTools.isPackageInstalled(PACKAGE_NAME_PLAY_STORE))
+                        writeNext("am force-stop $PACKAGE_NAME_PLAY_STORE 2>/dev/null")
+
+                    if (commonTools.isPackageInstalled(PACKAGE_NAME_FDROID))
+                        writeNext("am force-stop $PACKAGE_NAME_FDROID 2>/dev/null")
 
                     for (appPacket in appPackets) {
 

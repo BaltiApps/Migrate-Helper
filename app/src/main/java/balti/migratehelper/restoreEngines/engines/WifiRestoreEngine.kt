@@ -1,6 +1,7 @@
 package balti.migratehelper.restoreEngines.engines
 
 import android.os.Build
+import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.restoreEngines.ParentRestoreClass
 import balti.migratehelper.restoreEngines.RestoreServiceKotlin
@@ -9,6 +10,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_WIFI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_WIFI
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_WIFI_RESTORED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_NAME
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_PATH
 import java.io.*
@@ -61,7 +63,11 @@ class WifiRestoreEngine(private val jobcode: Int,
     }
 
     override fun postExecuteFunction() {
-        if (errors.size == 0) File("${wifiPacket.wifiFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
+        if (errors.size == 0)
+            File("${wifiPacket.wifiFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
+
+        AppInstance.sharedPrefs.edit().putBoolean(PREF_IS_WIFI_RESTORED, errors.isEmpty()).apply()
+
         onRestoreComplete.onRestoreComplete(jobcode, errors.size == 0, errors)
     }
 }

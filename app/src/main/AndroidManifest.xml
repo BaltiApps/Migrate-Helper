@@ -16,6 +16,11 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER"/>
 
+    <!--for wifi restore-->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -62,7 +67,6 @@
 
         <activity android:name=".preferences.MainPreferencesActivity"
             android:screenOrientation="portrait"
-            android:exported="true"
             />
 
         <activity android:name=".postJobs.utils.ResurrectorActivity"
@@ -98,7 +102,7 @@
         
         <provider
             android:authorities="migrate.helper.provider"
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
