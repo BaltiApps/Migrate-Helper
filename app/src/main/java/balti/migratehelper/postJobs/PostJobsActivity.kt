@@ -27,6 +27,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_LAST_DPI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_TEMPORARY_DISABLE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_WAS_CANCELLED
+import balti.migratehelper.utilities.StupidStartupServiceKotlin
 import balti.migratehelper.utilities.UninstallServiceKotlin
 import kotlinx.android.synthetic.main.post_restore_jobs.*
 
@@ -200,6 +201,9 @@ class PostJobsActivity: AppCompatActivity() {
             pj_actionButton.apply {
                 text = getString(R.string.finish)
                 setOnClickListener {
+
+                    // clear startup notification, if still running
+                    stopService(Intent(this@PostJobsActivity, StupidStartupServiceKotlin::class.java))
 
                     // send intent to uninstall service
                     val finishIntent = Intent(this@PostJobsActivity, UninstallServiceKotlin::class.java).apply {
