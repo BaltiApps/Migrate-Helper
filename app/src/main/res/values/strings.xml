@@ -265,8 +265,9 @@
     <string name="script_file_does_not_exist">Script file does not exist</string>
 
     <!--ExtraRestorePrepare.kt-->
-    <string name="skip_apps">Cancel all apps</string>
-    <string name="continue_">Continue</string>
+    <string name="skip_apps">Skip all</string>
+    <string name="continue_">Skip these</string>
+    <string name="refresh">Refresh</string>
     <string name="keyboard_not_present">Keyboard app not available</string>
     <string name="keyboard_not_present_desc">The keyboard app is not installed and is neither present in the restore. You can install the app from Play Store or elsewhere.</string>
     <string name="install_from_playstore">Play Store</string>

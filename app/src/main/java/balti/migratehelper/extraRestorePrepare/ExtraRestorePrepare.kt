@@ -264,6 +264,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
             }
 
             val appsNotInstalled = ArrayList<AppPacketsKotlin>(0)
+            val appsInstalled = ArrayList<AppPacketsKotlin>(0)
 
             commonTools.doBackgroundTask({
                 val appFiltered = ArrayList<AppPacketsKotlin>(0)
@@ -272,8 +273,11 @@ class ExtraRestorePrepare: AppCompatActivity() {
                     if (cancelChecks) break
                     if (p.IS_SELECTED) appFiltered.add(p)
                     p.packageName?.let {
-                        if (p.IS_SELECTED && !(commonTools.isPackageInstalled(it) || p.apkName != null))
-                            appsNotInstalled.add(p)
+                        if (p.IS_SELECTED) {
+                            if (commonTools.isPackageInstalled(it) || p.apkName != null)
+                                appsInstalled.add(p)
+                            else appsNotInstalled.add(p)
+                        }
                     }
                 }
                 if (!cancelChecks) {
@@ -286,9 +290,12 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 }
                 else {
                     AppsNotInstalledViewManager(appsNotInstalled, this).run {
-                        AlertDialog.Builder(this@ExtraRestorePrepare)
+
+                        val ad = AlertDialog.Builder(this@ExtraRestorePrepare)
                                 .setView(this.getView())
                                 .setPositiveButton(R.string.continue_) {_, _ ->
+                                    appPackets.clear()
+                                    appPackets.addAll(appsInstalled)
                                     proceed(DONE, "${getString(R.string.number_of_selected_apps)}: ${appPackets.size}")
                                 }
                                 .setNegativeButton(R.string.abort) {_, _ ->
@@ -299,7 +306,15 @@ class ExtraRestorePrepare: AppCompatActivity() {
                                     proceed(CANCEL, getString(R.string.cancelled))
                                 }
                                 .setCancelable(false)
-                                .show()
+                                .create()
+                        ad.show()
+
+                        getRefreshButton().setOnClickListener {
+                            commonTools.tryIt {
+                                ad.dismiss()
+                                doFallThroughJob(JOBCODE_PREP_APP)
+                            }
+                        }
                     }
                 }
             })

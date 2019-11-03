@@ -6,11 +6,33 @@
     android:padding="@dimen/large_padding_width"
     >
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/apps_not_installed_title"
-        />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        >
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/apps_not_installed_title"
+            />
+
+        <Space
+            android:layout_width="@dimen/large_padding_width"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/refresh"
+            android:id="@+id/apps_not_installed_refresh"
+            android:backgroundTint="@color/colorButtons"
+            />
+
+    </LinearLayout>
 
     <Space
         android:layout_width="wrap_content"
