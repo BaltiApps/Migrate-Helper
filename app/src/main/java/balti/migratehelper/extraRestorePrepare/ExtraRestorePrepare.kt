@@ -267,11 +267,8 @@ class ExtraRestorePrepare: AppCompatActivity() {
             val appsInstalled = ArrayList<AppPacketsKotlin>(0)
 
             commonTools.doBackgroundTask({
-                val appFiltered = ArrayList<AppPacketsKotlin>(0)
-
                 for (p in appPackets){
                     if (cancelChecks) break
-                    if (p.IS_SELECTED) appFiltered.add(p)
                     p.packageName?.let {
                         if (p.IS_SELECTED) {
                             if (commonTools.isPackageInstalled(it) || p.apkName != null)
@@ -280,12 +277,10 @@ class ExtraRestorePrepare: AppCompatActivity() {
                         }
                     }
                 }
-                if (!cancelChecks) {
-                    appPackets.clear()
-                    appPackets.addAll(appFiltered)
-                }
             }, {
                 if (appsNotInstalled.isEmpty()) {
+                    appPackets.clear()
+                    appPackets.addAll(appsInstalled)
                     proceed(DONE, "${getString(R.string.number_of_selected_apps)}: ${appPackets.size}")
                 }
                 else {

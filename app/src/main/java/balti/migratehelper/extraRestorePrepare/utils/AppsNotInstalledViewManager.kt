@@ -2,7 +2,7 @@ package balti.migratehelper.extraRestorePrepare.utils
 
 import android.content.Context
 import android.view.View
-import android.widget.Button
+import android.widget.ImageButton
 import balti.migratehelper.R
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
@@ -27,8 +27,8 @@ class AppsNotInstalledViewManager(private val appListNotInstalled: ArrayList<App
         return mainView
     }
 
-    fun getRefreshButton(): Button {
-        return (mainView.apps_not_installed_refresh as Button)
+    fun getRefreshButton(): ImageButton {
+        return (mainView.apps_not_installed_refresh as ImageButton)
     }
 
 }

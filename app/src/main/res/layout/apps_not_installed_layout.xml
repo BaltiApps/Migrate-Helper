@@ -24,12 +24,12 @@
             android:layout_width="@dimen/large_padding_width"
             android:layout_height="wrap_content"/>
 
-        <Button
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/refresh"
             android:id="@+id/apps_not_installed_refresh"
-            android:backgroundTint="@color/colorButtons"
+            android:backgroundTint="@android:color/transparent"
+            android:src="@drawable/ic_refresh_apps_not_installed"
             />
 
     </LinearLayout>
