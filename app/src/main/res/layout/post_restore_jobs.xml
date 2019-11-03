@@ -212,6 +212,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:id="@+id/packagePath"
+                        android:textSize="12sp"
+                        android:paddingStart="@dimen/large_padding_width"
+                        android:paddingEnd="@dimen/large_padding_width"
+                        android:textColor="@color/colorAccent"
+                        tools:text="/system/app/MigrateHelper"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@string/uninstall_desc"
                         android:textSize="12sp"
                         android:paddingStart="@dimen/large_padding_width"

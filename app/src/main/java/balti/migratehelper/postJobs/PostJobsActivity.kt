@@ -60,6 +60,10 @@ class PostJobsActivity: AppCompatActivity() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P)
             pj_resetSmsAppAndroid10.visibility = View.VISIBLE
 
+        packagePath.text = applicationInfo.sourceDir.let {
+            it.substring(0, it.lastIndexOf('/'))
+        }
+
         execute()
 
         restartWatcher(this)
