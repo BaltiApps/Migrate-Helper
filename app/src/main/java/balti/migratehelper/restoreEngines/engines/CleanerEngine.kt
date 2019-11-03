@@ -15,6 +15,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
+import balti.migratehelper.utilities.WatcherInstallerCommands
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileFilter
@@ -82,10 +83,9 @@ class CleanerEngine(private val jobcode: Int,
                 }
 
                 if (doInstallWatcher){
-                    val watcherPath = commonTools.unpackAssetToInternal("watcher.apk", "watcher.apk")
-                    writer.write("mv $watcherPath /data/local/tmp/watcher.apk\n")
-                    writer.write("pm install /data/local/tmp/watcher.apk 2>/dev/null\n")
-                    writer.write("rm /data/local/tmp/watcher.apk\n")
+                    WatcherInstallerCommands.getCommands(engineContext).forEach {
+                        writer.write(it)
+                    }
                 }
 
                 writer.write("exit\n")

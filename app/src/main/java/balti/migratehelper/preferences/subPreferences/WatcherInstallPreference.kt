@@ -11,6 +11,7 @@ import android.widget.Toast
 import balti.migratehelper.R
 import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.WatcherInstallerCommands
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 
@@ -46,10 +47,9 @@ class WatcherInstallPreference(context: Context?, attrs: AttributeSet?) : Prefer
                 Runtime.getRuntime().exec("su").run {
                     val writer = BufferedWriter(OutputStreamWriter(outputStream))
 
-                    val watcherPath = commonTools.unpackAssetToInternal("watcher.apk", "watcher.apk")
-                    writer.write("mv $watcherPath /data/local/tmp/watcher.apk\n")
-                    writer.write("pm install /data/local/tmp/watcher.apk\n")
-                    writer.write("rm /data/local/tmp/watcher.apk\n")
+                    WatcherInstallerCommands.getCommands(context).forEach {
+                        writer.write(it)
+                    }
 
                     writer.write("exit\n")
                     writer.flush()

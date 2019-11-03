@@ -62,6 +62,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PENDING_INTENT_
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_WAS_CANCELLED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_CANCEL_TASK
+import balti.migratehelper.utilities.StupidStartupServiceKotlin
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -258,6 +259,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                 if (!isBackupInitiated) {
                     notificationFix = intent.getBooleanExtra(EXTRA_NOTIFICATION_FIX, false)
                     AppInstance.notificationManager.cancelAll()
+                    stopService(Intent(this@RestoreServiceKotlin, StupidStartupServiceKotlin::class.java))
                     startRestore()
                 }
             }
