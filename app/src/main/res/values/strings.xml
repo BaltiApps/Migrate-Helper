@@ -3,7 +3,7 @@
     <!--Version changes to be made in
 
     current_version_name (must not have blank spaces)
-    build.gradle
+    build.gradle (versionCode should match Migrate versionCode)
 
     in strings:
     too_fast
@@ -271,14 +271,10 @@
     <string name="keyboard_not_present_desc">The keyboard app is not installed and is neither present in the restore. You can install the app from Play Store or elsewhere.</string>
     <string name="install_from_playstore">Play Store</string>
     <string name="skip_keyboard">Skip keyboard and continue</string>
-    <string name="wifiSearchNeeded">A manual wifi search is needed</string>
-    <string name="wifiSearchNeededDesc">To restore Wifi configuration file\n
-    1. Enable Wifi.\n
-    2. Do a wifi search (from phone settings or from long pressing on wifi icon in notification panel).\n
-    3. DO NOT CONNECT to any Wifi.\n
-    4. Get back to this app and restore wifi.
+    <string name="wifiPrepareTitle">Please enable wifi first</string>
+    <string name="wifiPrepareDesc">Please enable Wifi first (from notification panel)\n\n
+        Wifi restore is still unreliable. You may need to re-flash the backup and try again. Usually it gets always gets restored in the second try.
     </string>
-    <string name="retry">Retry</string>
     <string name="skip_wifi">Skip wifi</string>
 
     <!--RestoreSelectorKotlin.kt-->

@@ -4,10 +4,12 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import balti.migratehelper.R
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migratehelper.utilities.IconTools
 import kotlinx.android.synthetic.main.apps_not_installed_item.view.*
@@ -16,6 +18,7 @@ import java.io.File
 class AppsNotInstalledAdapter(private val context: Context, private val appsNotInstalled: ArrayList<AppPacketsKotlin>) : BaseAdapter() {
 
     private val iconTools by lazy { IconTools() }
+    private val commonTools by lazy { CommonToolsKotlin(context) }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
 
@@ -29,6 +32,7 @@ class AppsNotInstalledAdapter(private val context: Context, private val appsNotI
             viewHolder = ViewHolder()
             viewHolder.appIcon = view.apps_not_installed_icon
             viewHolder.appName = view.apps_not_installed_text
+            viewHolder.installButton = view.apps_not_installed_button
 
             view.tag = viewHolder
         }
@@ -43,6 +47,9 @@ class AppsNotInstalledAdapter(private val context: Context, private val appsNotI
         appItem.appIcon?.run {
             iconTools.setIconFromIconString(viewHolder.appIcon, this)
         }
+        viewHolder.installButton.setOnClickListener {
+            appItem.packageName?.let {commonTools.playStoreLink(it)}
+        }
 
         return view!!
     }
@@ -56,5 +63,6 @@ class AppsNotInstalledAdapter(private val context: Context, private val appsNotI
     private class ViewHolder {
         lateinit var appIcon: ImageView
         lateinit var appName: TextView
+        lateinit var installButton: Button
     }
 }

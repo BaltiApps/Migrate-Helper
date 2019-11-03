@@ -20,11 +20,21 @@
         android:layout_height="wrap_content"/>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:id="@+id/apps_not_installed_text"
         tools:text="@string/apps"
         android:textStyle="bold"
+        />
+    
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/small_icon_wh"
+        android:text="@string/play_store"
+        android:backgroundTint="@color/colorButtons"
+        android:textSize="12sp"
+        android:id="@+id/apps_not_installed_button"
         />
 
 </LinearLayout>
