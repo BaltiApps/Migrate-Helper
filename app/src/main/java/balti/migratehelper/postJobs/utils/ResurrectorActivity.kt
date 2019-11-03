@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import balti.migratehelper.AppInstance
 import balti.migratehelper.postJobs.PostJobsActivity
+import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.EXTRA_OVERRIDE_IS_ALIVE
 import balti.migratehelper.simpleActivities.MainActivityKotlin
 import balti.migratehelper.simpleActivities.ProgressShowActivity
 import balti.migratehelper.utilities.CommonToolsKotlin
@@ -17,7 +18,7 @@ class ResurrectorActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (AppInstance.sharedPrefs.getBoolean(PREF_IS_POST_JOBS_NEEDED, false)) {
-            if (!PostJobsActivity.IS_ALIVE)
+            if (!PostJobsActivity.IS_ALIVE || intent.getBooleanExtra(EXTRA_OVERRIDE_IS_ALIVE, false))
                 startActivity(
                         if (intent.hasExtra(EXTRA_PROGRESS_TYPE)) {
                             Log.d(CommonToolsKotlin.DEBUG_TAG, "resurrecting ProgressShowActivity")
