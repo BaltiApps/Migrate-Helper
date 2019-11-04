@@ -167,7 +167,7 @@ class PostJobsActivity: AppCompatActivity() {
                 // if DPI checkbox is checked, check reboot checkbox and disable it
                 pj_doChangeDpiCheckbox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) pj_reboot.isChecked = true
-                    pj_reboot.isEnabled = pj_reboot.isEnabled && !isChecked
+                    pj_reboot.isEnabled = if (isWifiRestored()) false else !isChecked
                 }
 
                 // if DPI layout is clicked, toggle DPI checkbox state
@@ -212,21 +212,6 @@ class PostJobsActivity: AppCompatActivity() {
                         putExtra(EXTRA_DO_REBOOT, pj_reboot.isChecked)
                     }
 
-                    editor.run {
-
-                        // disable the app if selected
-                        if (pj_disableRadio.isChecked) putBoolean(PREF_TEMPORARY_DISABLE, true)
-
-                        // reset all data fed to this activity via sharedPreference
-                        putString(PREF_DEFAULT_SMS_APP, "")
-                        putInt(PREF_LAST_DPI, -1)
-                        putBoolean(PREF_WAS_CANCELLED, false)
-                        putBoolean(PREF_IS_POST_JOBS_NEEDED, false)
-                        putBoolean(PREF_IS_WIFI_RESTORED, false)
-
-                        commit()
-                    }
-
                     // start the uninstall service
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
                         startForegroundService(finishIntent)
@@ -234,6 +219,22 @@ class PostJobsActivity: AppCompatActivity() {
 
                     // close all activities if "Do nothing" is not selected
                     if (!pj_doNothing.isChecked) {
+
+                        editor.run {
+
+                            // disable the app if selected
+                            if (pj_disableRadio.isChecked) putBoolean(PREF_TEMPORARY_DISABLE, true)
+
+                            // reset all data fed to this activity via sharedPreference
+                            putString(PREF_DEFAULT_SMS_APP, "")
+                            putInt(PREF_LAST_DPI, -1)
+                            putBoolean(PREF_WAS_CANCELLED, false)
+                            putBoolean(PREF_IS_POST_JOBS_NEEDED, false)
+                            putBoolean(PREF_IS_WIFI_RESTORED, false)
+
+                            commit()
+                        }
+
                         commonTools.LBM?.sendBroadcast(Intent(ACTION_END_ALL))
                         finishAffinity()
                     }

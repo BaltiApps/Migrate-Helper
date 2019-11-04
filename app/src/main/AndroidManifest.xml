@@ -41,17 +41,17 @@
         </activity>
 
         <activity android:name=".restoreSelectorActivity.RestoreSelectorKotlin"
-            android:launchMode="singleTask"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             />
 
         <activity android:name=".extraRestorePrepare.ExtraRestorePrepare"
-            android:launchMode="singleTask"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             />
 
         <activity android:name=".simpleActivities.ProgressShowActivity"
-            android:launchMode="singleTask"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             />
 
