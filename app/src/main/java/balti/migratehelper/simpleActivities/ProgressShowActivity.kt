@@ -18,6 +18,7 @@ import balti.migratehelper.R
 import balti.migratehelper.postJobs.PostJobsActivity
 import balti.migratehelper.restoreEngines.engines.AppRestoreEngine
 import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_ABORT
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_START_POST_JOBS
@@ -62,6 +63,12 @@ class ProgressShowActivity: AppCompatActivity() {
 
     private var forceStopDialog: AlertDialog? = null
     private var abortDialog: AlertDialog? = null
+
+    private val endOnDisable by lazy {
+        object : BroadcastReceiver(){
+            override fun onReceive(context: Context?, intent: Intent?) = finish()
+        }
+    }
 
     private fun setImageIcon(intent: Intent, type: String){
 
@@ -329,11 +336,14 @@ class ProgressShowActivity: AppCompatActivity() {
             }, 100)
 
         }
+
+        commonTools.LBM?.registerReceiver(endOnDisable, IntentFilter(ACTION_END_ALL))
     }
 
     override fun onDestroy() {
         super.onDestroy()
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(endOnDisable) }
         commonTools.tryIt { abortDialog?.dismiss() }
         commonTools.tryIt { forceStopDialog?.dismiss() }
     }

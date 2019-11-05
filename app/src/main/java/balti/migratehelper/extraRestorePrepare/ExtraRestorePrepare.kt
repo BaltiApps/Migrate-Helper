@@ -271,7 +271,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                     if (cancelChecks) break
                     p.packageName?.let {
                         if (p.IS_SELECTED) {
-                            if (commonTools.isPackageInstalled(it) || p.apkName != null)
+                            if (commonTools.isPackageInstalled(it) || (p.apkName != null && p.APP))
                                 appsInstalled.add(p)
                             else appsNotInstalled.add(p)
                         }
