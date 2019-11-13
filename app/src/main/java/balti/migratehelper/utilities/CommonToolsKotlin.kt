@@ -81,6 +81,7 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_TOTAL_TIME = "total_time"
 
         val EXTRA_NOTIFICATION_FIX = "notification_fix"
+        val EXTRA_AUTO_INSTALL_HELPER = "autoInstallHelper"
 
         val EXTRA_POST_JOBS_ON_FINISH = "post_jobs_on_finish"
 
@@ -137,6 +138,7 @@ class CommonToolsKotlin(val context: Context) {
 
         val JOBCODE_RESTORE_CONTACTS = 35001
         val JOBCODE_RESTORE_SMS = 45001
+        val JOBCODE_RESTORE_INSTALL_WATCHER = 45500
         val JOBCODE_RESTORE_CALLS = 55001
         val JOBCODE_RESTORE_SETTINGS = 62001
         val JOBCODE_RESTORE_WIFI = 75000
@@ -145,6 +147,8 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_RESTORE_END = 95002
 
         val JOBCODE_RESET_SMS_APP = 45010
+
+        val JOBCODE_PREFERENCES_INSTALL_WATCHER = 45510
 
         val TIMEOUT_WAITING_TO_CANCEL_TASK = 500L
         val TIMEOUT_WAITING_TO_KILL = 3000L
@@ -241,11 +245,11 @@ class CommonToolsKotlin(val context: Context) {
             LBM = LocalBroadcastManager.getInstance(context)
     }
 
-
-    fun unpackAssetToInternal(assetFileName: String, targetFileName: String): String {
+    fun unpackAssetToInternal(assetFileName: String, targetFileName: String, toInternal: Boolean = true): String {
 
         val assetManager = context.assets
-        val unpackFile = File(context.filesDir, targetFileName)
+        val unpackFile = if (toInternal) File(context.filesDir, targetFileName)
+        else File(context.externalCacheDir, targetFileName)
 
         var read: Int
         val buffer = ByteArray(4096)
@@ -597,5 +601,20 @@ class CommonToolsKotlin(val context: Context) {
             tryIt { suProcess?.waitFor() }
         }
 
+    }
+
+    fun installWatcherByPackageManager(requestCode: Int) {
+        if (context is Activity) {
+
+            unpackAssetToInternal("watcher.apk", "watcher.apk", false)
+            val apkFile = File(unpackAssetToInternal("watcher.apk", "watcher.apk", false))
+
+            tryIt({
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.addCategory(Intent.CATEGORY_DEFAULT)
+                intent.setDataAndType(getUri(apkFile), "application/vnd.android.package-archive")
+                context.startActivityForResult(intent, requestCode)
+            }, context.getString(R.string.failed_watcher_install))
+        }
     }
 }

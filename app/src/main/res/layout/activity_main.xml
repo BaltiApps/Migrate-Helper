@@ -114,6 +114,21 @@
 
                 <Space
                     android:layout_width="wrap_content"
+                    android:layout_height="@dimen/large_padding_width"/>
+
+                <TextView
+                    android:id="@+id/watcher_disclaimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:text="@string/watcher_disclaimer"
+                    android:textColor="@color/colorAccent" />
+
+                <Space
+                    android:layout_width="wrap_content"
                     android:layout_height="@dimen/xlarge_padding_width" />
 
                 <TextView

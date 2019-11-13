@@ -34,6 +34,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_END
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_RUNNING
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ERROR_RESTORE_SERVICE_ERROR
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_AUTO_INSTALL_HELPER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_ERRORS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_IS_CANCELLED
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
@@ -101,6 +102,8 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
     private var currentTask: ParentRestoreClass? = null
 
     private var notificationFix = false
+    private var autoInstallHelper = false
+
     private val isSettingsNull : Boolean
         get() = if (settingsPacket == null) true else settingsPacket!!.internalPackets.isEmpty()
 
@@ -257,7 +260,10 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         intent?.run {
             try {
                 if (!isBackupInitiated) {
+
                     notificationFix = intent.getBooleanExtra(EXTRA_NOTIFICATION_FIX, false)
+                    autoInstallHelper = intent.getBooleanExtra(EXTRA_AUTO_INSTALL_HELPER, false)
+
                     AppInstance.notificationManager.cancelAll()
                     stopService(Intent(this@RestoreServiceKotlin, StupidStartupServiceKotlin::class.java))
                     startRestore()
@@ -298,7 +304,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                                 JOBCODE_RESTORE_WIFI -> WifiRestoreEngine(jCode, workingObject as WifiPacketKotlin)
                                 JOBCODE_RESTORE_APP -> AppRestoreEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, notificationFix)
                                 JOBCODE_RESTORE_SETTINGS -> SettingsRestoreEngine(jCode, workingObject as SettingsPacketKotlin)
-                                JOBCODE_RESTORE_CLEAN -> CleanerEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, commonTools.areWeDefaultSmsApp())
+                                JOBCODE_RESTORE_CLEAN -> CleanerEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, autoInstallHelper)
                                 else -> null
                             }
                         } catch (e: Exception) {

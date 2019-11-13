@@ -26,6 +26,14 @@
     <string name="please_use_magisk">Make sure to use Magisk</string>
     <string name="lastLog">Last logs</string>
     <string name="preferences">Preferences</string>
+    <string name="watcher_disclaimer">Watcher app maybe installed. Click to know more.</string>
+    <string name="watcher_extended_desc">Migrate is now a 3-app package - the main \"Migrate app\", the \"Migrate helper\" and on Android 10+ the \"Migrate helper restart watcher\"\n\n
+    The last app is only used if you choose to restore SMS on Android 10 and above. During the SMS restore process, you need to temporarily make \"Migrate helper\" as the default SMS app.\n
+    After all messages are restored, during post restore processes, the helper would prompt to change back to your old default SMS app. The helper does not handle your incoming messages.\n
+    On Android 9 and below, this worked without any problem. However, on Android 10+, on changing the default SMS app, Android kills the app from which the SMS permission is being revoked. In this case, it is the \"Migrate helper\" that is killed.\n
+    To make the process seamless, the watcher app acts like a plugin, if this helper app is closed by the system, it restarts this helper.\n\n
+    You can opt to not use the watcher app. Simply go to \"Preferences\" in this app and disable \"Use watcher\" option. However, you would need to manually restart this helper app to complete the post restore processes.
+    </string>
 
     <!--last_log_report.xml-->
     <string name="seeProgressLog">See Progress log</string>
@@ -78,6 +86,7 @@
     <string name="ready_to_be_restored">Ready to restore</string>
     <string name="restore_starting_in">Restore starting in…</string>
     <string name="number_of_selected_apps">Selected apps</string>
+    <string name="dont_use_watcher">Don\'t use watcher</string>
 
     <!--restore_progress_layout.xml-->
     <string name="close">CLOSE</string>
@@ -323,7 +332,7 @@
     <string name="use_watcher">Use watcher (Android 10+)</string>
     <string name="use_watcher_desc">A plugin app (installed and uninstalled with this helper app). Android 10 system closes this app after changing default SMS app. Watcher re-opens this helper app.</string>
     <string name="advanced">Advanced</string>
-    <string name="watcher">Watcher</string>
+    <string name="watcher">Watcher (Android 10+)</string>
     <string name="install_watcher">Install watcher</string>
     <string name="installed_watcher">Watcher installed successfully</string>
     <string name="failed_watcher_install">Failed to install watcher</string>
@@ -349,6 +358,12 @@
 
     <!--CommonToolsKotlin.kt-->
     <string name="error_occurred">Error occurred!!</string>
+
+    <!--install_watcher_dialog_view.xml-->
+    <string name="confirm_install_watcher">Install watcher app?</string>
+    <string name="confirm_watcher_desc">Watcher ensures a seamless process of restoring SMS and other apps.</string>
+    <string name="know_more">Know more</string>
+    <string name="install_by_root">Install by root (automatic install, no confirmation needed)</string>
 
     <!--Do not change!!-->
     <string name="actionSu" translatable="false">Migrate_helper_fix_SU</string>

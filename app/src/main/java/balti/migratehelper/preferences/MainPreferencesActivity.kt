@@ -1,5 +1,6 @@
 package balti.migratehelper.preferences
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.preference.CheckBoxPreference
@@ -10,6 +11,7 @@ import balti.migratehelper.R
 import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migratehelper.preferences.subPreferences.WatcherInstallPreference
 import balti.migratehelper.utilities.CommonToolsKotlin
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREFERENCES_INSTALL_WATCHER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
@@ -45,8 +47,8 @@ class MainPreferencesActivity: PreferenceActivity() {
             fun setValue(checkbox: CheckBoxPreference, field: String, defaultValue: Boolean = false){
 
                 if (checkbox == useWatcher) {
-                    toggleWatcherInstaller()
                     checkbox.isChecked = if (isAbove10) getBoolean(field, defaultValue) else false
+                    toggleWatcherInstaller(checkbox.isChecked)
                 }
                 else checkbox.isChecked = getBoolean(field, defaultValue)
 
@@ -63,13 +65,22 @@ class MainPreferencesActivity: PreferenceActivity() {
             setValue(restoreStartAnimation, PREF_RESTORE_START_ANIMATION, true)
             setValue(useWatcher, PREF_USE_WATCHER, true)
 
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            if (isAbove10)
                 useWatcher.isEnabled = true
-            } else {
+            else {
                 setValue(useWatcher, PREF_USE_WATCHER, false)
                 useWatcher.isEnabled = false
+                installWatcherLayout.isEnabled = false
             }
 
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == JOBCODE_PREFERENCES_INSTALL_WATCHER) {
+            if (commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME))
+                useWatcher.isEnabled = false
         }
     }
 

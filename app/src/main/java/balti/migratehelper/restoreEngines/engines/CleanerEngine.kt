@@ -23,7 +23,7 @@ import java.io.OutputStreamWriter
 
 class CleanerEngine(private val jobcode: Int,
                     private val appPackets: ArrayList<AppPacketsKotlin>,
-                    private val wasSmsRestored: Boolean): ParentRestoreClass(EXTRA_PROGRESS_TYPE_CLEANING) {
+                    private val autoInstallWatcher: Boolean): ParentRestoreClass(EXTRA_PROGRESS_TYPE_CLEANING) {
 
     private val errors by lazy { ArrayList<String>(0) }
 
@@ -73,7 +73,7 @@ class CleanerEngine(private val jobcode: Int,
                 f.delete()
             }
 
-            val doInstallWatcher = wasSmsRestored && AppInstance.sharedPrefs.getBoolean(PREF_USE_WATCHER, true)
+            val doInstallWatcher = autoInstallWatcher && AppInstance.sharedPrefs.getBoolean(PREF_USE_WATCHER, true)
                     && !commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)
 
             Runtime.getRuntime().exec("su").run {

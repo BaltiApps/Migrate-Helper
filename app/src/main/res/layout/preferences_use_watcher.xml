@@ -15,8 +15,8 @@
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceListItem"
             android:text="@string/install_watcher"
             android:id="@+id/watcherInstallLabel"
@@ -29,6 +29,14 @@
             android:text="@string/install"/>
 
     </LinearLayout>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/install_by_root"
+        android:layout_marginTop="@dimen/small_padding_width"
+        android:id="@+id/installWatcherByRootPreferences"
+        />
 
     <ProgressBar
         android:layout_width="match_parent"

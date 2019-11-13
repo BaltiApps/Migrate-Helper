@@ -29,6 +29,7 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.FILE_PROGRESSLO
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.LAST_SUPPORTED_ANDROID_API
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_ANDROID_VERSION_WARNING
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_FILEPATH
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_HEAD
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.TG_LINK
@@ -148,6 +149,16 @@ class MainActivityKotlin: AppCompatActivity() {
             setOnClickListener { startActivity(Intent(this@MainActivityKotlin, MainPreferencesActivity::class.java)) }
         }
 
+        watcher_disclaimer.apply {
+            paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            setOnClickListener {
+                AlertDialog.Builder(this@MainActivityKotlin)
+                        .setMessage(R.string.watcher_extended_desc)
+                        .setNeutralButton(R.string.close, null)
+                        .show()
+            }
+        }
+
         close_button.setOnClickListener { finish() }
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
@@ -159,6 +170,14 @@ class MainActivityKotlin: AppCompatActivity() {
             if (getBooleanExtra(EXTRA_DO_START_POST_JOBS, false))
                 startActivity(Intent(this@MainActivityKotlin, PostJobsActivity::class.java))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        watcher_disclaimer.visibility = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P
+                && main.getBoolean(PREF_USE_WATCHER, true))
+            View.VISIBLE
+        else View.GONE
     }
 
     private fun showLog(){

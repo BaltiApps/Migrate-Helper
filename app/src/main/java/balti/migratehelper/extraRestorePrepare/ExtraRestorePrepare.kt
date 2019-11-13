@@ -29,6 +29,7 @@ import balti.migratehelper.AppInstance.Companion.smsDataPackets
 import balti.migratehelper.AppInstance.Companion.wifiPacket
 import balti.migratehelper.R
 import balti.migratehelper.extraRestorePrepare.utils.AppsNotInstalledViewManager
+import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migratehelper.restoreEngines.RestoreServiceKotlin
 import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.restoreSelectorActivity.containers.AppPacketsKotlin
@@ -38,6 +39,7 @@ import balti.migratehelper.simpleActivities.ProgressShowActivity
 import balti.migratehelper.utilities.CommonToolsKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_AUTO_INSTALL_HELPER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_ADB
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_APP
@@ -50,12 +52,15 @@ import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_KE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_SMS
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_WIFI
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CONTACTS
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_INSTALL_WATCHER
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
 import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
+import balti.migratehelper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
 import kotlinx.android.synthetic.main.extra_restore_prepare.*
+import kotlinx.android.synthetic.main.install_watcher_dialog_view.view.*
 
 class ExtraRestorePrepare: AppCompatActivity() {
 
@@ -74,6 +79,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
     private val CANCEL = 8
 
     private var cancelChecks = false
+    private var autoInstallHelper = false
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
 
@@ -442,7 +448,38 @@ class ExtraRestorePrepare: AppCompatActivity() {
                         .show()
             }
             else {
-                proceed(DONE, getString(R.string.ready_to_be_restored))
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P && sharedPrefs.getBoolean(PREF_USE_WATCHER, true)
+                        && !commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)){
+
+                    val v = View.inflate(this, R.layout.install_watcher_dialog_view, null)
+                    v.install_watcher_by_root.setOnCheckedChangeListener {_, isChecked ->
+                        autoInstallHelper = isChecked
+                    }
+                    v.know_more_watcher.setOnClickListener {
+                        AlertDialog.Builder(this)
+                                .setMessage(R.string.watcher_extended_desc)
+                                .setNeutralButton(R.string.close, null)
+                                .show()
+                    }
+
+                    AlertDialog.Builder(this)
+                            .setView(v)
+                            .setPositiveButton(android.R.string.ok) {_, _ ->
+                                if (!autoInstallHelper) {
+                                    commonTools.installWatcherByPackageManager(JOBCODE_RESTORE_INSTALL_WATCHER)
+                                }
+                            }
+                            .setNeutralButton(R.string.dont_use_watcher) {_, _ ->
+                                sharedPrefs.edit().putBoolean(PREF_USE_WATCHER, false).commit()
+                                proceed(DONE, getString(R.string.ready_to_be_restored))
+                            }
+                            .setCancelable(false)
+                            .show()
+
+                }
+                else {
+                    proceed(DONE, getString(R.string.ready_to_be_restored))
+                }
             }
         }
 
@@ -496,6 +533,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 else {
                     Intent(this, RestoreServiceKotlin::class.java)
                             .putExtra(EXTRA_NOTIFICATION_FIX, notificationFix)
+                            .putExtra(EXTRA_AUTO_INSTALL_HELPER, autoInstallHelper)
                             .run {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                                     startForegroundService(this)
@@ -597,6 +635,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
         when (requestCode) {
             JOBCODE_RESTORE_CONTACTS -> nextContact()
             JOBCODE_PREP_SMS -> doFallThroughJob(JOBCODE_PREP_SMS)
+            JOBCODE_RESTORE_INSTALL_WATCHER -> doFallThroughJob(JOBCODE_PREP_SMS)
         }
     }
 
