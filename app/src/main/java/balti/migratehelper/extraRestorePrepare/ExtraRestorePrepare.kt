@@ -452,8 +452,11 @@ class ExtraRestorePrepare: AppCompatActivity() {
                         && !commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)){
 
                     val v = View.inflate(this, R.layout.install_watcher_dialog_view, null)
-                    v.install_watcher_by_root.setOnCheckedChangeListener {_, isChecked ->
+                    v.install_watcher_by_root.run {
                         autoInstallHelper = isChecked
+                        setOnCheckedChangeListener { _, isChecked ->
+                            autoInstallHelper = isChecked
+                        }
                     }
                     v.know_more_watcher.setOnClickListener {
                         AlertDialog.Builder(this)
@@ -464,13 +467,13 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
                     AlertDialog.Builder(this)
                             .setView(v)
-                            .setPositiveButton(android.R.string.ok) {_, _ ->
-                                if (!autoInstallHelper) {
+                            .setPositiveButton(R.string.install) {_, _ ->
+                                if (!autoInstallHelper)
                                     commonTools.installWatcherByPackageManager(JOBCODE_RESTORE_INSTALL_WATCHER)
-                                }
+                                else proceed(DONE, getString(R.string.ready_to_be_restored))
                             }
                             .setNeutralButton(R.string.dont_use_watcher) {_, _ ->
-                                sharedPrefs.edit().putBoolean(PREF_USE_WATCHER, false).commit()
+                                autoInstallHelper = false
                                 proceed(DONE, getString(R.string.ready_to_be_restored))
                             }
                             .setCancelable(false)

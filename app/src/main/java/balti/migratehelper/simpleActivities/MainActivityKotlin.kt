@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import balti.migratehelper.AppInstance
 import balti.migratehelper.R
 import balti.migratehelper.postJobs.PostJobsActivity
+import balti.migratehelper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migratehelper.preferences.MainPreferencesActivity
 import balti.migratehelper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migratehelper.utilities.CommonToolsKotlin
@@ -178,6 +179,10 @@ class MainActivityKotlin: AppCompatActivity() {
                 && main.getBoolean(PREF_USE_WATCHER, true))
             View.VISIBLE
         else View.GONE
+        watcher_disclaimer.setText(
+                if (commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)) R.string.watcher_installed_disclaimer
+                else R.string.watcher_disclaimer
+        )
     }
 
     private fun showLog(){

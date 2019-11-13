@@ -36,6 +36,7 @@
         android:text="@string/install_by_root"
         android:layout_marginTop="@dimen/small_padding_width"
         android:id="@+id/installWatcherByRootPreferences"
+        android:checked="true"
         />
 
     <ProgressBar

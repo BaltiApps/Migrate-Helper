@@ -30,6 +30,7 @@
         android:layout_height="wrap_content"
         android:text="@string/install_by_root"
         android:id="@+id/install_watcher_by_root"
+        android:checked="true"
         />
 
     <Space

@@ -610,10 +610,17 @@ class CommonToolsKotlin(val context: Context) {
             val apkFile = File(unpackAssetToInternal("watcher.apk", "watcher.apk", false))
 
             tryIt({
+
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.addCategory(Intent.CATEGORY_DEFAULT)
                 intent.setDataAndType(getUri(apkFile), "application/vnd.android.package-archive")
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                else intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+
                 context.startActivityForResult(intent, requestCode)
+
             }, context.getString(R.string.failed_watcher_install))
         }
     }

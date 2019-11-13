@@ -37,13 +37,6 @@ class MainPreferencesActivity: PreferenceActivity() {
 
             val editor = edit()
 
-            fun toggleWatcherInstaller(checkbox: Boolean = true){
-                installWatcherLayout.isEnabled =
-                        if (checkbox)
-                            isAbove10 && !commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)
-                        else false
-            }
-
             fun setValue(checkbox: CheckBoxPreference, field: String, defaultValue: Boolean = false){
 
                 if (checkbox == useWatcher) {
@@ -76,12 +69,24 @@ class MainPreferencesActivity: PreferenceActivity() {
         }
     }
 
+    private fun toggleWatcherInstaller(checkbox: Boolean = true){
+        installWatcherLayout.isEnabled =
+                if (checkbox)
+                    isAbove10 && !commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)
+                else false
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == JOBCODE_PREFERENCES_INSTALL_WATCHER) {
             if (commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME))
                 useWatcher.isEnabled = false
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        toggleWatcherInstaller(useWatcher.isChecked)
     }
 
 }
