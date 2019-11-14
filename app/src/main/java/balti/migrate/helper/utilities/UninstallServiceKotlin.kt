@@ -114,12 +114,16 @@ class UninstallServiceKotlin: Service() {
                 write("exit\n")
 
                 stopService(Intent(this@UninstallServiceKotlin, StupidStartupServiceKotlin::class.java))
-                flush()
-                fullProcess.waitFor()
+
+                commonTools.doBackgroundTask({
+                    flush()
+                    fullProcess.waitFor()
+                }, {
+                    stopSelf()
+                })
             }
         }
-
-        stopSelf()
+        else stopSelf()
     }
 
 

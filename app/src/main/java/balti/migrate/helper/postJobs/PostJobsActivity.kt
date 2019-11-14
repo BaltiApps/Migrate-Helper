@@ -125,10 +125,7 @@ class PostJobsActivity: AppCompatActivity() {
                             }
                         }
                     }
-                    else {
-                        AppInstance.sharedPrefs.edit().putBoolean(PREF_USE_WATCHER, false).apply()
-                        android10ManualSet()
-                    }
+                    else android10ManualSet()
                 }
                 else android10ManualSet()
 
