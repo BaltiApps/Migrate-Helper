@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="balti.migratehelper">
+    package="balti.migrate.helper">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission-sdk-23 android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -28,10 +28,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".AppInstance"
+        android:name="balti.migrate.helper.AppInstance"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".simpleActivities.MainActivityKotlin"
+        <activity android:name="balti.migrate.helper.simpleActivities.MainActivityKotlin"
             android:screenOrientation="portrait"
             >
             <intent-filter>
@@ -41,65 +41,65 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".restoreSelectorActivity.RestoreSelectorKotlin"
+        <activity android:name="balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".extraRestorePrepare.ExtraRestorePrepare"
+        <activity android:name="balti.migrate.helper.extraRestorePrepare.ExtraRestorePrepare"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".simpleActivities.ProgressShowActivity"
+        <activity android:name="balti.migrate.helper.simpleActivities.ProgressShowActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".postJobs.PostJobsActivity"
+        <activity android:name="balti.migrate.helper.postJobs.PostJobsActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/PostJobsActivityTheme"
             />
 
-        <activity android:name=".simpleActivities.SimpleLogViewer"
+        <activity android:name="balti.migrate.helper.simpleActivities.SimpleLogViewer"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".preferences.MainPreferencesActivity"
+        <activity android:name="balti.migrate.helper.preferences.MainPreferencesActivity"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".postJobs.utils.ResurrectorActivity"
+        <activity android:name="balti.migrate.helper.postJobs.utils.ResurrectorActivity"
             android:theme="@style/AppTheme.Blank"
             android:launchMode="singleInstance"
             >
             <intent-filter>
-                <action android:name="balti.migratehelper.RESURRECTOR"/>
+                <action android:name="balti.migrate.helper.RESURRECTOR"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
 
-        <receiver android:name=".utilities.BootCompletedReceiver">
+        <receiver android:name="balti.migrate.helper.utilities.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" android:priority="999"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".postJobs.utils.AliveCheckReceiver">
+        <receiver android:name="balti.migrate.helper.postJobs.utils.AliveCheckReceiver">
             <intent-filter>
-                <action android:name="balti.migratehelper.RECEIVER"/>
+                <action android:name="balti.migrate.helper.RECEIVER"/>
             </intent-filter>
         </receiver>
 
-        <service android:name=".utilities.StupidStartupServiceKotlin"
+        <service android:name="balti.migrate.helper.utilities.StupidStartupServiceKotlin"
             android:exported="false"/>
 
-        <service android:name=".restoreEngines.RestoreServiceKotlin"
+        <service android:name="balti.migrate.helper.restoreEngines.RestoreServiceKotlin"
             android:exported="false"/>
 
-        <service android:name=".utilities.UninstallServiceKotlin"/>
+        <service android:name="balti.migrate.helper.utilities.UninstallServiceKotlin"/>
         
         <provider
             android:authorities="migrate.helper.provider"
@@ -113,14 +113,14 @@
 
         <!--Dummies-->
 
-        <receiver android:name=".dummies.SmsBroadcastReceiver"
+        <receiver android:name="balti.migrate.helper.dummies.SmsBroadcastReceiver"
             android:permission="android.permission.BROADCAST_SMS">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".dummies.MmsBroadcastReceiver"
+        <receiver android:name="balti.migrate.helper.dummies.MmsBroadcastReceiver"
             android:permission="android.permission.BROADCAST_WAP_PUSH">
             <intent-filter>
                 <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
@@ -128,7 +128,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".dummies.ComposeSmsActivity" >
+        <activity android:name="balti.migrate.helper.dummies.ComposeSmsActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SENDTO" />
@@ -141,7 +141,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".dummies.HeadlessSmsSendService"
+        <service android:name="balti.migrate.helper.dummies.HeadlessSmsSendService"
             android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE"
             android:exported="true" >
             <intent-filter>

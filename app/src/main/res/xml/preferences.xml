@@ -25,7 +25,7 @@
             android:title="@string/use_watcher"
             android:summary="@string/use_watcher_desc"/>
 
-        <balti.migratehelper.preferences.subPreferences.WatcherInstallPreference
+        <balti.migrate.helper.preferences.subPreferences.WatcherInstallPreference
             android:layout="@layout/preferences_use_watcher"
             android:key="installWatcherLayout"
             />
@@ -35,10 +35,10 @@
     <PreferenceCategory
         android:title="@string/advanced">
 
-        <balti.migratehelper.preferences.subPreferences.ManualCachePref
+        <balti.migrate.helper.preferences.subPreferences.ManualCachePref
             android:layout="@layout/preferences_edittext" />
 
-        <balti.migratehelper.preferences.subPreferences.ManualMetadataHolder
+        <balti.migrate.helper.preferences.subPreferences.ManualMetadataHolder
             android:layout="@layout/preferences_edittext"/>
 
     </PreferenceCategory>
