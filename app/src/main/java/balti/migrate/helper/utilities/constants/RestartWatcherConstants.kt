@@ -1,4 +1,4 @@
-package balti.migrate.helper.postJobs.utils
+package balti.migrate.helper.utilities.constants
 
 import android.content.Context
 import android.content.Intent

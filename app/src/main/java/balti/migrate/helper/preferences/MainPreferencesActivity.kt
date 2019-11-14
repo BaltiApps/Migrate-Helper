@@ -8,7 +8,6 @@ import android.preference.Preference
 import android.preference.PreferenceActivity
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
-import balti.migrate.helper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migrate.helper.preferences.subPreferences.WatcherInstallPreference
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREFERENCES_INSTALL_WATCHER
@@ -16,6 +15,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EX
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
+import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 
 class MainPreferencesActivity: PreferenceActivity() {
 

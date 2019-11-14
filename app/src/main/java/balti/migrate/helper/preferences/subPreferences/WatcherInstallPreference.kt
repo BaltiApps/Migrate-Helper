@@ -6,10 +6,10 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.*
 import balti.migrate.helper.R
-import balti.migrate.helper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREFERENCES_INSTALL_WATCHER
 import balti.migrate.helper.utilities.WatcherInstallerCommands
+import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 

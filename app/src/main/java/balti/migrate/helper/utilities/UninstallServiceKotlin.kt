@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
-import balti.migrate.helper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migrate.helper.simpleActivities.MainActivityKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_UNINSTALLING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
@@ -20,6 +19,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DPI_VALU
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.UNINSTALL_START_ID
+import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 

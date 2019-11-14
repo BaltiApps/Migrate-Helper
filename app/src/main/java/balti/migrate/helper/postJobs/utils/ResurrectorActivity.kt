@@ -6,13 +6,13 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.postJobs.PostJobsActivity
-import balti.migrate.helper.postJobs.utils.RestartWatcherConstants.Companion.EXTRA_OVERRIDE_IS_ALIVE
 import balti.migrate.helper.simpleActivities.MainActivityKotlin
 import balti.migrate.helper.simpleActivities.ProgressShowActivity
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_START_POST_JOBS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
+import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.EXTRA_OVERRIDE_IS_ALIVE
 
 class ResurrectorActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

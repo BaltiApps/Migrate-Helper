@@ -29,7 +29,6 @@ import balti.migrate.helper.AppInstance.Companion.smsDataPackets
 import balti.migrate.helper.AppInstance.Companion.wifiPacket
 import balti.migrate.helper.R
 import balti.migrate.helper.extraRestorePrepare.utils.AppsNotInstalledViewManager
-import balti.migrate.helper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migrate.helper.restoreEngines.RestoreServiceKotlin
 import balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
@@ -57,6 +56,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_P
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
+import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
 import kotlinx.android.synthetic.main.extra_restore_prepare.*

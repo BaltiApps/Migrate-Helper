@@ -10,8 +10,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
-import balti.migrate.helper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
-import balti.migrate.helper.postJobs.utils.RestartWatcherConstants.Companion.restartWatcher
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
@@ -29,6 +27,8 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_WAS_CANCELLED
 import balti.migrate.helper.utilities.StupidStartupServiceKotlin
 import balti.migrate.helper.utilities.UninstallServiceKotlin
+import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
+import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.restartWatcher
 import kotlinx.android.synthetic.main.post_restore_jobs.*
 
 class PostJobsActivity: AppCompatActivity() {

@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
 import balti.migrate.helper.postJobs.PostJobsActivity
-import balti.migrate.helper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migrate.helper.preferences.MainPreferencesActivity
 import balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin
@@ -34,6 +33,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_FILEPATH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_HEAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_LINK
+import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.last_log_report.view.*
 import java.io.File

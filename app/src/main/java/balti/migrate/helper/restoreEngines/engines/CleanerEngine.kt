@@ -2,7 +2,6 @@ package balti.migrate.helper.restoreEngines.engines
 
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
-import balti.migrate.helper.postJobs.utils.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import balti.migrate.helper.restoreEngines.ParentRestoreClass
 import balti.migrate.helper.restoreEngines.RestoreServiceKotlin
 import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
@@ -16,6 +15,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
 import balti.migrate.helper.utilities.WatcherInstallerCommands
+import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileFilter
