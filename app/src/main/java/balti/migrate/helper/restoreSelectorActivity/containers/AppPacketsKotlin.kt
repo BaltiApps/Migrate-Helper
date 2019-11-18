@@ -37,6 +37,7 @@ class AppPacketsKotlin(jsonObject: JSONObject, val jsonFile: File) {
         MtdConstants.MTD_DATA_SIZE.let {if (jsonObject.has(it)) dataSize = jsonObject.getLong(it)}
         MtdConstants.MTD_SYSTEM_SIZE.let {if (jsonObject.has(it)) systemSize = jsonObject.getLong(it)}
         MtdConstants.MTD_PERMISSION.let {if (jsonObject.has(it)) isPermission = jsonObject.getBoolean(it)}
+        MtdConstants.MTD_PERMISSION_OLD.let {if (jsonObject.has(it)) isPermission = jsonObject.getBoolean(it)}
         MtdConstants.MTD_ICON_FILE_NAME.let {if (jsonObject.has(it)) iconFileName = jsonObject.getString(it)}
         MtdConstants.MTD_INSTALLER_NAME.let {if (jsonObject.has(it)) installerName = jsonObject.getString(it)}
 

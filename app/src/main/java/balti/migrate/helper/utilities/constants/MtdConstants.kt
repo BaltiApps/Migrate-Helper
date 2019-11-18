@@ -13,6 +13,7 @@ class MtdConstants {
         val MTD_DATA_SIZE = "data_size"
         val MTD_SYSTEM_SIZE = "system_size"
         val MTD_PERMISSION = "permission"
+        val MTD_PERMISSION_OLD = "permissions"
         val MTD_ICON_FILE_NAME = "icon_file"
         val MTD_INSTALLER_NAME = "installer_name"
     }
