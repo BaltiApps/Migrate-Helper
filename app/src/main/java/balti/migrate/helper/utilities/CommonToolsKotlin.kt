@@ -179,6 +179,8 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_IS_WIFI_RESTORED = "is_wifi_restored"
         val PREF_IS_POST_JOBS_NEEDED = "is_post_jobs_needed"
 
+        val PREF_REMOUNT_DATA = "remount_data"
+
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migrate.helper/cache/"
 

@@ -13,6 +13,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREFERENCES_INSTALL_WATCHER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_DATA
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
 import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
@@ -25,6 +26,8 @@ class MainPreferencesActivity: PreferenceActivity() {
 
     private val useWatcher: CheckBoxPreference by lazy { findPreference("useWatcher") as CheckBoxPreference }
     private val installWatcherLayout: WatcherInstallPreference by lazy { findPreference("installWatcherLayout") as WatcherInstallPreference }
+
+    private val remountData: CheckBoxPreference by lazy { findPreference("remountData") as CheckBoxPreference }
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val isAbove10 = Build.VERSION.SDK_INT > Build.VERSION_CODES.P
@@ -57,6 +60,7 @@ class MainPreferencesActivity: PreferenceActivity() {
             setValue(ignoreExtras, PREF_IGNORE_EXTRAS)
             setValue(restoreStartAnimation, PREF_RESTORE_START_ANIMATION, true)
             setValue(useWatcher, PREF_USE_WATCHER, true)
+            setValue(remountData, PREF_REMOUNT_DATA, false)
 
             if (isAbove10)
                 useWatcher.isEnabled = true

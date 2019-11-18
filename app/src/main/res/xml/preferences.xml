@@ -35,6 +35,11 @@
     <PreferenceCategory
         android:title="@string/advanced">
 
+        <CheckBoxPreference
+            android:key="remountData"
+            android:title="@string/remount_data"
+            android:summary="@string/remount_data_desc"/>
+
         <balti.migrate.helper.preferences.subPreferences.ManualCachePref
             android:layout="@layout/preferences_edittext" />
 

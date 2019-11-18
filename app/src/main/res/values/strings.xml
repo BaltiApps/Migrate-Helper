@@ -335,6 +335,8 @@
     <string name="use_watcher">Use watcher (Android 10+)</string>
     <string name="use_watcher_desc">A plugin app (installed and uninstalled with this helper app). Android 10 system closes this app after changing default SMS app. Watcher re-opens this helper app.</string>
     <string name="advanced">Advanced</string>
+    <string name="remount_data">Remount data</string>
+    <string name="remount_data_desc">This tries to find and remount /data partition as read-write. Usually this is not needed.</string>
     <string name="watcher">Watcher (Android 10+)</string>
     <string name="install_watcher">Install watcher</string>
     <string name="installed_watcher">Watcher installed successfully</string>

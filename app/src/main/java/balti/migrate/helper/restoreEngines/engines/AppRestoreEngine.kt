@@ -22,6 +22,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_STATUS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_FDROID
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_DATA
 import java.io.*
 
 class AppRestoreEngine(private val jobcode: Int,
@@ -123,6 +124,16 @@ class AppRestoreEngine(private val jobcode: Int,
                     writeNext("cp ${it.absolutePath} ${engineContext.externalCacheDir}/")
                     writeNext("echo \" \"")
 
+                    if (sharedPreferences.getBoolean(PREF_REMOUNT_DATA, false)) {
+                        write("cat /proc/mounts | grep data | while read -r line || [[ -n \"\$line\" ]]; do\n")
+                        write("    mp=\"\$(echo \$line | cut -d ' ' -f2)\"\n")
+                        write("    md=\"\$(echo \$line | cut -d ' ' -f1)\"\n")
+                        write("    if [[ \$mp == \"/data\" || \$mp == \"/\" || \$mp == \"/data/data\" ]]; then\n")
+                        write("        mount -o rw,remount \$md \$mp && echo \"Mounted \$md on \$mp\"\n")
+                        write("    fi\n")
+                        write("done\n")
+                    }
+
                     if (commonTools.isPackageInstalled(PACKAGE_NAME_PLAY_STORE))
                         writeNext("am force-stop $PACKAGE_NAME_PLAY_STORE 2>/dev/null")
 
@@ -153,7 +164,7 @@ class AppRestoreEngine(private val jobcode: Int,
                                 writeNext("sh $installScriptPath $MIGRATE_CACHE ${appPacket.packageName}.app ${appPacket.apkName} ${appPacket.packageName} ${appPacket.installerName} $METADATA_HOLDER_DIR")
 
                             if (isData)
-                                writeNext("sh $restoreDataScriptPath $busyboxBinaryPath ${appPacket.dataName} ${appPacket.packageName} $doNotificationFix $METADATA_HOLDER_DIR")
+                                writeNext("sh $restoreDataScriptPath $busyboxBinaryPath ${appPacket.dataName} ${appPacket.packageName} $doNotificationFix $METADATA_HOLDER_DIR $MIGRATE_CACHE")
 
                             if (isPermission) {
                                 BufferedReader(FileReader(permFile)).readLines().forEach { it1 ->

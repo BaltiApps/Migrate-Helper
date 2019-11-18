@@ -7,6 +7,7 @@ tar_gz_file=$2
 package_name=$3
 notification_fix=$4
 METADATA_HOLDER=$5
+MIGRATE_CACHE=$6
 
 dataDir=$(dumpsys package ${package_name} | grep dataDir | head -n 1 | cut -d '=' -f2)
 app_uid=$(dumpsys package ${package_name} | grep userId= | head -n 1 | cut -d '=' -f2 | cut -d ' ' -f1)
@@ -23,6 +24,11 @@ else
 
     rm -rf ${dataDir} 2>/dev/null
 
+    if [[ -e ${MIGRATE_CACHE}/${tar_gz_file} ]]; then
+        echo "Trying to move $tar_gz_file under /data/data/"
+        mv ${MIGRATE_CACHE}/${tar_gz_file} /data/data/
+    fi
+
     if [[ -e /data/data/${tar_gz_file} ]]; then
 
         cd /data/data/
@@ -36,6 +42,7 @@ else
         fi
 
         if [[ -n ${tarCmd} ]]; then
+            echo "Extracting data"
             ${tarCmd} -xzpf ${tar_gz_file} && rm ${tar_gz_file} && echo "ok" > ${METADATA_HOLDER}/${package_name}.data.marker
         else
             echo "busybox not found under ${busybox_file}. Tar not installed."
