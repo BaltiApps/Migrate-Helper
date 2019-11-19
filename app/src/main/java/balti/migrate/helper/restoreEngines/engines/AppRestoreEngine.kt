@@ -180,12 +180,12 @@ class AppRestoreEngine(private val jobcode: Int,
                             e.printStackTrace()
                             addToActualErrors("$ERROR_APP_MAKING_SCRIPT: ${e.message}")
                         }
-
-                        writeNext("echo \" \"")
-                        writeNext("echo \"--- DONE! ---\"")
                     }
 
                     writeNext("mv -f $MIGRATE_CACHE/$FILE_PACKAGE_DATA* ${engineContext.externalCacheDir}/ 2>/dev/null")
+
+                    writeNext("echo \" \"")
+                    writeNext("echo \"--- DONE! ---\"")
 
                     close()
                 }
