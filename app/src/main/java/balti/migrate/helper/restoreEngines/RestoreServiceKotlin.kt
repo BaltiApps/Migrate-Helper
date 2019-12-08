@@ -34,7 +34,8 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTOR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_END
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_RUNNING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_RESTORE_SERVICE_ERROR
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_AUTO_INSTALL_HELPER
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_AUTO_INSTALL_WATCHER
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DISABLE_PACKAGE_VERIFICATION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_IS_CANCELLED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
@@ -102,7 +103,8 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
     private var currentTask: ParentRestoreClass? = null
 
     private var notificationFix = false
-    private var autoInstallHelper = false
+    private var autoInstallWatcher = false
+    private var disablePackageVerification = false
 
     private val isSettingsNull : Boolean
         get() = if (settingsPacket == null) true else settingsPacket!!.internalPackets.isEmpty()
@@ -262,7 +264,8 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                 if (!isBackupInitiated) {
 
                     notificationFix = intent.getBooleanExtra(EXTRA_NOTIFICATION_FIX, false)
-                    autoInstallHelper = intent.getBooleanExtra(EXTRA_AUTO_INSTALL_HELPER, false)
+                    autoInstallWatcher = intent.getBooleanExtra(EXTRA_AUTO_INSTALL_WATCHER, false)
+                    disablePackageVerification = intent.getBooleanExtra(EXTRA_DISABLE_PACKAGE_VERIFICATION, false)
 
                     AppInstance.notificationManager.cancelAll()
                     stopService(Intent(this@RestoreServiceKotlin, StupidStartupServiceKotlin::class.java))
@@ -302,9 +305,9 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                                 JOBCODE_RESTORE_SMS -> SmsRestoreEngine(jCode, workingObject as ArrayList<SmsPacketKotlin>)
                                 JOBCODE_RESTORE_CALLS -> CallsRestoreEngine(jCode, workingObject as ArrayList<CallsPacketKotlin>)
                                 JOBCODE_RESTORE_WIFI -> WifiRestoreEngine(jCode, workingObject as WifiPacketKotlin)
-                                JOBCODE_RESTORE_APP -> AppRestoreEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, notificationFix)
+                                JOBCODE_RESTORE_APP -> AppRestoreEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, notificationFix, disablePackageVerification)
                                 JOBCODE_RESTORE_SETTINGS -> SettingsRestoreEngine(jCode, workingObject as SettingsPacketKotlin)
-                                JOBCODE_RESTORE_CLEAN -> CleanerEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, autoInstallHelper)
+                                JOBCODE_RESTORE_CLEAN -> CleanerEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, autoInstallWatcher)
                                 else -> null
                             }
                         } catch (e: Exception) {

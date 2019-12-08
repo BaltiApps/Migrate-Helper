@@ -17,6 +17,11 @@
         android:title="@string/restore_start_animation"
         android:summary="@string/restore_start_animation_desc"/>
 
+    <CheckBoxPreference
+        android:key="loadAppIconsInList"
+        android:title="@string/loadIconsInList"
+        android:summary="@string/loadIconsInListDesc"/>
+
     <PreferenceCategory
         android:title="@string/watcher">
 

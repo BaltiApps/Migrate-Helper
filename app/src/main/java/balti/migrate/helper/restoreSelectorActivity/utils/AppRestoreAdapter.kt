@@ -12,12 +12,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import balti.migrate.helper.AppInstance.Companion.appPackets
+import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_FDROID
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DO_LOAD_ICON_IN_LIST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PROPERTY_APP_SELECTION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PROPERTY_DATA_SELECTION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PROPERTY_PERMISSION_SELECTION
@@ -36,6 +38,7 @@ class AppRestoreAdapter(val context: Context,
     private var permissionAllChangeFromScanning = false
     private var externalDataSetChanged = true
     private val iconTools by lazy { IconTools() }
+    private val doLoadIcons = sharedPrefs.getBoolean(PREF_DO_LOAD_ICON_IN_LIST, true)
 
     private val commonTools by lazy { CommonToolsKotlin(context) }
 
@@ -116,12 +119,15 @@ class AppRestoreAdapter(val context: Context,
         val appItem = appPackets[position]
 
         viewHolder.appName.text = appItem.appName
-        appItem.iconFileName?.run{
-            iconTools.setIconFromFile(viewHolder.appIcon, File(METADATA_HOLDER_DIR, this))
+        if (doLoadIcons) {
+            appItem.iconFileName?.run {
+                iconTools.setIconFromFile(viewHolder.appIcon, File(METADATA_HOLDER_DIR, this))
+            }
+            appItem.appIcon?.run {
+                iconTools.setIconFromIconString(viewHolder.appIcon, this)
+            }
         }
-        appItem.appIcon?.run{
-            iconTools.setIconFromIconString(viewHolder.appIcon, this)
-        }
+        else viewHolder.appIcon.setImageResource(R.drawable.ic_app)
 
         viewHolder.appInfo.setOnClickListener {
 

@@ -16,8 +16,10 @@ app_uid=$(dumpsys package ${package_name} | grep userId= | head -n 1 | cut -d '=
 # so "head -n 1" takes only the first line.
 # in android lollipop unnecessary extras along with app_uid. So take only first item.
 
-if [[ -z "$app_uid" && -n "$(pm list packages ${package_name})" ]]; then
+if [[ -z "$(pm list packages ${package_name})" ]]; then
     echo "Failed to find package $package_name. Cannot restore data."
+elif [[ -z "$app_uid" ]]; then
+    echo "Failed to find uid of package $package_name. Cannot restore data."
 else
 
     am force-stop ${package_name} 2>/dev/null

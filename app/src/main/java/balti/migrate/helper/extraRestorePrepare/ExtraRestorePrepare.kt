@@ -38,7 +38,8 @@ import balti.migrate.helper.simpleActivities.ProgressShowActivity
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_AUTO_INSTALL_HELPER
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_AUTO_INSTALL_WATCHER
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DISABLE_PACKAGE_VERIFICATION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_ADB
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_APP
@@ -79,7 +80,8 @@ class ExtraRestorePrepare: AppCompatActivity() {
     private val CANCEL = 8
 
     private var cancelChecks = false
-    private var autoInstallHelper = false
+    private var autoInstallWatcher = false
+    private var disablePackageVerification = false
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
 
@@ -265,8 +267,31 @@ class ExtraRestorePrepare: AppCompatActivity() {
         doJob(JOBCODE_PREP_APP) {
 
             fun proceed(status: Int, label: String){
-                toggleERPItemStatusIcon(erpItemApps, status, label)
-                doFallThroughJob(JOBCODE_PREP_KEYBOARD)
+                if (status == DONE) {
+                    AlertDialog.Builder(this).apply {
+                        setTitle(R.string.disable_package_verification)
+                        setMessage(R.string.disable_package_verification_desc)
+                        setPositiveButton(R.string.ok_disable) {_, _ ->
+                            disablePackageVerification = true
+                            toggleERPItemStatusIcon(erpItemApps, status, label)
+                            doFallThroughJob(JOBCODE_PREP_KEYBOARD)
+                        }
+                        setNegativeButton(R.string.dont_disable) {_, _ ->
+                            disablePackageVerification = false
+                            toggleERPItemStatusIcon(erpItemApps, status, label)
+                            doFallThroughJob(JOBCODE_PREP_KEYBOARD)
+                        }
+                        setNeutralButton(R.string.abort) {_, _ ->
+                            finishThis()
+                        }
+                        setCancelable(false)
+                    }
+                            .show()
+                }
+                else {
+                    toggleERPItemStatusIcon(erpItemApps, status, label)
+                    doFallThroughJob(JOBCODE_PREP_KEYBOARD)
+                }
             }
 
             val appsNotInstalled = ArrayList<AppPacketsKotlin>(0)
@@ -453,9 +478,9 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
                     val v = View.inflate(this, R.layout.install_watcher_dialog_view, null)
                     v.install_watcher_by_root.run {
-                        autoInstallHelper = isChecked
+                        autoInstallWatcher = isChecked
                         setOnCheckedChangeListener { _, isChecked ->
-                            autoInstallHelper = isChecked
+                            autoInstallWatcher = isChecked
                         }
                     }
                     v.know_more_watcher.setOnClickListener {
@@ -468,12 +493,12 @@ class ExtraRestorePrepare: AppCompatActivity() {
                     AlertDialog.Builder(this)
                             .setView(v)
                             .setPositiveButton(R.string.install) {_, _ ->
-                                if (!autoInstallHelper)
+                                if (!autoInstallWatcher)
                                     commonTools.installWatcherByPackageManager(JOBCODE_RESTORE_INSTALL_WATCHER)
                                 else proceed(DONE, getString(R.string.ready_to_be_restored))
                             }
                             .setNeutralButton(R.string.dont_use_watcher) {_, _ ->
-                                autoInstallHelper = false
+                                autoInstallWatcher = false
                                 proceed(DONE, getString(R.string.ready_to_be_restored))
                             }
                             .setCancelable(false)
@@ -536,7 +561,8 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 else {
                     Intent(this, RestoreServiceKotlin::class.java)
                             .putExtra(EXTRA_NOTIFICATION_FIX, notificationFix)
-                            .putExtra(EXTRA_AUTO_INSTALL_HELPER, autoInstallHelper)
+                            .putExtra(EXTRA_AUTO_INSTALL_WATCHER, autoInstallWatcher)
+                            .putExtra(EXTRA_DISABLE_PACKAGE_VERIFICATION, disablePackageVerification)
                             .run {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                                     startForegroundService(this)

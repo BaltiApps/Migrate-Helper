@@ -81,7 +81,8 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_TOTAL_TIME = "total_time"
 
         val EXTRA_NOTIFICATION_FIX = "notification_fix"
-        val EXTRA_AUTO_INSTALL_HELPER = "autoInstallHelper"
+        val EXTRA_AUTO_INSTALL_WATCHER = "autoInstallHelper"
+        val EXTRA_DISABLE_PACKAGE_VERIFICATION = "disablePackageVerification"
 
         val EXTRA_POST_JOBS_ON_FINISH = "post_jobs_on_finish"
 
@@ -183,6 +184,8 @@ class CommonToolsKotlin(val context: Context) {
 
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migrate.helper/cache/"
+
+        val PREF_DO_LOAD_ICON_IN_LIST = "doLoadIconInList"
 
         val PACKAGE_NAME_PLAY_STORE = "com.android.vending"
         val PACKAGE_NAME_FDROID = "org.fdroid.fdroid.privileged"

@@ -90,6 +90,13 @@
     <string name="restore_starting_in">Restore starting in…</string>
     <string name="number_of_selected_apps">Selected apps</string>
     <string name="dont_use_watcher">Don\'t use watcher</string>
+    <string name="disable_package_verification">Disable package verification? (recommended)</string>
+    <string name="disable_package_verification_desc">If not disabled, some apps like Paytm do not get installed.
+    Migrate will briefly disable package verification during apps installation.\n\n
+    Please avoid installing any other app from anywhere during the restore process, as you might end up installing a harmful app.
+    </string>
+    <string name="ok_disable">OK, disable</string>
+    <string name="dont_disable">No, don\'t disable</string>
 
     <!--restore_progress_layout.xml-->
     <string name="close">CLOSE</string>
@@ -332,6 +339,8 @@
     <string name="ignore_extras_desc">This will completely ignore reading and restoring extras like contacts, sms, calls, DPI etc</string>
     <string name="restore_start_animation">Show restore start countdown</string>
     <string name="restore_start_animation_desc">Show/hide the countdown animation before restore starts.</string>
+    <string name="loadIconsInList">Load icons in app list</string>
+    <string name="loadIconsInListDesc">Disable this in case of memory overflow crashes</string>
     <string name="use_watcher">Use watcher (Android 10+)</string>
     <string name="use_watcher_desc">A plugin app (installed and uninstalled with this helper app). Android 10 system closes this app after changing default SMS app. Watcher re-opens this helper app.</string>
     <string name="advanced">Advanced</string>

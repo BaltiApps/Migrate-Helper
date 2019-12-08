@@ -11,6 +11,7 @@ import balti.migrate.helper.R
 import balti.migrate.helper.preferences.subPreferences.WatcherInstallPreference
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREFERENCES_INSTALL_WATCHER
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DO_LOAD_ICON_IN_LIST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_DATA
@@ -23,6 +24,7 @@ class MainPreferencesActivity: PreferenceActivity() {
     private val ignoreReadErrors: CheckBoxPreference by lazy { findPreference("ignoreReadErrors") as CheckBoxPreference }
     private val ignoreExtras: CheckBoxPreference by lazy { findPreference("ignoreExtras") as CheckBoxPreference }
     private val restoreStartAnimation: CheckBoxPreference by lazy { findPreference("restoreStartAnimation") as CheckBoxPreference }
+    private val loadAppIconsInList: CheckBoxPreference by lazy { findPreference("loadAppIconsInList") as CheckBoxPreference }
 
     private val useWatcher: CheckBoxPreference by lazy { findPreference("useWatcher") as CheckBoxPreference }
     private val installWatcherLayout: WatcherInstallPreference by lazy { findPreference("installWatcherLayout") as WatcherInstallPreference }
@@ -59,6 +61,7 @@ class MainPreferencesActivity: PreferenceActivity() {
             setValue(ignoreReadErrors, PREF_IGNORE_READ_ERRORS)
             setValue(ignoreExtras, PREF_IGNORE_EXTRAS)
             setValue(restoreStartAnimation, PREF_RESTORE_START_ANIMATION, true)
+            setValue(loadAppIconsInList, PREF_DO_LOAD_ICON_IN_LIST, true)
             setValue(useWatcher, PREF_USE_WATCHER, true)
             setValue(remountData, PREF_REMOUNT_DATA, false)
 
