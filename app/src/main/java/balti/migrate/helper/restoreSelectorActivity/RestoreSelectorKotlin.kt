@@ -326,16 +326,24 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                             }
                         }
 
+                        // this function toggles the checkbox in extra banner or app list banner,
+                        // when an individual item is toggled
                         fun checkAll(immediateSelection: Boolean) {
 
-                            var isAnyNotSelected = false
-
-                            if (!immediateSelection) {
+                            fun toggleMasterCheckbox(state: Boolean) {
                                 extrasContainer.extras_select_all.apply {
                                     setOnCheckedChangeListener(null)
-                                    isChecked = false
+                                    isChecked = state
                                     setOnCheckedChangeListener(extrasAllListener)
                                 }
+                            }
+
+                            var isAnyNotSelected = false
+                            // flag. If any item is not in checked state,
+                            // do not check the other items, just mark banner checkbox as not selected
+
+                            if (!immediateSelection) {
+                                toggleMasterCheckbox(false)
                             } else {
                                 for (i in 0 until extrasContainer.restore_selector_extras_container.childCount) {
                                     commonTools.tryIt {
@@ -345,7 +353,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                                     }
                                     if (isAnyNotSelected) break
                                 }
-                                extrasContainer.extras_select_all.isChecked = !isAnyNotSelected
+                                toggleMasterCheckbox(!isAnyNotSelected)
                             }
                         }
 
