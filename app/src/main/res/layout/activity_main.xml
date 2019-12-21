@@ -68,9 +68,23 @@
                     android:background="@drawable/restore_button"
                     android:text="@string/restore_main" />
 
+
                 <Space
                     android:layout_width="wrap_content"
-                    android:layout_height="20dp" />
+                    android:layout_height="@dimen/xlarge_padding_width" />
+
+                <Button
+                    android:id="@+id/revert_system_settings"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/uninstall_button"
+                    android:text="@string/revert_system_settings"
+                    />
+
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xlarge_padding_width" />
 
                 <Button
                     android:id="@+id/uninstall_from_system"

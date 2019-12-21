@@ -44,6 +44,9 @@ class CommonToolsKotlin(val context: Context) {
         val FILE_PACKAGE_DATA = "package-data"
         val FILE_FILE_LIST = "fileList.txt"
 
+        val DIR_REVERT_DIR = "/sdcard/Migrate/.revert"
+        val FILE_REVERT_HEAD = "revert_"
+
         val CHANNEL_INIT = "Initializing"
         val CHANNEL_RESTORE_END = "Restore finished notification"
         val CHANNEL_RESTORE_RUNNING = "Restore running notification"
@@ -150,6 +153,8 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_RESET_SMS_APP = 45010
 
         val JOBCODE_PREFERENCES_INSTALL_WATCHER = 45510
+
+        val JOBCODE_READ_FILE_PERMISSION = 22773
 
         val TIMEOUT_WAITING_TO_CANCEL_TASK = 500L
         val TIMEOUT_WAITING_TO_KILL = 3000L

@@ -18,6 +18,7 @@ import balti.migrate.helper.R
 import balti.migrate.helper.postJobs.PostJobsActivity
 import balti.migrate.helper.preferences.MainPreferencesActivity
 import balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin
+import balti.migrate.helper.revert.RevertSettingsActivity
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_RESTORE_DATA
@@ -138,6 +139,10 @@ class MainActivityKotlin: AppCompatActivity() {
                         .show()
             }
             else startActivity(uIntent)
+        }
+
+        revert_system_settings.setOnClickListener {
+            startActivity(Intent(this, RevertSettingsActivity::class.java))
         }
 
         last_logs_textView.apply {

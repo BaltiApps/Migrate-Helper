@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_list_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/large_padding_width">
+
+        <ImageButton
+            android:id="@+id/erp_close_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="10dp"
+            android:src="@drawable/ic_close" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:text="@string/revert_settings"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="@dimen/large_padding_width"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/revert_content_layout"
+            android:visibility="gone"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/select_revert_file"
+                />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/large_padding_width"/>
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/restore_file_list"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/revert_no_files_layout"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_revert_found"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/large_padding_width"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_revert_found_desc"
+                />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/large_padding_width"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/refresh"
+                android:backgroundTint="@color/colorButtons"
+                android:id="@+id/refresh_revert"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/revert_no_permission"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/storage_perm_needed"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/large_padding_width"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/storage_perm_needed_desc"
+                />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/large_padding_width"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/grant"
+                android:backgroundTint="@color/colorButtons"
+                android:id="@+id/grant_revert"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

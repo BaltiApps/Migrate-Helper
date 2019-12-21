@@ -17,6 +17,10 @@
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER"/>
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
 
+    <!--store and read revert files-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <!--for wifi restore-->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -28,10 +32,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name="balti.migrate.helper.AppInstance"
+        android:name=".AppInstance"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name="balti.migrate.helper.simpleActivities.MainActivityKotlin"
+        <activity android:name=".simpleActivities.MainActivityKotlin"
             android:screenOrientation="portrait"
             >
             <intent-filter>
@@ -41,65 +45,69 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin"
+        <activity android:name=".restoreSelectorActivity.RestoreSelectorKotlin"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name="balti.migrate.helper.extraRestorePrepare.ExtraRestorePrepare"
+        <activity android:name=".extraRestorePrepare.ExtraRestorePrepare"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name="balti.migrate.helper.simpleActivities.ProgressShowActivity"
+        <activity android:name=".simpleActivities.ProgressShowActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name="balti.migrate.helper.postJobs.PostJobsActivity"
+        <activity android:name=".postJobs.PostJobsActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/PostJobsActivityTheme"
             />
 
-        <activity android:name="balti.migrate.helper.simpleActivities.SimpleLogViewer"
+        <activity android:name=".simpleActivities.SimpleLogViewer"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name="balti.migrate.helper.preferences.MainPreferencesActivity"
+        <activity android:name=".preferences.MainPreferencesActivity"
             android:screenOrientation="portrait"
             />
 
-        <activity android:name="balti.migrate.helper.postJobs.utils.ResurrectorActivity"
+        <activity android:name=".revert.RevertSettingsActivity"
+            android:screenOrientation="portrait"
+            />
+
+        <activity android:name=".postJobs.utils.ResurrectorActivity"
             android:theme="@style/AppTheme.Blank"
             android:launchMode="singleInstance"
             >
             <intent-filter>
-                <action android:name="balti.migrate.helper.RESURRECTOR"/>
+                <action android:name=".RESURRECTOR"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
 
-        <receiver android:name="balti.migrate.helper.utilities.BootCompletedReceiver">
+        <receiver android:name=".utilities.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" android:priority="999"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name="balti.migrate.helper.postJobs.utils.AliveCheckReceiver">
+        <receiver android:name=".postJobs.utils.AliveCheckReceiver">
             <intent-filter>
-                <action android:name="balti.migrate.helper.RECEIVER"/>
+                <action android:name=".RECEIVER"/>
             </intent-filter>
         </receiver>
 
-        <service android:name="balti.migrate.helper.utilities.StupidStartupServiceKotlin"
+        <service android:name=".utilities.StupidStartupServiceKotlin"
             android:exported="false"/>
 
-        <service android:name="balti.migrate.helper.restoreEngines.RestoreServiceKotlin"
+        <service android:name=".restoreEngines.RestoreServiceKotlin"
             android:exported="false"/>
 
-        <service android:name="balti.migrate.helper.utilities.UninstallServiceKotlin"/>
+        <service android:name=".utilities.UninstallServiceKotlin"/>
         
         <provider
             android:authorities="migrate.helper.provider"
@@ -113,14 +121,14 @@
 
         <!--Dummies-->
 
-        <receiver android:name="balti.migrate.helper.dummies.SmsBroadcastReceiver"
+        <receiver android:name=".dummies.SmsBroadcastReceiver"
             android:permission="android.permission.BROADCAST_SMS">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="balti.migrate.helper.dummies.MmsBroadcastReceiver"
+        <receiver android:name=".dummies.MmsBroadcastReceiver"
             android:permission="android.permission.BROADCAST_WAP_PUSH">
             <intent-filter>
                 <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
@@ -128,7 +136,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name="balti.migrate.helper.dummies.ComposeSmsActivity" >
+        <activity android:name=".dummies.ComposeSmsActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SENDTO" />
@@ -141,7 +149,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="balti.migrate.helper.dummies.HeadlessSmsSendService"
+        <service android:name=".dummies.HeadlessSmsSendService"
             android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE"
             android:exported="true" >
             <intent-filter>

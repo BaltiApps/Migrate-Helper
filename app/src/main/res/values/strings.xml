@@ -20,6 +20,7 @@
     <!--activity_main.xml-->
     <string name="restore_main">Restore apps and data</string>
     <string name="uninstallFromSystem">Uninstall from system</string>
+    <string name="revert_system_settings">Revert system settings</string>
     <string name="uninstall_or_finalize">Uninstall app\nor Finalize restore</string>
     <string name="temporary_disable">Temporary disable</string>
     <string name="selective_restore">Choose what to restore</string>
@@ -37,6 +38,15 @@
     Before restore starts, you will be asked if you want to install the watcher. If installed, it gets auto-uninstalled after restore is complete.\n\n
     You can opt to not use the watcher app. Simply go to \"Preferences\" in this app and disable \"Use watcher\" option. However, you would need to manually restart this helper app to complete the post restore processes.
     </string>
+
+    <!--revert_settings.xml-->
+    <string name="revert_settings">Revert settings</string>
+    <string name="select_revert_file">Choose a file. These files store the system settings before restoring from helper.</string>
+    <string name="no_revert_found">No backup found.</string>
+    <string name="no_revert_found_desc">Could not load any revert files.\nPlease restore a Migrate backup first.</string>
+    <string name="storage_perm_needed">Storage permission needed</string>
+    <string name="storage_perm_needed_desc">Please grant permission to read revert files</string>
+    <string name="grant">Grant</string>
 
     <!--last_log_report.xml-->
     <string name="seeProgressLog">See Progress log</string>
