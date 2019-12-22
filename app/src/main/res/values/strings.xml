@@ -47,6 +47,12 @@
     <string name="storage_perm_needed">Storage permission needed</string>
     <string name="storage_perm_needed_desc">Please grant permission to read revert files</string>
     <string name="grant">Grant</string>
+    <string name="reading_revert_file">Reading revert file</string>
+
+    <!--RevertSettingsActivity.kt-->
+    <string name="error_revert_alert">Error. Kindly send to developer.</string>
+    <string name="null_revert_object">Null revert object.</string>
+    <string name="error_send_screenshot">Error. Kindly take a screenshot and share in our Telegram group: https://t.me/migrateApp</string>
 
     <!--last_log_report.xml-->
     <string name="seeProgressLog">See Progress log</string>
@@ -244,6 +250,7 @@
     <string name="report_header">Report via Telegram</string>
     <string name="share_progress_logs">Share progress logs</string>
     <string name="share_error_logs">Share error logs</string>
+    <string name="share_revert_errors">Share revert errors</string>
     <string name="share_file_lists">Share list of files in backup</string>
     <string name="share_script">Share script</string>
     <string name="share_package_data">Share package-data</string>

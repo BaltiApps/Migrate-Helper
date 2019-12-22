@@ -144,6 +144,51 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/revert_waiting_layout"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            >
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/please_wait"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/large_padding_width"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reading_revert_file"
+                android:id="@+id/revert_text_status"
+                />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/large_padding_width"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@android:string/cancel"
+                android:backgroundTint="@color/error_color"
+                android:id="@+id/revert_cancel"
+                />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>

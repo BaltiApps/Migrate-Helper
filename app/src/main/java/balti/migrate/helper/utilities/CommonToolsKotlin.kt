@@ -46,6 +46,8 @@ class CommonToolsKotlin(val context: Context) {
 
         val DIR_REVERT_DIR = "/sdcard/Migrate/.revert"
         val FILE_REVERT_HEAD = "revert_"
+        val FILE_REVERT_SCRIPT = "revertScript.sh"
+        val FILE_REVERT_ERROR = "revertError.txt"
 
         val CHANNEL_INIT = "Initializing"
         val CHANNEL_RESTORE_END = "Restore finished notification"
@@ -108,6 +110,8 @@ class CommonToolsKotlin(val context: Context) {
         val ERROR_APP_RESTORE = "RUN"
         val ERROR_APP_RESTORE_SUPPRESSED = "RUN_SUPPRESSED"
         val ERROR_CLEANING_SUPPRESSED = "CLEANING_ERROR_SUPPRESSED"
+
+        val ERROR_REVERT_READ = "REVERT_READ"
 
         val ERROR_RESTORE_SERVICE_ERROR = "RESTORE_SERVICE"
 
@@ -250,6 +254,8 @@ class CommonToolsKotlin(val context: Context) {
 
     var LBM : LocalBroadcastManager? = null
 
+    val workingDir = context.externalCacheDir
+
     init {
         if (context is Activity || context is Service)
             LBM = LocalBroadcastManager.getInstance(context)
@@ -301,17 +307,19 @@ class CommonToolsKotlin(val context: Context) {
 
     fun reportLogs(isErrorLogMandatory: Boolean) {
 
-        val progressLog = File(context.externalCacheDir, FILE_PROGRESSLOG)
-        val errorLog = File(context.externalCacheDir, FILE_ERRORLOG)
-        val theRestoreScript = File(context.externalCacheDir, FILE_RESTORE_SCRIPT)
+        val progressLog = File(workingDir, FILE_PROGRESSLOG)
+        val errorLog = File(workingDir, FILE_ERRORLOG)
+        val theRestoreScript = File(workingDir, FILE_RESTORE_SCRIPT)
+        val revertError = File(workingDir, FILE_REVERT_ERROR)
+        val revertScript = File(workingDir, FILE_REVERT_SCRIPT)
 
-        val packageDatas = context.externalCacheDir.let {
+        val packageDatas = workingDir.let {
             if (it != null) it.listFiles { f: File ->
                 f.name.startsWith(FILE_PACKAGE_DATA) && f.name.endsWith(".txt")
             } else emptyArray<File>()
         }
 
-        val fileLists = context.externalCacheDir.let {
+        val fileLists = workingDir.let {
             if (it != null) it.listFiles { f: File ->
                 f.name.startsWith(FILE_FILE_LIST) && f.name.endsWith(".txt")
             } else emptyArray<File>()
@@ -324,7 +332,9 @@ class CommonToolsKotlin(val context: Context) {
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
         }
-        else if (errorLog.exists() || progressLog.exists() || theRestoreScript.exists() || packageDatas.isNotEmpty() || fileLists.isNotEmpty()){
+        else if (errorLog.exists() || progressLog.exists() || theRestoreScript.exists() ||
+                revertScript.exists() || revertError.exists() ||
+                packageDatas.isNotEmpty() || fileLists.isNotEmpty()){
 
             val eView = View.inflate(context, R.layout.error_report_layout, null)
 
@@ -342,6 +352,9 @@ class CommonToolsKotlin(val context: Context) {
 
             eView.share_errors_checkbox.isChecked = errorLog.exists()
             eView.share_errors_checkbox.isEnabled = errorLog.exists() && !isErrorLogMandatory
+
+            eView.share_revert_errors.isChecked = revertError.exists() || revertScript.exists()
+            eView.share_revert_errors.isEnabled = revertError.exists() || revertScript.exists()
 
             eView.report_button_what_is_shared.setOnClickListener {
                 AlertDialog.Builder(context)
@@ -365,6 +378,10 @@ class CommonToolsKotlin(val context: Context) {
                     if (eView.share_script_checkbox.isChecked) uris.add(getUri(theRestoreScript))
                     if (eView.share_package_data.isChecked) for (f in packageDatas) uris.add(getUri(f))
                     if (eView.share_fileLists_checkbox.isChecked) for (f in fileLists) uris.add(getUri(f))
+                    if (eView.share_revert_errors.isChecked) {
+                        uris.add(getUri(revertScript))
+                        uris.add(getUri(revertError))
+                    }
 
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -442,7 +459,7 @@ class CommonToolsKotlin(val context: Context) {
             else doBackgroundTask({
 
                 tryIt {
-                    val infoFile = File(context.externalCacheDir, FILE_DEVICE_INFO)
+                    val infoFile = File(workingDir, FILE_DEVICE_INFO)
                     BufferedWriter(FileWriter(infoFile)).run {
                         write(deviceSpecifications)
                         close()
