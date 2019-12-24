@@ -11,17 +11,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import balti.migrate.helper.R
+import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DIR_REVERT_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_REVERT_READ
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_REVERT_ERROR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_REVERT_HEAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_READ_FILE_PERMISSION
+import balti.migrate.helper.utilities.constants.SettingsFields
 import kotlinx.android.synthetic.main.revert_settings.*
 import org.json.JSONObject
 import java.io.*
 
 class RevertSettingsActivity: AppCompatActivity() {
+
+    companion object {
+        var cancelRevert = false
+    }
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val revertErrorWriter by lazy {
@@ -82,7 +88,7 @@ class RevertSettingsActivity: AppCompatActivity() {
 
     private fun startRestore(file: File) {
 
-        var jsonObject: JSONObject? = null
+        var settingsObject: SettingsPacketKotlin? = null
         var error = ""
 
         toggleLayout(3)
@@ -96,7 +102,22 @@ class RevertSettingsActivity: AppCompatActivity() {
                 reader.readLines().forEach {
                     text.append(it)
                 }
-                jsonObject = JSONObject(text.toString())
+                val jsonObject = JSONObject(text.toString())
+
+                jsonObject.run {
+
+                    var dpiText: String? = null
+                    var adbState: Int? = null
+                    var fontScale: Double? = null
+                    var keyboardText: String? = null
+
+                    SettingsFields.JSON_FIELD_DPI_TEXT.let { if (this.has(it)) dpiText = this.getString(it) }
+                    SettingsFields.JSON_FIELD_ADB_TEXT.let { if (this.has(it)) adbState = this.getInt(it) }
+                    SettingsFields.JSON_FIELD_FONT_SCALE.let { if (this.has(it)) fontScale = this.getDouble(it) }
+                    SettingsFields.JSON_FIELD_KEYBOARD_TEXT.let { if (this.has(it)) keyboardText = this.getString(it) }
+
+                    settingsObject = SettingsPacketKotlin(dpiText, adbState, fontScale, keyboardText, file)
+                }
             }
             catch (e: Exception) {
                 e.printStackTrace()
@@ -105,11 +126,14 @@ class RevertSettingsActivity: AppCompatActivity() {
 
         }, {
 
-            if (jsonObject == null && error == "")
+            if (settingsObject == null && error == "")
                 error = getString(R.string.null_revert_object)
 
             if (error == "") {
-                //TODO("implement shell restore")
+
+                revert_cancel.setOnClickListener { cancelRevert = true }
+                //TODO("finish RevertEngine")
+
             }
             else showErrorDialog(error)
 
