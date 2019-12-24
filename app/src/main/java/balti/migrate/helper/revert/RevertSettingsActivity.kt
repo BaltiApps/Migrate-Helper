@@ -115,14 +115,12 @@ class RevertSettingsActivity: AppCompatActivity(), OnRevert {
                     var dpiText: String? = null
                     var adbState: Int? = null
                     var fontScale: Double? = null
-                    var keyboardText: String? = null
 
                     SettingsFields.JSON_FIELD_DPI_TEXT.let { if (this.has(it)) dpiText = this.getString(it) }
                     SettingsFields.JSON_FIELD_ADB_TEXT.let { if (this.has(it)) adbState = this.getInt(it) }
                     SettingsFields.JSON_FIELD_FONT_SCALE.let { if (this.has(it)) fontScale = this.getDouble(it) }
-                    SettingsFields.JSON_FIELD_KEYBOARD_TEXT.let { if (this.has(it)) keyboardText = this.getString(it) }
 
-                    settingsObject = SettingsPacketKotlin(dpiText, adbState, fontScale, keyboardText, file)
+                    settingsObject = SettingsPacketKotlin(dpiText, adbState, fontScale, null, file)
                 }
             }
             catch (e: Exception) {

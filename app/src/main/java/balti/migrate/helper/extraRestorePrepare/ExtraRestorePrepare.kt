@@ -396,11 +396,6 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 doFallThroughJob(JOBCODE_PREP_WIFI)
             }
 
-            if (!grantedSettingsChange){
-                proceed(CANCEL, getString(R.string.denied))
-                keyboardSettingsItem?.isSelected = false
-            }
-
             var executed = false
             keyboardSettingsItem?.value.toString().let {
 
