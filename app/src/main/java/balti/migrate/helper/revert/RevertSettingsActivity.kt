@@ -1,6 +1,7 @@
 package balti.migrate.helper.revert
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -12,18 +13,22 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import balti.migrate.helper.R
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin
+import balti.migrate.helper.revert.engine.RevertEngine
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DIR_REVERT_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_REVERT_READ
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_UNINSTALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_REVERT_ERROR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_REVERT_HEAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_READ_FILE_PERMISSION
+import balti.migrate.helper.utilities.UninstallServiceKotlin
 import balti.migrate.helper.utilities.constants.SettingsFields
 import kotlinx.android.synthetic.main.revert_settings.*
 import org.json.JSONObject
 import java.io.*
 
-class RevertSettingsActivity: AppCompatActivity() {
+class RevertSettingsActivity: AppCompatActivity(), OnRevert {
 
     companion object {
         var cancelRevert = false
@@ -75,7 +80,7 @@ class RevertSettingsActivity: AppCompatActivity() {
                 toggleLayout(0)
                 restore_file_list.apply {
                     adapter = ArrayAdapter<String>(this@RevertSettingsActivity, android.R.layout.simple_list_item_1, display)
-                    setOnItemClickListener { parent, view, position, id ->
+                    setOnItemClickListener { _, _, position, _ ->
                         startRestore(revertFiles[position])
                     }
                 }
@@ -92,6 +97,7 @@ class RevertSettingsActivity: AppCompatActivity() {
         var error = ""
 
         toggleLayout(3)
+        cancelRevert = false
 
         commonTools.doBackgroundTask({
 
@@ -131,8 +137,31 @@ class RevertSettingsActivity: AppCompatActivity() {
 
             if (error == "") {
 
-                revert_cancel.setOnClickListener { cancelRevert = true }
-                //TODO("finish RevertEngine")
+                settingsObject?.let {
+
+                    val message = StringBuilder()
+                    it.internalPackets.forEach { v ->
+                        message.append("${v.displayText}: ${v.value}")
+                    }
+
+                    AlertDialog.Builder(this).apply {
+
+                        setTitle(R.string.following_will_be_restored)
+                        setMessage(message.toString())
+                        setPositiveButton(R.string.proceed) {_, _ ->
+
+                            revert_text_status.setText(R.string.restoring_revert_file)
+                            revert_cancel.setOnClickListener { cancelRevert = true }
+
+                            RevertEngine(it, this@RevertSettingsActivity).execute()
+                        }
+                        setNegativeButton(android.R.string.cancel) {_, _ ->
+                            toggleLayout(0)
+                        }
+                        setCancelable(false)
+                    }
+                            .show()
+                }
 
             }
             else showErrorDialog(error)
@@ -182,5 +211,32 @@ class RevertSettingsActivity: AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         commonTools.tryIt { revertErrorWriter.close() }
+    }
+
+    override fun onRevert(errors: ArrayList<String>) {
+        if (errors.isEmpty()){
+            AlertDialog.Builder(this).apply {
+                setTitle(R.string.settings_reverted)
+                setMessage(R.string.please_reboot)
+                setPositiveButton(R.string.reboot) {_, _ ->
+                    startService(
+                            Intent(this@RevertSettingsActivity, UninstallServiceKotlin::class.java).apply {
+                                putExtra(EXTRA_DO_REBOOT, true)
+                                putExtra(EXTRA_DO_UNINSTALL, false)
+                            }
+                    )
+                }
+                setNegativeButton(R.string.close) {_, _ ->
+                    finish()
+                }
+                setCancelable(false)
+            }
+                    .show()
+        }
+        else {
+            val text = StringBuilder()
+            errors.forEach { text.append(it + "\n") }
+            showErrorDialog(text.toString().trim())
+        }
     }
 }

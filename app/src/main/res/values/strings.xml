@@ -48,11 +48,15 @@
     <string name="storage_perm_needed_desc">Please grant permission to read revert files</string>
     <string name="grant">Grant</string>
     <string name="reading_revert_file">Reading revert file</string>
+    <string name="settings_reverted">Settings reverted!</string>
+    <string name="please_reboot">Please reboot.</string>
 
     <!--RevertSettingsActivity.kt-->
     <string name="error_revert_alert">Error. Kindly send to developer.</string>
     <string name="null_revert_object">Null revert object.</string>
+    <string name="following_will_be_restored">Following values will be restored.</string>
     <string name="error_send_screenshot">Error. Kindly take a screenshot and share in our Telegram group: https://t.me/migrateApp</string>
+    <string name="restoring_revert_file">Restoring revert file. Please wait…\nLong press cancel to kill app if not responding.</string>
 
     <!--last_log_report.xml-->
     <string name="seeProgressLog">See Progress log</string>

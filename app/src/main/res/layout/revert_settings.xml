@@ -150,7 +150,6 @@
             android:id="@+id/revert_waiting_layout"
             android:gravity="center"
             android:orientation="vertical"
-            android:visibility="gone"
             >
 
             <ProgressBar
