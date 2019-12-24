@@ -115,6 +115,12 @@
     Migrate will briefly disable package verification during apps installation.\n\n
     Please avoid installing any other app from anywhere during the restore process, as you might end up installing a harmful app.
     </string>
+    <string name="secure_settings_grant">Grant to change secure settings?</string>
+    <string name="secure_settings_grant_desc">ADB state, font scale, DPI, keyboard is considered secure android settings. If you deny, none of the backed up settings will be restored.\n
+    This is a measure to ensure transparency to the user according to Google Play standards. You may also revert these changes from the app\'s main screen.
+    </string>
+    <string name="deny">Deny</string>
+    <string name="denied">Denied</string>
     <string name="ok_disable">OK, disable</string>
     <string name="dont_disable">No, don\'t disable</string>
 

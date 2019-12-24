@@ -82,6 +82,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
     private var cancelChecks = false
     private var autoInstallWatcher = false
     private var disablePackageVerification = false
+    private var grantedSettingsChange = false
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
 
@@ -91,6 +92,10 @@ class ExtraRestorePrepare: AppCompatActivity() {
     private lateinit var handler: Handler
 
     private var keyboardSettingsItem : SettingsPacketKotlin.SettingsItem? = null
+    private var dpiSettingsItem : SettingsPacketKotlin.SettingsItem? = null
+    private var adbSettingsItem : SettingsPacketKotlin.SettingsItem? = null
+    private var fontScaleSettingsItem : SettingsPacketKotlin.SettingsItem? = null
+
     private var notificationFix = false
 
     private val progressReceiver by lazy {
@@ -134,9 +139,9 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
                 val view = getERPItem(p.iconResource, p.displayText)
                 when (p.settingsType) {
-                    SettingsPacketKotlin.SETTINGS_TYPE_DPI -> erpItemDpi = view
-                    SettingsPacketKotlin.SETTINGS_TYPE_ADB -> erpItemAdb = view
-                    SettingsPacketKotlin.SETTINGS_TYPE_FONT_SCALE -> erpItemFontScale = view
+                    SettingsPacketKotlin.SETTINGS_TYPE_DPI -> { erpItemDpi = view; dpiSettingsItem = p }
+                    SettingsPacketKotlin.SETTINGS_TYPE_ADB -> { erpItemAdb = view; adbSettingsItem = p }
+                    SettingsPacketKotlin.SETTINGS_TYPE_FONT_SCALE -> { erpItemFontScale = view; fontScaleSettingsItem = p }
                     SettingsPacketKotlin.SETTINGS_TYPE_KEYBOARD -> {
                         erpItemKeyboard = view
                         keyboardSettingsItem = p
@@ -175,9 +180,35 @@ class ExtraRestorePrepare: AppCompatActivity() {
             doFallThroughJob(JOBCODE_PREP_END)
         }
 
-        commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
+        commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS));
 
-        doFallThroughJob(JOBCODE_PREP_APP)
+        {
+            doFallThroughJob(JOBCODE_PREP_APP)
+        }.let { func ->
+
+            settingsPacket.let {
+
+                if (it != null && it.internalPackets.isNotEmpty()) {
+
+                    AlertDialog.Builder(this).apply {
+
+                        setTitle(R.string.secure_settings_grant)
+                        setMessage(R.string.secure_settings_grant_desc)
+                        setPositiveButton(R.string.grant) { _, _ ->
+                            grantedSettingsChange = true
+                            func()
+                        }
+                        setNegativeButton(R.string.deny) { _, _ ->
+                            grantedSettingsChange = false
+                            func()
+                        }
+                        setCancelable(false)
+                    }
+                            .show()
+                }
+                else func()
+            }
+        }
     }
 
     private fun getERPItem(iconResource: Int, textResource: Int): View {
@@ -262,6 +293,18 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 else true
 
             }
+        }
+
+        fun secureSettingsFallThrough(erpItemView: View?, positiveMessage: String,
+                                      settingsItem: SettingsPacketKotlin.SettingsItem?, fallThroughCode: Int){
+            if (grantedSettingsChange) {
+                toggleERPItemStatusIcon(erpItemView, DONE, positiveMessage)
+            }
+            else {
+                settingsItem?.isSelected = false
+                toggleERPItemStatusIcon(erpItemView, CANCEL, getString(R.string.denied))
+            }
+            doFallThroughJob(fallThroughCode)
         }
 
         doJob(JOBCODE_PREP_APP) {
@@ -351,6 +394,11 @@ class ExtraRestorePrepare: AppCompatActivity() {
             fun proceed(status: Int, label: String){
                 toggleERPItemStatusIcon(erpItemKeyboard, status, label)
                 doFallThroughJob(JOBCODE_PREP_WIFI)
+            }
+
+            if (!grantedSettingsChange){
+                proceed(CANCEL, getString(R.string.denied))
+                keyboardSettingsItem?.isSelected = false
             }
 
             var executed = false
@@ -540,18 +588,15 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
 
         doJob(JOBCODE_PREP_DPI) {
-            toggleERPItemStatusIcon(erpItemDpi, DONE, getString(R.string.will_be_restored_later))
-            doFallThroughJob(JOBCODE_PREP_ADB)
+            secureSettingsFallThrough(erpItemDpi, getString(R.string.will_be_restored_later), dpiSettingsItem, JOBCODE_PREP_ADB)
         }
 
         doJob(JOBCODE_PREP_ADB) {
-            toggleERPItemStatusIcon(erpItemAdb, DONE, getString(R.string.ready_to_be_restored))
-            doFallThroughJob(JOBCODE_PREP_FONT_SCALE)
+            secureSettingsFallThrough(erpItemAdb, getString(R.string.ready_to_be_restored), adbSettingsItem, JOBCODE_PREP_FONT_SCALE)
         }
 
         doJob(JOBCODE_PREP_FONT_SCALE) {
-            toggleERPItemStatusIcon(erpItemFontScale, DONE, getString(R.string.ready_to_be_restored))
-            doFallThroughJob(JOBCODE_PREP_END)
+            secureSettingsFallThrough(erpItemFontScale, getString(R.string.ready_to_be_restored), fontScaleSettingsItem, JOBCODE_PREP_END)
         }
 
         doJob(JOBCODE_PREP_END) {
