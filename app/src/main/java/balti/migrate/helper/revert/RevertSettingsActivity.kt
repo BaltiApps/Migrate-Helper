@@ -139,7 +139,7 @@ class RevertSettingsActivity: AppCompatActivity(), OnRevert {
 
                     val message = StringBuilder()
                     it.internalPackets.forEach { v ->
-                        message.append("${v.displayText}: ${v.value}")
+                        message.append("${v.displayText}: ${v.value}\n")
                     }
 
                     AlertDialog.Builder(this).apply {

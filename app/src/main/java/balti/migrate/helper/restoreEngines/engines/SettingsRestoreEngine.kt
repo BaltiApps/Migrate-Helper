@@ -39,15 +39,18 @@ class SettingsRestoreEngine(private val jobcode: Int,
     }
 
     private fun backupSettings() {
-        val file = File(DIR_REVERT_DIR, "${FILE_REVERT_HEAD}_$timeStamp")
-        file.parentFile.mkdirs()
+
+        val file = File(DIR_REVERT_DIR, "${FILE_REVERT_HEAD}$timeStamp")
+
+        flushToSu("mkdir -p $DIR_REVERT_DIR")
+        flushToSu("touch ${file.absolutePath}")
 
         flushToSu("echo \"{\" > ${file.absolutePath}")
         flushToSu("adbVal=\"$(settings get global adb_enabled)\"")
-        flushToSu("echo \"   \\\"${SettingsFields.JSON_FIELD_ADB_TEXT}\"\\\": \$adbVal,\" >> ${file.absolutePath}")
-        flushToSu("echo \"   \\\"${SettingsFields.JSON_FIELD_DPI_TEXT}\"\\\": \\\"\$(wm density)\\\",\" >> ${file.absolutePath}")
+        flushToSu("echo \"   \\\"${SettingsFields.JSON_FIELD_ADB_TEXT}\\\": \$adbVal,\" >> ${file.absolutePath}")
+        flushToSu("echo \"   \\\"${SettingsFields.JSON_FIELD_DPI_TEXT}\\\": \\\"\$(wm density)\\\",\" >> ${file.absolutePath}")
         flushToSu("fontVal=\"$(settings get system font_scale)\"")
-        flushToSu("echo \"   \\\"${SettingsFields.JSON_FIELD_FONT_SCALE}\"\\\": \$fontVal\" >> ${file.absolutePath}")
+        flushToSu("echo \"   \\\"${SettingsFields.JSON_FIELD_FONT_SCALE}\\\": \$fontVal\" >> ${file.absolutePath}")
         flushToSu("echo \"}\" >> ${file.absolutePath}")
 
     }
