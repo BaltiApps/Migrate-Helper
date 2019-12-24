@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -149,7 +150,30 @@ class RevertSettingsActivity: AppCompatActivity(), OnRevert {
                         setPositiveButton(R.string.proceed) {_, _ ->
 
                             revert_text_status.setText(R.string.restoring_revert_file)
-                            revert_cancel.setOnClickListener { cancelRevert = true }
+                            revert_cancel.apply {
+                                setOnClickListener { cancelRevert = true }
+                                setOnLongClickListener {
+
+                                    Toast.makeText(this@RevertSettingsActivity, R.string.killing, Toast.LENGTH_SHORT).show()
+
+                                    Runtime.getRuntime().exec("su").apply {
+                                        BufferedWriter(OutputStreamWriter(this.outputStream)).run {
+                                            this.write("am force-stop $packageName\n")
+                                            this.write("exit\n")
+                                            this.flush()
+                                        }
+                                    }
+
+                                    val handler = Handler()
+                                    handler.postDelayed({
+                                        Toast.makeText(this@RevertSettingsActivity, R.string.killing_programmatically, Toast.LENGTH_SHORT).show()
+                                        android.os.Process.killProcess(android.os.Process.myPid())
+                                    }, CommonToolsKotlin.TIMEOUT_WAITING_TO_KILL)
+
+                                    true
+
+                                }
+                            }
 
                             RevertEngine(it, this@RevertSettingsActivity).execute()
                         }
