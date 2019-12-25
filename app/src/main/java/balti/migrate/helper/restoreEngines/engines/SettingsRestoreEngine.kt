@@ -16,6 +16,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_FONT_SCALE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_KEYBOARD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_REVERT_HEAD
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_BACKUP_SECURE_SETTINGS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LAST_DPI
 import balti.migrate.helper.utilities.constants.SettingsFields
 import java.io.*
@@ -79,7 +80,9 @@ class SettingsRestoreEngine(private val jobcode: Int,
 
     override fun doInBackground(vararg params: Any?): Any {
         try {
-            backupSettings()
+
+            if (sharedPreferences.getBoolean(PREF_BACKUP_SECURE_SETTINGS, true))
+                backupSettings()
 
             settingsPacket.internalPackets.forEach {
                 if (!RestoreServiceKotlin.cancelAll) {

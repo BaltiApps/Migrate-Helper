@@ -22,6 +22,11 @@
         android:title="@string/loadIconsInList"
         android:summary="@string/loadIconsInListDesc"/>
 
+    <CheckBoxPreference
+        android:key="backupSecureSettings"
+        android:title="@string/backup_secure_settings"
+        android:summary="@string/backup_secure_settings_desc"/>
+
     <PreferenceCategory
         android:title="@string/watcher">
 

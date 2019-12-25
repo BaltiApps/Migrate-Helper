@@ -195,6 +195,7 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migrate.helper/cache/"
 
         val PREF_DO_LOAD_ICON_IN_LIST = "doLoadIconInList"
+        val PREF_BACKUP_SECURE_SETTINGS = "backupSecureSettings"
 
         val PACKAGE_NAME_PLAY_STORE = "com.android.vending"
         val PACKAGE_NAME_FDROID = "org.fdroid.fdroid.privileged"

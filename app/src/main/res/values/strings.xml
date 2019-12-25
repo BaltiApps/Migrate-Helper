@@ -369,6 +369,8 @@
     <string name="restore_start_animation_desc">Show/hide the countdown animation before restore starts.</string>
     <string name="loadIconsInList">Load icons in app list</string>
     <string name="loadIconsInListDesc">Disable this in case of memory overflow crashes</string>
+    <string name="backup_secure_settings">Backup secure settings</string>
+    <string name="backup_secure_settings_desc">Allows you to revert the restore of ADB, DPI, Font scale.</string>
     <string name="use_watcher">Use watcher (Android 10+)</string>
     <string name="use_watcher_desc">A plugin app (installed and uninstalled with this helper app). Android 10 system closes this app after changing default SMS app. Watcher re-opens this helper app.</string>
     <string name="advanced">Advanced</string>
