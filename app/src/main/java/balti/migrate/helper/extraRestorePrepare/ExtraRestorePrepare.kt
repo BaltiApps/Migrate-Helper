@@ -310,30 +310,34 @@ class ExtraRestorePrepare: AppCompatActivity() {
         doJob(JOBCODE_PREP_APP) {
 
             fun proceed(status: Int, label: String){
-                if (status == DONE) {
-                    AlertDialog.Builder(this).apply {
-                        setTitle(R.string.disable_package_verification)
-                        setMessage(R.string.disable_package_verification_desc)
-                        setPositiveButton(R.string.ok_disable) {_, _ ->
-                            disablePackageVerification = true
-                            toggleERPItemStatusIcon(erpItemApps, status, label)
-                            doFallThroughJob(JOBCODE_PREP_KEYBOARD)
-                        }
-                        setNegativeButton(R.string.dont_disable) {_, _ ->
-                            disablePackageVerification = false
-                            toggleERPItemStatusIcon(erpItemApps, status, label)
-                            doFallThroughJob(JOBCODE_PREP_KEYBOARD)
-                        }
-                        setNeutralButton(R.string.abort) {_, _ ->
-                            finishThis()
-                        }
-                        setCancelable(false)
-                    }
-                            .show()
-                }
-                else {
-                    toggleERPItemStatusIcon(erpItemApps, status, label)
-                    doFallThroughJob(JOBCODE_PREP_KEYBOARD)
+
+                    {
+                        toggleERPItemStatusIcon(erpItemApps, status, label)
+                        doFallThroughJob(JOBCODE_PREP_KEYBOARD)
+                    }.let {
+
+                        if (status == DONE) {
+                            if (appPackets.isNotEmpty()) {
+                                AlertDialog.Builder(this).apply {
+                                    setTitle(R.string.disable_package_verification)
+                                    setMessage(R.string.disable_package_verification_desc)
+                                    setPositiveButton(R.string.ok_disable) { _, _ ->
+                                        disablePackageVerification = true
+                                        it()
+                                    }
+                                    setNegativeButton(R.string.dont_disable) { _, _ ->
+                                        disablePackageVerification = false
+                                        it()
+                                    }
+                                    setNeutralButton(R.string.abort) { _, _ ->
+                                        finishThis()
+                                    }
+                                    setCancelable(false)
+                                }
+                                        .show()
+                            } else it()
+
+                        } else it()
                 }
             }
 
