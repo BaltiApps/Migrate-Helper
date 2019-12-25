@@ -15,6 +15,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_BACKUP_SE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DO_LOAD_ICON_IN_LIST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LOAD_EXTRAS_ON_UI_THREAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_DATA
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
@@ -32,6 +33,7 @@ class MainPreferencesActivity: PreferenceActivity() {
     private val installWatcherLayout: WatcherInstallPreference by lazy { findPreference("installWatcherLayout") as WatcherInstallPreference }
 
     private val remountData: CheckBoxPreference by lazy { findPreference("remountData") as CheckBoxPreference }
+    private val loadExtrasOnUiThread: CheckBoxPreference by lazy { findPreference("loadExtrasOnUiThread") as CheckBoxPreference }
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val isAbove10 = Build.VERSION.SDK_INT > Build.VERSION_CODES.P
@@ -67,6 +69,7 @@ class MainPreferencesActivity: PreferenceActivity() {
             setValue(backupSecureSettings, PREF_BACKUP_SECURE_SETTINGS, true)
             setValue(useWatcher, PREF_USE_WATCHER, true)
             setValue(remountData, PREF_REMOUNT_DATA, false)
+            setValue(loadExtrasOnUiThread, PREF_LOAD_EXTRAS_ON_UI_THREAD, false)
 
             if (isAbove10)
                 useWatcher.isEnabled = true

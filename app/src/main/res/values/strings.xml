@@ -381,6 +381,8 @@
     <string name="installed_watcher">Watcher installed successfully</string>
     <string name="failed_watcher_install">Failed to install watcher</string>
     <string name="install">Install</string>
+    <string name="load_extras_on_ui_thread">Load extras on ui thread</string>
+    <string name="load_extras_on_ui_thread_desc">Probable fix to some errors in restore selector screen.</string>
     <string name="clear_to_reset">Clear and press OK to reset to default value</string>
     <string name="manual_cache">Specify path to migrate_cache</string>
     <string name="manual_metadata_holder">Specify path to metadata holder</string>

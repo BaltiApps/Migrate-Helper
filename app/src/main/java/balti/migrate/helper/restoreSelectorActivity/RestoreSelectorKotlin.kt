@@ -21,6 +21,7 @@ import balti.migrate.helper.AppInstance.Companion.appPackets
 import balti.migrate.helper.AppInstance.Companion.callsDataPackets
 import balti.migrate.helper.AppInstance.Companion.contactDataPackets
 import balti.migrate.helper.AppInstance.Companion.settingsPacket
+import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.AppInstance.Companion.smsDataPackets
 import balti.migrate.helper.AppInstance.Companion.wifiPacket
 import balti.migrate.helper.R
@@ -49,6 +50,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_GET_WI
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_ROOT_COPY
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DISPLAY_EXTRAS_ON_UI_THREAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
@@ -303,6 +305,8 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         wifiPacket?.let { allExtras.add(it) }
         settingsPacket?.let { allExtras.addAll(it.internalPackets) }
 
+        var triedUiThread = false
+
         if (!cancelLoading && (appPackets.isNotEmpty() || allExtras.isNotEmpty())) {
 
             if (allExtras.isNotEmpty())
@@ -310,105 +314,120 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             else extrasContainer.visibility = View.GONE
 
             commonTools.doBackgroundTask({
-                try {
+                fun load() {
+                    try {
 
-                    if (!AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false) && allExtras.isNotEmpty()) {
+                        if (!sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false) && allExtras.isNotEmpty()) {
 
-                        commonTools.tryIt { app_list.removeHeaderView(extrasContainer) }
-                        app_list.addHeaderView(extrasContainer, null, false)
+                            commonTools.tryIt { app_list.removeHeaderView(extrasContainer) }
+                            app_list.addHeaderView(extrasContainer, null, false)
 
-                        val extrasAllListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-                            for (i in 0 until extrasContainer.restore_selector_extras_container.childCount) {
-                                commonTools.tryIt {
-                                    val item = extrasContainer.restore_selector_extras_container.getChildAt(i)
-                                    item.findViewById<CheckBox>(R.id.extras_item_select).isChecked = isChecked
-                                }
-                            }
-                        }
-
-                        // this function toggles the checkbox in extra banner or app list banner,
-                        // when an individual item is toggled
-                        fun checkAll(immediateSelection: Boolean) {
-
-                            fun toggleMasterCheckbox(state: Boolean) {
-                                extrasContainer.extras_select_all.apply {
-                                    setOnCheckedChangeListener(null)
-                                    isChecked = state
-                                    setOnCheckedChangeListener(extrasAllListener)
-                                }
-                            }
-
-                            var isAnyNotSelected = false
-                            // flag. If any item is not in checked state,
-                            // do not check the other items, just mark banner checkbox as not selected
-
-                            if (!immediateSelection) {
-                                toggleMasterCheckbox(false)
-                            } else {
+                            val extrasAllListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
                                 for (i in 0 until extrasContainer.restore_selector_extras_container.childCount) {
                                     commonTools.tryIt {
                                         val item = extrasContainer.restore_selector_extras_container.getChildAt(i)
-                                        if (!item.findViewById<CheckBox>(R.id.extras_item_select).isChecked)
-                                            isAnyNotSelected = true
+                                        item.findViewById<CheckBox>(R.id.extras_item_select).isChecked = isChecked
                                     }
-                                    if (isAnyNotSelected) break
-                                }
-                                toggleMasterCheckbox(!isAnyNotSelected)
-                            }
-                        }
-
-                        var c = EXTRA_VIEW_COUNT
-
-                        for (item in allExtras) {
-
-                            val v = View.inflate(this, R.layout.extra_item, null)
-                            v.id = c++
-                            v.extras_item_select.apply {
-                                isChecked = item.isSelected
-                                setOnCheckedChangeListener { _, isChecked ->
-                                    checkAll(isChecked)
-                                    item.isSelected = isChecked
                                 }
                             }
 
-                            when (item) {
-                                is SettingsPacketKotlin.SettingsItem -> when(item.settingsType){
-                                    SettingsPacketKotlin.SETTINGS_TYPE_DPI -> v.extra_item_desc.apply {
+                            // this function toggles the checkbox in extra banner or app list banner,
+                            // when an individual item is toggled
+                            fun checkAll(immediateSelection: Boolean) {
+
+                                fun toggleMasterCheckbox(state: Boolean) {
+                                    extrasContainer.extras_select_all.apply {
+                                        setOnCheckedChangeListener(null)
+                                        isChecked = state
+                                        setOnCheckedChangeListener(extrasAllListener)
+                                    }
+                                }
+
+                                var isAnyNotSelected = false
+                                // flag. If any item is not in checked state,
+                                // do not check the other items, just mark banner checkbox as not selected
+
+                                if (!immediateSelection) {
+                                    toggleMasterCheckbox(false)
+                                } else {
+                                    for (i in 0 until extrasContainer.restore_selector_extras_container.childCount) {
+                                        commonTools.tryIt {
+                                            val item = extrasContainer.restore_selector_extras_container.getChildAt(i)
+                                            if (!item.findViewById<CheckBox>(R.id.extras_item_select).isChecked)
+                                                isAnyNotSelected = true
+                                        }
+                                        if (isAnyNotSelected) break
+                                    }
+                                    toggleMasterCheckbox(!isAnyNotSelected)
+                                }
+                            }
+
+                            var c = EXTRA_VIEW_COUNT
+
+                            for (item in allExtras) {
+
+                                val v = View.inflate(this, R.layout.extra_item, null)
+                                v.id = c++
+                                v.extras_item_select.apply {
+                                    isChecked = item.isSelected
+                                    setOnCheckedChangeListener { _, isChecked ->
+                                        checkAll(isChecked)
+                                        item.isSelected = isChecked
+                                    }
+                                }
+
+                                when (item) {
+                                    is SettingsPacketKotlin.SettingsItem -> when (item.settingsType) {
+                                        SettingsPacketKotlin.SETTINGS_TYPE_DPI -> v.extra_item_desc.apply {
+                                            visibility = View.VISIBLE
+                                            text = getString(R.string.reboot_is_necessary)
+                                        }
+                                    }
+                                    is WifiPacketKotlin -> v.extra_item_desc.apply {
                                         visibility = View.VISIBLE
-                                        text = getString(R.string.reboot_is_necessary)
+                                        text = getString(R.string.wifi_reboot_is_necessary)
                                     }
+                                    else -> v.extra_item_desc.visibility = View.VISIBLE
                                 }
-                                is WifiPacketKotlin -> v.extra_item_desc.apply {
-                                    visibility = View.VISIBLE
-                                    text = getString(R.string.wifi_reboot_is_necessary)
-                                }
-                                else -> v.extra_item_desc.visibility = View.VISIBLE
+
+                                v.extra_item_icon.setImageResource(item.iconResource)
+                                v.extra_item_name.text = item.displayText
+                                v.setOnClickListener { v.extras_item_select.apply { isChecked = !isChecked } }
+
+                                extrasContainer.restore_selector_extras_container.addView(v)
                             }
 
-                            v.extra_item_icon.setImageResource(item.iconResource)
-                            v.extra_item_name.text = item.displayText
-                            v.setOnClickListener { v.extras_item_select.apply { isChecked = !isChecked } }
-
-                            extrasContainer.restore_selector_extras_container.addView(v)
+                            if (allExtras.isNotEmpty()) {
+                                checkAll(true)
+                                extrasContainer.extras_select_all.setOnCheckedChangeListener(extrasAllListener)
+                            }
                         }
 
-                        if (allExtras.isNotEmpty()) {
-                            checkAll(true)
-                            extrasContainer.extras_select_all.setOnCheckedChangeListener(extrasAllListener)
+                        if (appPackets.isNotEmpty()) {
+                            commonTools.tryIt {
+                                commonTools.tryIt { app_list.removeHeaderView(appBar) }
+                                app_list.addHeaderView(appBar, null, false)
+                            }
+                            adapter = AppRestoreAdapter(this, appBar.appAllSelect, appBar.dataAllSelect, appBar.permissionsAllSelect)
                         }
+
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        error = e.message.toString()
                     }
 
-                    if (appPackets.isNotEmpty()) {
-                        commonTools.tryIt {
-                            commonTools.tryIt { app_list.removeHeaderView(appBar) }
-                            app_list.addHeaderView(appBar, null, false)
-                        }
-                        adapter = AppRestoreAdapter(this, appBar.appAllSelect, appBar.dataAllSelect, appBar.permissionsAllSelect)
-                    }
+                }
 
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    error = e.message.toString()
+                if (sharedPrefs.getBoolean(PREF_DISPLAY_EXTRAS_ON_UI_THREAD, false)) {
+                    runOnUiThread { load() }
+                    triedUiThread = true
+                }
+                else load()
+
+
+                if (error != "" && !triedUiThread) {
+                    runOnUiThread { load() }
+                    triedUiThread = true
                 }
 
             }, {

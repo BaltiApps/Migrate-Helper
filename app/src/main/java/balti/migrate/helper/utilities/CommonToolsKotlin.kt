@@ -190,12 +190,14 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_IS_POST_JOBS_NEEDED = "is_post_jobs_needed"
 
         val PREF_REMOUNT_DATA = "remount_data"
+        val PREF_LOAD_EXTRAS_ON_UI_THREAD = "loadExtrasOnUiThread"
 
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migrate.helper/cache/"
 
         val PREF_DO_LOAD_ICON_IN_LIST = "doLoadIconInList"
         val PREF_BACKUP_SECURE_SETTINGS = "backupSecureSettings"
+        val PREF_DISPLAY_EXTRAS_ON_UI_THREAD = "displayExtrasOnUiThread"
 
         val PACKAGE_NAME_PLAY_STORE = "com.android.vending"
         val PACKAGE_NAME_FDROID = "org.fdroid.fdroid.privileged"
