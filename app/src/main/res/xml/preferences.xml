@@ -55,6 +55,11 @@
             android:title="@string/load_extras_on_ui_thread"
             android:summary="@string/load_extras_on_ui_thread_desc"/>
 
+        <CheckBoxPreference
+            android:key="trackRestoreFinished"
+            android:title="@string/track_restore_finished"
+            android:summary="@string/track_restore_finished_desc"/>
+
         <balti.migrate.helper.preferences.subPreferences.ManualCachePref
             android:layout="@layout/preferences_edittext" />
 

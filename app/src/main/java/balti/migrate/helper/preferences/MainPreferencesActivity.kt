@@ -18,6 +18,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_RE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LOAD_EXTRAS_ON_UI_THREAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_DATA
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_TRACK_RESTORE_FINISHED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
 import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 
@@ -34,6 +35,7 @@ class MainPreferencesActivity: PreferenceActivity() {
 
     private val remountData: CheckBoxPreference by lazy { findPreference("remountData") as CheckBoxPreference }
     private val loadExtrasOnUiThread: CheckBoxPreference by lazy { findPreference("loadExtrasOnUiThread") as CheckBoxPreference }
+    private val trackRestoreFinished: CheckBoxPreference by lazy { findPreference("trackRestoreFinished") as CheckBoxPreference }
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val isAbove10 = Build.VERSION.SDK_INT > Build.VERSION_CODES.P
@@ -70,6 +72,7 @@ class MainPreferencesActivity: PreferenceActivity() {
             setValue(useWatcher, PREF_USE_WATCHER, true)
             setValue(remountData, PREF_REMOUNT_DATA, false)
             setValue(loadExtrasOnUiThread, PREF_LOAD_EXTRAS_ON_UI_THREAD, false)
+            setValue(trackRestoreFinished, PREF_TRACK_RESTORE_FINISHED, true)
 
             if (isAbove10)
                 useWatcher.isEnabled = true

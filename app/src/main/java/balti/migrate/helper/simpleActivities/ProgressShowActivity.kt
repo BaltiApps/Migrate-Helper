@@ -14,11 +14,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import balti.migrate.helper.AppInstance
+import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.postJobs.PostJobsActivity
 import balti.migrate.helper.restoreEngines.engines.AppRestoreEngine
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_RESTORE_DATA
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_ABORT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_START_POST_JOBS
@@ -42,6 +45,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_TASKLOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_TITLE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_TOTAL_TIME
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_TRACK_RESTORE_FINISHED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import balti.migrate.helper.utilities.IconTools
 import kotlinx.android.synthetic.main.restore_progress_layout.*
@@ -326,21 +330,31 @@ class ProgressShowActivity: AppCompatActivity() {
             movementMethod = ScrollingMovementMethod()
         }
 
-        commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
-
         if (intent.extras != null){
             handleProgress(intent)
             Handler().postDelayed({
                 if (intent.getBooleanExtra(EXTRA_DO_START_POST_JOBS, false))
                     startActivity(Intent(this, PostJobsActivity::class.java))
             }, 100)
-
         }
 
+        commonTools.LBM?.sendBroadcast(Intent(ACTION_REQUEST_RESTORE_DATA))
+        commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
         commonTools.LBM?.registerReceiver(endOnDisable, IntentFilter(ACTION_END_ALL))
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (sharedPrefs.getBoolean(PREF_TRACK_RESTORE_FINISHED, true) && AppInstance.isFinished) {
+            if (!intent.hasExtra(EXTRA_PROGRESS_TYPE) || intent.getStringExtra(EXTRA_PROGRESS_TYPE) != EXTRA_PROGRESS_TYPE_FINISHED) {
+                startActivity(Intent(this, MainActivityKotlin::class.java))
+                finish()
+            }
+        }
+    }
+
     override fun onDestroy() {
+        commonTools.tryIt { intent.replaceExtras(Bundle()) }
         super.onDestroy()
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(endOnDisable) }

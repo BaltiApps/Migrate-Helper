@@ -21,6 +21,8 @@ class AppInstance: Application() {
         val callsDataPackets by lazy { ArrayList<CallsPacketKotlin>(0) }
         var settingsPacket: SettingsPacketKotlin? = null
         var wifiPacket: WifiPacketKotlin? = null
+
+        var isFinished = false
     }
 
     override fun onCreate() {

@@ -231,10 +231,9 @@ class PostJobsActivity: AppCompatActivity() {
 
                             commit()
                         }
-
-                        commonTools.LBM?.sendBroadcast(Intent(ACTION_END_ALL))
                     }
                     finishAffinity()
+                    commonTools.LBM?.sendBroadcast(Intent(ACTION_END_ALL))
                 }
             }
         }

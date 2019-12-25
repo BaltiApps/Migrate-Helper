@@ -230,6 +230,8 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
     override fun onCreate() {
         super.onCreate()
 
+        AppInstance.isFinished = false
+
         serviceContext = this
 
         val loadingNotification = NotificationCompat.Builder(this, CHANNEL_RESTORE_RUNNING)
@@ -441,6 +443,8 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         callsDataPackets.clear()
         settingsPacket = null
         wifiPacket = null
+
+        AppInstance.isFinished = true
 
         stopSelf()
     }
