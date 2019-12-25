@@ -314,7 +314,9 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             else extrasContainer.visibility = View.GONE
 
             commonTools.doBackgroundTask({
+
                 fun load() {
+
                     try {
 
                         if (!sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false) && allExtras.isNotEmpty()) {
@@ -403,17 +405,9 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                             }
                         }
 
-                        if (appPackets.isNotEmpty()) {
-                            commonTools.tryIt {
-                                commonTools.tryIt { app_list.removeHeaderView(appBar) }
-                                app_list.addHeaderView(appBar, null, false)
-                            }
-                            adapter = AppRestoreAdapter(this, appBar.appAllSelect, appBar.dataAllSelect, appBar.permissionsAllSelect)
-                        }
-
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        error = e.message.toString()
+                        error = e.message.toString() + "\n"
                     }
 
                 }
@@ -425,9 +419,24 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                 else load()
 
 
-                if (error != "" && !triedUiThread) {
+                if (error.trim() != "" && !triedUiThread) {
                     runOnUiThread { load() }
                     triedUiThread = true
+                }
+
+                try {
+
+                    if (appPackets.isNotEmpty()) {
+                        commonTools.tryIt {
+                            commonTools.tryIt { app_list.removeHeaderView(appBar) }
+                            app_list.addHeaderView(appBar, null, false)
+                        }
+                        adapter = AppRestoreAdapter(this, appBar.appAllSelect, appBar.dataAllSelect, appBar.permissionsAllSelect)
+                    }
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    error += e.message.toString()
                 }
 
             }, {
