@@ -394,6 +394,7 @@
     <!--uninstall_activity.xml-->
     <string name="uninstall_desc">If doesn\'t work, delete the above directory. This option also deletes migrate_cache.</string>
     <string name="temporary_disable_desc">App will stop giving notifications, but remain installed.</string>
+    <string name="delete_migrate_cache">Delete migrate_cache (recommended)</string>
     <string name="reboot">Reboot (recommended)</string>
 
     <!--UninstallServiceKotlin.kt-->

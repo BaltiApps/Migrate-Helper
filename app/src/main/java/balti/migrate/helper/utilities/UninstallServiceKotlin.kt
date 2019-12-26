@@ -15,6 +15,7 @@ import balti.migrate.helper.R
 import balti.migrate.helper.simpleActivities.MainActivityKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_UNINSTALLING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REMOVE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_UNINSTALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DPI_VALUE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
@@ -49,10 +50,11 @@ class UninstallServiceKotlin: Service() {
             val dpiValue = intent.getIntExtra(EXTRA_DPI_VALUE, 0)
             val doReboot = intent.getBooleanExtra(EXTRA_DO_REBOOT, false)
             val doUninstall = intent.getBooleanExtra(EXTRA_DO_UNINSTALL, true)
+            val doRemoveCache = intent.getBooleanExtra(EXTRA_DO_REMOVE_CACHE, true)
 
             try {
                 AppInstance.notificationManager.cancelAll()
-                finishTasks(dpiValue, doUninstall, doReboot)
+                finishTasks(dpiValue, doUninstall, doReboot, doRemoveCache)
             }
             catch (e: Exception){
                 e.printStackTrace()
@@ -65,7 +67,7 @@ class UninstallServiceKotlin: Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun finishTasks(dpiValue: Int, doUninstall: Boolean, doReboot: Boolean){
+    private fun finishTasks(dpiValue: Int, doUninstall: Boolean, doReboot: Boolean, doRemoveCache: Boolean){
 
         if (dpiValue > 0 || doUninstall || doReboot) {
 
@@ -83,9 +85,12 @@ class UninstallServiceKotlin: Service() {
                 if (doUninstall) {
 
                     write("mount -o rw,remount /data\n")
-                    write("rm -rf $MIGRATE_CACHE\n")
-                    write("rm -rf $METADATA_HOLDER_DIR\n")
-                    write("rm -rf /data/data/*.tar.gz\n")
+
+                    if (doRemoveCache) {
+                        write("rm -rf $MIGRATE_CACHE\n")
+                        write("rm -rf $METADATA_HOLDER_DIR\n")
+                        write("rm -rf /data/data/*.tar.gz\n")
+                    }
 
                     if (sourceDir.startsWith("/system")) {
                         disableApp()

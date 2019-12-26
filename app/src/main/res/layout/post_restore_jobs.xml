@@ -161,7 +161,6 @@
                 android:padding="@dimen/large_padding_width"
                 android:id="@+id/pj_uninstallLayout"
                 android:layout_marginBottom="@dimen/large_padding_width"
-                android:visibility="gone"
                 >
 
                 <TextView
@@ -227,6 +226,27 @@
                         android:textSize="12sp"
                         android:paddingStart="@dimen/large_padding_width"
                         android:paddingEnd="@dimen/large_padding_width"
+                        />
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/delete_migrate_cache"
+                        android:textSize="12sp"
+                        android:layout_marginStart="@dimen/large_padding_width"
+                        android:layout_marginEnd="@dimen/large_padding_width"
+                        android:checked="true"
+                        android:id="@+id/pj_deleteCache"
+                        />
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/remount_all_to_uninstall"
+                        android:textSize="12sp"
+                        android:layout_marginStart="@dimen/large_padding_width"
+                        android:layout_marginEnd="@dimen/large_padding_width"
+                        android:id="@+id/pj_remountAll"
                         />
 
                     <Space

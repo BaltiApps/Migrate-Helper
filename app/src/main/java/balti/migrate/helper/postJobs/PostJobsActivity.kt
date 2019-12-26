@@ -9,10 +9,12 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.AppInstance
+import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REMOVE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_UNINSTALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DPI_VALUE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_POST_JOBS_ON_FINISH
@@ -22,6 +24,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_S
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IS_WIFI_RESTORED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LAST_DPI
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_ALL_TO_UNINSTALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_TEMPORARY_DISABLE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_WAS_CANCELLED
@@ -63,6 +66,13 @@ class PostJobsActivity: AppCompatActivity() {
 
         packagePath.text = applicationInfo.sourceDir.let {
             it.substring(0, it.lastIndexOf('/'))
+        }
+
+        pj_remountAll.apply {
+            isChecked = sharedPrefs.getBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, false)
+            setOnCheckedChangeListener { _, isChecked ->
+                sharedPrefs.edit().putBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, isChecked).commit()
+            }
         }
 
         execute()
@@ -207,6 +217,7 @@ class PostJobsActivity: AppCompatActivity() {
                         if (pj_doChangeDpiCheckbox.isChecked) putExtra(EXTRA_DPI_VALUE, dpiInt)
                         putExtra(EXTRA_DO_UNINSTALL, pj_uninstallRadio.isChecked)
                         putExtra(EXTRA_DO_REBOOT, pj_reboot.isChecked)
+                        putExtra(EXTRA_DO_REMOVE_CACHE, pj_uninstallRadio.isChecked && pj_deleteCache.isChecked)
                     }
 
                     // start the uninstall service
