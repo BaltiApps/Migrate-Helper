@@ -14,20 +14,30 @@
         android:padding="@dimen/large_padding_width">
 
         <ImageButton
-            android:id="@+id/erp_close_button"
+            android:id="@+id/revert_close_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:foreground="?android:attr/selectableItemBackground"
             android:padding="10dp"
-            android:src="@drawable/ic_close" />
+            android:src="@drawable/ic_back" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:paddingStart="10dp"
             android:text="@string/revert_settings"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ImageButton
+            android:id="@+id/revert_delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="10dp"
+            android:src="@drawable/ic_revert_delete" />
 
     </LinearLayout>
 

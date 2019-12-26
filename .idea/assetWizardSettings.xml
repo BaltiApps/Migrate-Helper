@@ -111,7 +111,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/home/sayantan/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_refresh_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/home/sayantan/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_delete_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -122,7 +122,7 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="2c9d94" />
-                            <entry key="outputName" value="ic_refresh_apps_not_installed" />
+                            <entry key="outputName" value="ic_revert_delete" />
                             <entry key="sourceFile" value="$PROJECT_DIR$/app/src/main/res/drawable-nodpi/normal_button.svg" />
                           </map>
                         </option>

@@ -47,6 +47,25 @@ class RevertSettingsActivity: AppCompatActivity(), OnRevert {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.revert_settings)
 
+        revert_close_button.setOnClickListener {
+            finish()
+        }
+
+        revert_delete_button.setOnClickListener {
+            if (isFilePermissionGranted()) {
+                AlertDialog.Builder(this).apply {
+                    setTitle(R.string.delete_all_revert)
+                    setPositiveButton(R.string.proceed) {_, _ ->
+                        File(DIR_REVERT_DIR).deleteRecursively()
+                        refreshFiles()
+                    }
+                    setNegativeButton(android.R.string.cancel, null)
+                }
+                        .show()
+            }
+            else Toast.makeText(this, R.string.storage_perm_needed, Toast.LENGTH_SHORT).show()
+        }
+
         refreshFiles()
         refresh_revert.setOnClickListener { refreshFiles() }
         grant_revert.setOnClickListener { requestReadPermission() }
@@ -194,6 +213,7 @@ class RevertSettingsActivity: AppCompatActivity(), OnRevert {
 
     private fun showErrorDialog(message: String) {
 
+        toggleLayout(0)
 
         AlertDialog.Builder(this).apply {
             setTitle(R.string.error_revert_alert)

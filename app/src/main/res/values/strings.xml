@@ -58,6 +58,7 @@
     <string name="error_send_screenshot">Error. Kindly take a screenshot and share in our Telegram group: https://t.me/migrateApp</string>
     <string name="restoring_revert_file">Restoring revert file. Please wait…\nLong press cancel to kill app if not responding.</string>
     <string name="killing">Killing…</string>
+    <string name="delete_all_revert">Delete all revert files?</string>
 
     <!--last_log_report.xml-->
     <string name="seeProgressLog">See Progress log</string>
