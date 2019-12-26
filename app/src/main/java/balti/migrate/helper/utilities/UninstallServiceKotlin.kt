@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import balti.migrate.helper.AppInstance
+import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.simpleActivities.MainActivityKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_UNINSTALLING
@@ -18,6 +19,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_UNINS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DPI_VALUE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_ALL_TO_UNINSTALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.UNINSTALL_START_ID
 import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import java.io.BufferedWriter
@@ -103,6 +105,20 @@ class UninstallServiceKotlin: Service() {
                         write("    done\n")
                         write("    rm -rf $sourceDir\n")
                         write("fi\n")
+
+                        // mount all as rw if app not removed
+
+                        if (sharedPrefs.getBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, false)) {
+
+                            write("if [[ -e $sourceDir ]]; then\n")
+                            write("    cat /proc/mounts | while read -r line || [[ -n \"\$line\" ]]; do\n")
+                            write("        mp=\"\$(echo \$line | cut -d ' ' -f2)\"\n")
+                            write("        md=\"\$(echo \$line | cut -d ' ' -f1)\"\n")
+                            write("        mount -o rw,remount \$md \$mp\n")
+                            write("    done\n")
+                            write("    rm -rf $sourceDir\n")
+                            write("fi\n")
+                        }
 
                     } else write("pm uninstall $packageName\n")
 

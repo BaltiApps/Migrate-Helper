@@ -192,6 +192,7 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_REMOUNT_DATA = "remount_data"
         val PREF_LOAD_EXTRAS_ON_UI_THREAD = "loadExtrasOnUiThread"
         val PREF_TRACK_RESTORE_FINISHED = "track_restore_finished"
+        val PREF_REMOUNT_ALL_TO_UNINSTALL = "remount_all_to_uninstall"
 
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migrate.helper/cache/"
