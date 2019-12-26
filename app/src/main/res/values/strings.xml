@@ -125,6 +125,7 @@
     <string name="denied">Denied</string>
     <string name="ok_disable">OK, disable</string>
     <string name="dont_disable">No, don\'t disable</string>
+    <string name="start">Start</string>
 
     <!--restore_progress_layout.xml-->
     <string name="close">CLOSE</string>

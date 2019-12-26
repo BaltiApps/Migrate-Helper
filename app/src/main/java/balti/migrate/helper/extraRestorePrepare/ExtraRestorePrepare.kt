@@ -97,6 +97,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
     private var fontScaleSettingsItem : SettingsPacketKotlin.SettingsItem? = null
 
     private var notificationFix = false
+    private var alreadyTriggered = false
 
     private val progressReceiver by lazy {
         object : BroadcastReceiver(){
@@ -617,6 +618,11 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
             if (!cancelChecks){
 
+                just_start_restore.setOnClickListener {
+                    act()
+                    alreadyTriggered = true
+                }
+
                 if (sharedPrefs.getBoolean(PREF_RESTORE_START_ANIMATION, true)) {
 
                     restore_countdown.visibility = View.VISIBLE
@@ -645,7 +651,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                                 runnable = Runnable {
                                     if (c == 1) {
                                         commonTools.tryIt { handler.removeCallbacks(runnable) }
-                                        act()
+                                        if (!alreadyTriggered) act()
                                     } else {
                                         restore_countdown_text.startAnimation(slideOut)
                                         handler.postDelayed(runnable, 1000)

@@ -88,6 +88,15 @@
         android:padding="10dp">
 
         <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/start"
+            android:id="@+id/just_start_restore"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="@color/colorAccent"
+            />
+
+        <Button
             android:id="@+id/extra_restore_prep_cancel_button"
             android:layout_width="@dimen/button_width"
             android:layout_height="@dimen/button_height"
