@@ -38,6 +38,7 @@
     Before restore starts, you will be asked if you want to install the watcher. If installed, it gets auto-uninstalled after restore is complete.\n\n
     You can opt to not use the watcher app. Simply go to \"Preferences\" in this app and disable \"Use watcher\" option. However, you would need to manually restart this helper app to complete the post restore processes.
     </string>
+    <string name="uninstall_by_twrp">Uninstall by twrp.</string>
 
     <!--revert_settings.xml-->
     <string name="revert_settings">Revert settings</string>
@@ -417,6 +418,12 @@
     <string name="confirm_watcher_desc">Watcher ensures a seamless process of restoring SMS and other apps.</string>
     <string name="know_more">Know more</string>
     <string name="install_by_root">Install by root (automatic install, no confirmation needed)</string>
+
+    <!--twrp_unpack_layout.xml-->
+    <string name="twrp_zip_files_under">TWRP zip files will be unpacked under:\n<b>[Internal storage]/Migrate/</b>\nPlease reboot to TWRP and flash.</string>
+    <string name="zip_only_helper">Uninstall only helper</string>
+    <string name="zip_helper_cache">Uninstall helper + migrate_cache</string>
+    <string name="extracted_under">Extracted under: [Internal storage]/Migrate/</string>
 
     <!--Do not change!!-->
     <string name="actionSu" translatable="false">Migrate_helper_fix_SU</string>

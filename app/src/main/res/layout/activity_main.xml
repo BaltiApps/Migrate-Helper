@@ -99,6 +99,21 @@
                     android:layout_height="@dimen/large_padding_width"/>
 
                 <TextView
+                    android:id="@+id/twrp_uninstall_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:text="@string/uninstall_by_twrp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/colorAccent" />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/small_padding_width"/>
+
+                <TextView
                     android:id="@+id/last_logs_textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

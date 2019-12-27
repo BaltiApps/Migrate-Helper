@@ -45,6 +45,7 @@ class CommonToolsKotlin(val context: Context) {
         val FILE_FILE_LIST = "fileList.txt"
 
         val DIR_REVERT_DIR = "/sdcard/Migrate/revert"
+        val DIR_TWRP_UNINSTALL = "/sdcard/Migrate/"
         val FILE_REVERT_HEAD = "revert_"
         val FILE_REVERT_SCRIPT = "revertScript.sh"
         val FILE_REVERT_ERROR = "revertError.txt"

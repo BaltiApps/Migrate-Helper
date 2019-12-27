@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/large_padding_width"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/twrp_zip_files_under"/>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/xlarge_padding_width"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/zip_only_helper"
+        android:backgroundTint="@color/colorButtons"
+        android:id="@+id/zip_helper_only"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/zip_helper_cache"
+        android:backgroundTint="@color/colorButtons"
+        android:id="@+id/zip_helper_cache"
+        />
+
+</LinearLayout>

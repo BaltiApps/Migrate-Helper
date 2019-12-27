@@ -1,18 +1,23 @@
 package balti.migrate.helper.simpleActivities
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
 import balti.migrate.helper.postJobs.PostJobsActivity
@@ -23,6 +28,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_RESTORE_DATA
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DIR_TWRP_UNINSTALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_START_POST_JOBS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_POST_JOBS_ON_FINISH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_ERRORLOG
@@ -34,6 +40,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_FILEPATH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_HEAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_LINK
+import balti.migrate.helper.utilities.ToolsNoContext
 import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.last_log_report.view.*
@@ -44,6 +51,9 @@ class MainActivityKotlin: AppCompatActivity() {
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val main by lazy { AppInstance.sharedPrefs }
     private val editor by lazy { main.edit() }
+
+    private val fCode1 = 11
+    private val fCode2 = 21
 
     private val progressReceiver by lazy {
         object : BroadcastReceiver(){
@@ -145,6 +155,34 @@ class MainActivityKotlin: AppCompatActivity() {
             startActivity(Intent(this, RevertSettingsActivity::class.java))
         }
 
+        twrp_uninstall_textView.apply {
+            paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            setOnClickListener {
+
+                val layoutView = View.inflate(this@MainActivityKotlin, R.layout.twrp_unpack_layout, null)
+
+                val ad = AlertDialog.Builder(this@MainActivityKotlin)
+                        .setView(layoutView)
+                        .setNegativeButton(R.string.close, null)
+                        .create()
+
+                val zipHelper = layoutView.findViewById<Button>(R.id.zip_helper_only)
+                val zipHelperCache = layoutView.findViewById<Button>(R.id.zip_helper_cache)
+
+                zipHelper.setOnClickListener {
+                    extractTWRPUninstall(fCode1)
+                    commonTools.tryIt { ad.dismiss() }
+                }
+
+                zipHelperCache.setOnClickListener {
+                    extractTWRPUninstall(fCode2)
+                    commonTools.tryIt { ad.dismiss() }
+                }
+
+                ad.show()
+            }
+        }
+
         last_logs_textView.apply {
             paintFlags = Paint.UNDERLINE_TEXT_FLAG
             setOnClickListener { showLog() }
@@ -228,6 +266,47 @@ class MainActivityKotlin: AppCompatActivity() {
         }
 
         ad.show()
+    }
+
+    private fun extractTWRPUninstall(fCode: Int) {
+
+        if (isFilePermissionGranted()) {
+            val fileName: String = if (fCode == fCode1)
+                "twrp_helper_uninstall.zip"
+            else "twrp_helper+cache_uninstall.zip"
+
+            fileName.let {
+                commonTools.unpackAssetToInternal(it, it, false)
+                File(commonTools.workingDir, it).run {
+                    if (this.exists()) {
+                        ToolsNoContext.moveFile(this, File(DIR_TWRP_UNINSTALL)).run {
+                            if (this == "")
+                                Toast.makeText(this@MainActivityKotlin, R.string.extracted_under, Toast.LENGTH_SHORT).show()
+                            else Toast.makeText(this@MainActivityKotlin, this, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+        }
+        else requestFilePermission(fCode)
+    }
+
+    private fun isFilePermissionGranted() =
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+
+    private fun requestFilePermission(fCode: Int) {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE), fCode)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == fCode1 || requestCode == fCode2) {
+            if (grantResults.size == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED)
+                extractTWRPUninstall(requestCode)
+            else Toast.makeText(this, R.string.storage_perm_needed, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroy() {
