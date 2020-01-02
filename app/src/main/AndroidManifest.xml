@@ -101,6 +101,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".utilities.AddonReceiver">
+            <intent-filter>
+                <action android:name="balti.migrate.helper.RECEIVER"/>
+            </intent-filter>
+        </receiver>
+
         <service android:name=".utilities.StupidStartupServiceKotlin"
             android:exported="false"/>
 

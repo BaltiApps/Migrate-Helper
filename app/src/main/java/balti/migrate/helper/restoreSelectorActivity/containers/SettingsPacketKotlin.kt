@@ -15,7 +15,6 @@ data class SettingsPacketKotlin(private val dpiText: String?, private val adbSta
     }
 
     abstract class SettingsItem : GetterMarker() {
-        abstract var commandsToRestore: List<String>
         abstract var settingsType: String
         abstract var value : Any
     }
@@ -51,9 +50,6 @@ data class SettingsPacketKotlin(private val dpiText: String?, private val adbSta
 
             valueToRestore
         }
-        override var commandsToRestore = if (value as Int > 0)
-            listOf("wm density $value")
-        else listOf("")
     }
 
     private inner class AdbInternalPacket(adbState: Int): SettingsItem() {
@@ -62,11 +58,6 @@ data class SettingsPacketKotlin(private val dpiText: String?, private val adbSta
         override var iconResource: Int = R.drawable.ic_adb_icon
         override var displayText: String = AppInstance.appContext.getString(R.string.adb_state)
         override var isSelected: Boolean = true
-        override var commandsToRestore = listOf(
-                "echo \"ADB: $adbState\"",
-                "echo \" \"",
-                "settings put global adb_enabled $adbState"
-        )
     }
 
     private inner class FontScaleInternalPacket(fontScale: Double): SettingsItem() {
@@ -75,11 +66,6 @@ data class SettingsPacketKotlin(private val dpiText: String?, private val adbSta
         override var iconResource: Int = R.drawable.ic_font_scale_icon
         override var displayText: String = AppInstance.appContext.getString(R.string.font_scale)
         override var isSelected: Boolean = true
-        override var commandsToRestore = listOf(
-                "echo \"Font scale: $fontScale\"",
-                "echo \" \"",
-                "settings put system font_scale $fontScale"
-        )
     }
 
     private inner class KeyboardInternalPacket(keyboardText: String): SettingsItem() {
@@ -88,10 +74,6 @@ data class SettingsPacketKotlin(private val dpiText: String?, private val adbSta
         override var iconResource: Int = R.drawable.ic_keyboard_icon
         override var displayText: String = AppInstance.appContext.getString(R.string.keyboard)
         override var isSelected: Boolean = true
-        override var commandsToRestore = listOf(
-                "ime enable $keyboardText",
-                "ime set $keyboardText"
-        )
     }
 
     val internalPackets: ArrayList<SettingsItem> = ArrayList(0)
@@ -99,9 +81,9 @@ data class SettingsPacketKotlin(private val dpiText: String?, private val adbSta
     init {
         internalPackets.clear()
         dpiText?.let { internalPackets.add(DpiInternalPacket(it)) }
-        adbState?.let { internalPackets.add(AdbInternalPacket(adbState)) }
-        fontScale?.let { internalPackets.add(FontScaleInternalPacket(fontScale)) }
-        keyboardText?.let { internalPackets.add(KeyboardInternalPacket(keyboardText)) }
+        adbState?.let { internalPackets.add(AdbInternalPacket(it)) }
+        fontScale?.let { internalPackets.add(FontScaleInternalPacket(it)) }
+        keyboardText?.let { internalPackets.add(KeyboardInternalPacket(it)) }
     }
 
 }
