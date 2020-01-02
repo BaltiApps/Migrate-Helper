@@ -3,7 +3,6 @@ package balti.migrate.helper.restoreEngines.engines
 import android.content.*
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import balti.migrate.helper.R
 import balti.migrate.helper.restoreEngines.ParentRestoreClass
@@ -14,7 +13,6 @@ import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKot
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_DPI
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_FONT_SCALE
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_KEYBOARD
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DEBUG_TAG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DIR_REVERT_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_GENERIC_SETTINGS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
@@ -27,6 +25,7 @@ import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_DPI
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT
+import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_WAS_CANCELLED
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_CLASS
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_PACKAGE_NAME
 import balti.migrate.helper.utilities.constants.SettingsFields
@@ -63,6 +62,9 @@ class SettingsRestoreEngine(private val jobcode: Int,
                 intent?.let {
                     it.getStringArrayListExtra(ADDON_SETTINGS_EXTRA_ERRORS)?.let {e ->
                         errors.addAll(e)
+                    }
+                    if (it.getBooleanExtra(ADDON_SETTINGS_EXTRA_WAS_CANCELLED, false)) {
+                        broadcastProgress("", engineContext.getString(R.string.settings_cancelled), false)
                     }
                 }
             }
@@ -116,8 +118,6 @@ class SettingsRestoreEngine(private val jobcode: Int,
                 putExtra(ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT, keyboardText)
                 putExtra(ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE, fontScale)
             })
-
-            Log.d(DEBUG_TAG, "started restore")
 
             runnable = Runnable {
                 handler?.run {

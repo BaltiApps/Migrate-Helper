@@ -8,7 +8,6 @@ base_apk_name=$3
 package_name=$4
 installer_name=$5
 METADATA_HOLDER=$6
-DISABLE_VERIFICATION=$7
 
 if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
 
@@ -21,7 +20,7 @@ if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
     verification_state="$(settings get global package_verifier_enable)"
 
     # disable package verification if the above field exists or if it not 0 by default
-    if [[ "${DISABLE_VERIFICATION}" == "true" && -n ${verification_state} && ${verification_state} != "null" && ${verification_state} != "0" ]]; then
+    if [[ -n ${verification_state} && ${verification_state} != "null" && ${verification_state} != "0" ]]; then
         settings put global package_verifier_enable 0
     fi
 
@@ -69,7 +68,7 @@ if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
     fi
 
     # restore package verification state
-    if [[ "${DISABLE_VERIFICATION}" == "true" && -n ${verification_state} && ${verification_state} != "null" && ${verification_state} != "0" ]]; then
+    if [[ -n ${verification_state} && ${verification_state} != "null" && ${verification_state} != "0" ]]; then
         settings put global package_verifier_enable ${verification_state}
     fi
 

@@ -1,10 +1,7 @@
 package balti.migrate.helper.extraRestorePrepare
 
 import android.Manifest
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.net.wifi.WifiManager
@@ -29,6 +26,7 @@ import balti.migrate.helper.AppInstance.Companion.smsDataPackets
 import balti.migrate.helper.AppInstance.Companion.wifiPacket
 import balti.migrate.helper.R
 import balti.migrate.helper.extraRestorePrepare.utils.AppsNotInstalledViewManager
+import balti.migrate.helper.extraRestorePrepare.utils.SettingsAddonInstall
 import balti.migrate.helper.restoreEngines.RestoreServiceKotlin
 import balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
@@ -39,7 +37,6 @@ import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_AUTO_INSTALL_WATCHER
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DISABLE_PACKAGE_VERIFICATION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_ADB
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_APP
@@ -57,10 +54,17 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_P
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
+import balti.migrate.helper.utilities.constants.AddonReceiverConstants.Companion.ACTION_ADDON_SETTINGS_SU
+import balti.migrate.helper.utilities.constants.AddonSettingsConstants
+import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_OPERATION_DUMMY_SU
+import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_SU_ERROR
+import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_SU_GRANTED
+import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_PACKAGE_NAME
 import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
 import kotlinx.android.synthetic.main.extra_restore_prepare.*
+import kotlinx.android.synthetic.main.install_addon_settings.view.*
 import kotlinx.android.synthetic.main.install_watcher_dialog_view.view.*
 
 class ExtraRestorePrepare: AppCompatActivity() {
@@ -81,8 +85,6 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
     private var cancelChecks = false
     private var autoInstallWatcher = false
-    private var disablePackageVerification = false
-    private var grantedSettingsChange = false
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
 
@@ -95,6 +97,9 @@ class ExtraRestorePrepare: AppCompatActivity() {
     private var dpiSettingsItem : SettingsPacketKotlin.SettingsItem? = null
     private var adbSettingsItem : SettingsPacketKotlin.SettingsItem? = null
     private var fontScaleSettingsItem : SettingsPacketKotlin.SettingsItem? = null
+    private var grantedSettingsChange = false
+
+    private var settingsInstallAD: AlertDialog? = null
 
     private var notificationFix = false
     private var alreadyTriggered = false
@@ -112,6 +117,38 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 )
                 commonTools.tryIt { commonTools.LBM?.unregisterReceiver(this) }
                 finish()
+            }
+        }
+    }
+
+    private val settingsSuReceiver by lazy {
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                intent?.run {
+                    if (this.getBooleanExtra(ADDON_SETTINGS_EXTRA_SU_GRANTED, false))
+                    {
+                        grantedSettingsChange = true
+                        commonTools.tryIt { settingsInstallAD?.dismiss() }
+                        doFallThroughJob(JOBCODE_PREP_APP)
+                    }
+                    else {
+                        val err = intent.getStringExtra(ADDON_SETTINGS_EXTRA_SU_ERROR)
+
+                        AlertDialog.Builder(this@ExtraRestorePrepare).apply {
+
+                            setTitle(R.string.grant_root_to_settings_addon)
+                            setMessage((if(err != null) err + "\n\n" else "") + getString(R.string.grant_root_to_settings_addon))
+                            setPositiveButton(R.string.abort) {_, _ -> finishThis() }
+                            setNegativeButton(R.string.skip_settings) {_, _ ->
+                                grantedSettingsChange = false
+                                doFallThroughJob(JOBCODE_PREP_APP)
+                            }
+                            setCancelable(false)
+
+                        }
+                                .show()
+                    }
+                }
             }
         }
     }
@@ -181,35 +218,117 @@ class ExtraRestorePrepare: AppCompatActivity() {
             doFallThroughJob(JOBCODE_PREP_END)
         }
 
-        commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS));
+        settingsPacket.let {
 
-        {
-            doFallThroughJob(JOBCODE_PREP_APP)
-        }.let { func ->
+            fun func() {
+                doFallThroughJob(JOBCODE_PREP_APP)
+            }
 
-            settingsPacket.let {
+            if (it != null && it.internalPackets.isNotEmpty()) {
 
-                if (it != null && it.internalPackets.isNotEmpty()) {
+                val view = View.inflate(this, R.layout.install_addon_settings, null)
+                view.settings_addon_progressBar.visibility = View.GONE
 
-                    AlertDialog.Builder(this).apply {
+                fun askSu() {
 
-                        setTitle(R.string.secure_settings_grant)
-                        setMessage(R.string.secure_settings_grant_desc)
-                        setPositiveButton(R.string.grant) { _, _ ->
-                            grantedSettingsChange = true
-                            func()
+                    view.settings_addon_title.setText(R.string.checking_settings_addon_root_access)
+                    view.settings_addon_desc.setText(R.string.please_grant_if_prompted)
+                    view.settings_addon_know_more.visibility = View.GONE
+                    view.settings_addon_progressBar.visibility = View.VISIBLE
+
+                    startActivity(Intent().apply {
+                        component = ComponentName(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME, AddonSettingsConstants.ADDON_SETTINGS_RECEIVER_CLASS)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        putExtra(ADDON_SETTINGS_EXTRA_OPERATION_DUMMY_SU, true)
+                    })
+
+                    settingsInstallAD?.run {
+                        commonTools.tryIt { getButton(AlertDialog.BUTTON_POSITIVE).visibility = View.GONE }
+                        commonTools.tryIt { getButton(AlertDialog.BUTTON_NEGATIVE).visibility = View.GONE }
+                        commonTools.tryIt { getButton(AlertDialog.BUTTON_NEUTRAL).visibility = View.GONE }
+                    }
+                }
+
+                val adBuilder = AlertDialog.Builder(this).apply {
+                    setView(view)
+                    setCancelable(false)
+                }
+
+                // if settings addon installed, just ask for root
+                if (commonTools.isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME)) {
+
+                    settingsInstallAD = adBuilder.create()
+                    askSu()
+
+                } else {
+
+                    // else, prompt to install
+                    view.settings_addon_title.setText(R.string.confirm_install_settings_addon)
+                    view.settings_addon_desc.setText(R.string.confirm_install_settings_addon_desc)
+                    view.settings_addon_know_more.apply {
+                        visibility = View.VISIBLE
+                        setOnClickListener {
+                            AlertDialog.Builder(this@ExtraRestorePrepare)
+                                    .setTitle(R.string.confirm_install_settings_addon_desc)
+                                    .setPositiveButton(R.string.close, null)
+                                    .show()
                         }
-                        setNegativeButton(R.string.deny) { _, _ ->
+                    }
+                    view.settings_addon_progressBar.visibility = View.GONE
+
+                    settingsInstallAD = adBuilder.apply {
+
+                        setPositiveButton(R.string.install, null)
+                        setNegativeButton(android.R.string.cancel) { _, _ ->
                             grantedSettingsChange = false
                             func()
                         }
+                        setNeutralButton(R.string.abort) {_, _ ->
+                            finishThis()
+                        }
                         setCancelable(false)
+                    }.create()
+
+                    // separate init of positive button to prevent alert dialog from closing
+                    settingsInstallAD?.setOnShowListener {
+
+                        settingsInstallAD?.getButton(AlertDialog.BUTTON_POSITIVE)?.setOnClickListener {
+
+                            view.settings_addon_progressBar.visibility = View.VISIBLE
+                            var error = ""
+
+                            commonTools.doBackgroundTask({
+                                error = SettingsAddonInstall(this@ExtraRestorePrepare).start()
+                            }, {
+                                if (error != "") {
+
+                                    // install failed
+                                    commonTools.showErrorDialog(error, getString(R.string.error), true, closeFunc = {
+
+                                        // if settings addon is not present, deny all settings restore, continue. Else ask for su
+                                        if (!commonTools.isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME)) {
+                                            grantedSettingsChange = false
+                                            settingsInstallAD?.dismiss()
+                                            func()
+                                        } else askSu()
+                                    })
+                                } else {
+                                    // install success. ask for su permission from addon
+                                    askSu()
+                                }
+                            })
+
+                        }
                     }
-                            .show()
                 }
-                else func()
-            }
+
+                settingsInstallAD?.show()
+
+            } else func()
         }
+
+        commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
+        commonTools.LBM?.registerReceiver(settingsSuReceiver, IntentFilter(ACTION_ADDON_SETTINGS_SU))
     }
 
     private fun getERPItem(iconResource: Int, textResource: Int): View {
@@ -303,7 +422,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
             }
             else {
                 settingsItem?.isSelected = false
-                toggleERPItemStatusIcon(erpItemView, CANCEL, getString(R.string.denied))
+                toggleERPItemStatusIcon(erpItemView, CANCEL, getString(R.string.no_addon))
             }
             doFallThroughJob(fallThroughCode)
         }
@@ -311,35 +430,8 @@ class ExtraRestorePrepare: AppCompatActivity() {
         doJob(JOBCODE_PREP_APP) {
 
             fun proceed(status: Int, label: String){
-
-                    {
-                        toggleERPItemStatusIcon(erpItemApps, status, label)
-                        doFallThroughJob(JOBCODE_PREP_KEYBOARD)
-                    }.let {
-
-                        if (status == DONE) {
-                            if (appPackets.isNotEmpty()) {
-                                AlertDialog.Builder(this).apply {
-                                    setTitle(R.string.disable_package_verification)
-                                    setMessage(R.string.disable_package_verification_desc)
-                                    setPositiveButton(R.string.ok_disable) { _, _ ->
-                                        disablePackageVerification = true
-                                        it()
-                                    }
-                                    setNegativeButton(R.string.dont_disable) { _, _ ->
-                                        disablePackageVerification = false
-                                        it()
-                                    }
-                                    setNeutralButton(R.string.abort) { _, _ ->
-                                        finishThis()
-                                    }
-                                    setCancelable(false)
-                                }
-                                        .show()
-                            } else it()
-
-                        } else it()
-                }
+                toggleERPItemStatusIcon(erpItemApps, status, label)
+                doFallThroughJob(JOBCODE_PREP_KEYBOARD)
             }
 
             val appsNotInstalled = ArrayList<AppPacketsKotlin>(0)
@@ -607,7 +699,6 @@ class ExtraRestorePrepare: AppCompatActivity() {
                     Intent(this, RestoreServiceKotlin::class.java)
                             .putExtra(EXTRA_NOTIFICATION_FIX, notificationFix)
                             .putExtra(EXTRA_AUTO_INSTALL_WATCHER, autoInstallWatcher)
-                            .putExtra(EXTRA_DISABLE_PACKAGE_VERIFICATION, disablePackageVerification)
                             .run {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                                     startForegroundService(this)
@@ -621,6 +712,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 just_start_restore.setOnClickListener {
                     act()
                     alreadyTriggered = true
+                    commonTools.tryIt { handler.removeCallbacks(runnable) }
                 }
 
                 if (sharedPrefs.getBoolean(PREF_RESTORE_START_ANIMATION, true)) {
@@ -732,5 +824,6 @@ class ExtraRestorePrepare: AppCompatActivity() {
         super.onDestroy()
         commonTools.tryIt { handler.removeCallbacks(runnable) }
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(settingsSuReceiver) }
     }
 }

@@ -28,8 +28,7 @@ import java.io.*
 
 class AppRestoreEngine(private val jobcode: Int,
                        private val appPackets: ArrayList<AppPacketsKotlin>,
-                       private val doNotificationFix: Boolean,
-                       private val disablePackageVerification: Boolean): ParentRestoreClass("") {
+                       private val doNotificationFix: Boolean): ParentRestoreClass("") {
 
     companion object {
         var ICON_STRING = ""
@@ -163,7 +162,7 @@ class AppRestoreEngine(private val jobcode: Int,
                                 isContactAppPresent = true
 
                             if (isApp)
-                                writeNext("sh $installScriptPath $MIGRATE_CACHE ${appPacket.packageName}.app ${appPacket.apkName} ${appPacket.packageName} ${appPacket.installerName} $METADATA_HOLDER_DIR $disablePackageVerification")
+                                writeNext("sh $installScriptPath $MIGRATE_CACHE ${appPacket.packageName}.app ${appPacket.apkName} ${appPacket.packageName} ${appPacket.installerName} $METADATA_HOLDER_DIR")
 
                             if (isData)
                                 writeNext("sh $restoreDataScriptPath $busyboxBinaryPath ${appPacket.dataName} ${appPacket.packageName} $doNotificationFix $METADATA_HOLDER_DIR $MIGRATE_CACHE")

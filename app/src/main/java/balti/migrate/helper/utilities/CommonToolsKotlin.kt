@@ -88,7 +88,6 @@ class CommonToolsKotlin(val context: Context) {
 
         val EXTRA_NOTIFICATION_FIX = "notification_fix"
         val EXTRA_AUTO_INSTALL_WATCHER = "autoInstallHelper"
-        val EXTRA_DISABLE_PACKAGE_VERIFICATION = "disablePackageVerification"
 
         val EXTRA_POST_JOBS_ON_FINISH = "post_jobs_on_finish"
 
@@ -547,17 +546,18 @@ class CommonToolsKotlin(val context: Context) {
         tryIt(f, "", false)
     }
 
-    fun showErrorDialog(message: String, title: String = "", isCancelable: Boolean = true){
+    fun showErrorDialog(message: String, title: String = "", isCancelable: Boolean = true, closeFunc: (() -> Unit)? = null){
         try {
             AlertDialog.Builder(context)
                     .setIcon(R.drawable.ic_error)
                     .setMessage(message).apply {
 
                         if (isCancelable)
-                            setNegativeButton(R.string.close, null)
+                            setNegativeButton(R.string.close) {_, _ -> closeFunc?.invoke() }
                         else {
                             setCancelable(false)
                             setNegativeButton(R.string.close) { _, _ ->
+                                closeFunc?.invoke()
                                 if (context is AppCompatActivity) {
                                     (context as AppCompatActivity).finish()
                                 }

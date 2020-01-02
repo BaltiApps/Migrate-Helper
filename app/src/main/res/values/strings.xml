@@ -118,11 +118,7 @@
     Migrate will briefly disable package verification during apps installation.\n\n
     Please avoid installing any other app from anywhere during the restore process, as you might end up installing a harmful app.
     </string>
-    <string name="secure_settings_grant">Grant to change secure settings?</string>
-    <string name="secure_settings_grant_desc">ADB state, font scale, DPI is considered secure android settings. If you deny, none of the backed up settings will be restored.\n
-    This is a measure to ensure transparency to the user according to Google Play standards. You may also revert these changes from the app\'s main screen.
-    </string>
-    <string name="deny">Deny</string>
+    <string name="no_addon">No add-on</string>
     <string name="denied">Denied</string>
     <string name="ok_disable">OK, disable</string>
     <string name="dont_disable">No, don\'t disable</string>
@@ -314,6 +310,7 @@
     <string name="cleaning_up">Cleaning up files</string>
     <string name="restoring_settings">Restoring settings</string>
     <string name="script_file_does_not_exist">Script file does not exist</string>
+    <string name="settings_cancelled">Settings cancelled</string>
 
     <!--ExtraRestorePrepare.kt-->
     <string name="skip_apps">Skip all</string>
@@ -328,6 +325,9 @@
         Wifi restore is still unreliable. You may need to re-flash the backup and try again. Usually it gets always gets restored in the second try.
     </string>
     <string name="skip_wifi">Skip wifi</string>
+    <string name="settings_root_permission_error">Settings add-on root permission error</string>
+    <string name="grant_root_to_settings_addon">Please grant root access to Settings addon. You can Abort now, open Magisk and manually grant root permission to Migrate settings addon</string>
+    <string name="skip_settings">Skip settings</string>
 
     <!--RestoreSelectorKotlin.kt-->
     <string name="contacts">Contacts</string>
@@ -410,9 +410,16 @@
     <!--miscellaneous-->
     <string name="notifHeader">Migrate package flashed!</string>
     <string name="notifBody">Click to continue restoration!!</string>
+    <string name="error">Error</string>
 
     <!--CommonToolsKotlin.kt-->
     <string name="error_occurred">Error occurred!!</string>
+
+    <!--install_addon_settings.xml-->
+    <string name="confirm_install_settings_addon">Install settings add-on?</string>
+    <string name="checking_settings_addon_root_access">Checking settings add-on root access</string>
+    <string name="please_grant_if_prompted">Please grant if prompted</string>
+    <string name="confirm_install_settings_addon_desc">Settings add-on is needed to restore DPI, ADB, FontScale etc. It will be automatically removed later.</string>
 
     <!--install_watcher_dialog_view.xml-->
     <string name="confirm_install_watcher">Install watcher app?</string>
