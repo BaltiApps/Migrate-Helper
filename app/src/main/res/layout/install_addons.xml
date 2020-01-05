@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="@dimen/xlarge_padding_width"
-    android:theme="@style/Theme.AppCompat.Dialog"
+    android:background="@color/darkGray"
     >
 
     <LinearLayout
