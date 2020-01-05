@@ -19,6 +19,8 @@ class AddonSettingsConstants {
 
         val ADDON_SETTINGS_RECEIVER_PACKAGE_NAME = "balti.migrate.addon.settings"
         val ADDON_SETTINGS_RECEIVER_CLASS = "balti.migrate.addon.settings.DummyActivity"
+
+        val ADDON_SETTINGS_ASSET_NAME = "addonSettings.apk"
     }
 
 }

@@ -415,16 +415,23 @@
     <!--CommonToolsKotlin.kt-->
     <string name="error_occurred">Error occurred!!</string>
 
-    <!--install_addon_settings.xml-->
-    <string name="confirm_install_settings_addon">Install settings add-on?</string>
+    <!--install_addons.xml-->
+    <string name="confirm_install_addon">Following add-ons need to be installed</string>
+    <string name="sms_calls_addon">SMS, calls add-on</string>
+    <string name="sms_calls_addon_desc">Restores SMS and calls.</string>
+    <string name="settings_addon">Settings add-on</string>
+    <string name="settings_addon_desc">Restores ADB, DPI, Font scale, Keyboard</string>
     <string name="checking_settings_addon_root_access">Checking settings add-on root access</string>
     <string name="please_grant_if_prompted">Please grant if prompted</string>
-    <string name="confirm_install_settings_addon_desc">Settings add-on is needed to restore DPI, ADB, FontScale etc. It will be automatically removed later.</string>
+
+    <!--AddonInstallerActivity.kt-->
+    <string name="no_addon_to_install">No add-on to install!</string>
+    <string name="press_abort_to_cancel">Press Abort! to cancel.</string>
 
     <!--install_watcher_dialog_view.xml-->
     <string name="confirm_install_watcher">Install watcher app?</string>
     <string name="confirm_watcher_desc">Watcher ensures a seamless process of restoring SMS and other apps.</string>
-    <string name="know_more">Know more</string>
+    <string name="info">Info</string>
     <string name="install_by_root">Install by root (automatic install, no confirmation needed)</string>
 
     <!--twrp_unpack_layout.xml-->

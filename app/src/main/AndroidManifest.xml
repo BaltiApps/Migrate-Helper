@@ -78,6 +78,11 @@
             android:screenOrientation="portrait"
             />
 
+        <activity android:name=".extraRestorePrepare.AddonInstallerActivity"
+            android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
+            />
+
         <activity android:name=".postJobs.utils.ResurrectorActivity"
             android:theme="@style/AppTheme.Blank"
             android:launchMode="singleInstance"

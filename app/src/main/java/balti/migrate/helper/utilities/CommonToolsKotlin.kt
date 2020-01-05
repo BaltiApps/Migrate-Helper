@@ -91,6 +91,14 @@ class CommonToolsKotlin(val context: Context) {
 
         val EXTRA_POST_JOBS_ON_FINISH = "post_jobs_on_finish"
 
+        val EXTRA_SETTINGS_ADDON_OK = "settings_addon_ok"
+        val EXTRA_SMS_CALLS_ADDON_OK = "sms_calls_addon_ok"
+        val EXTRA_ADDON_DO_ABORT = "addon_abort"
+
+        val EXTRA_DO_INSTALL_SMS_CALLS_ADDON = "install_addon_smsCalls"
+        val EXTRA_DO_INSTALL_SETTINGS_ADDON = "install_addon_settings"
+        val EXTRA_SMS_CALLS_ADDON_FILES = "sms_calls_addon_files"
+
         val ERROR_APP_JSON_TRY_CATCH = "APP_JSON_TRY_CATCH"
         val ERROR_APP_JSON = "APP_JSON"
         val ERROR_CONTACTS_GET_TRY_CATCH = "CONTACTS_GET_TRY_CATCH"
@@ -159,6 +167,10 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_PREFERENCES_INSTALL_WATCHER = 45510
 
         val JOBCODE_READ_FILE_PERMISSION = 22773
+
+        val JOBCODE_ADDON_INSTALL_SMS_CALLS = 433
+        val JOBCODE_ADDON_INSTALL_SETTINGS = 434
+        val JOBCODE_ADDON_END = 432
 
         val TIMEOUT_WAITING_TO_CANCEL_TASK = 500L
         val TIMEOUT_WAITING_TO_KILL = 3000L
