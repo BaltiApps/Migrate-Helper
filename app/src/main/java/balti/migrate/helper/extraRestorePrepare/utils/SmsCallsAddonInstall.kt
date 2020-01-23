@@ -8,6 +8,7 @@ class SmsCallsAddonInstall(override val context: Context, private val filePaths:
     fun installAddon(): String {
         val moveCommands = ArrayList<String>(0)
         filePaths.forEach {
+            moveCommands.add("mkdir -p $ADDON_SMS_CALLS_WORKING_DIR")
             moveCommands.add("cp $it $ADDON_SMS_CALLS_WORKING_DIR")
         }
         setCustomCommands(moveCommands)

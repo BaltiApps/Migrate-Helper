@@ -31,6 +31,8 @@ class AddonSmsCallsConstants {
         val ADDON_SMS_CALLS_EXTRA_OPERATION_STOP_RESTORE = "operation_stop_restore_sms_calls"
         val ADDON_SMS_CALLS_EXTRA_OPERATION_JOB_UPDATE = "job_update"
 
+        val ADDON_SMS_CALLS_EXTRA_MASTER_JOBCODE = "smsCalls_master_job_code"
+
         val ADDON_SMS_CALLS_EXTRA_FILE_NAMES = "value_file_names"
 
         val ADDON_SMS_CALLS_EXTRA_SMS_GRANTED = "sms_perm_granted"

@@ -27,6 +27,7 @@ import balti.migrate.helper.AppInstance.Companion.wifiPacket
 import balti.migrate.helper.R
 import balti.migrate.helper.extraRestorePrepare.utils.AppsNotInstalledViewManager
 import balti.migrate.helper.extraRestorePrepare.utils.CommunicatorAddon
+import balti.migrate.helper.extraRestorePrepare.utils.OnPermissionAsked
 import balti.migrate.helper.restoreEngines.RestoreServiceKotlin
 import balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
@@ -56,16 +57,13 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_K
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_SMS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_WIFI
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CONTACTS
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOB_RESULT_DENIED
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOB_RESULT_OK
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOB_RESULT_TIMEOUT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
 import kotlinx.android.synthetic.main.extra_restore_prepare.*
 
-class ExtraRestorePrepare: AppCompatActivity() {
+class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
 
     private var erpItemContacts : View? = null
     private var erpItemSms : View? = null
@@ -106,6 +104,12 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
     private var addonSmsCallsSuccessful = false
     private var addonSettingsSuccessful = false
+
+    private val jobcodeOrder by lazy { arrayListOf(JOBCODE_PREP_APP, JOBCODE_PREP_KEYBOARD, JOBCODE_PREP_WIFI,
+            JOBCODE_PREP_CONTACTS, JOBCODE_PREP_SMS, JOBCODE_PREP_CALLS, JOBCODE_PREP_DPI, JOBCODE_PREP_ADB,
+            JOBCODE_PREP_FONT_SCALE, JOBCODE_PREP_END) }
+    private val viewOrder by lazy { arrayListOf(erpItemApps, erpItemKeyboard, erpItemWifi, erpItemContacts, erpItemSms,
+            erpItemCalls, erpItemDpi, erpItemAdb, erpItemFontScale) }
 
     private val progressReceiver by lazy {
         object : BroadcastReceiver(){
@@ -264,11 +268,19 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
     }
 
+    private fun jobProceed(jobCode: Int, status: Int, label: String){
+        jobcodeOrder.indexOf(jobCode).let {
+            toggleERPItemStatusIcon(viewOrder[it], status, label)
+            doFallThroughJob(jobcodeOrder[it+1])
+        }
+    }
+
     private fun doFallThroughJob(jobCode: Int) {
 
         var fallThrough = false
+        var workingJobCode = 0
 
-        fun doJob(jCode: Int, func: () -> Unit) {
+        fun doJob(jCode: Int, func: (jCode: Int) -> Unit) {
 
             if ((jCode == JOBCODE_PREP_END || !cancelChecks) && (fallThrough || jobCode == jCode)) {
 
@@ -286,9 +298,10 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 }
 
                 fallThrough = if (view != null || jCode == JOBCODE_PREP_END){
+                    workingJobCode = jCode
                     toggleERPItemStatusIcon(view, WAIT)
                     restore_countdown.visibility = View.GONE
-                    Handler().postDelayed({func()}, DUMMY_WAIT_TIME)
+                    Handler().postDelayed({func(jCode)}, DUMMY_WAIT_TIME)
                     false
                 }
                 else true
@@ -296,24 +309,9 @@ class ExtraRestorePrepare: AppCompatActivity() {
             }
         }
 
-        /*fun secureSettingsFallThrough(erpItemView: View?, positiveMessage: String,
-                                      settingsItem: SettingsPacketKotlin.SettingsItem?, fallThroughCode: Int){
-            if (grantedSettingsChange) {
-                toggleERPItemStatusIcon(erpItemView, DONE, positiveMessage)
-            }
-            else {
-                settingsItem?.isSelected = false
-                toggleERPItemStatusIcon(erpItemView, CANCEL, getString(R.string.no_addon))
-            }
-            doFallThroughJob(fallThroughCode)
-        }*/
+        fun proceed(status: Int, label: String) = jobProceed(workingJobCode, status, label)
 
         doJob(JOBCODE_PREP_APP) {
-
-            fun proceed(status: Int, label: String){
-                toggleERPItemStatusIcon(erpItemApps, status, label)
-                doFallThroughJob(JOBCODE_PREP_KEYBOARD)
-            }
 
             val appsNotInstalled = ArrayList<AppPacketsKotlin>(0)
             val appsInstalled = ArrayList<AppPacketsKotlin>(0)
@@ -369,11 +367,6 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         doJob(JOBCODE_PREP_KEYBOARD) {
 
-            fun proceed(status: Int, label: String){
-                toggleERPItemStatusIcon(erpItemKeyboard, status, label)
-                doFallThroughJob(JOBCODE_PREP_WIFI)
-            }
-
             var executed = false
             keyboardSettingsItem?.value.toString().let {
 
@@ -422,11 +415,6 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         doJob(JOBCODE_PREP_WIFI) {
 
-            fun proceed(status: Int, label: String){
-                toggleERPItemStatusIcon(erpItemWifi, status, label)
-                doFallThroughJob(JOBCODE_PREP_CONTACTS)
-            }
-
             val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
             if (!wifiManager.isWifiEnabled){
@@ -446,11 +434,6 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
 
         doJob(JOBCODE_PREP_CONTACTS) {
-
-            fun proceed(status: Int, label: String){
-                toggleERPItemStatusIcon(erpItemContacts, status, label)
-                doFallThroughJob(JOBCODE_PREP_SMS)
-            }
 
             val contactsView = View.inflate(this, R.layout.contacts_dialog_view, null).apply {
                 for (cp in contactDataPackets) {
@@ -472,21 +455,9 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         doJob(JOBCODE_PREP_SMS) {
 
-            fun proceed(status: Int, label: String){
-                toggleERPItemStatusIcon(erpItemSms, status, label)
-                doFallThroughJob(JOBCODE_PREP_CALLS)
-            }
-
             if (doInstallSmsCallsAddon) {
-
-                if (addonSmsCallsSuccessful)
-                    when(communicatorAddon.setSmsCallsAddonAsDefaultSmsApp()){
-                        JOB_RESULT_OK -> proceed(DONE, getString(R.string.ready_to_be_restored))
-                        JOB_RESULT_DENIED -> proceed(CANCEL, getString(R.string.denied))
-                        JOB_RESULT_TIMEOUT -> proceed(CANCEL, getString(R.string.addon_timed_out))
-                    }
+                if (addonSmsCallsSuccessful) communicatorAddon.setSmsCallsAddonAsDefaultSmsApp(it)
                 else proceed(CANCEL, getString(R.string.addon_not_installed))
-
             }
             else proceed(DONE, getString(R.string.nothing_to_restore))
 
@@ -494,19 +465,8 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         doJob(JOBCODE_PREP_CALLS) {
 
-            fun proceed(status: Int, label: String){
-                toggleERPItemStatusIcon(erpItemCalls, status, label)
-                doFallThroughJob(JOBCODE_PREP_DPI)
-            }
-
             if (doInstallSmsCallsAddon) {
-
-                if (addonSmsCallsSuccessful)
-                    when(communicatorAddon.grantWriteCallLogToSmsCallsAddon()){
-                        JOB_RESULT_OK -> proceed(DONE, getString(R.string.ready_to_be_restored))
-                        JOB_RESULT_DENIED -> proceed(CANCEL, getString(R.string.denied))
-                        JOB_RESULT_TIMEOUT -> proceed(CANCEL, getString(R.string.addon_timed_out))
-                    }
+                if (addonSmsCallsSuccessful) communicatorAddon.grantWriteCallLogToSmsCallsAddon(it)
                 else proceed(CANCEL, getString(R.string.addon_not_installed))
 
             }
@@ -514,18 +474,15 @@ class ExtraRestorePrepare: AppCompatActivity() {
         }
 
         doJob(JOBCODE_PREP_DPI) {
-            toggleERPItemStatusIcon(erpItemDpi, DONE, getString(R.string.will_be_restored_later))
-            doFallThroughJob(JOBCODE_PREP_ADB)
+            proceed(DONE, getString(R.string.will_be_restored_later))
         }
 
         doJob(JOBCODE_PREP_ADB) {
-            toggleERPItemStatusIcon(erpItemAdb, DONE, getString(R.string.ready_to_be_restored))
-            doFallThroughJob(JOBCODE_PREP_FONT_SCALE)
+            proceed(DONE, getString(R.string.ready_to_be_restored))
         }
 
         doJob(JOBCODE_PREP_FONT_SCALE) {
-            toggleERPItemStatusIcon(erpItemFontScale, DONE, getString(R.string.ready_to_be_restored))
-            doFallThroughJob(JOBCODE_PREP_END)
+            proceed(DONE, getString(R.string.ready_to_be_restored))
         }
 
         doJob(JOBCODE_PREP_END) {
@@ -645,10 +602,17 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
             JOBCODE_LAUNCH_ADDON_INSTALLER -> {
                 when {
-                    resultCode == Activity.RESULT_OK -> doFallThroughJob(JOBCODE_PREP_APP)
+                    resultCode == Activity.RESULT_OK -> {
+                        addonSmsCallsSuccessful = true
+                        addonSettingsSuccessful = true
+                        doFallThroughJob(JOBCODE_PREP_APP)
+                    }
                     data != null -> {
                         data.run {
-                            if (getBooleanExtra(EXTRA_ADDON_DO_ABORT, false)) doFallThroughJob(JOBCODE_PREP_END)
+                            if (getBooleanExtra(EXTRA_ADDON_DO_ABORT, false)){
+                                cancelChecks = true
+                                doFallThroughJob(JOBCODE_PREP_END)
+                            }
                             else {
                                 addonSmsCallsSuccessful = getBooleanExtra(EXTRA_SMS_CALLS_ADDON_OK, false)
                                 addonSettingsSuccessful = getBooleanExtra(EXTRA_SETTINGS_ADDON_OK, false)
@@ -659,14 +623,12 @@ class ExtraRestorePrepare: AppCompatActivity() {
                     else -> {
                         AlertDialog.Builder(this).apply {
                             setMessage(R.string.addon_installer_data_null)
-                            setNegativeButton(R.string.abort) { _, _ -> doFallThroughJob(JOBCODE_PREP_END) }
+                            setNegativeButton(R.string.abort) { _, _ -> cancelChecks = true; doFallThroughJob(JOBCODE_PREP_END) }
                             setPositiveButton(R.string.restore_only_apps) { _, _ -> doFallThroughJob(JOBCODE_PREP_APP) }
                         }
                     }
                 }
             }
-            /*JOBCODE_PREP_SMS -> doFallThroughJob(JOBCODE_PREP_SMS)
-            JOBCODE_RESTORE_INSTALL_WATCHER -> doFallThroughJob(JOBCODE_PREP_SMS)*/
         }
     }
 
@@ -684,5 +646,11 @@ class ExtraRestorePrepare: AppCompatActivity() {
         super.onDestroy()
         commonTools.tryIt { handler.removeCallbacks(runnable) }
         commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+    }
+
+    override fun onPermissionAsked(requestCode: Int, result: Boolean) {
+        jobProceed(requestCode,
+                if (result) DONE else CANCEL,
+                getString(if (result) R.string.ready_to_be_restored else R.string.denied))
     }
 }

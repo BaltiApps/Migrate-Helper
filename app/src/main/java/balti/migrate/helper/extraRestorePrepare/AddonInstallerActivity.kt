@@ -156,7 +156,9 @@ class AddonInstallerActivity: Activity() {
                 finishThis()
             }
 
-            doFallThroughJob(JOBCODE_ADDON_INSTALL_SMS_CALLS)
+            addon_install_button.setOnClickListener {
+                doFallThroughJob(JOBCODE_ADDON_INSTALL_SMS_CALLS)
+            }
         }
 
         commonTools.LBM?.registerReceiver(settingsSuReceiver, IntentFilter(ACTION_ADDON_SETTINGS_SU))

@@ -65,6 +65,7 @@ fabric.properties
 *.apk
 !*watcher.apk
 !*addonSettings.apk
+!*addonSmsCalls.apk
 *.ap_
 
 # Files for the ART/Dalvik VM
