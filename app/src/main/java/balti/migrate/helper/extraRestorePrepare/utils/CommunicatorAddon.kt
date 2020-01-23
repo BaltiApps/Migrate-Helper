@@ -22,6 +22,8 @@ class CommunicatorAddon(val context: Context) {
     private val onPermissionAsked by lazy { context as OnPermissionAsked }
     private var lastRequestCode = 0
 
+    private val GAP = 500L
+
     private fun smsCallsSend(bundle: Bundle, masterJobCode: Int) {
         context.startActivity(
             Intent().apply {
@@ -57,6 +59,7 @@ class CommunicatorAddon(val context: Context) {
 
     fun setSmsCallsAddonAsDefaultSmsApp(requestCode: Int) {
 
+        Thread.sleep(GAP)
         lastRequestCode = requestCode
         commonTools.LBM?.registerReceiver(smsCallsAddonReceiver, IntentFilter(ACTION_ADDON_SMS_CALLS_PERMISSION))
 
@@ -70,6 +73,7 @@ class CommunicatorAddon(val context: Context) {
 
     fun grantWriteCallLogToSmsCallsAddon(requestCode: Int) {
 
+        Thread.sleep(GAP)
         lastRequestCode = requestCode
         commonTools.LBM?.registerReceiver(smsCallsAddonReceiver, IntentFilter(ACTION_ADDON_SMS_CALLS_PERMISSION))
         var isGranted = false
