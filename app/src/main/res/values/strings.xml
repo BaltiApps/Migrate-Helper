@@ -306,6 +306,9 @@
     <string name="restoring_settings">Restoring settings</string>
     <string name="script_file_does_not_exist">Script file does not exist</string>
     <string name="settings_cancelled">Settings cancelled</string>
+    <string name="smsCalls_cancelled">SMS, calls cancelled</string>
+    <string name="restoring_smsCalls_by_addon">Restoring SMS, calls by addon</string>
+    <string name="init_smsCalls_addon">Initialising addon</string>
 
     <!--ExtraRestorePrepare.kt-->
     <string name="skip_apps">Skip all</string>

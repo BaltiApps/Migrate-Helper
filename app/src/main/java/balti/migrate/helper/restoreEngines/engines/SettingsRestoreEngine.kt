@@ -46,7 +46,8 @@ class SettingsRestoreEngine(private val jobcode: Int,
     private var handler : Handler? = null
     private var runnable: Runnable? = null
 
-    var exitWait = false
+    private var exitWait = false
+    private var alreadyFinished = false
 
     private fun flushToSu(cmd: String, ignoreCancel: Boolean = false){
         if (!RestoreServiceKotlin.cancelAll || ignoreCancel){
@@ -58,7 +59,6 @@ class SettingsRestoreEngine(private val jobcode: Int,
     private val addonResultsReceiver by lazy {
         object : BroadcastReceiver(){
             override fun onReceive(context: Context?, intent: Intent?) {
-                exitWait = true
                 intent?.let {
                     it.getStringArrayListExtra(ADDON_SETTINGS_EXTRA_ERRORS)?.let {e ->
                         errors.addAll(e)
@@ -67,6 +67,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
                         broadcastProgress("", engineContext.getString(R.string.settings_cancelled), false)
                     }
                 }
+                exitWait = true
             }
         }
     }
@@ -143,12 +144,16 @@ class SettingsRestoreEngine(private val jobcode: Int,
     }
 
     private fun finishJob(){
-        commonTools.tryIt { LBM.unregisterReceiver(addonResultsReceiver) }
+        if (!alreadyFinished) {
 
-        if (errors.size == 0) File("${settingsPacket.settingsFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
+            alreadyFinished = true
+            commonTools.tryIt { LBM.unregisterReceiver(addonResultsReceiver) }
 
-        (engineContext as OnRestoreComplete).run {
-            onRestoreComplete(jobcode, errors.size == 0, errors)
+            if (errors.size == 0) File("${settingsPacket.settingsFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
+
+            (engineContext as OnRestoreComplete).run {
+                onRestoreComplete(jobcode, errors.size == 0, errors)
+            }
         }
     }
 
@@ -156,6 +161,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
 
     override fun doInBackground(vararg params: Any?): Any {
 
+        alreadyFinished = false
         resetBroadcast(true, engineContext.getString(R.string.restoring_settings))
 
         try {
@@ -176,6 +182,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
         catch (e: Exception){
             e.printStackTrace()
             errors.add("${ERROR_GENERIC_SETTINGS}: ${e.message}")
+            finishJob()
         }
 
         return 0

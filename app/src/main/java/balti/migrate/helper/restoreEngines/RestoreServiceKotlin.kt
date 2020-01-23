@@ -23,7 +23,9 @@ import balti.migrate.helper.AppInstance.Companion.wifiPacket
 import balti.migrate.helper.R
 import balti.migrate.helper.restoreEngines.engines.*
 import balti.migrate.helper.restoreEngines.utils.OnRestoreComplete
-import balti.migrate.helper.restoreSelectorActivity.containers.*
+import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
+import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin
+import balti.migrate.helper.restoreSelectorActivity.containers.WifiPacketKotlin
 import balti.migrate.helper.simpleActivities.ProgressShowActivity
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_RESTORE_DATA
@@ -50,11 +52,10 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_TOTAL_TI
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_ERRORLOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_PROGRESSLOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_APP
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CALLS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CLEAN
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_END
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_SETTINGS
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_SMS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_SMS_CALLS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_WIFI
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_ID_CANCELLING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_ID_FINISHED
@@ -222,7 +223,8 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
         AppInstance.notificationManager.cancelAll()
 
-        doFallThroughJob(JOBCODE_RESTORE_SMS)
+        //doFallThroughJob(JOBCODE_RESTORE_SMS)
+        doFallThroughJob(JOBCODE_RESTORE_SMS_CALLS)
     }
 
     override fun onCreate() {
@@ -301,8 +303,9 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
                         currentTask = try {
                             when (jCode) {
-                                JOBCODE_RESTORE_SMS -> SmsRestoreEngine(jCode, workingObject as ArrayList<SmsPacketKotlin>)
-                                JOBCODE_RESTORE_CALLS -> CallsRestoreEngine(jCode, workingObject as ArrayList<CallsPacketKotlin>)
+                                //JOBCODE_RESTORE_SMS -> SmsRestoreEngine(jCode, workingObject as ArrayList<SmsPacketKotlin>)
+                                //JOBCODE_RESTORE_CALLS -> CallsRestoreEngine(jCode, workingObject as ArrayList<CallsPacketKotlin>)
+                                JOBCODE_RESTORE_SMS_CALLS -> SmsCallsRestoreEngine(jCode, smsDataPackets, callsDataPackets)
                                 JOBCODE_RESTORE_WIFI -> WifiRestoreEngine(jCode, workingObject as WifiPacketKotlin)
                                 JOBCODE_RESTORE_APP -> AppRestoreEngine(jCode, workingObject as ArrayList<AppPacketsKotlin>, notificationFix)
                                 JOBCODE_RESTORE_SETTINGS -> SettingsRestoreEngine(jCode, workingObject as SettingsPacketKotlin)
@@ -323,8 +326,9 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
             }
         }
 
-        doJob(JOBCODE_RESTORE_SMS, smsDataPackets.let { if (it.isNotEmpty()) it else null })
-        doJob(JOBCODE_RESTORE_CALLS, callsDataPackets.let { if (it.isNotEmpty()) it else null })
+        //doJob(JOBCODE_RESTORE_SMS, smsDataPackets.let { if (it.isNotEmpty()) it else null })
+        //doJob(JOBCODE_RESTORE_CALLS, callsDataPackets.let { if (it.isNotEmpty()) it else null })
+        doJob(JOBCODE_RESTORE_SMS_CALLS, if (smsDataPackets.isNotEmpty() || callsDataPackets.isNotEmpty()) Any() else null)
         doJob(JOBCODE_RESTORE_WIFI, wifiPacket)
 
         doJob(JOBCODE_RESTORE_APP, appPackets.let { if (it.isNotEmpty()) it else null })
@@ -340,12 +344,17 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
         when (jobCode) {
 
-            JOBCODE_RESTORE_SMS -> {
+            /*JOBCODE_RESTORE_SMS -> {
                 if (!jobSuccess) jobResults?.let { addError(it) }
                 doFallThroughJob(JOBCODE_RESTORE_CALLS)
             }
 
             JOBCODE_RESTORE_CALLS -> {
+                if (!jobSuccess) jobResults?.let { addError(it) }
+                doFallThroughJob(JOBCODE_RESTORE_WIFI)
+            }*/
+
+            JOBCODE_RESTORE_SMS_CALLS -> {
                 if (!jobSuccess) jobResults?.let { addError(it) }
                 doFallThroughJob(JOBCODE_RESTORE_WIFI)
             }
