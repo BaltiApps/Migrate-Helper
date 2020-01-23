@@ -28,6 +28,10 @@ class CommonToolsKotlin(val context: Context) {
         val DEBUG_TAG = "migrate_helper_tag"
         val LAST_SUPPORTED_ANDROID_API = 29
 
+        val JOB_RESULT_OK = 0
+        val JOB_RESULT_DENIED = 1
+        val JOB_RESULT_TIMEOUT = -1
+
         val PENDING_INTENT_REQUEST_ID = 914
         val PENDING_INTENT_RESTORE_ABORT_ID = 916
 
@@ -168,6 +172,7 @@ class CommonToolsKotlin(val context: Context) {
 
         val JOBCODE_READ_FILE_PERMISSION = 22773
 
+        val JOBCODE_LAUNCH_ADDON_INSTALLER = 430
         val JOBCODE_ADDON_INSTALL_SMS_CALLS = 433
         val JOBCODE_ADDON_INSTALL_SETTINGS = 434
         val JOBCODE_ADDON_END = 432

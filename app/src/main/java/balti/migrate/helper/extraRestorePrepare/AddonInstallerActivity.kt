@@ -269,7 +269,9 @@ class AddonInstallerActivity: Activity() {
         SETTINGS_ADDON_OK = SETTINGS_ADDON_OK && !settingsSuCancelled
 
         setResult(
-                if(SETTINGS_ADDON_OK && SMS_CALLS_ADDON_OK && !DO_ABORT)
+                if((SETTINGS_ADDON_OK || !doInstallSettings) &&
+                        (SMS_CALLS_ADDON_OK || !doInstallSmsCalls) &&
+                        !DO_ABORT)
                     RESULT_OK else RESULT_CANCELED,
                 Intent().apply {
                     putExtra(EXTRA_SETTINGS_ADDON_OK, SETTINGS_ADDON_OK)

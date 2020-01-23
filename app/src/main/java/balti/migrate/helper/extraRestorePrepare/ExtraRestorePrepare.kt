@@ -1,11 +1,10 @@
 package balti.migrate.helper.extraRestorePrepare
 
-import android.Manifest
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
@@ -17,8 +16,6 @@ import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import balti.migrate.helper.AppInstance.Companion.appPackets
 import balti.migrate.helper.AppInstance.Companion.callsDataPackets
@@ -29,6 +26,7 @@ import balti.migrate.helper.AppInstance.Companion.smsDataPackets
 import balti.migrate.helper.AppInstance.Companion.wifiPacket
 import balti.migrate.helper.R
 import balti.migrate.helper.extraRestorePrepare.utils.AppsNotInstalledViewManager
+import balti.migrate.helper.extraRestorePrepare.utils.CommunicatorAddon
 import balti.migrate.helper.restoreEngines.RestoreServiceKotlin
 import balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
@@ -38,8 +36,15 @@ import balti.migrate.helper.simpleActivities.ProgressShowActivity
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_ADDON_DO_ABORT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_AUTO_INSTALL_WATCHER
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_INSTALL_SETTINGS_ADDON
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_INSTALL_SMS_CALLS_ADDON
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SETTINGS_ADDON_OK
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SMS_CALLS_ADDON_FILES
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SMS_CALLS_ADDON_OK
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_LAUNCH_ADDON_INSTALLER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_ADB
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_APP
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_CALLS
@@ -51,16 +56,14 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_K
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_SMS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_WIFI
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CONTACTS
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_INSTALL_WATCHER
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOB_RESULT_DENIED
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOB_RESULT_OK
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOB_RESULT_TIMEOUT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
-import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
 import kotlinx.android.synthetic.main.extra_restore_prepare.*
-import kotlinx.android.synthetic.main.install_watcher_dialog_view.view.*
 
 class ExtraRestorePrepare: AppCompatActivity() {
 
@@ -82,6 +85,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
     private var autoInstallWatcher = false
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
+    private val communicatorAddon by lazy { CommunicatorAddon(this) }
 
     private var contactsCount = 0
 
@@ -92,10 +96,16 @@ class ExtraRestorePrepare: AppCompatActivity() {
     private var dpiSettingsItem : SettingsPacketKotlin.SettingsItem? = null
     private var adbSettingsItem : SettingsPacketKotlin.SettingsItem? = null
     private var fontScaleSettingsItem : SettingsPacketKotlin.SettingsItem? = null
-    private var grantedSettingsChange = false
+    //private var grantedSettingsChange = false
 
     private var notificationFix = false
     private var alreadyTriggered = false
+
+    private var doInstallSmsCallsAddon = false
+    private var doInstallSettingsAddon = false
+
+    private var addonSmsCallsSuccessful = false
+    private var addonSettingsSuccessful = false
 
     private val progressReceiver by lazy {
         object : BroadcastReceiver(){
@@ -179,18 +189,27 @@ class ExtraRestorePrepare: AppCompatActivity() {
             doFallThroughJob(JOBCODE_PREP_END)
         }
 
-        //TODO("start addon activity here")
+        doInstallSmsCallsAddon = smsDataPackets.isNotEmpty() || callsDataPackets.isNotEmpty()
+        doInstallSettingsAddon = try { settingsPacket?.internalPackets?.isNotEmpty()!! } catch (_: Exception) {false}
 
-//        settingsPacket.let {
-//
-//            fun func() {
-//                doFallThroughJob(JOBCODE_PREP_APP)
-//            }
-//
-//            if (it != null && it.internalPackets.isNotEmpty()) {} else func()
-//        }
+        if (doInstallSettingsAddon || doInstallSmsCallsAddon) installAddons()
+        else doFallThroughJob(JOBCODE_PREP_APP)
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
+    }
+
+    private fun installAddons(){
+        startActivityForResult(Intent(this, AddonInstallerActivity::class.java).apply {
+
+            putExtra(EXTRA_DO_INSTALL_SMS_CALLS_ADDON, doInstallSmsCallsAddon)
+            putExtra(EXTRA_DO_INSTALL_SETTINGS_ADDON, doInstallSettingsAddon)
+
+            val filePaths = ArrayList<String>(0)
+            for (p in callsDataPackets) { filePaths.add(p.callDBFile.absolutePath) }
+            for (p in smsDataPackets) { filePaths.add(p.smsDBFile.absolutePath) }
+
+            putStringArrayListExtra(EXTRA_SMS_CALLS_ADDON_FILES, filePaths)
+        }, JOBCODE_LAUNCH_ADDON_INSTALLER)
     }
 
     private fun getERPItem(iconResource: Int, textResource: Int): View {
@@ -277,7 +296,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
             }
         }
 
-        fun secureSettingsFallThrough(erpItemView: View?, positiveMessage: String,
+        /*fun secureSettingsFallThrough(erpItemView: View?, positiveMessage: String,
                                       settingsItem: SettingsPacketKotlin.SettingsItem?, fallThroughCode: Int){
             if (grantedSettingsChange) {
                 toggleERPItemStatusIcon(erpItemView, DONE, positiveMessage)
@@ -287,7 +306,7 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 toggleERPItemStatusIcon(erpItemView, CANCEL, getString(R.string.no_addon))
             }
             doFallThroughJob(fallThroughCode)
-        }
+        }*/
 
         doJob(JOBCODE_PREP_APP) {
 
@@ -458,59 +477,19 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 doFallThroughJob(JOBCODE_PREP_CALLS)
             }
 
-            if (!commonTools.areWeDefaultSmsApp()) {
+            if (doInstallSmsCallsAddon) {
 
-                AlertDialog.Builder(this)
-                        .setTitle(R.string.smsPermission)
-                        .setMessage(getText(R.string.smsPermission_desc))
-                        .setPositiveButton(android.R.string.ok) { _, _ ->
-                            sharedPrefs.edit().putString(PREF_DEFAULT_SMS_APP, commonTools.getDefaultSmsApp()).apply()
-                            commonTools.setDefaultSms(packageName, JOBCODE_PREP_SMS)
-                        }
-                        .setNegativeButton(android.R.string.cancel) { _, _ ->
-                            smsDataPackets.clear()
-                            proceed(CANCEL, getString(R.string.cancelled))
-                        }
-                        .setCancelable(false)
-                        .show()
-            }
-            else {
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P && sharedPrefs.getBoolean(PREF_USE_WATCHER, true)
-                        && !commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)){
-
-                    val v = View.inflate(this, R.layout.install_watcher_dialog_view, null)
-                    v.install_watcher_by_root.run {
-                        autoInstallWatcher = isChecked
-                        setOnCheckedChangeListener { _, isChecked ->
-                            autoInstallWatcher = isChecked
-                        }
+                if (addonSmsCallsSuccessful)
+                    when(communicatorAddon.setSmsCallsAddonAsDefaultSmsApp()){
+                        JOB_RESULT_OK -> proceed(DONE, getString(R.string.ready_to_be_restored))
+                        JOB_RESULT_DENIED -> proceed(CANCEL, getString(R.string.denied))
+                        JOB_RESULT_TIMEOUT -> proceed(CANCEL, getString(R.string.addon_timed_out))
                     }
-                    v.know_more_watcher.setOnClickListener {
-                        AlertDialog.Builder(this)
-                                .setMessage(R.string.watcher_extended_desc)
-                                .setNeutralButton(R.string.close, null)
-                                .show()
-                    }
+                else proceed(CANCEL, getString(R.string.addon_not_installed))
 
-                    AlertDialog.Builder(this)
-                            .setView(v)
-                            .setPositiveButton(R.string.install) {_, _ ->
-                                if (!autoInstallWatcher)
-                                    commonTools.installWatcherByPackageManager(JOBCODE_RESTORE_INSTALL_WATCHER)
-                                else proceed(DONE, getString(R.string.ready_to_be_restored))
-                            }
-                            .setNeutralButton(R.string.dont_use_watcher) {_, _ ->
-                                autoInstallWatcher = false
-                                proceed(DONE, getString(R.string.ready_to_be_restored))
-                            }
-                            .setCancelable(false)
-                            .show()
-
-                }
-                else {
-                    proceed(DONE, getString(R.string.ready_to_be_restored))
-                }
             }
+            else proceed(DONE, getString(R.string.nothing_to_restore))
+
         }
 
         doJob(JOBCODE_PREP_CALLS) {
@@ -520,37 +499,33 @@ class ExtraRestorePrepare: AppCompatActivity() {
                 doFallThroughJob(JOBCODE_PREP_DPI)
             }
 
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED){
+            if (doInstallSmsCallsAddon) {
 
-                AlertDialog.Builder(this)
-                        .setTitle(R.string.callsPermission)
-                        .setMessage(getText(R.string.callsPermission_desc))
-                        .setPositiveButton(android.R.string.ok) { _, _ ->
-                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_CALL_LOG), JOBCODE_PREP_CALLS)
-                        }
-                        .setNegativeButton(android.R.string.cancel) { _, _ ->
-                            callsDataPackets.clear()
-                            proceed(CANCEL, getString(R.string.cancelled))
-                        }
-                        .setCancelable(false)
-                        .show()
+                if (addonSmsCallsSuccessful)
+                    when(communicatorAddon.grantWriteCallLogToSmsCallsAddon()){
+                        JOB_RESULT_OK -> proceed(DONE, getString(R.string.ready_to_be_restored))
+                        JOB_RESULT_DENIED -> proceed(CANCEL, getString(R.string.denied))
+                        JOB_RESULT_TIMEOUT -> proceed(CANCEL, getString(R.string.addon_timed_out))
+                    }
+                else proceed(CANCEL, getString(R.string.addon_not_installed))
 
             }
-            else {
-                proceed(DONE, getString(R.string.ready_to_be_restored))
-            }
+            else proceed(DONE, getString(R.string.nothing_to_restore))
         }
 
         doJob(JOBCODE_PREP_DPI) {
-            secureSettingsFallThrough(erpItemDpi, getString(R.string.will_be_restored_later), dpiSettingsItem, JOBCODE_PREP_ADB)
+            toggleERPItemStatusIcon(erpItemDpi, DONE, getString(R.string.will_be_restored_later))
+            doFallThroughJob(JOBCODE_PREP_ADB)
         }
 
         doJob(JOBCODE_PREP_ADB) {
-            secureSettingsFallThrough(erpItemAdb, getString(R.string.ready_to_be_restored), adbSettingsItem, JOBCODE_PREP_FONT_SCALE)
+            toggleERPItemStatusIcon(erpItemAdb, DONE, getString(R.string.ready_to_be_restored))
+            doFallThroughJob(JOBCODE_PREP_FONT_SCALE)
         }
 
         doJob(JOBCODE_PREP_FONT_SCALE) {
-            secureSettingsFallThrough(erpItemFontScale, getString(R.string.ready_to_be_restored), fontScaleSettingsItem, JOBCODE_PREP_END)
+            toggleERPItemStatusIcon(erpItemFontScale, DONE, getString(R.string.ready_to_be_restored))
+            doFallThroughJob(JOBCODE_PREP_END)
         }
 
         doJob(JOBCODE_PREP_END) {
@@ -667,8 +642,31 @@ class ExtraRestorePrepare: AppCompatActivity() {
 
         when (requestCode) {
             JOBCODE_RESTORE_CONTACTS -> nextContact()
-            JOBCODE_PREP_SMS -> doFallThroughJob(JOBCODE_PREP_SMS)
-            JOBCODE_RESTORE_INSTALL_WATCHER -> doFallThroughJob(JOBCODE_PREP_SMS)
+
+            JOBCODE_LAUNCH_ADDON_INSTALLER -> {
+                when {
+                    resultCode == Activity.RESULT_OK -> doFallThroughJob(JOBCODE_PREP_APP)
+                    data != null -> {
+                        data.run {
+                            if (getBooleanExtra(EXTRA_ADDON_DO_ABORT, false)) doFallThroughJob(JOBCODE_PREP_END)
+                            else {
+                                addonSmsCallsSuccessful = getBooleanExtra(EXTRA_SMS_CALLS_ADDON_OK, false)
+                                addonSettingsSuccessful = getBooleanExtra(EXTRA_SETTINGS_ADDON_OK, false)
+                                doFallThroughJob(JOBCODE_PREP_APP)
+                            }
+                        }
+                    }
+                    else -> {
+                        AlertDialog.Builder(this).apply {
+                            setMessage(R.string.addon_installer_data_null)
+                            setNegativeButton(R.string.abort) { _, _ -> doFallThroughJob(JOBCODE_PREP_END) }
+                            setPositiveButton(R.string.restore_only_apps) { _, _ -> doFallThroughJob(JOBCODE_PREP_APP) }
+                        }
+                    }
+                }
+            }
+            /*JOBCODE_PREP_SMS -> doFallThroughJob(JOBCODE_PREP_SMS)
+            JOBCODE_RESTORE_INSTALL_WATCHER -> doFallThroughJob(JOBCODE_PREP_SMS)*/
         }
     }
 

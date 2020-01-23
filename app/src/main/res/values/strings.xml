@@ -113,11 +113,6 @@
     <string name="restore_starting_in">Restore starting in…</string>
     <string name="number_of_selected_apps">Selected apps</string>
     <string name="dont_use_watcher">Don\'t use watcher</string>
-    <string name="disable_package_verification">Disable package verification? (recommended)</string>
-    <string name="disable_package_verification_desc">If not disabled, some apps like Paytm do not get installed.
-    Migrate will briefly disable package verification during apps installation.\n\n
-    Please avoid installing any other app from anywhere during the restore process, as you might end up installing a harmful app.
-    </string>
     <string name="no_addon">No add-on</string>
     <string name="denied">Denied</string>
     <string name="ok_disable">OK, disable</string>
@@ -328,6 +323,10 @@
     <string name="settings_root_permission_error">Settings add-on root permission error</string>
     <string name="grant_root_to_settings_addon">Please grant root access to Settings addon. You can Abort now, open Magisk and manually grant root permission to Migrate settings addon</string>
     <string name="skip_settings">Skip settings</string>
+    <string name="addon_installer_data_null">Addon installer data is null. Settings, SMS, calls will not be restored.</string>
+    <string name="restore_only_apps">Restore only apps</string>
+    <string name="addon_not_installed">Add-on not installed.</string>
+    <string name="addon_timed_out">Add-on timed out.</string>
 
     <!--RestoreSelectorKotlin.kt-->
     <string name="contacts">Contacts</string>

@@ -45,7 +45,7 @@ abstract class ParentRestoreClass(private val intentType: String): AsyncTask<Any
                 .addAction(
                         NotificationCompat.Action(0, serviceContext.getString(android.R.string.cancel),
                                 PendingIntent.getBroadcast(serviceContext, PENDING_INTENT_RESTORE_ABORT_ID,
-                                        Intent(ACTION_RESTORE_ABORT), 0))
+                                        Intent(ACTION_RESTORE_ABORT), PendingIntent.FLAG_CANCEL_CURRENT))
                 )
     }
 

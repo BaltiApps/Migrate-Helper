@@ -96,7 +96,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
         settingsPacket.let {
             var dpiValue: Int = -1
             var adbValue: Int = -1
-            var keyboardText: String = ""
+            var keyboardText = ""
             var fontScale: Double = -1.0
 
             for (ip in it.internalPackets){
