@@ -25,6 +25,8 @@ class CommunicatorAddon(val context: Context) {
     private val GAP = 500L
 
     private fun smsCallsSend(bundle: Bundle, masterJobCode: Int) {
+
+        Thread.sleep(GAP)
         context.startActivity(
             Intent().apply {
                 component = ComponentName(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME, ADDON_SMS_CALLS_RECEIVER_CLASS)
@@ -59,7 +61,6 @@ class CommunicatorAddon(val context: Context) {
 
     fun setSmsCallsAddonAsDefaultSmsApp(requestCode: Int) {
 
-        Thread.sleep(GAP)
         lastRequestCode = requestCode
         commonTools.LBM?.registerReceiver(smsCallsAddonReceiver, IntentFilter(ACTION_ADDON_SMS_CALLS_PERMISSION))
 
@@ -73,7 +74,6 @@ class CommunicatorAddon(val context: Context) {
 
     fun grantWriteCallLogToSmsCallsAddon(requestCode: Int) {
 
-        Thread.sleep(GAP)
         lastRequestCode = requestCode
         commonTools.LBM?.registerReceiver(smsCallsAddonReceiver, IntentFilter(ACTION_ADDON_SMS_CALLS_PERMISSION))
         var isGranted = false
