@@ -21,6 +21,7 @@ import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_FINISHED_TITLE
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_IS_CANCELLED
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_OPERATION_START_RESTORE
+import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_OPERATION_STOP_RESTORE
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_OPERATION_TYPE
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_PROGRESS
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_PROPERLY_RESTORED_FILES
@@ -51,6 +52,9 @@ class SmsCallsRestoreEngine(private val jobcode: Int,
 
     private var exitWait = false
     private var alreadyFinished = false
+
+    private var CANCELLED_MAX_COUNT = 10
+    private var alreadyCancelled = false
 
     private val addonResultsReceiver by lazy {
         object : BroadcastReceiver(){
@@ -109,11 +113,27 @@ class SmsCallsRestoreEngine(private val jobcode: Int,
 
         runnable = Runnable {
             handler?.run {
-                if (exitWait || RestoreServiceKotlin.cancelAll) {
+
+                if (exitWait || CANCELLED_MAX_COUNT == 0) {
                     removeCallbacks(runnable)
                     finishJob()
                 }
-                else postDelayed(runnable, 500)
+                else {
+
+                    if (RestoreServiceKotlin.cancelAll){
+                        if (!alreadyCancelled){
+                            engineContext.startActivity(Intent().apply {
+                                component = ComponentName(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME, ADDON_SMS_CALLS_RECEIVER_CLASS)
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                putExtra(ADDON_SMS_CALLS_EXTRA_OPERATION_TYPE, ADDON_SMS_CALLS_EXTRA_OPERATION_STOP_RESTORE)
+                            })
+                            alreadyCancelled = true
+                        }
+                        CANCELLED_MAX_COUNT--
+                    }
+
+                    postDelayed(runnable, 500)
+                }
             }
         }
 
@@ -149,6 +169,9 @@ class SmsCallsRestoreEngine(private val jobcode: Int,
     override fun doInBackground(vararg params: Any?): Any {
 
         alreadyFinished = false
+        alreadyCancelled = false
+        CANCELLED_MAX_COUNT = 60
+
         resetBroadcast(false, engineContext.getString(R.string.init_smsCalls_addon))
 
         try { restoreData() }
