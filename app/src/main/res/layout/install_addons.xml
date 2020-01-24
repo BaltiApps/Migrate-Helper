@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/xlarge_padding_width"
     android:background="@color/darkGray"
+    android:id="@+id/master_addon_installer_layout"
     >
 
     <LinearLayout
@@ -31,6 +32,7 @@
             android:paddingBottom="@dimen/large_padding_width"
             android:id="@+id/addon_layout_smsCalls"
             android:gravity="center_vertical"
+            android:visibility="gone"
             >
 
             <LinearLayout
@@ -95,6 +97,7 @@
             android:paddingBottom="@dimen/large_padding_width"
             android:id="@+id/addon_layout_settings"
             android:gravity="center_vertical"
+            android:visibility="gone"
             >
 
             <LinearLayout

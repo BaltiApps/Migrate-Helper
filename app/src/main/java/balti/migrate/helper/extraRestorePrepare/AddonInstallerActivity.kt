@@ -148,20 +148,37 @@ class AddonInstallerActivity: Activity() {
 
             setContentView(R.layout.install_addons)
 
-            if (!doInstallSmsCalls) addon_layout_smsCalls.visibility = View.GONE
-            if (!doInstallSettings) addon_layout_settings.visibility = View.GONE
+            if (isAddonDialogNeeded()) {
 
-            addon_abort_button.setOnClickListener {
-                DO_ABORT = true
-                finishThis()
+                if (doInstallSmsCalls && !commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
+                    addon_layout_smsCalls.visibility = View.VISIBLE
+                else addon_layout_smsCalls.visibility = View.GONE
+
+                if (doInstallSettings && !commonTools.isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME))
+                    addon_layout_settings.visibility = View.VISIBLE
+                else addon_layout_settings.visibility = View.GONE
+
+                addon_abort_button.setOnClickListener {
+                    DO_ABORT = true
+                    finishThis()
+                }
+
+                addon_install_button.setOnClickListener {
+                    doFallThroughJob(JOBCODE_ADDON_INSTALL_SMS_CALLS)
+                }
             }
-
-            addon_install_button.setOnClickListener {
+            else {
+                master_addon_installer_layout.visibility = View.GONE
                 doFallThroughJob(JOBCODE_ADDON_INSTALL_SMS_CALLS)
             }
         }
 
         commonTools.LBM?.registerReceiver(settingsSuReceiver, IntentFilter(ACTION_ADDON_SETTINGS_SU))
+    }
+
+    private fun isAddonDialogNeeded(): Boolean {
+        return (doInstallSmsCalls && !commonTools.isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME)) ||
+                (doInstallSettings && !commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
     }
 
     private fun installSettings() {
