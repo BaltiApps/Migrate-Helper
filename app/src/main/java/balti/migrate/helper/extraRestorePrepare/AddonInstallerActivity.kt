@@ -251,7 +251,25 @@ class AddonInstallerActivity: Activity() {
 
         toggleSmsCallsProcessing()
 
-        // if settings addon installed, continue to settings addon
+        var error = ""
+
+        commonTools.doBackgroundTask({
+            error = SmsCallsAddonInstall(this, smsCallsFilePaths,
+                    commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
+                    .installAddon()
+        }, {
+            if (error != "") {
+
+                // install failed
+                commonTools.showErrorDialog(error, getString(R.string.error), true, closeFunc = {
+                    toggleSmsCallsNotOk()
+                })
+            } else {
+                toggleSmsCallsOk()     // install success.
+            }
+        })
+
+        /*// if settings addon installed, continue to settings addon
         if (commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME)) {
             toggleSmsCallsOk()
         }
@@ -280,7 +298,7 @@ class AddonInstallerActivity: Activity() {
                 }
             })
 
-        }
+        }*/
     }
 
     private fun setData(){

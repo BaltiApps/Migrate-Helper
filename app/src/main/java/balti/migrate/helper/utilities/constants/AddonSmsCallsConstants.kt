@@ -8,6 +8,7 @@ class AddonSmsCallsConstants {
 
         val ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME = "balti.migrate.addon.smsCalls"
         val ADDON_SMS_CALLS_RECEIVER_CLASS = "balti.migrate.addon.smsCalls.DummyActivity"
+        val ADDON_SMS_CALLS_INTENT_ACTION = "balti.migrate.addon.smsCalls.COMMAND_RECIVER"
 
         val PREF_MANUAL_SMS_CALLS_ADDON_CACHE = "smsCallsManualCache"
 

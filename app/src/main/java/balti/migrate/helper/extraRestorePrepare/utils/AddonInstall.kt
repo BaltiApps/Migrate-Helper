@@ -7,7 +7,7 @@ import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 
-abstract class AddonInstall(open val context: Context, private val apkAsset: String) {
+abstract class AddonInstall(open val context: Context, private val apkAsset: String, private val doInstallApk: Boolean = true) {
 
     private val customCommands by lazy { ArrayList<String>(0) }
 
@@ -25,7 +25,7 @@ abstract class AddonInstall(open val context: Context, private val apkAsset: Str
             val writer = BufferedWriter(OutputStreamWriter(it.outputStream))
             val errorStream = BufferedReader(InputStreamReader(it.errorStream))
 
-            writer.write("pm install $path\n")
+            if (doInstallApk) writer.write("pm install $path\n")
             customCommands.forEach { cmd -> writer.write("$cmd\n") }
             writer.write("exit\n")
             writer.flush()

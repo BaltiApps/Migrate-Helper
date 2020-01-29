@@ -103,13 +103,14 @@ class SmsCallsRestoreEngine(private val jobcode: Int,
         for (p in smsPackets) if (p.isSelected) fileNames.add(p.smsDBFile.name)
         for (p in callsPackets) if (p.isSelected) fileNames.add(p.callDBFile.name)
 
+        Thread.sleep(500)
+
         engineContext.startActivity(Intent().apply {
             component = ComponentName(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME, ADDON_SMS_CALLS_RECEIVER_CLASS)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
             putExtra(ADDON_SMS_CALLS_EXTRA_OPERATION_TYPE, ADDON_SMS_CALLS_EXTRA_OPERATION_START_RESTORE)
             putStringArrayListExtra(ADDON_SMS_CALLS_EXTRA_FILE_NAMES, fileNames)
         })
-
 
         runnable = Runnable {
             handler?.run {
