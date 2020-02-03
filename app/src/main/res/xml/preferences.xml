@@ -22,26 +22,6 @@
         android:title="@string/loadIconsInList"
         android:summary="@string/loadIconsInListDesc"/>
 
-    <CheckBoxPreference
-        android:key="backupSecureSettings"
-        android:title="@string/backup_secure_settings"
-        android:summary="@string/backup_secure_settings_desc"/>
-
-    <PreferenceCategory
-        android:title="@string/watcher">
-
-        <CheckBoxPreference
-            android:key="useWatcher"
-            android:title="@string/use_watcher"
-            android:summary="@string/use_watcher_desc"/>
-
-        <balti.migrate.helper.preferences.subPreferences.WatcherInstallPreference
-            android:layout="@layout/preferences_use_watcher"
-            android:key="installWatcherLayout"
-            />
-
-    </PreferenceCategory>
-
     <PreferenceCategory
         android:title="@string/advanced">
 

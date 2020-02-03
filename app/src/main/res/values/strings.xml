@@ -20,7 +20,6 @@
     <!--activity_main.xml-->
     <string name="restore_main">Restore apps and data</string>
     <string name="uninstallFromSystem">Uninstall from system</string>
-    <string name="revert_system_settings">Revert system settings</string>
     <string name="uninstall_or_finalize">Uninstall app\nor Finalize restore</string>
     <string name="temporary_disable">Temporary disable</string>
     <string name="selective_restore">Choose what to restore</string>
@@ -29,26 +28,9 @@
     <string name="preferences">Preferences</string>
     <string name="uninstall_by_twrp">Uninstall by twrp.</string>
 
-    <!--revert_settings.xml-->
-    <string name="revert_settings">Revert settings</string>
-    <string name="select_revert_file">Choose a file. These files store the system settings before restoring from helper.</string>
-    <string name="no_revert_found">No backup found.</string>
-    <string name="no_revert_found_desc">Could not load any revert files.\nPlease restore a Migrate backup first.</string>
+    <!--MainActivityKotlin.kt-->
     <string name="storage_perm_needed">Storage permission needed</string>
-    <string name="storage_perm_needed_desc">Please grant permission to read revert files</string>
     <string name="grant">Grant</string>
-    <string name="reading_revert_file">Reading revert file</string>
-    <string name="settings_reverted">Settings reverted!</string>
-    <string name="please_reboot">Please reboot.</string>
-
-    <!--RevertSettingsActivity.kt-->
-    <string name="error_revert_alert">Error. Kindly send to developer.</string>
-    <string name="null_revert_object">Null revert object.</string>
-    <string name="following_will_be_restored">Following values will be restored.</string>
-    <string name="error_send_screenshot">Error. Kindly take a screenshot and share in our Telegram group: https://t.me/migrateApp</string>
-    <string name="restoring_revert_file">Restoring revert file. Please wait…\nLong press cancel to kill app if not responding.</string>
-    <string name="killing">Killing…</string>
-    <string name="delete_all_revert">Delete all revert files?</string>
 
     <!--last_log_report.xml-->
     <string name="seeProgressLog">See Progress log</string>
@@ -101,7 +83,6 @@
     <string name="ready_to_be_restored">Ready to restore</string>
     <string name="restore_starting_in">Restore starting in…</string>
     <string name="number_of_selected_apps">Selected apps</string>
-    <string name="dont_use_watcher">Don\'t use watcher</string>
     <string name="no_addon">No add-on</string>
     <string name="denied">Denied</string>
     <string name="ok_disable">OK, disable</string>
@@ -244,7 +225,6 @@
     <string name="report_header">Report via Telegram</string>
     <string name="share_progress_logs">Share progress logs</string>
     <string name="share_error_logs">Share error logs</string>
-    <string name="share_revert_errors">Share revert errors</string>
     <string name="share_file_lists">Share list of files in backup</string>
     <string name="share_script">Share script</string>
     <string name="share_package_data">Share package-data</string>
@@ -318,7 +298,6 @@
     <string name="addon_installer_data_null">Addon installer data is null. Settings, SMS, calls will not be restored.</string>
     <string name="restore_only_apps">Restore only apps</string>
     <string name="addon_not_installed">Add-on not installed.</string>
-    <string name="addon_timed_out">Add-on timed out.</string>
 
     <!--RestoreSelectorKotlin.kt-->
     <string name="contacts">Contacts</string>
@@ -363,17 +342,9 @@
     <string name="restore_start_animation_desc">Show/hide the countdown animation before restore starts.</string>
     <string name="loadIconsInList">Load icons in app list</string>
     <string name="loadIconsInListDesc">Disable this in case of memory overflow crashes</string>
-    <string name="backup_secure_settings">Backup secure settings</string>
-    <string name="backup_secure_settings_desc">Allows you to revert the restore of ADB, DPI, Font scale.</string>
-    <string name="use_watcher">Use watcher (Android 10+)</string>
-    <string name="use_watcher_desc">A plugin app (installed and uninstalled with this helper app). Android 10 system closes this app after changing default SMS app. Watcher re-opens this helper app.</string>
     <string name="advanced">Advanced</string>
     <string name="remount_data">Remount data</string>
     <string name="remount_data_desc">This tries to find and remount /data partition as read-write. Usually this is not needed.</string>
-    <string name="watcher">Watcher (Android 10+)</string>
-    <string name="install_watcher">Install watcher</string>
-    <string name="installed_watcher">Watcher installed successfully</string>
-    <string name="failed_watcher_install">Failed to install watcher</string>
     <string name="install">Install</string>
     <string name="load_extras_on_ui_thread">Load extras on ui thread</string>
     <string name="load_extras_on_ui_thread_desc">Probable fix to some errors in restore selector screen.</string>
@@ -413,16 +384,11 @@
     <string name="settings_addon_desc">Restores ADB, DPI, Font scale, Keyboard</string>
     <string name="checking_settings_addon_root_access">Checking settings add-on root access</string>
     <string name="please_grant_if_prompted">Please grant if prompted</string>
+    <string name="info">Info</string>
 
     <!--AddonInstallerActivity.kt-->
     <string name="no_addon_to_install">No add-on to install!</string>
     <string name="press_abort_to_cancel">Press Abort! to cancel.</string>
-
-    <!--install_watcher_dialog_view.xml-->
-    <string name="confirm_install_watcher">Install watcher app?</string>
-    <string name="confirm_watcher_desc">Watcher ensures a seamless process of restoring SMS and other apps.</string>
-    <string name="info">Info</string>
-    <string name="install_by_root">Install by root (automatic install, no confirmation needed)</string>
 
     <!--twrp_unpack_layout.xml-->
     <string name="twrp_zip_files_under">TWRP zip files will be unpacked under:\n<b>[Internal storage]/Migrate/</b>\nPlease reboot to TWRP and flash.</string>

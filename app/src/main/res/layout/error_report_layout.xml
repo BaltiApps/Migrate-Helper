@@ -95,13 +95,6 @@
                     android:checked="true"
                     android:text="@string/share_error_logs" />
 
-                <CheckBox
-                    android:id="@+id/share_revert_errors"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="@string/share_revert_errors" />
-
 
             </LinearLayout>
 

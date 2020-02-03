@@ -17,11 +17,8 @@ import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKot
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_DPI
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_FONT_SCALE
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_KEYBOARD
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DIR_REVERT_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_GENERIC_SETTINGS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_REVERT_HEAD
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_BACKUP_SECURE_SETTINGS
 import balti.migrate.helper.utilities.constants.AddonReceiverConstants.Companion.ACTION_ADDON_SETTINGS_BROADCAST
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_ERRORS
@@ -31,8 +28,6 @@ import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_WAS_CANCELLED
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_PACKAGE_NAME
-import balti.migrate.helper.utilities.constants.SettingsFields
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -74,27 +69,6 @@ class SettingsRestoreEngine(private val jobcode: Int,
                 exitWait = true
             }
         }
-    }
-
-    private fun backupSettings() {
-
-        val file = File(DIR_REVERT_DIR, "${FILE_REVERT_HEAD}$timeStamp")
-
-        flushToSu("mkdir -p $DIR_REVERT_DIR")
-        flushToSu("touch ${file.absolutePath}")
-
-        flushToSu("am force-stop $ADDON_SETTINGS_RECEIVER_PACKAGE_NAME")
-
-        flushToSu("echo \"{\" > ${file.absolutePath}")
-        flushToSu("adbVal=\"$(settings get global adb_enabled)\"")
-        flushToSu("echo \"   \\\"${SettingsFields.JSON_FIELD_ADB_TEXT}\\\": \$adbVal,\" >> ${file.absolutePath}")
-        flushToSu("echo \"   \\\"${SettingsFields.JSON_FIELD_DPI_TEXT}\\\": \\\"\$(wm density)\\\",\" >> ${file.absolutePath}")
-        flushToSu("fontVal=\"$(settings get system font_scale)\"")
-        flushToSu("echo \"   \\\"${SettingsFields.JSON_FIELD_FONT_SCALE}\\\": \$fontVal\" >> ${file.absolutePath}")
-        flushToSu("echo \"}\" >> ${file.absolutePath}")
-
-        flushToSu("exit", true)
-        suProcess.waitFor()
     }
 
     private fun restorePacket(){
@@ -177,9 +151,6 @@ class SettingsRestoreEngine(private val jobcode: Int,
         resetBroadcast(true, engineContext.getString(R.string.restoring_settings))
 
         try {
-            if (sharedPreferences.getBoolean(PREF_BACKUP_SECURE_SETTINGS, true)) {
-                backupSettings()
-            }
 
             restorePacket()
 

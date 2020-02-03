@@ -38,7 +38,6 @@ import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_ADDON_DO_ABORT
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_AUTO_INSTALL_WATCHER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_INSTALL_SETTINGS_ADDON
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_INSTALL_SMS_CALLS_ADDON
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
@@ -80,7 +79,6 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
     private val CANCEL = 8
 
     private var cancelChecks = false
-    private var autoInstallWatcher = false
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val communicatorAddon by lazy { CommunicatorAddon(this) }
@@ -492,7 +490,6 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                 else {
                     Intent(this, RestoreServiceKotlin::class.java)
                             .putExtra(EXTRA_NOTIFICATION_FIX, notificationFix)
-                            .putExtra(EXTRA_AUTO_INSTALL_WATCHER, autoInstallWatcher)
                             .run {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                                     startForegroundService(this)

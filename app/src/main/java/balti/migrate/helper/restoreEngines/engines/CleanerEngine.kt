@@ -18,8 +18,7 @@ import java.io.FileFilter
 import java.io.OutputStreamWriter
 
 class CleanerEngine(private val jobcode: Int,
-                    private val appPackets: ArrayList<AppPacketsKotlin>,
-                    private val autoInstallWatcher: Boolean): ParentRestoreClass(EXTRA_PROGRESS_TYPE_CLEANING) {
+                    private val appPackets: ArrayList<AppPacketsKotlin>): ParentRestoreClass(EXTRA_PROGRESS_TYPE_CLEANING) {
 
     private val errors by lazy { ArrayList<String>(0) }
 

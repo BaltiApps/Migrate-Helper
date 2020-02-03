@@ -63,7 +63,6 @@ fabric.properties
 ### Android template
 # Built application files
 *.apk
-!*watcher.apk
 !*addonSettings.apk
 !*addonSmsCalls.apk
 *.ap_

@@ -49,11 +49,7 @@ class CommonToolsKotlin(val context: Context) {
         val FILE_PACKAGE_DATA = "package-data"
         val FILE_FILE_LIST = "fileList.txt"
 
-        val DIR_REVERT_DIR = "/sdcard/Migrate/revert"
         val DIR_TWRP_UNINSTALL = "/sdcard/Migrate/"
-        val FILE_REVERT_HEAD = "revert_"
-        val FILE_REVERT_SCRIPT = "revertScript.sh"
-        val FILE_REVERT_ERROR = "revertError.txt"
 
         val CHANNEL_INIT = "Initializing"
         val CHANNEL_RESTORE_END = "Restore finished notification"
@@ -92,7 +88,6 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_TOTAL_TIME = "total_time"
 
         val EXTRA_NOTIFICATION_FIX = "notification_fix"
-        val EXTRA_AUTO_INSTALL_WATCHER = "autoInstallHelper"
 
         val EXTRA_SETTINGS_ADDON_OK = "settings_addon_ok"
         val EXTRA_SMS_CALLS_ADDON_OK = "sms_calls_addon_ok"
@@ -122,8 +117,6 @@ class CommonToolsKotlin(val context: Context) {
         val ERROR_APP_RESTORE = "RUN"
         val ERROR_APP_RESTORE_SUPPRESSED = "RUN_SUPPRESSED"
         val ERROR_CLEANING_SUPPRESSED = "CLEANING_ERROR_SUPPRESSED"
-
-        val ERROR_REVERT_READ = "REVERT_READ"
 
         val ERROR_RESTORE_SERVICE_ERROR = "RESTORE_SERVICE"
 
@@ -158,7 +151,6 @@ class CommonToolsKotlin(val context: Context) {
 
         val JOBCODE_RESTORE_CONTACTS = 35001
         //val JOBCODE_RESTORE_SMS = 45001
-        //val JOBCODE_RESTORE_INSTALL_WATCHER = 45500
         //val JOBCODE_RESTORE_CALLS = 55001
         val JOBCODE_RESTORE_SMS_CALLS = 48001
         val JOBCODE_RESTORE_SETTINGS = 62001
@@ -209,7 +201,6 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migrate.helper/cache/"
 
         val PREF_DO_LOAD_ICON_IN_LIST = "doLoadIconInList"
-        val PREF_BACKUP_SECURE_SETTINGS = "backupSecureSettings"
         val PREF_DISPLAY_EXTRAS_ON_UI_THREAD = "displayExtrasOnUiThread"
 
         val PACKAGE_NAME_PLAY_STORE = "com.android.vending"
@@ -326,8 +317,6 @@ class CommonToolsKotlin(val context: Context) {
         val progressLog = File(workingDir, FILE_PROGRESSLOG)
         val errorLog = File(workingDir, FILE_ERRORLOG)
         val theRestoreScript = File(workingDir, FILE_RESTORE_SCRIPT)
-        val revertError = File(workingDir, FILE_REVERT_ERROR)
-        val revertScript = File(workingDir, FILE_REVERT_SCRIPT)
 
         val packageDatas = workingDir.let {
             if (it != null) it.listFiles { f: File ->
@@ -349,7 +338,6 @@ class CommonToolsKotlin(val context: Context) {
                     .show()
         }
         else if (errorLog.exists() || progressLog.exists() || theRestoreScript.exists() ||
-                revertScript.exists() || revertError.exists() ||
                 packageDatas.isNotEmpty() || fileLists.isNotEmpty()){
 
             val eView = View.inflate(context, R.layout.error_report_layout, null)
@@ -368,9 +356,6 @@ class CommonToolsKotlin(val context: Context) {
 
             eView.share_errors_checkbox.isChecked = errorLog.exists()
             eView.share_errors_checkbox.isEnabled = errorLog.exists() && !isErrorLogMandatory
-
-            eView.share_revert_errors.isChecked = revertError.exists() || revertScript.exists()
-            eView.share_revert_errors.isEnabled = revertError.exists() || revertScript.exists()
 
             eView.report_button_what_is_shared.setOnClickListener {
                 AlertDialog.Builder(context)
@@ -394,10 +379,6 @@ class CommonToolsKotlin(val context: Context) {
                     if (eView.share_script_checkbox.isChecked) uris.add(getUri(theRestoreScript))
                     if (eView.share_package_data.isChecked) for (f in packageDatas) uris.add(getUri(f))
                     if (eView.share_fileLists_checkbox.isChecked) for (f in fileLists) uris.add(getUri(f))
-                    if (eView.share_revert_errors.isChecked) {
-                        uris.add(getUri(revertScript))
-                        uris.add(getUri(revertError))
-                    }
 
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -637,27 +618,5 @@ class CommonToolsKotlin(val context: Context) {
             tryIt { suProcess?.waitFor() }
         }
 
-    }
-
-    fun installWatcherByPackageManager(requestCode: Int) {
-        if (context is Activity) {
-
-            unpackAssetToInternal("watcher.apk", "watcher.apk", false)
-            val apkFile = File(unpackAssetToInternal("watcher.apk", "watcher.apk", false))
-
-            tryIt({
-
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.addCategory(Intent.CATEGORY_DEFAULT)
-                intent.setDataAndType(getUri(apkFile), "application/vnd.android.package-archive")
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                else intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-
-                context.startActivityForResult(intent, requestCode)
-
-            }, context.getString(R.string.failed_watcher_install))
-        }
     }
 }
