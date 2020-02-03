@@ -12,8 +12,9 @@ echo "--- PID: $$"
 echo " "
 
 # getting elevated permissions
-pm grant ${SELF_PACKAGE_NAME} android.permission.PACKAGE_USAGE_STATS
+#pm grant ${SELF_PACKAGE_NAME} android.permission.PACKAGE_USAGE_STATS
 #pm grant ${SELF_PACKAGE_NAME} android.permission.WRITE_SECURE_SETTINGS
+pm grant ${SELF_PACKAGE_NAME} android.permission.DUMP
 
 # make METADATA_HOLDER if not present
 mkdir -p ${METADATA_HOLDER}

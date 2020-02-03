@@ -180,8 +180,8 @@ class AddonInstallerActivity: Activity() {
     }
 
     private fun isAddonDialogNeeded(): Boolean {
-        return (doInstallSmsCalls && !commonTools.isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME)) ||
-                (doInstallSettings && !commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
+        return (doInstallSmsCalls && !commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME)) ||
+                (doInstallSettings && !commonTools.isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME))
     }
 
     private fun installSettings() {
@@ -262,7 +262,7 @@ class AddonInstallerActivity: Activity() {
 
         commonTools.doBackgroundTask({
             error = SmsCallsAddonInstall(this, smsCallsFilePaths,
-                    commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
+                    !commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
                     .installAddon()
         }, {
             if (error != "") {
