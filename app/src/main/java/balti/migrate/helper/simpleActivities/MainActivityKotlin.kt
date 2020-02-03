@@ -30,18 +30,14 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DIR_TWRP_UNINSTALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_START_POST_JOBS
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_POST_JOBS_ON_FINISH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_ERRORLOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_PROGRESSLOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.LAST_SUPPORTED_ANDROID_API
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_ANDROID_VERSION_WARNING
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_FILEPATH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_HEAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_LINK
 import balti.migrate.helper.utilities.ToolsNoContext
-import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.last_log_report.view.*
 import java.io.File
@@ -134,12 +130,9 @@ class MainActivityKotlin: AppCompatActivity() {
 
         uninstall_from_system.setOnClickListener {
 
-            AppInstance.sharedPrefs.edit().putBoolean(PREF_IS_POST_JOBS_NEEDED, true).commit()
-
             val uIntent = Intent(this, PostJobsActivity::class.java)
-                    .putExtra(EXTRA_POST_JOBS_ON_FINISH, false)
 
-            if (commonTools.areWeDefaultSmsApp()) {
+            if (commonTools.isAddonDefaultSmsApp()) {
                 AlertDialog.Builder(this)
                         .setMessage(R.string.default_sms_app_must_be_changed)
                         .setPositiveButton(R.string.proceed) {_, _ ->
@@ -193,16 +186,6 @@ class MainActivityKotlin: AppCompatActivity() {
             setOnClickListener { startActivity(Intent(this@MainActivityKotlin, MainPreferencesActivity::class.java)) }
         }
 
-        watcher_disclaimer.apply {
-            paintFlags = Paint.UNDERLINE_TEXT_FLAG
-            setOnClickListener {
-                AlertDialog.Builder(this@MainActivityKotlin)
-                        .setMessage(R.string.watcher_extended_desc)
-                        .setNeutralButton(R.string.close, null)
-                        .show()
-            }
-        }
-
         close_button.setOnClickListener { finish() }
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
@@ -214,18 +197,6 @@ class MainActivityKotlin: AppCompatActivity() {
             if (getBooleanExtra(EXTRA_DO_START_POST_JOBS, false))
                 startActivity(Intent(this@MainActivityKotlin, PostJobsActivity::class.java))
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        watcher_disclaimer.visibility = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P
-                && main.getBoolean(PREF_USE_WATCHER, true))
-            View.VISIBLE
-        else View.GONE
-        watcher_disclaimer.setText(
-                if (commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)) R.string.watcher_installed_disclaimer
-                else R.string.watcher_disclaimer
-        )
     }
 
     private fun showLog(){

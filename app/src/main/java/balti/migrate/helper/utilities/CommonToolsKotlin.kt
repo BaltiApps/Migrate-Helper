@@ -18,6 +18,7 @@ import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
+import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
 import kotlinx.android.synthetic.main.error_report_layout.view.*
 import java.io.*
 
@@ -93,8 +94,6 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_NOTIFICATION_FIX = "notification_fix"
         val EXTRA_AUTO_INSTALL_WATCHER = "autoInstallHelper"
 
-        val EXTRA_POST_JOBS_ON_FINISH = "post_jobs_on_finish"
-
         val EXTRA_SETTINGS_ADDON_OK = "settings_addon_ok"
         val EXTRA_SMS_CALLS_ADDON_OK = "sms_calls_addon_ok"
         val EXTRA_ADDON_DO_ABORT = "addon_abort"
@@ -168,10 +167,6 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_RESTORE_CLEAN = 95001
         val JOBCODE_RESTORE_END = 95002
 
-        val JOBCODE_RESET_SMS_APP = 45010
-
-        val JOBCODE_PREFERENCES_INSTALL_WATCHER = 45510
-
         val JOBCODE_READ_FILE_PERMISSION = 22773
 
         val JOBCODE_LAUNCH_ADDON_INSTALLER = 430
@@ -182,7 +177,6 @@ class CommonToolsKotlin(val context: Context) {
         val TIMEOUT_WAITING_TO_CANCEL_TASK = 500L
         val TIMEOUT_WAITING_TO_KILL = 3000L
 
-        val EXTRA_DPI_VALUE = "dpiValue"
         val EXTRA_DO_REBOOT = "doReboot"
         val EXTRA_DO_UNINSTALL = "doUninstall"
         val EXTRA_DO_REMOVE_CACHE = "doRemoveCache"
@@ -201,13 +195,10 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_IGNORE_READ_ERRORS = "ignore_read_errors"
         val PREF_IGNORE_EXTRAS = "ignore_extras"
         val PREF_RESTORE_START_ANIMATION = "restore_start_animation"
-        val PREF_USE_WATCHER = "use_watcher"
 
         val PREF_DEFAULT_SMS_APP = "default_sms_app"
-        val PREF_LAST_DPI = "last_read_dpi"
         val PREF_WAS_CANCELLED = "was_cancelled"
         val PREF_IS_WIFI_RESTORED = "is_wifi_restored"
-        val PREF_IS_POST_JOBS_NEEDED = "is_post_jobs_needed"
 
         val PREF_REMOUNT_DATA = "remount_data"
         val PREF_LOAD_EXTRAS_ON_UI_THREAD = "loadExtrasOnUiThread"
@@ -621,16 +612,8 @@ class CommonToolsKotlin(val context: Context) {
         return Telephony.Sms.getDefaultSmsPackage(context)
     }
 
-    fun areWeDefaultSmsApp(): Boolean {
-        return getDefaultSmsApp() == context.packageName
-    }
-
-    fun setDefaultSms(packageName: String, requestCode: Int) {
-        if (context is AppCompatActivity) {
-            val intent = Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT)
-            intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName)
-            context.startActivityForResult(intent, requestCode)
-        }
+    fun isAddonDefaultSmsApp(): Boolean {
+        return getDefaultSmsApp() == ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
     }
 
     fun cancelTask(suProcess: Process?, vararg pids: Int) {

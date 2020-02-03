@@ -1,6 +1,10 @@
 package balti.migrate.helper.restoreEngines.engines
 
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -19,6 +23,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_REVERT_HEAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_BACKUP_SECURE_SETTINGS
 import balti.migrate.helper.utilities.constants.AddonReceiverConstants.Companion.ACTION_ADDON_SETTINGS_BROADCAST
+import balti.migrate.helper.utilities.constants.AddonSettingsConstants
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_ERRORS
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_OPERATION_DO_START
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_ADB
@@ -26,7 +31,6 @@ import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_WAS_CANCELLED
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_CLASS
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_PACKAGE_NAME
 import balti.migrate.helper.utilities.constants.SettingsFields
 import java.io.*
@@ -110,7 +114,15 @@ class SettingsRestoreEngine(private val jobcode: Int,
                     }
             }
 
-            engineContext.startActivity(Intent().apply {
+            engineContext.startActivity(AddonSettingsConstants.getSettingsIntent(Bundle().apply {
+                putBoolean(ADDON_SETTINGS_EXTRA_OPERATION_DO_START, true)
+                putInt(ADDON_SETTINGS_EXTRA_VALUE_DPI, dpiValue)
+                putInt(ADDON_SETTINGS_EXTRA_VALUE_ADB, adbValue)
+                putString(ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT, keyboardText)
+                putDouble(ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE, fontScale)
+            }))
+
+            /*engineContext.startActivity(Intent().apply {
                 component = ComponentName(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME, ADDON_SETTINGS_RECEIVER_CLASS)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 putExtra(ADDON_SETTINGS_EXTRA_OPERATION_DO_START, true)
@@ -118,7 +130,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
                 putExtra(ADDON_SETTINGS_EXTRA_VALUE_ADB, adbValue)
                 putExtra(ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT, keyboardText)
                 putExtra(ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE, fontScale)
-            })
+            })*/
 
             runnable = Runnable {
                 handler?.run {

@@ -1,19 +1,24 @@
 package balti.migrate.helper.extraRestorePrepare.utils
 
 import android.Manifest
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
+import balti.migrate.helper.AppInstance
 import balti.migrate.helper.utilities.CommonToolsKotlin
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
 import balti.migrate.helper.utilities.constants.AddonReceiverConstants.Companion.ACTION_ADDON_SMS_CALLS_PERMISSION
+import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_CALLS_GRANTED
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_MASTER_JOBCODE
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_OPERATION_GET_CALLS_PERMISSION
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_OPERATION_GET_SMS_PERMISSION
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_OPERATION_TYPE
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_SMS_GRANTED
-import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_CLASS
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
 
 class CommunicatorAddon(val context: Context) {
@@ -24,17 +29,10 @@ class CommunicatorAddon(val context: Context) {
 
     private val GAP = 500L
 
-    private fun smsCallsSend(bundle: Bundle, masterJobCode: Int) {
+    private fun smsCallsSend(operation: String, masterJobCode: Int, bundle: Bundle = Bundle()) {
 
         Thread.sleep(GAP)
-        context.startActivity(
-            Intent().apply {
-                component = ComponentName(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME, ADDON_SMS_CALLS_RECEIVER_CLASS)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                putExtra(ADDON_SMS_CALLS_EXTRA_MASTER_JOBCODE, masterJobCode)
-                putExtras(bundle)
-            }
-        )
+        context.startActivity(AddonSmsCallsConstants.getSmsCallsIntent(bundle, operation, masterJobCode))
     }
 
     private val smsCallsAddonReceiver by lazy {
@@ -64,11 +62,10 @@ class CommunicatorAddon(val context: Context) {
         lastRequestCode = requestCode
         commonTools.LBM?.registerReceiver(smsCallsAddonReceiver, IntentFilter(ACTION_ADDON_SMS_CALLS_PERMISSION))
 
-        if (commonTools.getDefaultSmsApp() == ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME) sendResult(requestCode, true)
+        if (commonTools.isAddonDefaultSmsApp()) sendResult(requestCode, true)
         else {
-            smsCallsSend(Bundle().apply {
-                putString(ADDON_SMS_CALLS_EXTRA_OPERATION_TYPE, ADDON_SMS_CALLS_EXTRA_OPERATION_GET_SMS_PERMISSION)
-            }, requestCode)
+            AppInstance.sharedPrefs.edit().putString(PREF_DEFAULT_SMS_APP, commonTools.getDefaultSmsApp()).apply()
+            smsCallsSend(ADDON_SMS_CALLS_EXTRA_OPERATION_GET_SMS_PERMISSION , requestCode)
         }
     }
 
@@ -91,9 +88,7 @@ class CommunicatorAddon(val context: Context) {
 
         if (isGranted) sendResult(requestCode, true)
         else {
-            smsCallsSend(Bundle().apply {
-                putString(ADDON_SMS_CALLS_EXTRA_OPERATION_TYPE, ADDON_SMS_CALLS_EXTRA_OPERATION_GET_CALLS_PERMISSION)
-            }, requestCode)
+            smsCallsSend(ADDON_SMS_CALLS_EXTRA_OPERATION_GET_CALLS_PERMISSION, requestCode)
         }
     }
 

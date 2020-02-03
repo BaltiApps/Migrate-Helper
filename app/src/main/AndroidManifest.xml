@@ -80,26 +80,10 @@
             android:theme="@style/AppTheme.Dialog"
             />
 
-        <activity android:name=".postJobs.utils.ResurrectorActivity"
-            android:theme="@style/AppTheme.Blank"
-            android:launchMode="singleInstance"
-            >
-            <intent-filter>
-                <action android:name=".RESURRECTOR"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </activity>
-
         <receiver android:name=".utilities.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" android:priority="999"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
-            </intent-filter>
-        </receiver>
-
-        <receiver android:name=".postJobs.utils.AliveCheckReceiver">
-            <intent-filter>
-                <action android:name=".RECEIVER"/>
             </intent-filter>
         </receiver>
 

@@ -1,6 +1,5 @@
 package balti.migrate.helper.restoreEngines.engines
 
-import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
 import balti.migrate.helper.restoreEngines.ParentRestoreClass
 import balti.migrate.helper.restoreEngines.RestoreServiceKotlin
@@ -13,9 +12,6 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_CLEANING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_USE_WATCHER
-import balti.migrate.helper.utilities.WatcherInstallerCommands
-import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileFilter
@@ -73,19 +69,10 @@ class CleanerEngine(private val jobcode: Int,
                 f.delete()
             }
 
-            val doInstallWatcher = autoInstallWatcher && AppInstance.sharedPrefs.getBoolean(PREF_USE_WATCHER, true)
-                    && !commonTools.isPackageInstalled(WATCHER_PACKAGE_NAME)
-
             Runtime.getRuntime().exec("su").run {
                 val writer = BufferedWriter(OutputStreamWriter(outputStream))
                 removableFilesList.forEach {
                     writer.write("rm $MIGRATE_CACHE/$it 2>/dev/null\n")
-                }
-
-                if (doInstallWatcher){
-                    WatcherInstallerCommands.getCommands(engineContext).forEach {
-                        writer.write(it)
-                    }
                 }
 
                 writer.write("exit\n")
@@ -93,7 +80,7 @@ class CleanerEngine(private val jobcode: Int,
                 waitFor()
             }
 
-            if (!doInstallWatcher) Thread.sleep(DUMMY_WAIT_TIME_LONGER)
+            Thread.sleep(DUMMY_WAIT_TIME_LONGER)
         }
         catch (e: Exception){
             e.printStackTrace()

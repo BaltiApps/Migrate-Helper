@@ -1,5 +1,8 @@
 package balti.migrate.helper.utilities.constants
 
+import android.content.ComponentName
+import android.content.Intent
+import android.os.Bundle
 import balti.migrate.helper.AppInstance
 
 class AddonSmsCallsConstants {
@@ -53,5 +56,15 @@ class AddonSmsCallsConstants {
         val ADDON_SMS_CALLS_EXTRA_RESTORE_TYPE = "smsCalls_restore_type"
         val ADDON_SMS_CALLS_EXTRA_RESTORE_TYPE_SMS = 332
         val ADDON_SMS_CALLS_EXTRA_RESTORE_TYPE_CALLS = 333
+
+        fun getSmsCallsIntent(bundle: Bundle, operationType: String, masterJobCode: Int = 0): Intent {
+            return Intent().apply {
+                component = ComponentName(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME, ADDON_SMS_CALLS_RECEIVER_CLASS)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                putExtra(ADDON_SMS_CALLS_EXTRA_MASTER_JOBCODE, masterJobCode)
+                putExtra(ADDON_SMS_CALLS_EXTRA_OPERATION_TYPE, operationType)
+                putExtras(bundle)
+            }
+        }
     }
 }

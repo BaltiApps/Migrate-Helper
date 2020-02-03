@@ -1,5 +1,9 @@
 package balti.migrate.helper.utilities.constants
 
+import android.content.ComponentName
+import android.content.Intent
+import android.os.Bundle
+
 class AddonSettingsConstants {
 
     companion object {
@@ -21,6 +25,14 @@ class AddonSettingsConstants {
         val ADDON_SETTINGS_RECEIVER_CLASS = "balti.migrate.addon.settings.DummyActivity"
 
         val ADDON_SETTINGS_ASSET_NAME = "addonSettings.apk"
+
+        fun getSettingsIntent(bundle: Bundle): Intent {
+            return Intent().apply {
+                component = ComponentName(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME, ADDON_SETTINGS_RECEIVER_CLASS)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                putExtras(bundle)
+            }
+        }
     }
 
 }

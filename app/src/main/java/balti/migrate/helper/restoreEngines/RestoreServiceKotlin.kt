@@ -61,7 +61,6 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_I
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_ID_FINISHED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_ID_ONGOING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PENDING_INTENT_REQUEST_ID
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IS_POST_JOBS_NEEDED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_WAS_CANCELLED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_CANCEL_TASK
 import balti.migrate.helper.utilities.StupidStartupServiceKotlin
@@ -439,7 +438,6 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         )
 
         sharedPrefs.edit().apply {
-            putBoolean(PREF_IS_POST_JOBS_NEEDED, true)
             putBoolean(PREF_WAS_CANCELLED, cancelAll)
         }.commit()
 

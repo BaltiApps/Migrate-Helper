@@ -27,17 +27,6 @@
     <string name="please_use_magisk">Make sure to use Magisk</string>
     <string name="lastLog">Last logs</string>
     <string name="preferences">Preferences</string>
-    <string name="watcher_disclaimer">Watcher app may be installed if permitted.\nClick to know more.</string>
-    <string name="watcher_installed_disclaimer">Watcher installed. Click to know more.</string>
-    <string name="watcher_extended_desc">Please note that this is optional and maybe removed if found to be violating Google Play policies.\n\n
-    Migrate is now a 3-app package - the main \"Migrate app\", the \"Migrate helper\" and on Android 10+ the \"Migrate helper watcher\"\n\n
-    The last app is only used if you choose to restore SMS on Android 10 and above. During the SMS restore process, you need to temporarily make \"Migrate helper\" as the default SMS app.\n
-    After all messages are restored, during post restore processes, the helper would prompt to change back to your old default SMS app. The helper does not handle your incoming messages.\n
-    On Android 9 and below, this worked without any problem. However, on Android 10+, on changing the default SMS app, Android kills the app from which the SMS permission is being revoked. In this case, it is the \"Migrate helper\" that is killed.\n
-    To make the process seamless, the watcher app acts like a plugin, if this helper app is closed by the system, it restarts this helper.\n\n
-    Before restore starts, you will be asked if you want to install the watcher. If installed, it gets auto-uninstalled after restore is complete.\n\n
-    You can opt to not use the watcher app. Simply go to \"Preferences\" in this app and disable \"Use watcher\" option. However, you would need to manually restart this helper app to complete the post restore processes.
-    </string>
     <string name="uninstall_by_twrp">Uninstall by twrp.</string>
 
     <!--revert_settings.xml-->
@@ -354,7 +343,6 @@
     <string name="set_manually_desc">Please open the SMS app by clicking "Set manually" and set the SMS app. Once done, open this app again to do the remaining steps.</string>
     <string name="reset_sms_app">Reset default SMS app</string>
     <string name="reboot_for_sms">You may need to reboot your phone for the restored messages to appear. <b>You may also need to clear data of the sms app.</b></string>
-    <string name="android_10_sms_message">On clicking "Next", Android 10+ will close this app because it is no longer the default SMS app. If the app does not restart, please open this app again to complete the rest of the steps.</string>
     <string name="uninstall_helper_app">Uninstall/disable</string>
     <string name="change_dpi">Change DPI value</string>
     <string name="wifi_was_restored">Wifi was restored. Reboot is needed.</string>

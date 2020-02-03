@@ -17,12 +17,12 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_UNINST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REMOVE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_UNINSTALL
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DPI_VALUE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_ALL_TO_UNINSTALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.UNINSTALL_START_ID
-import balti.migrate.helper.utilities.constants.RestartWatcherConstants.Companion.WATCHER_PACKAGE_NAME
+import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_PACKAGE_NAME
+import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 
@@ -47,14 +47,13 @@ class UninstallServiceKotlin: Service() {
 
         if (intent != null) {
 
-            val dpiValue = intent.getIntExtra(EXTRA_DPI_VALUE, 0)
             val doReboot = intent.getBooleanExtra(EXTRA_DO_REBOOT, false)
             val doUninstall = intent.getBooleanExtra(EXTRA_DO_UNINSTALL, true)
             val doRemoveCache = intent.getBooleanExtra(EXTRA_DO_REMOVE_CACHE, true)
 
             try {
                 AppInstance.notificationManager.cancelAll()
-                finishTasks(dpiValue, doUninstall, doReboot, doRemoveCache)
+                finishTasks(doUninstall, doReboot, doRemoveCache)
             }
             catch (e: Exception){
                 e.printStackTrace()
@@ -67,9 +66,9 @@ class UninstallServiceKotlin: Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun finishTasks(dpiValue: Int, doUninstall: Boolean, doReboot: Boolean, doRemoveCache: Boolean){
+    private fun finishTasks(doUninstall: Boolean, doReboot: Boolean, doRemoveCache: Boolean){
 
-        if (dpiValue > 0 || doUninstall || doReboot) {
+        if (doUninstall || doReboot) {
 
             val sourceDir = applicationInfo.sourceDir.let {
                 it.substring(0, it.lastIndexOf('/'))
@@ -78,12 +77,14 @@ class UninstallServiceKotlin: Service() {
             val fullProcess = Runtime.getRuntime().exec("su")
             BufferedWriter(OutputStreamWriter(fullProcess.outputStream)).run {
 
-                write("pm uninstall $WATCHER_PACKAGE_NAME 2>/dev/null\n")
-
-                if (dpiValue > 0) write("wm density $dpiValue\n")
-
                 if (doUninstall) {
 
+                    ADDON_SETTINGS_RECEIVER_PACKAGE_NAME.let {
+                        if (commonTools.isPackageInstalled(it)) write("pm uninstall $it\n")
+                    }
+                    ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME.let {
+                        if (commonTools.isPackageInstalled(it)) write("pm uninstall $it\n")
+                    }
                     write("mount -o rw,remount /data\n")
 
                     if (doRemoveCache) {

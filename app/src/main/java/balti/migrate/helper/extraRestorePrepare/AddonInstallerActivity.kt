@@ -1,7 +1,10 @@
 package balti.migrate.helper.extraRestorePrepare
 
 import android.app.Activity
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -20,10 +23,10 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_ADDON_
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_ADDON_INSTALL_SETTINGS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_ADDON_INSTALL_SMS_CALLS
 import balti.migrate.helper.utilities.constants.AddonReceiverConstants.Companion.ACTION_ADDON_SETTINGS_SU
+import balti.migrate.helper.utilities.constants.AddonSettingsConstants
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_OPERATION_DUMMY_SU
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_SU_ERROR
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_SU_GRANTED
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_CLASS
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_PACKAGE_NAME
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
 import kotlinx.android.synthetic.main.install_addons.*
@@ -205,11 +208,15 @@ class AddonInstallerActivity: Activity() {
 
                 requestSuDialog?.show()
 
-                startActivity(Intent().apply {
+                startActivity(AddonSettingsConstants.getSettingsIntent(Bundle().apply {
+                    putBoolean(ADDON_SETTINGS_EXTRA_OPERATION_DUMMY_SU, true)
+                }))
+
+                /*startActivity(Intent().apply {
                     component = ComponentName(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME, ADDON_SETTINGS_RECEIVER_CLASS)
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     putExtra(ADDON_SETTINGS_EXTRA_OPERATION_DUMMY_SU, true)
-                })
+                })*/
             }
         }
 
