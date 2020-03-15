@@ -19,6 +19,7 @@ import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKot
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_KEYBOARD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_GENERIC_SETTINGS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_ADDON_DELAY
 import balti.migrate.helper.utilities.constants.AddonReceiverConstants.Companion.ACTION_ADDON_SETTINGS_BROADCAST
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_ERRORS
@@ -28,18 +29,15 @@ import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_WAS_CANCELLED
-import java.io.*
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
 
 class SettingsRestoreEngine(private val jobcode: Int,
                             private val settingsPacket: SettingsPacketKotlin): ParentRestoreClass("") {
 
     private val errors by lazy { ArrayList<String>(0) }
     private val suProcess by lazy { Runtime.getRuntime().exec("su") }
-    private val suWriter by lazy { BufferedWriter(OutputStreamWriter(suProcess.outputStream)) }
-    private val timeStamp by lazy { SimpleDateFormat("yyyy.MM.dd_HH.mm.ss").format(Calendar.getInstance().time)}
     private val LBM by lazy { LocalBroadcastManager.getInstance(engineContext) }
 
     private var handler : Handler? = null
@@ -47,13 +45,6 @@ class SettingsRestoreEngine(private val jobcode: Int,
 
     private var exitWait = false
     private var alreadyFinished = false
-
-    private fun flushToSu(cmd: String, ignoreCancel: Boolean = false){
-        if (!RestoreServiceKotlin.cancelAll || ignoreCancel){
-            suWriter.write("$cmd\n")
-            suWriter.flush()
-        }
-    }
 
     private val addonResultsReceiver by lazy {
         object : BroadcastReceiver(){
@@ -88,6 +79,8 @@ class SettingsRestoreEngine(private val jobcode: Int,
                     }
             }
 
+            Thread.sleep(TIMEOUT_ADDON_DELAY)
+
             engineContext.startActivity(AddonSettingsConstants.getSettingsIntent(Bundle().apply {
                 putBoolean(ADDON_SETTINGS_EXTRA_OPERATION_DO_START, true)
                 putInt(ADDON_SETTINGS_EXTRA_VALUE_DPI, dpiValue)
@@ -96,19 +89,8 @@ class SettingsRestoreEngine(private val jobcode: Int,
                 putDouble(ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE, fontScale)
             }))
 
-            /*engineContext.startActivity(Intent().apply {
-                component = ComponentName(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME, ADDON_SETTINGS_RECEIVER_CLASS)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                putExtra(ADDON_SETTINGS_EXTRA_OPERATION_DO_START, true)
-                putExtra(ADDON_SETTINGS_EXTRA_VALUE_DPI, dpiValue)
-                putExtra(ADDON_SETTINGS_EXTRA_VALUE_ADB, adbValue)
-                putExtra(ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT, keyboardText)
-                putExtra(ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE, fontScale)
-            })*/
-
             runnable = Runnable {
                 handler?.run {
-                    //Log.d(DEBUG_TAG, "stat: ${RestoreServiceKotlin.cancelAll}")
                     if (exitWait || RestoreServiceKotlin.cancelAll) {
                         removeCallbacks(runnable)
                         finishJob()

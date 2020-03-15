@@ -169,6 +169,8 @@ class CommonToolsKotlin(val context: Context) {
         val TIMEOUT_WAITING_TO_CANCEL_TASK = 500L
         val TIMEOUT_WAITING_TO_KILL = 3000L
 
+        val TIMEOUT_ADDON_DELAY = 500L
+
         val EXTRA_DO_REBOOT = "doReboot"
         val EXTRA_DO_UNINSTALL = "doUninstall"
         val EXTRA_DO_REMOVE_CACHE = "doRemoveCache"

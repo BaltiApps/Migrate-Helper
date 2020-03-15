@@ -16,6 +16,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_CALLS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_SMS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_ADDON_DELAY
 import balti.migrate.helper.utilities.constants.AddonReceiverConstants.Companion.ACTION_ADDON_SMS_CALLS_RESTORE
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_ALL_ERRORS
@@ -105,20 +106,13 @@ class SmsCallsRestoreEngine(private val jobcode: Int,
         for (p in smsPackets) if (p.isSelected) fileNames.add(p.smsDBFile.name)
         for (p in callsPackets) if (p.isSelected) fileNames.add(p.callDBFile.name)
 
-        Thread.sleep(500)
+        Thread.sleep(TIMEOUT_ADDON_DELAY)
 
         engineContext.startActivity(
                 AddonSmsCallsConstants.getSmsCallsIntent(Bundle().apply {
                     putStringArrayList(ADDON_SMS_CALLS_EXTRA_FILE_NAMES, fileNames)
                 }, ADDON_SMS_CALLS_EXTRA_OPERATION_START_RESTORE)
         )
-
-        /*engineContext.startActivity(Intent().apply {
-            component = ComponentName(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME, ADDON_SMS_CALLS_RECEIVER_CLASS)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            putExtra(ADDON_SMS_CALLS_EXTRA_OPERATION_TYPE, ADDON_SMS_CALLS_EXTRA_OPERATION_START_RESTORE)
-            putStringArrayListExtra(ADDON_SMS_CALLS_EXTRA_FILE_NAMES, fileNames)
-        })*/
 
         runnable = Runnable {
             handler?.run {

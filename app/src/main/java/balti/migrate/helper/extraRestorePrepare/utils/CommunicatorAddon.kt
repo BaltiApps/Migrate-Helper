@@ -11,6 +11,7 @@ import android.os.Bundle
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_ADDON_DELAY
 import balti.migrate.helper.utilities.constants.AddonReceiverConstants.Companion.ACTION_ADDON_SMS_CALLS_PERMISSION
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_CALLS_GRANTED
@@ -27,11 +28,9 @@ class CommunicatorAddon(val context: Context) {
     private val onPermissionAsked by lazy { context as OnPermissionAsked }
     private var lastRequestCode = 0
 
-    private val GAP = 500L
-
     private fun smsCallsSend(operation: String, masterJobCode: Int, bundle: Bundle = Bundle()) {
 
-        Thread.sleep(GAP)
+        Thread.sleep(TIMEOUT_ADDON_DELAY)
         context.startActivity(AddonSmsCallsConstants.getSmsCallsIntent(bundle, operation, masterJobCode))
     }
 

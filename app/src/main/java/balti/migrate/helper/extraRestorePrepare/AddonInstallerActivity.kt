@@ -211,12 +211,6 @@ class AddonInstallerActivity: Activity() {
                 startActivity(AddonSettingsConstants.getSettingsIntent(Bundle().apply {
                     putBoolean(ADDON_SETTINGS_EXTRA_OPERATION_DUMMY_SU, true)
                 }))
-
-                /*startActivity(Intent().apply {
-                    component = ComponentName(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME, ADDON_SETTINGS_RECEIVER_CLASS)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    putExtra(ADDON_SETTINGS_EXTRA_OPERATION_DUMMY_SU, true)
-                })*/
             }
         }
 
@@ -275,37 +269,6 @@ class AddonInstallerActivity: Activity() {
                 toggleSmsCallsOk()     // install success.
             }
         })
-
-        /*// if settings addon installed, continue to settings addon
-        if (commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME)) {
-            toggleSmsCallsOk()
-        }
-        else {
-
-            // else, start installation
-
-            var error = ""
-
-            commonTools.doBackgroundTask({
-                error = SmsCallsAddonInstall(this, smsCallsFilePaths).installAddon()
-            }, {
-                if (error != "") {
-
-                    // install failed
-                    commonTools.showErrorDialog(error, getString(R.string.error), true, closeFunc = {
-
-                        // if settings addon is not present, deny all settings restore, continue. Else ask for su
-                        if (!commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME)) {
-                            toggleSmsCallsNotOk()
-                        } else toggleSmsCallsOk()
-
-                    })
-                } else {
-                    toggleSmsCallsOk()     // install success.
-                }
-            })
-
-        }*/
     }
 
     private fun setData(){
