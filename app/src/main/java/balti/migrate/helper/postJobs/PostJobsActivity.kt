@@ -1,5 +1,6 @@
 package balti.migrate.helper.postJobs
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -7,7 +8,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.utilities.CommonToolsKotlin
@@ -26,13 +26,15 @@ import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_OPERATION_RESTORE_SMS_PERMISSION
 import kotlinx.android.synthetic.main.post_restore_jobs.*
 
-class PostJobsActivity: AppCompatActivity() {
+class PostJobsActivity: Activity() {
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
     private val editor by lazy { sharedPrefs.edit() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setTheme(R.style.PostJobsActivityTheme)
         setContentView(R.layout.post_restore_jobs)
 
         window.setGravity(Gravity.BOTTOM)

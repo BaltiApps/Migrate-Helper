@@ -18,7 +18,8 @@
         <item name="android:background">@color/colorPrimary</item>
     </style>
 
-    <style name="PostJobsActivityTheme" parent="Theme.AppCompat.Dialog">
+    <style name="PostJobsActivityTheme" parent="android:Theme.Material.Dialog">
+        <item name="android:colorBackground">@color/grey_bg</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
