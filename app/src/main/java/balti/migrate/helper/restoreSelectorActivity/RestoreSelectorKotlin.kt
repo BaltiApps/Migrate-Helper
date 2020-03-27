@@ -50,9 +50,9 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_GET_WI
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_ROOT_COPY
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DISPLAY_EXTRAS_ON_UI_THREAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LOAD_EXTRAS_ON_UI_THREAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import kotlinx.android.synthetic.main.app_search_layout.view.*
 import kotlinx.android.synthetic.main.app_selector_header.view.*
@@ -412,7 +412,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
                 }
 
-                if (sharedPrefs.getBoolean(PREF_DISPLAY_EXTRAS_ON_UI_THREAD, false)) {
+                if (sharedPrefs.getBoolean(PREF_LOAD_EXTRAS_ON_UI_THREAD, false)) {
                     runOnUiThread { load() }
                     triedUiThread = true
                 }
