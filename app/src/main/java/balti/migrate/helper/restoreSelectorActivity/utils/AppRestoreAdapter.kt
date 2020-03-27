@@ -120,12 +120,15 @@ class AppRestoreAdapter(val context: Context,
 
         viewHolder.appName.text = appItem.appName
         if (doLoadIcons) {
-            appItem.iconFileName?.run {
-                iconTools.setIconFromFile(viewHolder.appIcon, File(METADATA_HOLDER_DIR, this))
+            try {
+                appItem.iconFileName?.run {
+                    iconTools.setIconFromFile(viewHolder.appIcon, File(METADATA_HOLDER_DIR, this))
+                }
+                appItem.appIcon?.run {
+                    iconTools.setIconFromIconString(viewHolder.appIcon, this)
+                }
             }
-            appItem.appIcon?.run {
-                iconTools.setIconFromIconString(viewHolder.appIcon, this)
-            }
+            catch (_: Exception) { viewHolder.appIcon.setImageResource(R.drawable.ic_app) }
         }
         else viewHolder.appIcon.setImageResource(R.drawable.ic_app)
 
