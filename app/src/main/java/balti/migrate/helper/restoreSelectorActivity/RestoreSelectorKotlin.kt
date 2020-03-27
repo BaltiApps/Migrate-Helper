@@ -420,7 +420,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
 
                 if (error.trim() != "" && !triedUiThread) {
-                    runOnUiThread { load() }
+                    runOnUiThread { error = ""; load() }
                     triedUiThread = true
                 }
 
