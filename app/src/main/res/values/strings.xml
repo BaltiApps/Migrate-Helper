@@ -191,9 +191,6 @@
     <!--ComposeSmsActivity.kt-->
     <string name="please_change_sms_app">\"Migrate helper\" is not meant to be used as an sms app. Please change the default sms app</string>
 
-    <!--GetAppPackets.kt-->
-    <string name="path_not_valid_directory">is not valid directory</string>
-
     <!--RootCopyTask.kt-->
     <string name="no_busybox">Busybox not found!</string>
 
@@ -214,6 +211,7 @@
     <string name="system_size">System size :</string>
 
     <!--ParentGetter.kt-->
+    <string name="path_not_valid_directory">is not valid directory</string>
     <string name="getting_apps">Getting apps</string>
     <string name="getting_contacts">Getting contacts</string>
     <string name="getting_sms">Getting sms</string>

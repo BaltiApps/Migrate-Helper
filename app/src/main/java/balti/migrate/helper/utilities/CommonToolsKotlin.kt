@@ -97,6 +97,8 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_DO_INSTALL_SETTINGS_ADDON = "install_addon_settings"
         val EXTRA_SMS_CALLS_ADDON_FILES = "sms_calls_addon_files"
 
+        val ERROR_PRE_EXECUTE = "PARENT_PRE_EXECUTE"
+
         val ERROR_APP_JSON_TRY_CATCH = "APP_JSON_TRY_CATCH"
         val ERROR_APP_JSON = "APP_JSON"
         val ERROR_CONTACTS_GET_TRY_CATCH = "CONTACTS_GET_TRY_CATCH"
@@ -235,7 +237,10 @@ class CommonToolsKotlin(val context: Context) {
             get() {
                 PREF_DEFAULT_METADATA_HOLDER.let {default ->
                     AppInstance.sharedPrefs.getString(PREF_MANUAL_METADATA_HOLDER, default).run {
-                        return this ?: default
+                        (this ?: default).let {
+                            File(it).run { if (!exists()) mkdirs() }
+                            return it
+                        }
                     }
                 }
             }

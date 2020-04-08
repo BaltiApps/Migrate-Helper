@@ -7,6 +7,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import balti.migrate.helper.R
 import balti.migrate.helper.restoreSelectorActivity.utils.OnReadComplete
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_PRE_EXECUTE
 import balti.migrate.helper.utilities.ViewOperations
 import java.io.File
 import java.io.FileFilter
@@ -31,20 +32,26 @@ abstract class ParentGetter(private val jobCode: Int,
     override fun onPreExecute() {
         super.onPreExecute()
 
-        vOp.textSet(waitingText, initWaitingTextResId)
+        try {
+            vOp.textSet(waitingText, initWaitingTextResId)
 
-        files = if (directory.isDirectory) { directory.listFiles(fileFilter) }
-        else {
-            errors.add("$metadataHolderPath ${vOp.getStringFromRes(R.string.path_not_valid_directory)}")
-            arrayOf()
-        }
-
-        vOp.doSomething {
-            progressBar.apply {
-                visibility = View.VISIBLE
-                max = files.size
-                progress = 0
+            files = if (directory.isDirectory) {
+                directory.listFiles(fileFilter)
+            } else {
+                errors.add("$metadataHolderPath ${vOp.getStringFromRes(R.string.path_not_valid_directory)}")
+                arrayOf()
             }
+
+            vOp.doSomething {
+                progressBar.apply {
+                    visibility = View.VISIBLE
+                    max = files.size
+                    progress = 0
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            errors.add("$ERROR_PRE_EXECUTE: $jobCode - ${e.message}")
         }
     }
 

@@ -16,7 +16,6 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import balti.migrate.helper.AppInstance
 import balti.migrate.helper.AppInstance.Companion.appPackets
 import balti.migrate.helper.AppInstance.Companion.callsDataPackets
 import balti.migrate.helper.AppInstance.Companion.contactDataPackets
@@ -209,21 +208,30 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
             fun handleResults(nextJob: Int, func: () -> Unit) {
 
+                fun addErrors(){
+                    if (jobResult is ArrayList<*>)
+                        allErrors.addAll(jobResult.map { it.toString() })
+                    else allErrors.add(jobResult.toString())
+                }
+
                 if (cancelLoading) {
                     displayAllData()
                     return
                 }
 
                 if (nextJob == JOBCODE_END_ALL){
-                    if (jobResult !is Int) func()
+                    if (jobResult !is Int) {
+                        if (jobSuccess) func()
+                        else addErrors()
+                    }
                     displayAllData()
                 }
                 else {
                     if (!jobSuccess) {
-                        if (AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_READ_ERRORS, false)) {
-                            allErrors.add(jobResult.toString())
+                        addErrors()
+                        if (sharedPrefs.getBoolean(PREF_IGNORE_READ_ERRORS, false))
                             doJob(nextJob)
-                        }
+                        else displayAllData()
                     } else {
                         if (jobResult !is Int) func()
                         doJob(nextJob)
@@ -242,7 +250,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
                 JOBCODE_GET_APP_JSON ->
                     handleResults(
-                            if (!AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false)) JOBCODE_GET_CONTACTS
+                            if (!sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false)) JOBCODE_GET_CONTACTS
                             else JOBCODE_END_ALL) {
                         appPackets.clear()
                         appPackets.addAll(jobResult as ArrayList<AppPacketsKotlin>)
@@ -293,7 +301,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             onBackPressed()
         }
 
-        if (!AppInstance.sharedPrefs.getBoolean(PREF_IGNORE_READ_ERRORS, false) && allErrors.isNotEmpty()){
+        if (!sharedPrefs.getBoolean(PREF_IGNORE_READ_ERRORS, false) && allErrors.isNotEmpty()){
             showError(getString(R.string.code_error), allErrors)
             return
         }

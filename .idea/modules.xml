@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MigrateHelper.iml" filepath="$PROJECT_DIR$/MigrateHelper.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MigrateHelper.iml" filepath="$PROJECT_DIR$/MigrateHelper.iml" group="MigrateHelper" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="MigrateHelper/app" />
     </modules>
   </component>
 </project>

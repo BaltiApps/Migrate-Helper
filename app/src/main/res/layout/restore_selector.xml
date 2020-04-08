@@ -113,6 +113,17 @@
 
             </ScrollView>
 
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/large_padding_width"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/current_version_name"
+                android:textColor="@color/colorAccent"
+                />
+
         </LinearLayout>
 
 
