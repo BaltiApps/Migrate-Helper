@@ -353,7 +353,7 @@
     <string name="clear_to_reset">Clear and press OK to reset to default value</string>
     <string name="manual_cache">Specify path to migrate_cache</string>
     <string name="manual_metadata_holder">Specify path to metadata holder</string>
-    
+
     <!--uninstall_activity.xml-->
     <string name="uninstall_desc">If doesn\'t work, delete the above directory. This option also deletes migrate_cache.</string>
     <string name="temporary_disable_desc">App will stop giving notifications, but remain installed.</string>
