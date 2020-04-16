@@ -350,6 +350,7 @@
     <string name="track_restore_finished_desc">Track when restore is finished to avoid resuming progress show activity. Do not disable unless you are sure.</string>
     <string name="remount_all_to_uninstall">Remount all to uninstall</string>
     <string name="remount_all_to_uninstall_desc">If uninstalling fails, remount all mount points and auto retry.</string>
+    <string name="clear_to_reset">Clear and press OK to reset to default value</string>
     <string name="manual_cache">Specify path to migrate_cache</string>
     <string name="manual_metadata_holder">Specify path to metadata holder</string>
 
