@@ -57,17 +57,18 @@ class MainPreferencesActivity: PreferenceActivity() {
                 }
             }
 
-            fun convertIfBlank(value: String?, defaultValue: String): String {
-                return value.let { if (it == null || it == "") defaultValue else it }
-            }
-
             fun setValue(editTextPreference: EditTextPreference, field: String, defaultValue: String){
+
+                fun convertIfBlank(value: String?, defaultValue: String): String {
+                    return value.let { if (it == null || it == "") defaultValue else it }
+                }
+
                 convertIfBlank(getString(field, defaultValue), defaultValue).let {
                     editTextPreference.summary = it
                     editTextPreference.text = it
                 }
                 editTextPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-                    val toStore = newValue.toString().let { if (it == "") defaultValue else it }
+                    val toStore = convertIfBlank(newValue.toString(), defaultValue)
                     editor.putString(field, toStore)
                     editor.apply()
                     editTextPreference.summary = toStore
