@@ -5,6 +5,7 @@ METADATA_HOLDER="$2/"
 CACHE_DIR="$3"
 SETTINGS_FILE_NAME="$4"
 WIFI_FILE_NAME="$5"
+MIGRATE_TEMP="$6"
 
 # display PID
 echo "--- PID: $$"
@@ -18,6 +19,15 @@ pm grant ${SELF_PACKAGE_NAME} android.permission.DUMP
 
 # make METADATA_HOLDER if not present
 mkdir -p ${METADATA_HOLDER}
+
+mkdir -p ${CACHE_DIR}
+
+tempCount="$(ls ${MIGRATE_TEMP} 2>/dev/null | wc -l)"
+
+if [[ -n ${MIGRATE_TEMP} && -n ${tempCount} && "$tempCount" -gt "0" ]]; then
+    echo "!!! Moving all files from temp..."
+    mv ${MIGRATE_TEMP}/* ${CACHE_DIR}/
+fi
 
 # removing contents of METADATA_HOLDER
 if [[ -n ${METADATA_HOLDER} ]]; then

@@ -9,6 +9,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.BACKUP_NAME_SETTINGS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_TEMP_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_NAME
 import balti.migrate.helper.utilities.ViewOperations
 import java.io.BufferedReader
@@ -62,7 +63,7 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
                 BufferedWriter(OutputStreamWriter(it.outputStream)).run {
 
                     write("chmod +x $scripFile\n")
-                    write("sh $scripFile ${context.packageName} $METADATA_HOLDER_DIR $MIGRATE_CACHE $BACKUP_NAME_SETTINGS $WIFI_FILE_NAME\n")
+                    write("sh $scripFile ${context.packageName} $METADATA_HOLDER_DIR $MIGRATE_CACHE $BACKUP_NAME_SETTINGS $WIFI_FILE_NAME $MIGRATE_TEMP_DIR\n")
                     write("exit\n")
                     flush()
 

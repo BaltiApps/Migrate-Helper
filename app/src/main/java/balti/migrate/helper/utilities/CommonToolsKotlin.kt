@@ -203,6 +203,7 @@ class CommonToolsKotlin(val context: Context) {
 
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
         val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migrate.helper/cache/"
+        val MIGRATE_TEMP_DIR = "/data/migrateTemp"
 
         val PREF_DO_LOAD_ICON_IN_LIST = "doLoadIconInList"
 
