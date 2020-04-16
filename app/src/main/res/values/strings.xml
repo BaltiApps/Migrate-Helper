@@ -2,8 +2,8 @@
 
     <!--Version changes to be made in
 
-    current_version_name (must not have blank spaces)
-    build.gradle (versionCode should match Migrate versionCode)
+    current_version_name (must not have blank spaces)               !!!
+    build.gradle (versionCode should match Migrate versionCode)     !!!
 
     in strings:
     too_fast
@@ -15,7 +15,7 @@
     <!--please also update LAST_SUPPORTED_ANDROID_API in CommonToolsKotlin.kt-->
 
     <string name="app_name">Migrate helper</string>
-    <string name="current_version_name">3.0.2_release</string>
+    <string name="current_version_name">3.0.3_release</string>
 
     <!--activity_main.xml-->
     <string name="restore_main">Restore apps and data</string>
