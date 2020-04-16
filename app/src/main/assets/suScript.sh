@@ -25,7 +25,6 @@ mkdir -p ${CACHE_DIR}
 tempCount="$(ls ${MIGRATE_TEMP} 2>/dev/null | wc -l)"
 
 if [[ -n ${MIGRATE_TEMP} && -n ${tempCount} && "$tempCount" -gt "0" ]]; then
-    echo "!!! Moving all files from temp..."
     mv ${MIGRATE_TEMP}/* ${CACHE_DIR}/
 fi
 
