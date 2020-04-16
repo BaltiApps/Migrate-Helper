@@ -2,15 +2,20 @@ package balti.migrate.helper.preferences
 
 import android.os.Bundle
 import android.preference.CheckBoxPreference
+import android.preference.EditTextPreference
 import android.preference.Preference
 import android.preference.PreferenceActivity
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
 import balti.migrate.helper.utilities.CommonToolsKotlin
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_METADATA_HOLDER
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DO_LOAD_ICON_IN_LIST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LOAD_EXTRAS_ON_UI_THREAD
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_MANUAL_CACHE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_MANUAL_METADATA_HOLDER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_ALL_TO_UNINSTALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_DATA
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
@@ -27,6 +32,9 @@ class MainPreferencesActivity: PreferenceActivity() {
     private val loadExtrasOnUiThread: CheckBoxPreference by lazy { findPreference("loadExtrasOnUiThread") as CheckBoxPreference }
     private val trackRestoreFinished: CheckBoxPreference by lazy { findPreference("trackRestoreFinished") as CheckBoxPreference }
     private val remountRetryUninstall: CheckBoxPreference by lazy { findPreference("remountRetryUninstall") as CheckBoxPreference }
+
+    private val manualCachePref: EditTextPreference by lazy { findPreference("manualCachePref") as EditTextPreference }
+    private val manualMetadataHolderPref: EditTextPreference by lazy { findPreference("manualMetadataHolderPref") as EditTextPreference }
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
 
@@ -49,6 +57,25 @@ class MainPreferencesActivity: PreferenceActivity() {
                 }
             }
 
+            fun convertIfBlank(value: String?, defaultValue: String): String {
+                return value.let { if (it == null || it == "") defaultValue else it }
+            }
+
+            fun setValue(editTextPreference: EditTextPreference, field: String, defaultValue: String){
+                convertIfBlank(getString(field, defaultValue), defaultValue).let {
+                    editTextPreference.summary = it
+                    editTextPreference.text = it
+                }
+                editTextPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    val toStore = newValue.toString().let { if (it == "") defaultValue else it }
+                    editor.putString(field, toStore)
+                    editor.apply()
+                    editTextPreference.summary = toStore
+                    editTextPreference.text = toStore
+                    false
+                }
+            }
+
             setValue(ignoreReadErrors, PREF_IGNORE_READ_ERRORS)
             setValue(ignoreExtras, PREF_IGNORE_EXTRAS)
             setValue(restoreStartAnimation, PREF_RESTORE_START_ANIMATION, true)
@@ -57,6 +84,9 @@ class MainPreferencesActivity: PreferenceActivity() {
             setValue(loadExtrasOnUiThread, PREF_LOAD_EXTRAS_ON_UI_THREAD, false)
             setValue(trackRestoreFinished, PREF_TRACK_RESTORE_FINISHED, true)
             setValue(remountRetryUninstall, PREF_REMOUNT_ALL_TO_UNINSTALL, false)
+
+            setValue(manualCachePref, PREF_MANUAL_CACHE, PREF_DEFAULT_MIGRATE_CACHE)
+            setValue(manualMetadataHolderPref, PREF_MANUAL_METADATA_HOLDER, PREF_DEFAULT_METADATA_HOLDER)
         }
     }
 

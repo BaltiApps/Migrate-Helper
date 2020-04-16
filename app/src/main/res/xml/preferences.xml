@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".preferences.MainPreferencesActivity"
+    >
 
     <CheckBoxPreference
         android:key="ignoreReadErrors"
@@ -45,11 +48,13 @@
             android:title="@string/remount_all_to_uninstall"
             android:summary="@string/remount_all_to_uninstall_desc"/>
 
-        <balti.migrate.helper.preferences.subPreferences.ManualCachePref
-            android:layout="@layout/preferences_edittext" />
+        <EditTextPreference
+            android:key="manualCachePref"
+            android:title="@string/manual_cache"/>
 
-        <balti.migrate.helper.preferences.subPreferences.ManualMetadataHolder
-            android:layout="@layout/preferences_edittext"/>
+        <EditTextPreference
+            android:key="manualMetadataHolderPref"
+            android:title="@string/manual_metadata_holder"/>
 
     </PreferenceCategory>
 
