@@ -68,7 +68,7 @@ class UninstallServiceKotlin: Service() {
 
     private fun finishTasks(doUninstall: Boolean, doReboot: Boolean, doRemoveCache: Boolean){
 
-        if (doUninstall || doReboot) {
+        if (doUninstall || doReboot || doRemoveCache) {
 
             val sourceDir = applicationInfo.sourceDir.let {
                 it.substring(0, it.lastIndexOf('/'))
@@ -77,14 +77,7 @@ class UninstallServiceKotlin: Service() {
             val fullProcess = Runtime.getRuntime().exec("su")
             BufferedWriter(OutputStreamWriter(fullProcess.outputStream)).run {
 
-                if (doUninstall) {
-
-                    ADDON_SETTINGS_RECEIVER_PACKAGE_NAME.let {
-                        if (commonTools.isPackageInstalled(it)) write("pm uninstall $it\n")
-                    }
-                    ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME.let {
-                        if (commonTools.isPackageInstalled(it)) write("pm uninstall $it\n")
-                    }
+                if (doUninstall || doRemoveCache) {
                     write("mount -o rw,remount /data\n")
 
                     if (doRemoveCache) {
@@ -93,42 +86,52 @@ class UninstallServiceKotlin: Service() {
                         write("rm -rf /data/data/*.tar.gz\n")
                     }
 
-                    if (sourceDir.startsWith("/system")) {
-                        disableApp()
-                        write("mount -o rw,remount /system\n")
-                        write("mount -o rw,remount /system/app/MigrateHelper\n")
-                        write("rm -rf ${applicationInfo.dataDir} $sourceDir\n")
+                    if (doUninstall) {
 
-                        // go advanced if not removed
+                        ADDON_SETTINGS_RECEIVER_PACKAGE_NAME.let {
+                            if (commonTools.isPackageInstalled(it)) write("pm uninstall $it\n")
+                        }
+                        ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME.let {
+                            if (commonTools.isPackageInstalled(it)) write("pm uninstall $it\n")
+                        }
 
-                        write("if [[ -e $sourceDir ]]; then\n")
-                        write("    cat /proc/mounts | grep system | while read -r line || [[ -n \"\$line\" ]]; do\n")
-                        write("        mp=\"\$(echo \$line | cut -d ' ' -f2)\"\n")
-                        write("        md=\"\$(echo \$line | cut -d ' ' -f1)\"\n")
-                        write("        if [[ \$mp == \"/system\" || \$mp == \"/\" ]]; then\n")
-                        write("            mount -o rw,remount \$md \$mp\n")
-                        write("        fi\n")
-                        write("    done\n")
-                        write("    rm -rf $sourceDir\n")
-                        write("fi\n")
+                        if (sourceDir.startsWith("/system")) {
+                            disableApp()
+                            write("mount -o rw,remount /system\n")
+                            write("mount -o rw,remount /system/app/MigrateHelper\n")
+                            write("rm -rf ${applicationInfo.dataDir} $sourceDir\n")
 
-                        // mount all as rw if app not removed
-
-                        if (sharedPrefs.getBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, false)) {
+                            // go advanced if not removed
 
                             write("if [[ -e $sourceDir ]]; then\n")
-                            write("    cat /proc/mounts | while read -r line || [[ -n \"\$line\" ]]; do\n")
+                            write("    cat /proc/mounts | grep system | while read -r line || [[ -n \"\$line\" ]]; do\n")
                             write("        mp=\"\$(echo \$line | cut -d ' ' -f2)\"\n")
                             write("        md=\"\$(echo \$line | cut -d ' ' -f1)\"\n")
-                            write("        mount -o rw,remount \$md \$mp\n")
+                            write("        if [[ \$mp == \"/system\" || \$mp == \"/\" ]]; then\n")
+                            write("            mount -o rw,remount \$md \$mp\n")
+                            write("        fi\n")
                             write("    done\n")
                             write("    rm -rf $sourceDir\n")
                             write("fi\n")
-                        }
 
-                    } else write("pm uninstall $packageName\n")
+                            // mount all as rw if app not removed
 
-                    write("rm -rf /sdcard/Android/data/$packageName/helper\n")
+                            if (sharedPrefs.getBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, false)) {
+
+                                write("if [[ -e $sourceDir ]]; then\n")
+                                write("    cat /proc/mounts | while read -r line || [[ -n \"\$line\" ]]; do\n")
+                                write("        mp=\"\$(echo \$line | cut -d ' ' -f2)\"\n")
+                                write("        md=\"\$(echo \$line | cut -d ' ' -f1)\"\n")
+                                write("        mount -o rw,remount \$md \$mp\n")
+                                write("    done\n")
+                                write("    rm -rf $sourceDir\n")
+                                write("fi\n")
+                            }
+
+                        } else write("pm uninstall $packageName\n")
+
+                        write("rm -rf /sdcard/Android/data/$packageName/helper\n")
+                    }
                 }
 
                 if (doReboot) write("reboot\n")

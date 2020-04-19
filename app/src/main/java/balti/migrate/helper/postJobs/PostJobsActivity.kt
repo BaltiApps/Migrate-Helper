@@ -114,11 +114,15 @@ class PostJobsActivity: Activity() {
         else pj_wifiRestoredRebootLabel.visibility = View.GONE
 
         // If nothing is to be done, try to uncheck the reboot option
+        // Also uncheck deleteCache
         // (because nothing is to be done)
         // Only uncheck reboot checkbox if wifi is not restored
         pj_doNothing.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked && !isWifiRestored())
-                pj_reboot.isChecked = false
+            if (isChecked) {
+                if (!isWifiRestored())
+                    pj_reboot.isChecked = false
+                pj_deleteCache.isChecked = false
+            }
         }
 
         // If restoration was cancelled, Do nothing
@@ -136,7 +140,7 @@ class PostJobsActivity: Activity() {
                 val finishIntent = Intent(this@PostJobsActivity, UninstallServiceKotlin::class.java).apply {
                     putExtra(EXTRA_DO_UNINSTALL, pj_uninstallRadio.isChecked)
                     putExtra(EXTRA_DO_REBOOT, pj_reboot.isChecked)
-                    putExtra(EXTRA_DO_REMOVE_CACHE, pj_uninstallRadio.isChecked && pj_deleteCache.isChecked)
+                    putExtra(EXTRA_DO_REMOVE_CACHE, pj_deleteCache.isChecked)
                 }
 
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
