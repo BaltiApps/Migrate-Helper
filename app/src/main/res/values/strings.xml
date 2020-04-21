@@ -15,7 +15,7 @@
     <!--please also update LAST_SUPPORTED_ANDROID_API in CommonToolsKotlin.kt-->
 
     <string name="app_name">Migrate helper</string>
-    <string name="current_version_name">3.0.3_release</string>
+    <string name="current_version_name">3.0.4_release</string>
 
     <!--activity_main.xml-->
     <string name="restore_main">Restore apps and data</string>
