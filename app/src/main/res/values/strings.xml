@@ -6,6 +6,7 @@
 
     current_version_name (must not have blank spaces)               !!!
     build.gradle (versionCode should match Migrate versionCode)     !!!
+    changelog
 
     in strings:
     too_fast
