@@ -1,4 +1,6 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation"
+    >
 
     <!--Version changes to be made in
 
@@ -26,11 +28,15 @@
     <string name="please_use_magisk">Make sure to use Magisk</string>
     <string name="lastLog">Last logs</string>
     <string name="preferences">Preferences</string>
+    <string name="contact_on_telegram">Contact on Telegram</string>
     <string name="uninstall_by_twrp">Uninstall by twrp.</string>
 
     <!--MainActivityKotlin.kt-->
     <string name="storage_perm_needed">Storage permission needed</string>
     <string name="grant">Grant</string>
+    <string name="contact_desc">Our Telegram group has many members, you will get quicker help on the group. In case your issue is not resolved, kindly contact developer.</string>
+    <string name="contact_developer">Contact developer</string>
+    <string name="contact_group">Message on group</string>
 
     <!--last_log_report.xml-->
     <string name="seeProgressLog">See Progress log</string>

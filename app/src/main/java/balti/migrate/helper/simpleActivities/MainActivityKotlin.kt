@@ -35,6 +35,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.LAST_SUPPORTED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_ANDROID_VERSION_WARNING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_FILEPATH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_HEAD
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_DEV_LINK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_LINK
 import balti.migrate.helper.utilities.ToolsNoContext
 import kotlinx.android.synthetic.main.activity_main.*
@@ -179,6 +180,23 @@ class MainActivityKotlin: AppCompatActivity() {
         preferences_textView.apply {
             paintFlags = Paint.UNDERLINE_TEXT_FLAG
             setOnClickListener { startActivity(Intent(this@MainActivityKotlin, MainPreferencesActivity::class.java)) }
+        }
+
+        contact_on_telegram.apply {
+            paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            setOnClickListener {
+                AlertDialog.Builder(this@MainActivityKotlin).apply {
+                    setMessage(R.string.contact_desc)
+                    setPositiveButton(R.string.contact_group) { _, _ ->
+                        commonTools.openWebLink(TG_LINK)
+                    }
+                    setNegativeButton(R.string.contact_developer) { _, _ ->
+                        commonTools.openWebLink(TG_DEV_LINK)
+                    }
+                    setNeutralButton(android.R.string.cancel, null)
+                }
+                        .show()
+            }
         }
 
         close_button.setOnClickListener { finish() }
