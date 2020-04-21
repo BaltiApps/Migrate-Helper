@@ -12,8 +12,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -183,7 +183,6 @@ class MainActivityKotlin: AppCompatActivity() {
         }
 
         contact_on_telegram.apply {
-            paintFlags = Paint.UNDERLINE_TEXT_FLAG
             setOnClickListener {
                 AlertDialog.Builder(this@MainActivityKotlin).apply {
                     setMessage(R.string.contact_desc)
@@ -199,6 +198,21 @@ class MainActivityKotlin: AppCompatActivity() {
             }
         }
 
+        main_menu.setOnClickListener {
+            val popupMenu = PopupMenu(this, main_menu)
+            popupMenu.run {
+                menuInflater.inflate(R.menu.main_menu, menu)
+                setOnMenuItemClickListener {
+                    when(it.itemId){
+                        R.id.lastLog_menu -> showLog()
+                        R.id.changelog_menu -> showChangelog()
+                    }
+                    true
+                }
+                show()
+            }
+        }
+
         close_button.setOnClickListener { finish() }
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
@@ -210,6 +224,31 @@ class MainActivityKotlin: AppCompatActivity() {
             if (getBooleanExtra(EXTRA_DO_START_POST_JOBS, false))
                 startActivity(Intent(this@MainActivityKotlin, PostJobsActivity::class.java))
         }
+    }
+
+    private fun showChangelog(){
+        val changelog = AlertDialog.Builder(this)
+
+        val padding = 20
+
+        val scrollView = ScrollView(this)
+        scrollView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+
+        val allVersions = TextView(this)
+        allVersions.setPadding(padding, padding, padding, padding)
+        allVersions.text = ""
+        allVersions.textSize = 15f
+
+        scrollView.addView(allVersions)
+
+        /*Add increasing versions here*/
+
+        allVersions.append("\n" + getString(R.string.version_3_1) + "\n" + getString(R.string.version_3_1_content) + "\n")
+
+        changelog.setTitle(R.string.changelog)
+                .setView(scrollView)
+                .setPositiveButton(R.string.close, null)
+                .show()
     }
 
     private fun showLog(){

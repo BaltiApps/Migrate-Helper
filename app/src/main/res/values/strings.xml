@@ -19,6 +19,14 @@
     <string name="app_name">Migrate helper</string>
     <string name="current_version_name">3.1_release</string>
 
+    <!--changelog-->
+    <string name="changelog">Changelog</string>
+    <string name="version_3_1">Version 3.1</string>
+    <string name="version_3_1_content">
+        \u2022 More fixes to no data restore\n
+        \u2022 Add changelog and contact options\n
+    </string>
+
     <!--activity_main.xml-->
     <string name="restore_main">Restore apps and data</string>
     <string name="uninstallFromSystem">Uninstall from system</string>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/lastLog_menu"
+        android:title="@string/lastLog"
+        android:icon="@drawable/ic_log"/>
+
+    <item android:id="@+id/changelog_menu"
+        android:title="@string/changelog"
+        android:icon="@drawable/ic_changelog"/>
+</menu>
