@@ -23,32 +23,24 @@ elif [[ -z "$app_uid" ]]; then
 else
 
     am force-stop ${package_name} 2>/dev/null
+    tarCmd=""
+
+    if [[ -e ${busybox_file} ]]; then
+        tarCmd="${busybox_file} tar"
+    elif [[ -n "$(command -v tar)" ]]; then
+        tarCmd="tar"
+    else
+        tarCmd=""
+    fi
+
+    if [[ -z ${tarCmd} ]]; then
+        echo "busybox not found under ${busybox_file}. Tar not installed."
+        exit 1
+    fi
 
     rm -rf ${dataDir} 2>/dev/null
 
-    if [[ -e ${MIGRATE_CACHE}/${tar_gz_file} ]]; then
-        echo "Trying to move $tar_gz_file under /data/data/"
-        mv ${MIGRATE_CACHE}/${tar_gz_file} /data/data/
-    fi
-
-    if [[ -e /data/data/${tar_gz_file} ]]; then
-
-        cd /data/data/
-
-        if [[ -e ${busybox_file} ]]; then
-            tarCmd="${busybox_file} tar"
-        elif [[ -n "$(command -v tar)" ]]; then
-            tarCmd="tar"
-        else
-            tarCmd=""
-        fi
-
-        if [[ -n ${tarCmd} ]]; then
-            echo "Extracting data"
-            ${tarCmd} -xzpf ${tar_gz_file} && rm ${tar_gz_file} && echo "ok" > ${METADATA_HOLDER}/${package_name}.data.marker
-        else
-            echo "busybox not found under ${busybox_file}. Tar not installed."
-        fi
+    fixPerms() {
 
         if [[ -e ${dataDir} ]]; then
             chmod 755 ${dataDir}
@@ -66,6 +58,30 @@ else
             echo "Data dir $dataDir for package $package_name not found!"
             echo "Data file was: $tar_gz_file"
         fi
+
+    }
+
+    if [[ -e ${MIGRATE_CACHE}/${tar_gz_file} ]]; then
+        echo "Trying to move $tar_gz_file under /data/data/"
+        mv ${MIGRATE_CACHE}/${tar_gz_file} /data/data/${tar_gz_file}
+    fi
+
+    if [[ -e /data/data/${tar_gz_file} ]]; then
+
+        cd /data/data/
+
+        echo "Extracting data"
+        ${tarCmd} -xzpf ${tar_gz_file} && rm ${tar_gz_file} && echo "ok" > ${METADATA_HOLDER}/${package_name}.data.marker
+
+        fixPerms
+
+    elif [[ -e ${MIGRATE_CACHE}/${tar_gz_file} ]]; then
+
+        echo "Direct extraction..."
+
+        ${tarCmd} -xzpf ${MIGRATE_CACHE}/${tar_gz_file} -C /data/data && rm ${tar_gz_file} && echo "ok" > ${METADATA_HOLDER}/${package_name}.data.marker
+
+        fixPerms
 
     else
         echo "Data file $tar_gz_file was not found!"
