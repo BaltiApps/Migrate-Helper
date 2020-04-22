@@ -14,6 +14,7 @@ class IconTools {
     fun setIconFromIconString(iconView: ImageView, iconString: String){
 
         class Setter : AsyncTask<Any, Any, Bitmap?>(){
+
             override fun doInBackground(vararg params: Any?): Bitmap? {
 
                 return try {
@@ -41,14 +42,19 @@ class IconTools {
 
             override fun onPostExecute(result: Bitmap?) {
                 super.onPostExecute(result)
-                if (result != null) {
-                    iconView.setImageBitmap(result)
-                } else {
+                try {
+                    if (result != null) {
+                        iconView.setImageBitmap(result)
+                    } else {
+                        iconView.setImageResource(R.drawable.ic_app)
+                    }
+                }
+                catch (e: Exception) {
                     iconView.setImageResource(R.drawable.ic_app)
                 }
             }
         }
-        Setter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        Setter().execute()
     }
 
     fun setIconFromFile(iconView: ImageView, file: File){
@@ -58,10 +64,15 @@ class IconTools {
             override fun doInBackground(vararg params: Any?): String {
 
                 val icon = StringBuffer("")
-                if (file.exists() && file.canRead()) {
-                    BufferedReader(FileReader(file)).readLines().forEach {
-                        icon.append(it)
+                try {
+                    if (file.exists() && file.canRead()) {
+                        BufferedReader(FileReader(file)).readLines().forEach {
+                            icon.append(it)
+                        }
                     }
+                }
+                catch (e: Exception){
+                    e.printStackTrace()
                 }
                 return icon.toString()
             }
@@ -71,6 +82,6 @@ class IconTools {
                 setIconFromIconString(iconView, result)
             }
         }
-        Setter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        Setter().execute()
     }
 }

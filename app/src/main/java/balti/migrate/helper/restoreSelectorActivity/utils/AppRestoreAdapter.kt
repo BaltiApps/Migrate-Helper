@@ -1,6 +1,7 @@
 package balti.migrate.helper.restoreSelectorActivity.utils
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.content.Context
 import android.database.DataSetObserver
 import android.graphics.Color
@@ -119,7 +120,7 @@ class AppRestoreAdapter(val context: Context,
         val appItem = appPackets[position]
 
         viewHolder.appName.text = appItem.appName
-        if (doLoadIcons) {
+        if (doLoadIcons && !getAvailableMemory().lowMemory) {
             try {
                 appItem.iconFileName?.run {
                     iconTools.setIconFromFile(viewHolder.appIcon, File(METADATA_HOLDER_DIR, this))
@@ -270,6 +271,13 @@ class AppRestoreAdapter(val context: Context,
             PROPERTY_DATA_SELECTION -> appItem.DATA
             PROPERTY_PERMISSION_SELECTION -> appItem.PERMISSION
             else -> false
+        }
+    }
+
+    private fun getAvailableMemory(): ActivityManager.MemoryInfo {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        return ActivityManager.MemoryInfo().also { memoryInfo ->
+            activityManager.getMemoryInfo(memoryInfo)
         }
     }
 

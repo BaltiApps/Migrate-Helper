@@ -12,7 +12,9 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_margin="@dimen/small_padding_width"
-        android:padding="@dimen/large_padding_width" />
+        android:padding="@dimen/large_padding_width"
+        android:src="@drawable/ic_app"
+        />
 
 
     <TextView
