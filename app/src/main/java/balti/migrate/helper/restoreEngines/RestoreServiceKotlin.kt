@@ -221,6 +221,11 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
         AppInstance.notificationManager.cancelAll()
 
+        File(INFO_HOLDER_DIR).run {
+            deleteRecursively()
+            mkdirs()
+        }
+
         //doFallThroughJob(JOBCODE_RESTORE_SMS)
         doFallThroughJob(JOBCODE_RESTORE_SMS_CALLS)
     }
