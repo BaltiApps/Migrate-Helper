@@ -369,6 +369,9 @@
     <string name="track_restore_finished_desc">Track when restore is finished to avoid resuming progress show activity. Do not disable unless you are sure.</string>
     <string name="remount_all_to_uninstall">Remount all to uninstall</string>
     <string name="remount_all_to_uninstall_desc">If uninstalling fails, remount all mount points and auto retry.</string>
+    <string name="load_multiple_icons">Load multiple app icons.</string>
+    <string name="load_multiple_icons_desc">This will attempt to load as many app icons as possible on the app selector screen. Turning on may result in crashes.</string>
+    <string name="check_low_memory_icons">Check low memory before loading icons</string>
     <string name="clear_to_reset">Clear and press OK to reset to default value</string>
     <string name="manual_cache">Specify path to migrate_cache</string>
     <string name="manual_metadata_holder">Specify path to metadata holder</string>

@@ -208,6 +208,8 @@ class CommonToolsKotlin(val context: Context) {
         val MIGRATE_TEMP_DIR = "/data/migrateTemp"
 
         val PREF_DO_LOAD_ICON_IN_LIST = "doLoadIconInList"
+        val PREF_DO_LOAD_MULTIPLE_ICON_IN_LIST = "doLoadMultipleIconInList"
+        val PREF_ICON_CHECK_LOW_MEMORY = "checkLowMemory"
 
         val PACKAGE_NAME_PLAY_STORE = "com.android.vending"
         val PACKAGE_NAME_FDROID = "org.fdroid.fdroid.privileged"

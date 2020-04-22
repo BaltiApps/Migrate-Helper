@@ -21,6 +21,8 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_FDROID
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DO_LOAD_ICON_IN_LIST
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DO_LOAD_MULTIPLE_ICON_IN_LIST
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_ICON_CHECK_LOW_MEMORY
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PROPERTY_APP_SELECTION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PROPERTY_DATA_SELECTION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PROPERTY_PERMISSION_SELECTION
@@ -38,8 +40,9 @@ class AppRestoreAdapter(val context: Context,
     private var dataAllChangeFromScanning = false
     private var permissionAllChangeFromScanning = false
     private var externalDataSetChanged = true
-    private val iconTools by lazy { IconTools() }
+    private val iconTools by lazy { IconTools(sharedPrefs.getBoolean(PREF_DO_LOAD_MULTIPLE_ICON_IN_LIST, false)) }
     private val doLoadIcons = sharedPrefs.getBoolean(PREF_DO_LOAD_ICON_IN_LIST, true)
+    private val checkLowMemory = sharedPrefs.getBoolean(PREF_ICON_CHECK_LOW_MEMORY, true)
 
     private val commonTools by lazy { CommonToolsKotlin(context) }
 
@@ -120,7 +123,7 @@ class AppRestoreAdapter(val context: Context,
         val appItem = appPackets[position]
 
         viewHolder.appName.text = appItem.appName
-        if (doLoadIcons && !getAvailableMemory().lowMemory) {
+        if (doLoadIcons && !(checkLowMemory && getAvailableMemory().lowMemory)) {
             try {
                 appItem.iconFileName?.run {
                     iconTools.setIconFromFile(viewHolder.appIcon, File(METADATA_HOLDER_DIR, this))

@@ -9,7 +9,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 
-class IconTools {
+class IconTools(private val multipleLoad: Boolean = false) {
 
     fun setIconFromIconString(iconView: ImageView, iconString: String){
 
@@ -54,7 +54,8 @@ class IconTools {
                 }
             }
         }
-        Setter().execute()
+        if (multipleLoad) Setter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        else Setter().execute()
     }
 
     fun setIconFromFile(iconView: ImageView, file: File){
@@ -82,6 +83,7 @@ class IconTools {
                 setIconFromIconString(iconView, result)
             }
         }
-        Setter().execute()
+        if (multipleLoad) Setter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        else Setter().execute()
     }
 }

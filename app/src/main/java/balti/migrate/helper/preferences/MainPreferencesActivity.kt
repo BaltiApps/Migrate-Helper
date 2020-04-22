@@ -11,6 +11,8 @@ import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_METADATA_HOLDER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DO_LOAD_ICON_IN_LIST
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DO_LOAD_MULTIPLE_ICON_IN_LIST
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_ICON_CHECK_LOW_MEMORY
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LOAD_EXTRAS_ON_UI_THREAD
@@ -32,6 +34,8 @@ class MainPreferencesActivity: PreferenceActivity() {
     private val loadExtrasOnUiThread: CheckBoxPreference by lazy { findPreference("loadExtrasOnUiThread") as CheckBoxPreference }
     private val trackRestoreFinished: CheckBoxPreference by lazy { findPreference("trackRestoreFinished") as CheckBoxPreference }
     private val remountRetryUninstall: CheckBoxPreference by lazy { findPreference("remountRetryUninstall") as CheckBoxPreference }
+    private val loadMultipleIcons: CheckBoxPreference by lazy { findPreference("loadMultipleIcons") as CheckBoxPreference }
+    private val checkLowMemoryOnIcons: CheckBoxPreference by lazy { findPreference("checkLowMemoryOnIcons") as CheckBoxPreference }
 
     private val manualCachePref: EditTextPreference by lazy { findPreference("manualCachePref") as EditTextPreference }
     private val manualMetadataHolderPref: EditTextPreference by lazy { findPreference("manualMetadataHolderPref") as EditTextPreference }
@@ -85,6 +89,8 @@ class MainPreferencesActivity: PreferenceActivity() {
             setValue(loadExtrasOnUiThread, PREF_LOAD_EXTRAS_ON_UI_THREAD, false)
             setValue(trackRestoreFinished, PREF_TRACK_RESTORE_FINISHED, true)
             setValue(remountRetryUninstall, PREF_REMOUNT_ALL_TO_UNINSTALL, false)
+            setValue(loadMultipleIcons, PREF_DO_LOAD_MULTIPLE_ICON_IN_LIST)
+            setValue(checkLowMemoryOnIcons, PREF_ICON_CHECK_LOW_MEMORY, true)
 
             setValue(manualCachePref, PREF_MANUAL_CACHE, PREF_DEFAULT_MIGRATE_CACHE)
             setValue(manualMetadataHolderPref, PREF_MANUAL_METADATA_HOLDER, PREF_DEFAULT_METADATA_HOLDER)
