@@ -8,6 +8,7 @@ import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_APP_MAKING_SCRIPT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_APP_MAKING_SCRIPT_TRY_CATCH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_APP_RESTORE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_APP_RESTORE_MESSAGE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_APP_RESTORE_SUPPRESSED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_APP_RESTORE_TRY_CATCH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_APP_RESTORE
@@ -239,6 +240,11 @@ class AppRestoreEngine(private val jobcode: Int,
                     }
 
                     var line = output
+
+                    if (output.startsWith("ERROR::")) {
+                        line = output.substring("ERROR:: ".length)
+                        addToActualErrors("$ERROR_APP_RESTORE_MESSAGE: $line")
+                    }
 
                     if (output.startsWith(MIGRATE_STATUS)) {
 
