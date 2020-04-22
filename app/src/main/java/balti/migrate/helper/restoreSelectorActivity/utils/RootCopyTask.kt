@@ -7,6 +7,9 @@ import balti.migrate.helper.R
 import balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.BACKUP_NAME_SETTINGS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_FILE_LIST
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_PACKAGE_DATA
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_RAW_LIST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_TEMP_DIR
@@ -63,7 +66,7 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
                 BufferedWriter(OutputStreamWriter(it.outputStream)).run {
 
                     write("chmod +x $scripFile\n")
-                    write("sh $scripFile ${context.packageName} $METADATA_HOLDER_DIR $MIGRATE_CACHE $BACKUP_NAME_SETTINGS $WIFI_FILE_NAME $MIGRATE_TEMP_DIR\n")
+                    write("sh $scripFile ${context.packageName} $METADATA_HOLDER_DIR $MIGRATE_CACHE $BACKUP_NAME_SETTINGS $WIFI_FILE_NAME $MIGRATE_TEMP_DIR $FILE_PACKAGE_DATA $FILE_RAW_LIST $FILE_FILE_LIST\n")
                     write("exit\n")
                     flush()
 

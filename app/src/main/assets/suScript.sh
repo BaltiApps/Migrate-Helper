@@ -6,6 +6,9 @@ CACHE_DIR="$3"
 SETTINGS_FILE_NAME="$4"
 WIFI_FILE_NAME="$5"
 MIGRATE_TEMP="$6"
+PACKAGE_DATA_PREFIX="$7"
+RAW_LIST_PREFIX="$8"
+FILE_LIST_PREFIX="$9"
 
 # display PID
 echo "--- PID: $$"
@@ -42,5 +45,9 @@ cp -f ${CACHE_DIR}/*.calls.db ${METADATA_HOLDER} 2>/dev/null
 cp -f ${CACHE_DIR}/*.perm ${METADATA_HOLDER} 2>/dev/null
 cp -f ${CACHE_DIR}/${SETTINGS_FILE_NAME} ${METADATA_HOLDER} 2>/dev/null
 cp -f ${CACHE_DIR}/${WIFI_FILE_NAME} ${METADATA_HOLDER} 2>/dev/null
+
+cp -f ${CACHE_DIR}/${PACKAGE_DATA_PREFIX}* ${METADATA_HOLDER} 2>/dev/null
+cp -f ${CACHE_DIR}/${RAW_LIST_PREFIX}* ${METADATA_HOLDER} 2>/dev/null
+cp -f ${CACHE_DIR}/${FILE_LIST_PREFIX}* ${METADATA_HOLDER} 2>/dev/null
 
 echo --- END_OF_COPY ---

@@ -48,6 +48,7 @@ class CommonToolsKotlin(val context: Context) {
         val FILE_RESTORE_SCRIPT = "the_restore_script.sh"
         val FILE_PACKAGE_DATA = "package-data"
         val FILE_FILE_LIST = "fileList.txt"
+        val FILE_RAW_LIST = "rawList.txt"
 
         val DIR_TWRP_UNINSTALL = "/sdcard/Migrate/"
 

@@ -13,8 +13,6 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_APP_REST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_APP_RESTORE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_MAKING_SCRIPTS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_WAITING_FOR_VCF
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_FILE_LIST
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_PACKAGE_DATA
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_RESTORE_SCRIPT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.KNOWN_CONTACTS_ELEMENTS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.KNOWN_CONTACT_APPS
@@ -183,8 +181,8 @@ class AppRestoreEngine(private val jobcode: Int,
                         }
                     }
 
-                    writeNext("mv -f $MIGRATE_CACHE/$FILE_PACKAGE_DATA* ${engineContext.externalCacheDir}/ 2>/dev/null")
-                    writeNext("cp $MIGRATE_CACHE/$FILE_FILE_LIST* ${engineContext.externalCacheDir}/ 2>/dev/null")
+                    //writeNext("mv -f $MIGRATE_CACHE/$FILE_PACKAGE_DATA* ${engineContext.externalCacheDir}/ 2>/dev/null")
+                    //writeNext("cp $MIGRATE_CACHE/$FILE_FILE_LIST* ${engineContext.externalCacheDir}/ 2>/dev/null")
 
                     writeNext("echo \" \"")
                     writeNext("echo \"--- DONE! ---\"")
