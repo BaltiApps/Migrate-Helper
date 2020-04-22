@@ -338,6 +338,12 @@ class CommonToolsKotlin(val context: Context) {
             } else emptyArray<File>()
         }
 
+        val rawLists = workingDir.let {
+            if (it != null) it.listFiles { f: File ->
+                f.name.startsWith(FILE_RAW_LIST) && f.name.endsWith(".txt")
+            } else emptyArray<File>()
+        }
+
         if (isErrorLogMandatory && !errorLog.exists()) {
             AlertDialog.Builder(context)
                     .setTitle(R.string.log_files_do_not_exist)
@@ -346,7 +352,7 @@ class CommonToolsKotlin(val context: Context) {
                     .show()
         }
         else if (errorLog.exists() || progressLog.exists() || theRestoreScript.exists() ||
-                packageDatas.isNotEmpty() || fileLists.isNotEmpty()){
+                packageDatas.isNotEmpty() || fileLists.isNotEmpty() || rawLists.isNotEmpty()){
 
             val eView = View.inflate(context, R.layout.error_report_layout, null)
 
@@ -355,6 +361,9 @@ class CommonToolsKotlin(val context: Context) {
 
             eView.share_fileLists_checkbox.isChecked = fileLists.isNotEmpty()
             eView.share_fileLists_checkbox.isEnabled = fileLists.isNotEmpty()
+
+            eView.share_rawLists_checkbox.isChecked = rawLists.isNotEmpty()
+            eView.share_rawLists_checkbox.isEnabled = rawLists.isNotEmpty()
 
             eView.share_script_checkbox.isChecked = theRestoreScript.exists()
             eView.share_script_checkbox.isEnabled = theRestoreScript.exists()
@@ -387,6 +396,7 @@ class CommonToolsKotlin(val context: Context) {
                     if (eView.share_script_checkbox.isChecked) uris.add(getUri(theRestoreScript))
                     if (eView.share_package_data.isChecked) for (f in packageDatas) uris.add(getUri(f))
                     if (eView.share_fileLists_checkbox.isChecked) for (f in fileLists) uris.add(getUri(f))
+                    if (eView.share_rawLists_checkbox.isChecked) for (f in rawLists) uris.add(getUri(f))
 
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -430,7 +440,8 @@ class CommonToolsKotlin(val context: Context) {
                     context.getString(R.string.error_log_does_not_exist) + "\n" +
                     context.getString(R.string.restore_script_does_not_exist) + "\n" +
                     context.getString(R.string.package_data_does_not_exist) + "\n" +
-                    context.getString(R.string.file_lists_does_not_exist)
+                    context.getString(R.string.file_lists_does_not_exist) + "\n" +
+                    context.getString(R.string.raw_lists_does_not_exist)
 
             AlertDialog.Builder(context)
                     .setTitle(R.string.log_files_do_not_exist)

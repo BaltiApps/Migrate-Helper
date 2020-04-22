@@ -239,6 +239,7 @@
     <string name="share_progress_logs">Share progress logs</string>
     <string name="share_error_logs">Share error logs</string>
     <string name="share_file_lists">Share list of files in backup</string>
+    <string name="share_raw_lists">Share raw list of files</string>
     <string name="share_script">Share script</string>
     <string name="share_package_data">Share package-data</string>
     <string name="send_to_tg">Send to Telegram</string>
@@ -266,6 +267,7 @@
     <string name="error_log_does_not_exist">\"errorLog\" does not exist</string>
     <string name="package_data_does_not_exist">\"package-data\" does not exist</string>
     <string name="file_lists_does_not_exist">File lists do not exist</string>
+    <string name="raw_lists_does_not_exist">Raw file lists do not exist</string>
     <string name="tg_not_installed">Our Telegram group helps to get quick resolutions to problems.</string>
     <string name="tg_not_installed_desc">Please install Telegram and join our group.</string>
     <string name="install_tg">Install Telegram</string>
