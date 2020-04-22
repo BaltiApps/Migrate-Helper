@@ -203,7 +203,7 @@ class CommonToolsKotlin(val context: Context) {
         val PREF_REMOUNT_ALL_TO_UNINSTALL = "remount_all_to_uninstall"
 
         val PREF_DEFAULT_MIGRATE_CACHE = "/data/local/tmp/migrate_cache"
-        val PREF_DEFAULT_METADATA_HOLDER = "/sdcard/Android/data/balti.migrate.helper/cache/"
+        val PREF_DEFAULT_METADATA_HOLDER = AppInstance.appContext.externalCacheDir?.absolutePath ?: "/sdcard/Android/data/balti.migrate.helper/cache"
         val MIGRATE_TEMP_DIR = "/data/migrateTemp"
 
         val PREF_DO_LOAD_ICON_IN_LIST = "doLoadIconInList"
@@ -247,6 +247,8 @@ class CommonToolsKotlin(val context: Context) {
                 }
             }
 
+        val INFO_HOLDER_DIR: String = "${this.METADATA_HOLDER_DIR}/info"
+
         val KNOWN_CONTACT_APPS = arrayOf("com.google.android.contacts", "com.android.contacts")
         val KNOWN_CONTACTS_ELEMENTS = arrayOf(
                 "com.google.android.contacts/com.google.android.apps.contacts.vcard.VCardService",
@@ -269,7 +271,7 @@ class CommonToolsKotlin(val context: Context) {
 
     var LBM : LocalBroadcastManager? = null
 
-    val workingDir = context.externalCacheDir
+    //val workingDir = context.externalCacheDir
 
     init {
         if (context is Activity || context is Service)
@@ -280,7 +282,7 @@ class CommonToolsKotlin(val context: Context) {
 
         val assetManager = context.assets
         val unpackFile = if (toInternal) File(context.filesDir, targetFileName)
-        else File(context.externalCacheDir, targetFileName)
+        else File(METADATA_HOLDER_DIR, targetFileName)
 
         var read: Int
         val buffer = ByteArray(4096)
@@ -322,26 +324,28 @@ class CommonToolsKotlin(val context: Context) {
 
     fun reportLogs(isErrorLogMandatory: Boolean) {
 
-        val progressLog = File(workingDir, FILE_PROGRESSLOG)
-        val errorLog = File(workingDir, FILE_ERRORLOG)
-        val theRestoreScript = File(workingDir, FILE_RESTORE_SCRIPT)
+        val progressLog = File(INFO_HOLDER_DIR, FILE_PROGRESSLOG)
+        val errorLog = File(INFO_HOLDER_DIR, FILE_ERRORLOG)
+        val theRestoreScript = File(INFO_HOLDER_DIR, FILE_RESTORE_SCRIPT)
+
+        val workingDir = File(METADATA_HOLDER_DIR)
 
         val packageDatas = workingDir.let {
-            if (it != null) it.listFiles { f: File ->
+            it.listFiles { f: File ->
                 f.name.startsWith(FILE_PACKAGE_DATA) && f.name.endsWith(".txt")
-            } else emptyArray<File>()
+            }
         }
 
         val fileLists = workingDir.let {
-            if (it != null) it.listFiles { f: File ->
+            it.listFiles { f: File ->
                 f.name.startsWith(FILE_FILE_LIST) && f.name.endsWith(".txt")
-            } else emptyArray<File>()
+            }
         }
 
         val rawLists = workingDir.let {
-            if (it != null) it.listFiles { f: File ->
+            it.listFiles { f: File ->
                 f.name.startsWith(FILE_RAW_LIST) && f.name.endsWith(".txt")
-            } else emptyArray<File>()
+            }
         }
 
         if (isErrorLogMandatory && !errorLog.exists()) {
@@ -475,7 +479,7 @@ class CommonToolsKotlin(val context: Context) {
             else doBackgroundTask({
 
                 tryIt {
-                    val infoFile = File(workingDir, FILE_DEVICE_INFO)
+                    val infoFile = File(INFO_HOLDER_DIR, FILE_DEVICE_INFO)
                     BufferedWriter(FileWriter(infoFile)).run {
                         write(deviceSpecifications)
                         close()

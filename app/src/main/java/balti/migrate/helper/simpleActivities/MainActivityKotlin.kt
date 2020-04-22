@@ -31,7 +31,9 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DIR_TWRP_UNINS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_START_POST_JOBS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_ERRORLOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_PROGRESSLOG
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.INFO_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.LAST_SUPPORTED_ANDROID_API
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_ANDROID_VERSION_WARNING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_FILEPATH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_HEAD
@@ -80,6 +82,9 @@ class MainActivityKotlin: AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val cpuAbi = Build.SUPPORTED_ABIS[0]
+
+        File(METADATA_HOLDER_DIR).mkdirs()
+        File(INFO_HOLDER_DIR).mkdirs()
 
         if (cpuAbi == "armeabi-v7a" || cpuAbi == "arm64-v8a" || cpuAbi == "x86" || cpuAbi == "x86_64") {
             if (Build.VERSION.SDK_INT > LAST_SUPPORTED_ANDROID_API && !main.getBoolean(PREF_ANDROID_VERSION_WARNING, false)) {
@@ -262,7 +267,7 @@ class MainActivityKotlin: AppCompatActivity() {
                 .create()
 
         lView.view_progress_log.setOnClickListener {
-            val f = File(externalCacheDir, FILE_PROGRESSLOG)
+            val f = File(INFO_HOLDER_DIR, FILE_PROGRESSLOG)
             if (f.exists())
                 startActivity(
                         Intent(this, SimpleLogViewer::class.java)                          /*kotlin*/
@@ -273,7 +278,7 @@ class MainActivityKotlin: AppCompatActivity() {
         }
 
         lView.view_error_log.setOnClickListener {
-            val f = File(externalCacheDir, FILE_ERRORLOG)
+            val f = File(INFO_HOLDER_DIR, FILE_ERRORLOG)
             if (f.exists())
                 startActivity(
                         Intent(this, SimpleLogViewer::class.java)                          /*kotlin*/
@@ -300,7 +305,7 @@ class MainActivityKotlin: AppCompatActivity() {
 
             fileName.let {
                 commonTools.unpackAssetToInternal(it, it, false)
-                File(commonTools.workingDir, it).run {
+                File(INFO_HOLDER_DIR, it).run {
                     if (this.exists()) {
                         ToolsNoContext.moveFile(this, File(DIR_TWRP_UNINSTALL)).run {
                             if (this == "")

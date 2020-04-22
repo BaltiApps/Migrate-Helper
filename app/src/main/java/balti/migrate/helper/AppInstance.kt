@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import balti.migrate.helper.restoreSelectorActivity.containers.*
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_MAIN_PREF
-import java.io.File
 
 class AppInstance: Application() {
 
@@ -30,7 +29,5 @@ class AppInstance: Application() {
         appContext = this
         sharedPrefs = getSharedPreferences(FILE_MAIN_PREF, Context.MODE_PRIVATE)
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-        File(externalCacheDir.absolutePath).mkdirs()
     }
 }

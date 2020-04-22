@@ -14,6 +14,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_MAKING_SCRIPTS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_WAITING_FOR_VCF
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_RESTORE_SCRIPT
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.INFO_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.KNOWN_CONTACTS_ELEMENTS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.KNOWN_CONTACT_APPS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
@@ -120,7 +121,7 @@ class AppRestoreEngine(private val jobcode: Int,
                     writeNext("echo \" \"")
                     writeNext("sleep 1s")
                     writeNext("echo \"--- RESTORE PID: $$\"")
-                    writeNext("cp ${it.absolutePath} ${engineContext.externalCacheDir}/")
+                    writeNext("cp ${it.absolutePath} ${INFO_HOLDER_DIR}/")
                     writeNext("echo \" \"")
 
                     if (sharedPreferences.getBoolean(PREF_REMOUNT_DATA, false)) {

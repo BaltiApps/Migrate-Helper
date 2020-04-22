@@ -50,6 +50,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_TITLE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_TOTAL_TIME
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_ERRORLOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_PROGRESSLOG
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.INFO_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_APP
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CLEAN
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_END
@@ -237,8 +238,8 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                 .build()
 
         commonTools.tryIt {
-            progressWriter = BufferedWriter(FileWriter(File(externalCacheDir, FILE_PROGRESSLOG)))
-            errorWriter = BufferedWriter(FileWriter(File(externalCacheDir, FILE_ERRORLOG)))
+            progressWriter = BufferedWriter(FileWriter(File(INFO_HOLDER_DIR, FILE_PROGRESSLOG)))
+            errorWriter = BufferedWriter(FileWriter(File(INFO_HOLDER_DIR, FILE_ERRORLOG)))
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
