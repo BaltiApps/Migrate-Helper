@@ -221,11 +221,6 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
         AppInstance.notificationManager.cancelAll()
 
-        File(INFO_HOLDER_DIR).run {
-            deleteRecursively()
-            mkdirs()
-        }
-
         //doFallThroughJob(JOBCODE_RESTORE_SMS)
         doFallThroughJob(JOBCODE_RESTORE_SMS_CALLS)
     }
@@ -243,8 +238,14 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                 .build()
 
         commonTools.tryIt {
-            progressWriter = BufferedWriter(FileWriter(File(INFO_HOLDER_DIR, FILE_PROGRESSLOG)))
-            errorWriter = BufferedWriter(FileWriter(File(INFO_HOLDER_DIR, FILE_ERRORLOG)))
+
+            File(INFO_HOLDER_DIR).run {
+                deleteRecursively()
+                mkdirs()
+
+                progressWriter = BufferedWriter(FileWriter(File(this, FILE_PROGRESSLOG)))
+                errorWriter = BufferedWriter(FileWriter(File(this, FILE_ERRORLOG)))
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
