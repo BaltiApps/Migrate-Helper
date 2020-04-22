@@ -247,7 +247,16 @@ class CommonToolsKotlin(val context: Context) {
                 }
             }
 
-        val INFO_HOLDER_DIR: String = "${this.METADATA_HOLDER_DIR}/info"
+        val INFO_HOLDER_DIR: String
+        get() {
+            return try {
+                "${this.METADATA_HOLDER_DIR}/info"
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+                "${this.PREF_DEFAULT_METADATA_HOLDER}/info"
+            }
+        }
 
         val KNOWN_CONTACT_APPS = arrayOf("com.google.android.contacts", "com.android.contacts")
         val KNOWN_CONTACTS_ELEMENTS = arrayOf(
