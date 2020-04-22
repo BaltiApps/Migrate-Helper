@@ -8,6 +8,7 @@ base_apk_name=$3
 package_name=$4
 installer_name=$5
 METADATA_HOLDER=$6
+app_name=$7
 
 if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
 
@@ -33,7 +34,7 @@ if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
     fi
 
     if [[ -z "$(pm list packages ${package_name})" ]]; then
-        echo "App not installed. Please install manually via Google Play or elsewhere"
+        echo "ERROR:: App $app_name not installed. Please install manually via Google Play or elsewhere"
     else
 
         split_count=$(ls -1 | grep "split" | grep ".apk" | wc -l)
@@ -79,5 +80,5 @@ if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
     fi
 
 else
-    echo "Apk(s) for ${package_name} not found!"
+    echo "ERROR:: Apk(s) for ${package_name} not found!"
 fi

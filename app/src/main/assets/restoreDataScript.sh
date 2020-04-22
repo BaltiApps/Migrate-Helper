@@ -17,9 +17,9 @@ app_uid=$(dumpsys package ${package_name} | grep userId= | head -n 1 | cut -d '=
 # in android lollipop unnecessary extras along with app_uid. So take only first item.
 
 if [[ -z "$(pm list packages ${package_name})" ]]; then
-    echo "Failed to find package $package_name. Cannot restore data."
+    echo "ERROR:: Failed to find package $package_name. Cannot restore data."
 elif [[ -z "$app_uid" ]]; then
-    echo "Failed to find uid of package $package_name. Cannot restore data."
+    echo "ERROR:: Failed to find uid of package $package_name. Cannot restore data."
 else
 
     am force-stop ${package_name} 2>/dev/null
@@ -34,7 +34,7 @@ else
     fi
 
     if [[ -z ${tarCmd} ]]; then
-        echo "busybox not found under ${busybox_file}. Tar not installed."
+        echo "ERROR:: busybox not found under ${busybox_file}. Tar not installed."
         exit 1
     fi
 
@@ -55,8 +55,8 @@ else
             fi
 
         else
-            echo "Data dir $dataDir for package $package_name not found!"
-            echo "Data file was: $tar_gz_file"
+            echo "ERROR:: Data dir $dataDir for package $package_name not found!"
+            echo "ERROR:: Data file was: $tar_gz_file"
         fi
 
     }
@@ -84,7 +84,7 @@ else
         fixPerms
 
     else
-        echo "Data file $tar_gz_file was not found!"
+        echo "ERROR:: Data file $tar_gz_file was not found!"
         echo "ok" > ${METADATA_HOLDER}/${package_name}.data.marker
     fi
 
