@@ -178,6 +178,7 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_DO_REBOOT = "doReboot"
         val EXTRA_DO_UNINSTALL = "doUninstall"
         val EXTRA_DO_REMOVE_CACHE = "doRemoveCache"
+        val EXTRA_SCAN_SYSTEM_APK = "doScanSystemForApk"
 
         val PENDING_INIT_REQUEST_ID = 231
         val PENDING_INIT_NOTIFICATION_ID = 232

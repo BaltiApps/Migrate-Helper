@@ -17,6 +17,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_UNINST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REMOVE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_UNINSTALL
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SCAN_SYSTEM_APK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_ALL_TO_UNINSTALL
@@ -50,10 +51,11 @@ class UninstallServiceKotlin: Service() {
             val doReboot = intent.getBooleanExtra(EXTRA_DO_REBOOT, false)
             val doUninstall = intent.getBooleanExtra(EXTRA_DO_UNINSTALL, true)
             val doRemoveCache = intent.getBooleanExtra(EXTRA_DO_REMOVE_CACHE, true)
+            val doScanSystem = intent.getBooleanExtra(EXTRA_SCAN_SYSTEM_APK, true)
 
             try {
                 AppInstance.notificationManager.cancelAll()
-                finishTasks(doUninstall, doReboot, doRemoveCache)
+                finishTasks(doUninstall, doReboot, doRemoveCache, doScanSystem)
             }
             catch (e: Exception){
                 e.printStackTrace()
@@ -66,9 +68,11 @@ class UninstallServiceKotlin: Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun finishTasks(doUninstall: Boolean, doReboot: Boolean, doRemoveCache: Boolean){
+    private fun finishTasks(doUninstall: Boolean, doReboot: Boolean, doRemoveCache: Boolean, doScanSystem: Boolean = true){
 
-        if (doUninstall || doReboot || doRemoveCache) {
+        val doScanSystemMod = doUninstall && doScanSystem
+
+        if (doUninstall || doReboot || doRemoveCache || doScanSystemMod) {
 
             val sourceDir = applicationInfo.sourceDir.let {
                 it.substring(0, it.lastIndexOf('/'))
@@ -77,7 +81,7 @@ class UninstallServiceKotlin: Service() {
             val fullProcess = Runtime.getRuntime().exec("su")
             BufferedWriter(OutputStreamWriter(fullProcess.outputStream)).run {
 
-                if (doUninstall || doRemoveCache) {
+                if (doUninstall || doRemoveCache || doScanSystemMod) {
                     write("mount -o rw,remount /data\n")
 
                     if (doRemoveCache) {
@@ -95,15 +99,17 @@ class UninstallServiceKotlin: Service() {
                             if (commonTools.isPackageInstalled(it)) write("pm uninstall $it\n")
                         }
 
-                        if (sourceDir.startsWith("/system")) {
-                            disableApp()
-                            write("mount -o rw,remount /system\n")
-                            write("mount -o rw,remount /system/app/MigrateHelper\n")
-                            write("rm -rf ${applicationInfo.dataDir} $sourceDir\n")
+                        fun deletePackageFromSystem(apkDir: String){
+
+                            write("if [[ -e $apkDir ]]; then\n")
+                            write("    mount -o rw,remount /system\n")
+                            write("    mount -o rw,remount ${apkDir}\n")
+                            write("    rm -rf ${applicationInfo.dataDir} $apkDir\n")
+                            write("fi\n")
 
                             // go advanced if not removed
 
-                            write("if [[ -e $sourceDir ]]; then\n")
+                            write("if [[ -e $apkDir ]]; then\n")
                             write("    cat /proc/mounts | grep system | while read -r line || [[ -n \"\$line\" ]]; do\n")
                             write("        mp=\"\$(echo \$line | cut -d ' ' -f2)\"\n")
                             write("        md=\"\$(echo \$line | cut -d ' ' -f1)\"\n")
@@ -111,24 +117,35 @@ class UninstallServiceKotlin: Service() {
                             write("            mount -o rw,remount \$md \$mp\n")
                             write("        fi\n")
                             write("    done\n")
-                            write("    rm -rf $sourceDir\n")
+                            write("    rm -rf $apkDir\n")
                             write("fi\n")
 
                             // mount all as rw if app not removed
 
                             if (sharedPrefs.getBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, false)) {
 
-                                write("if [[ -e $sourceDir ]]; then\n")
+                                write("if [[ -e $apkDir ]]; then\n")
                                 write("    cat /proc/mounts | while read -r line || [[ -n \"\$line\" ]]; do\n")
                                 write("        mp=\"\$(echo \$line | cut -d ' ' -f2)\"\n")
                                 write("        md=\"\$(echo \$line | cut -d ' ' -f1)\"\n")
                                 write("        mount -o rw,remount \$md \$mp\n")
                                 write("    done\n")
-                                write("    rm -rf $sourceDir\n")
+                                write("    rm -rf $apkDir\n")
                                 write("fi\n")
                             }
 
-                        } else write("pm uninstall $packageName\n")
+                        }
+
+                        if (sourceDir.startsWith("/system")) {
+                            disableApp()
+                            deletePackageFromSystem(sourceDir)
+                        } else {
+                            if (doScanSystemMod) {
+                                deletePackageFromSystem("/system/app/MigrateHelper")
+                                deletePackageFromSystem("/system/product/app/MigrateHelper")
+                            }
+                            write("pm uninstall $packageName\n")
+                        }
 
                         write("rm -rf /sdcard/Android/data/$packageName/helper\n")
                     }

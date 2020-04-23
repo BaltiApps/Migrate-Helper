@@ -15,6 +15,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REBOOT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_REMOVE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_UNINSTALL
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SCAN_SYSTEM_APK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IS_WIFI_RESTORED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_ALL_TO_UNINSTALL
@@ -105,6 +106,11 @@ class PostJobsActivity: Activity() {
         pj_resetSmsAppLayout.visibility = View.GONE
         pj_uninstallLayout.visibility = View.VISIBLE
 
+        applicationInfo.sourceDir.startsWith("/system").let {
+            pj_scanSystem.isChecked = !it
+            if (!it) pj_scanSystem.visibility = View.VISIBLE
+        }
+
         // check and disable reboot option if wifi was restored
         if (isWifiRestored()) {
             pj_reboot.isChecked = true
@@ -141,6 +147,7 @@ class PostJobsActivity: Activity() {
                     putExtra(EXTRA_DO_UNINSTALL, pj_uninstallRadio.isChecked)
                     putExtra(EXTRA_DO_REBOOT, pj_reboot.isChecked)
                     putExtra(EXTRA_DO_REMOVE_CACHE, pj_deleteCache.isChecked)
+                    putExtra(EXTRA_SCAN_SYSTEM_APK, pj_scanSystem.isChecked)
                 }
 
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)

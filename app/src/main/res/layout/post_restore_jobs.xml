@@ -169,6 +169,17 @@
                     <CheckBox
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="@string/remove_system_apk"
+                        android:textSize="12sp"
+                        android:layout_marginStart="@dimen/large_padding_width"
+                        android:layout_marginEnd="@dimen/large_padding_width"
+                        android:id="@+id/pj_scanSystem"
+                        android:visibility="gone"
+                        />
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@string/remount_all_to_uninstall"
                         android:textSize="12sp"
                         android:layout_marginStart="@dimen/large_padding_width"
