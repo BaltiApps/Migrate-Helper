@@ -305,7 +305,7 @@ class MainActivityKotlin: AppCompatActivity() {
 
             fileName.let {
                 commonTools.unpackAssetToInternal(it, it, false)
-                File(INFO_HOLDER_DIR, it).run {
+                File(METADATA_HOLDER_DIR, it).run {
                     if (this.exists()) {
                         ToolsNoContext.moveFile(this, File(DIR_TWRP_UNINSTALL)).run {
                             if (this == "")
@@ -313,6 +313,7 @@ class MainActivityKotlin: AppCompatActivity() {
                             else Toast.makeText(this@MainActivityKotlin, this, Toast.LENGTH_LONG).show()
                         }
                     }
+                    else Toast.makeText(this@MainActivityKotlin, "${getString(R.string.unpack_failed)}: ${this.absolutePath}", Toast.LENGTH_LONG).show()
                 }
             }
         }

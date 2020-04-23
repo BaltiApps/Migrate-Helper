@@ -417,6 +417,8 @@
     <string name="zip_only_helper">Uninstall only helper</string>
     <string name="zip_helper_cache">Uninstall helper + migrate_cache</string>
     <string name="extracted_under">Extracted under: [Internal storage]/Migrate/</string>
+    <string name="unpack_failed">Unpack failed</string>
+
 
     <!--Do not change!!-->
     <string name="actionSu" translatable="false">Migrate_helper_fix_SU</string>
