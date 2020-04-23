@@ -27,6 +27,7 @@
         \u2022 More fixes to no data restore\n
         \u2022 Detect errors in app restore\n
         \u2022 Probable fix to crashes while loading app list\n
+        \u2022 Also delete system apk if installed as a user app\n
         \u2022 Add changelog and contact options\n
     </string>
 
