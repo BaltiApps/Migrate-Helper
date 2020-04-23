@@ -42,7 +42,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_LINK
 import balti.migrate.helper.utilities.ToolsNoContext
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.last_log_report.view.*
-import java.io.File
+import java.io.*
 
 class MainActivityKotlin: AppCompatActivity() {
 
@@ -52,6 +52,9 @@ class MainActivityKotlin: AppCompatActivity() {
 
     private val fCode1 = 11
     private val fCode2 = 21
+
+    private var filePermissionAsked = false
+    private var filePermissionAsked2 = false
 
     private val progressReceiver by lazy {
         object : BroadcastReceiver(){
@@ -229,6 +232,9 @@ class MainActivityKotlin: AppCompatActivity() {
             if (getBooleanExtra(EXTRA_DO_START_POST_JOBS, false))
                 startActivity(Intent(this@MainActivityKotlin, PostJobsActivity::class.java))
         }
+
+        filePermissionAsked = false
+        filePermissionAsked2 = false
     }
 
     private fun showChangelog(){
@@ -298,26 +304,78 @@ class MainActivityKotlin: AppCompatActivity() {
 
     private fun extractTWRPUninstall(fCode: Int) {
 
-        if (isFilePermissionGranted()) {
-            val fileName: String = if (fCode == fCode1)
-                "twrp_helper_uninstall.zip"
-            else "twrp_helper+cache_uninstall.zip"
+        val fileName: String = if (fCode == fCode1)
+            "twrp_helper_uninstall.zip"
+        else "twrp_helper+cache_uninstall.zip"
+
+        fun check(error: String){
+            if (error == "")
+                Toast.makeText(this, R.string.extracted_under, Toast.LENGTH_SHORT).show()
+            else Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+        }
+
+        fun work(moveFunction: (mtdFile: File) -> Unit) {
 
             fileName.let {
-                commonTools.unpackAssetToInternal(it, it, false)
+                commonTools.unpackAssetToInternal(fileName, fileName, false)
                 File(METADATA_HOLDER_DIR, it).run {
                     if (this.exists()) {
-                        ToolsNoContext.moveFile(this, File(DIR_TWRP_UNINSTALL)).run {
-                            if (this == "")
-                                Toast.makeText(this@MainActivityKotlin, R.string.extracted_under, Toast.LENGTH_SHORT).show()
-                            else Toast.makeText(this@MainActivityKotlin, this, Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    else Toast.makeText(this@MainActivityKotlin, "${getString(R.string.unpack_failed)}: ${this.absolutePath}", Toast.LENGTH_LONG).show()
+                        moveFunction(this)
+                    } else Toast.makeText(this@MainActivityKotlin, "${getString(R.string.unpack_failed)}: ${this.absolutePath}", Toast.LENGTH_LONG).show()
                 }
             }
         }
-        else requestFilePermission(fCode)
+
+        if (isFilePermissionGranted()) {
+            work { check(ToolsNoContext.moveFile(it, File(DIR_TWRP_UNINSTALL))) }
+        }
+        else if (!filePermissionAsked2) requestFilePermission(fCode)
+        else {
+            AlertDialog.Builder(this).apply {
+                setMessage(R.string.use_root_to_unpack)
+                setPositiveButton(android.R.string.ok){_, _ ->
+
+                    var errors = ""
+
+                    work { source ->
+
+                        commonTools.doBackgroundTask({
+                            try {
+                                val destination = File(DIR_TWRP_UNINSTALL, source.name).absolutePath
+
+                                val suProcess = Runtime.getRuntime().exec("su")
+
+                                suProcess?.let {
+                                    BufferedWriter(OutputStreamWriter(it.outputStream)).run {
+                                        write("mv ${source.absolutePath} ${destination}\n")
+                                        write("exit\n")
+                                        flush()
+                                    }
+
+                                    val errorReader = BufferedReader(InputStreamReader(it.errorStream))
+
+                                    var line: String?
+                                    do {
+                                        errorReader.readLine().run {
+                                            this?.trim()?.let { s -> if (s != "") errors += "$s\n" }
+                                            line = this
+                                        }
+                                    } while (line != null)
+                                }
+                            }
+                            catch (e: Exception) {
+                                e.printStackTrace()
+                                errors += e.message.toString()
+                            }
+                        }, {
+                            check(errors)
+                        })
+                    }
+                }
+                setNegativeButton(android.R.string.cancel, null)
+            }
+                    .show()
+        }
     }
 
     private fun isFilePermissionGranted() =
@@ -325,6 +383,8 @@ class MainActivityKotlin: AppCompatActivity() {
                     ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 
     private fun requestFilePermission(fCode: Int) {
+        if (filePermissionAsked) filePermissionAsked2 = true
+        filePermissionAsked = true
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE), fCode)
     }

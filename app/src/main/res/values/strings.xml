@@ -418,6 +418,7 @@
     <string name="zip_helper_cache">Uninstall helper + migrate_cache</string>
     <string name="extracted_under">Extracted under: [Internal storage]/Migrate/</string>
     <string name="unpack_failed">Unpack failed</string>
+    <string name="use_root_to_unpack">File permission is being denied. Use root?</string>
 
 
     <!--Do not change!!-->
