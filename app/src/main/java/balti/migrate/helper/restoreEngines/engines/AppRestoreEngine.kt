@@ -148,8 +148,9 @@ class AppRestoreEngine(private val jobcode: Int,
 
                             appPacket.appName?.let { name -> broadcastProgress(name, name, false) }
 
-                            writeNext("echo \"$MIGRATE_STATUS: ${appPacket.appName} icon: ${appPacket.iconFileName
-                                    ?: appPacket.appIcon}\"")
+                            val correctedName: String = commonTools.applyNamingCorrectionForShell(appPacket.appName ?: "null")
+
+                            writeNext("echo \"$MIGRATE_STATUS: $correctedName icon: ${appPacket.iconFileName ?: appPacket.appIcon}\"")
 
                             val permFile = File(METADATA_HOLDER_DIR, "${appPacket.packageName}.perm")
 
@@ -162,7 +163,7 @@ class AppRestoreEngine(private val jobcode: Int,
                                 isContactAppPresent = true
 
                             if (isApp)
-                                writeNext("sh $installScriptPath $MIGRATE_CACHE ${appPacket.packageName}.app ${appPacket.apkName} ${appPacket.packageName} ${appPacket.installerName} $METADATA_HOLDER_DIR ${appPacket.appName}")
+                                writeNext("sh $installScriptPath $MIGRATE_CACHE ${appPacket.packageName}.app ${appPacket.apkName} ${appPacket.packageName} ${appPacket.installerName} $METADATA_HOLDER_DIR $correctedName")
 
                             if (isData)
                                 writeNext("sh $restoreDataScriptPath $busyboxBinaryPath ${appPacket.dataName} ${appPacket.packageName} $doNotificationFix $METADATA_HOLDER_DIR $MIGRATE_CACHE")
