@@ -254,6 +254,7 @@ class MainActivityKotlin: AppCompatActivity() {
 
         /*Add increasing versions here*/
 
+        allVersions.append("\n" + getString(R.string.version_3_1_1) + "\n" + getString(R.string.version_3_1_1_content) + "\n")
         allVersions.append("\n" + getString(R.string.version_3_1) + "\n" + getString(R.string.version_3_1_content) + "\n")
 
         changelog.setTitle(R.string.changelog)
