@@ -62,6 +62,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_I
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_ID_ONGOING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PENDING_INTENT_REQUEST_ID
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_WAS_CANCELLED
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.THIS_VERSION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_CANCEL_TASK
 import balti.migrate.helper.utilities.StupidStartupServiceKotlin
 import java.io.BufferedWriter
@@ -405,8 +406,9 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                 }
             }
             if (cancelAll) errorWriter?.write("--- Cancelled! ---\n")
-            errorWriter?.write("--- Migrate version ${getString(R.string.current_version_name)} ---\n")
-            progressWriter?.write("--- Migrate version ${getString(R.string.current_version_name)} ---\n")
+            errorWriter?.write("--- Migrate helper version ${getString(R.string.current_version_name)} ---\n")
+            progressWriter?.write("--- Migrate helper version ${getString(R.string.current_version_name)} ---\n")
+            progressWriter?.write("--- Build $THIS_VERSION ---\n")
         }
         catch (e: Exception){
             e.printStackTrace()
