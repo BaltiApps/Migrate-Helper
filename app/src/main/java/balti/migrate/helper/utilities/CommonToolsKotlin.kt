@@ -519,7 +519,11 @@ class CommonToolsKotlin(val context: Context) {
                     .replace(")", "\\)")
                     .replace("[", "\\[")
                     .replace("]", "\\]")
+                    .replace(">", "\\>")
+                    .replace("<", "\\<")
                     .replace(" ", "\\ ")
+                    .replace(":", "\\:")
+                    .replace(";", "\\;")
                     .replace("\"", "\\\"")
                     .replace("\'", "\\\'")
 
