@@ -18,7 +18,7 @@
     <!--please also update LAST_SUPPORTED_ANDROID_API in CommonToolsKotlin.kt-->
 
     <string name="app_name">Migrate helper</string>
-    <string name="current_version_name">3.1_release</string>
+    <string name="current_version_name">3.1.1_release</string>
 
     <!--changelog-->
     <string name="changelog">Changelog</string>
