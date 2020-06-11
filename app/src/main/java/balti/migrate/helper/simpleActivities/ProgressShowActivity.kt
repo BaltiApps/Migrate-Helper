@@ -80,7 +80,7 @@ class ProgressShowActivity: AppCompatActivity() {
             try {
                 if (lastIcon != AppRestoreEngine.ICON_STRING) {
                     AppRestoreEngine.ICON_STRING.run {
-                        if (this.contains(".icon", true)){
+                        if (this.contains(".icon", true) || this.contains(".png", true)){
                             val iconFile = File(METADATA_HOLDER_DIR, this.trim())
                             iconTools.setIconFromFile(app_icon, iconFile)
                         }

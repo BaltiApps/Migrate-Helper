@@ -39,6 +39,7 @@ fi
 # copy files
 cp -f ${CACHE_DIR}/*.json ${METADATA_HOLDER} 2>/dev/null
 cp -f ${CACHE_DIR}/*.icon ${METADATA_HOLDER} 2>/dev/null
+cp -f ${CACHE_DIR}/*.png ${METADATA_HOLDER} 2>/dev/null
 cp -f ${CACHE_DIR}/*.vcf ${METADATA_HOLDER} 2>/dev/null
 cp -f ${CACHE_DIR}/*.sms.db ${METADATA_HOLDER} 2>/dev/null
 cp -f ${CACHE_DIR}/*.calls.db ${METADATA_HOLDER} 2>/dev/null

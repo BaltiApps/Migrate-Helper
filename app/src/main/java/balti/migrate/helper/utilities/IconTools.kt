@@ -4,12 +4,15 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.widget.ImageView
+import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 
 class IconTools(private val multipleLoad: Boolean = false) {
+
+    private val commonTools by lazy { CommonToolsKotlin(AppInstance.appContext) }
 
     fun setIconFromIconString(iconView: ImageView, iconString: String){
 
@@ -60,27 +63,33 @@ class IconTools(private val multipleLoad: Boolean = false) {
 
     fun setIconFromFile(iconView: ImageView, file: File){
 
-        class Setter : AsyncTask<Any, Any, String>() {
+        var bitmap: Bitmap? = null
+        val icon = StringBuffer("")
 
+        class Setter : AsyncTask<Any, Any, String>() {
             override fun doInBackground(vararg params: Any?): String {
 
-                val icon = StringBuffer("")
-                try {
-                    if (file.exists() && file.canRead()) {
-                        BufferedReader(FileReader(file)).readLines().forEach {
-                            icon.append(it)
-                        }
-                    }
+                if (file.name.endsWith(".png")) {
+                    commonTools.tryIt { bitmap = BitmapFactory.decodeFile(file.absolutePath) }
                 }
-                catch (e: Exception){
-                    e.printStackTrace()
+                else {
+                    try {
+                        if (file.exists() && file.canRead()) {
+                            BufferedReader(FileReader(file)).readLines().forEach {
+                                icon.append(it)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
                 return icon.toString()
             }
 
             override fun onPostExecute(result: String) {
                 super.onPostExecute(result)
-                setIconFromIconString(iconView, result)
+                if (bitmap != null) commonTools.tryIt { iconView.setImageBitmap(bitmap) }
+                else setIconFromIconString(iconView, result)
             }
         }
         if (multipleLoad) Setter().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
