@@ -6,6 +6,7 @@ import android.os.AsyncTask
 import android.widget.ImageView
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -70,7 +71,7 @@ class IconTools(private val multipleLoad: Boolean = false) {
             override fun doInBackground(vararg params: Any?): String {
 
                 if (file.name.endsWith(".png")) {
-                    commonTools.tryIt { bitmap = BitmapFactory.decodeFile(file.absolutePath) }
+                    tryIt { bitmap = BitmapFactory.decodeFile(file.absolutePath) }
                 }
                 else {
                     try {
@@ -88,7 +89,7 @@ class IconTools(private val multipleLoad: Boolean = false) {
 
             override fun onPostExecute(result: String) {
                 super.onPostExecute(result)
-                if (bitmap != null) commonTools.tryIt { iconView.setImageBitmap(bitmap) }
+                if (bitmap != null) tryIt { iconView.setImageBitmap(bitmap) }
                 else setIconFromIconString(iconView, result)
             }
         }

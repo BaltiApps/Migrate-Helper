@@ -65,6 +65,8 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_WAS_CANCE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.THIS_VERSION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_CANCEL_TASK
 import balti.migrate.helper.utilities.StupidStartupServiceKotlin
+import balti.module.baltitoolbox.functions.Misc.makeNotificationChannel
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -140,7 +142,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
     private val cancelReceiver by lazy {
         object : BroadcastReceiver(){
             override fun onReceive(context: Context?, intent: Intent?) {
-                commonTools.tryIt {
+                tryIt {
 
                     cancelAll = true
 
@@ -156,9 +158,9 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
                         currentTask?.let {
                             while (it.status != AsyncTask.Status.FINISHED) {
-                                commonTools.tryIt { Thread.sleep(100) }
+                                tryIt { Thread.sleep(100) }
                             }
-                            commonTools.tryIt { Thread.sleep(TIMEOUT_WAITING_TO_CANCEL_TASK) }
+                            tryIt { Thread.sleep(TIMEOUT_WAITING_TO_CANCEL_TASK) }
                         }
 
                     }, {
@@ -238,7 +240,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .build()
 
-        commonTools.tryIt {
+        tryIt {
 
             File(INFO_HOLDER_DIR).run {
                 deleteRecursively()
@@ -250,9 +252,9 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            commonTools.makeNotificationChannel(CHANNEL_RESTORE_RUNNING, CHANNEL_RESTORE_RUNNING, NotificationManager.IMPORTANCE_LOW)
-            commonTools.makeNotificationChannel(CHANNEL_RESTORE_END, CHANNEL_RESTORE_END, NotificationManager.IMPORTANCE_HIGH)
-            commonTools.makeNotificationChannel(CHANNEL_RESTORE_ABORTING, CHANNEL_RESTORE_ABORTING, NotificationManager.IMPORTANCE_MIN)
+            makeNotificationChannel(CHANNEL_RESTORE_RUNNING, CHANNEL_RESTORE_RUNNING, NotificationManager.IMPORTANCE_LOW)
+            makeNotificationChannel(CHANNEL_RESTORE_END, CHANNEL_RESTORE_END, NotificationManager.IMPORTANCE_HIGH)
+            makeNotificationChannel(CHANNEL_RESTORE_ABORTING, CHANNEL_RESTORE_ABORTING, NotificationManager.IMPORTANCE_MIN)
         }
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
@@ -463,14 +465,14 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
     override fun onDestroy() {
         super.onDestroy()
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(cancelReceiver) }
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(requestProgressReceiver) }
-        commonTools.tryIt { unregisterReceiver(cancelReceiver) }
+        tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+        tryIt { commonTools.LBM?.unregisterReceiver(cancelReceiver) }
+        tryIt { commonTools.LBM?.unregisterReceiver(requestProgressReceiver) }
+        tryIt { unregisterReceiver(cancelReceiver) }
 
-        commonTools.tryIt { currentTask?.cancel(true) }
+        tryIt { currentTask?.cancel(true) }
 
-        commonTools.tryIt { progressWriter?.close() }
-        commonTools.tryIt { errorWriter?.close() }
+        tryIt { progressWriter?.close() }
+        tryIt { errorWriter?.close() }
     }
 }

@@ -58,6 +58,9 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_PREP_W
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RESTORE_CONTACTS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_START_ANIMATION
+import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
+import balti.module.baltitoolbox.functions.Misc.playStoreLink
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
 import kotlinx.android.synthetic.main.extra_restore_prepare.*
@@ -120,7 +123,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                             }
                         }
                 )
-                commonTools.tryIt { commonTools.LBM?.unregisterReceiver(this) }
+                tryIt { commonTools.LBM?.unregisterReceiver(this) }
                 finish()
             }
         }
@@ -220,8 +223,8 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
 
     private fun getERPItem(iconResource: Int, text: String): View {
         return View.inflate(this, R.layout.extra_prep_item, null).apply {
-            commonTools.tryIt { this.erp_item_icon.setImageResource(iconResource) }
-            commonTools.tryIt { this.erp_text.text = text }
+            tryIt { this.erp_item_icon.setImageResource(iconResource) }
+            tryIt { this.erp_text.text = text }
         }
     }
 
@@ -232,21 +235,21 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
         if (isDone == DONE || isDone == CANCEL) {
 
             if (isDone == DONE){
-                commonTools.tryIt { erpView.erp_state_icon.setImageResource(R.drawable.ic_item_done) }
+                tryIt { erpView.erp_state_icon.setImageResource(R.drawable.ic_item_done) }
             }
             else if (isDone == CANCEL){
-                commonTools.tryIt { erpView.erp_state_icon.setImageResource(R.drawable.ic_item_cancel) }
+                tryIt { erpView.erp_state_icon.setImageResource(R.drawable.ic_item_cancel) }
             }
 
-            commonTools.tryIt { erpView.erp_item_progressBar.visibility = View.GONE }
-            commonTools.tryIt { erpView.erp_state_icon.visibility = View.VISIBLE }
+            tryIt { erpView.erp_item_progressBar.visibility = View.GONE }
+            tryIt { erpView.erp_state_icon.visibility = View.VISIBLE }
         }
         else {
-            commonTools.tryIt { erpView.erp_item_progressBar.visibility = View.VISIBLE }
-            commonTools.tryIt { erpView.erp_state_icon.visibility = View.GONE }
+            tryIt { erpView.erp_item_progressBar.visibility = View.VISIBLE }
+            tryIt { erpView.erp_state_icon.visibility = View.GONE }
         }
 
-        commonTools.tryIt {
+        tryIt {
             doneMessage?.let {
                 erpView.erp_desc.text = it
                 erpView.erp_desc.visibility = View.VISIBLE
@@ -319,7 +322,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                     if (cancelChecks) break
                     p.packageName?.let {
                         if (p.IS_SELECTED) {
-                            if (commonTools.isPackageInstalled(it) || (p.apkName != null && p.APP))
+                            if (isPackageInstalled(it) || (p.apkName != null && p.APP))
                                 appsInstalled.add(p)
                             else appsNotInstalled.add(p)
                         }
@@ -353,7 +356,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                         ad.show()
 
                         getRefreshButton().setOnClickListener {
-                            commonTools.tryIt {
+                            tryIt {
                                 ad.dismiss()
                                 doFallThroughJob(JOBCODE_PREP_APP)
                             }
@@ -372,7 +375,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                         if (it.contains('/')) it.split('/')[0]
                         else it
 
-                if (!commonTools.isPackageInstalled(kPackageName)){
+                if (!isPackageInstalled(kPackageName)){
                     var isPresent = false
                     for (app in appPackets){
                         if (app.packageName.toString() == kPackageName && app.APP){
@@ -394,9 +397,9 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                                 }
                                 .setCancelable(false)
                                 .apply {
-                                    if (commonTools.isPackageInstalled(PACKAGE_NAME_PLAY_STORE)){
+                                    if (isPackageInstalled(PACKAGE_NAME_PLAY_STORE)){
                                         setNeutralButton(R.string.install_from_playstore) {_, _ ->
-                                            commonTools.playStoreLink(kPackageName)
+                                            playStoreLink(kPackageName)
                                             finishThis()
                                         }
                                     }
@@ -503,7 +506,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                 just_start_restore.setOnClickListener {
                     act()
                     alreadyTriggered = true
-                    commonTools.tryIt { handler.removeCallbacks(runnable) }
+                    tryIt { handler.removeCallbacks(runnable) }
                 }
 
                 if (sharedPrefs.getBoolean(PREF_RESTORE_START_ANIMATION, true)) {
@@ -533,7 +536,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                                 handler = Handler()
                                 runnable = Runnable {
                                     if (c == 1) {
-                                        commonTools.tryIt { handler.removeCallbacks(runnable) }
+                                        tryIt { handler.removeCallbacks(runnable) }
                                         if (!alreadyTriggered) act()
                                     } else {
                                         restore_countdown_text.startAnimation(slideOut)
@@ -630,7 +633,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
     }
 
     private fun finishThis(){
-        commonTools.tryIt { handler.removeCallbacks(runnable) }
+        tryIt { handler.removeCallbacks(runnable) }
         startActivity(Intent(this, RestoreSelectorKotlin::class.java))
         finish()
     }
@@ -641,8 +644,8 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
 
     override fun onDestroy() {
         super.onDestroy()
-        commonTools.tryIt { handler.removeCallbacks(runnable) }
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+        tryIt { handler.removeCallbacks(runnable) }
+        tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
     }
 
     override fun onPermissionAsked(requestCode: Int, result: Boolean) {

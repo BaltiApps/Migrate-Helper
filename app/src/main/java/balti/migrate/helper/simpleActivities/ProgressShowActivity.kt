@@ -48,6 +48,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_TRACK_RESTORE_FINISHED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import balti.migrate.helper.utilities.IconTools
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import kotlinx.android.synthetic.main.restore_progress_layout.*
 import java.io.BufferedWriter
 import java.io.File
@@ -173,8 +174,8 @@ class ProgressShowActivity: AppCompatActivity() {
 
                 if (type == EXTRA_PROGRESS_TYPE_FINISHED) {
 
-                    commonTools.tryIt { abortDialog?.dismiss() }
-                    commonTools.tryIt { forceStopDialog?.dismiss() }
+                    tryIt { abortDialog?.dismiss() }
+                    tryIt { forceStopDialog?.dismiss() }
 
                     window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     closeWarning.visibility = View.GONE
@@ -354,11 +355,11 @@ class ProgressShowActivity: AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        commonTools.tryIt { intent.replaceExtras(Bundle()) }
+        tryIt { intent.replaceExtras(Bundle()) }
         super.onDestroy()
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(endOnDisable) }
-        commonTools.tryIt { abortDialog?.dismiss() }
-        commonTools.tryIt { forceStopDialog?.dismiss() }
+        tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+        tryIt { commonTools.LBM?.unregisterReceiver(endOnDisable) }
+        tryIt { abortDialog?.dismiss() }
+        tryIt { forceStopDialog?.dismiss() }
     }
 }

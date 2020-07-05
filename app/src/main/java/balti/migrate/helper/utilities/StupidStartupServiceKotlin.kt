@@ -15,6 +15,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_INIT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PENDING_INIT_NOTIFICATION_ID
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PENDING_INIT_REQUEST_ID
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_TEMPORARY_DISABLE
+import balti.module.baltitoolbox.functions.Misc.makeNotificationChannel
 
 class StupidStartupServiceKotlin: Service() {
 
@@ -38,7 +39,7 @@ class StupidStartupServiceKotlin: Service() {
         if (!AppInstance.sharedPrefs.getBoolean(PREF_TEMPORARY_DISABLE, false)) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                commonTools.makeNotificationChannel(CHANNEL_INIT, CHANNEL_INIT, NotificationManager.IMPORTANCE_HIGH)
+                makeNotificationChannel(CHANNEL_INIT, CHANNEL_INIT, NotificationManager.IMPORTANCE_HIGH)
             }
 
             startForeground(PENDING_INIT_NOTIFICATION_ID, initNotification)

@@ -20,6 +20,8 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PROPERTY_APP_S
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PROPERTY_DATA_SELECTION
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PROPERTY_PERMISSION_SELECTION
 import balti.migrate.helper.utilities.IconTools
+import balti.module.baltitoolbox.functions.GetResources.getStringFromRes
+import balti.module.baltitoolbox.functions.Misc.getHumanReadableStorageSpace
 import kotlinx.android.synthetic.main.app_info.view.*
 import kotlinx.android.synthetic.main.app_item.view.*
 import java.io.File
@@ -77,8 +79,8 @@ class SearchAppAdapter(val tmpList: ArrayList<AppPacketsKotlin>, val context: Co
                 PACKAGE_NAME_FDROID -> context.getString(R.string.f_droid)
                 else -> appItem.installerName.let { if (it != "" && it != "NULL") it else "" }
             }
-            adView.app_info_size.text = context.getString(R.string.data_size) + " " + commonTools.getHumanReadableStorageSpace(appItem.dataSize) + "\n" +
-                    context.getString(R.string.system_size) + " " + commonTools.getHumanReadableStorageSpace(appItem.systemSize)
+            adView.app_info_size.text = getStringFromRes(R.string.data_size) + " " + getHumanReadableStorageSpace(appItem.dataSize, true) + "\n" +
+                    context.getString(R.string.system_size) + " " + getHumanReadableStorageSpace(appItem.systemSize, true)
 
             AlertDialog.Builder(context)
                     .setTitle(viewHolder.appName.text)

@@ -26,6 +26,7 @@ import balti.migrate.helper.utilities.constants.SmsDBConstant.Companion.SMS_STAT
 import balti.migrate.helper.utilities.constants.SmsDBConstant.Companion.SMS_SUBJECT
 import balti.migrate.helper.utilities.constants.SmsDBConstant.Companion.SMS_TABLE_NAME
 import balti.migrate.helper.utilities.constants.SmsDBConstant.Companion.SMS_TYPE
+import balti.module.baltitoolbox.functions.Misc.getPercentage
 import java.io.File
 
 class SmsRestoreEngine(private val jobcode: Int,
@@ -101,7 +102,7 @@ class SmsRestoreEngine(private val jobcode: Int,
                     it, uri, tableName, mirror, projection,
                     SMS_ADDRESS, ERROR_SMS_RESTORE, {return@restoreTable RestoreServiceKotlin.cancelAll},
                     { progress, taskLog ->
-                        publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
+                        publishProgress(false, taskLog, getPercentage(progress, maxCount))
                     }
             ).apply {
                 if (this.size == 0) File("${currentPacket.smsDBFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning

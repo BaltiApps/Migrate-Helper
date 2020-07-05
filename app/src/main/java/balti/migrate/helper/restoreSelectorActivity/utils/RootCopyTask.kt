@@ -15,10 +15,9 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_TEMP_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_NAME
 import balti.migrate.helper.utilities.ViewOperations
-import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import balti.module.baltitoolbox.functions.FileHandlers.unpackAssetToInternal
+import balti.module.baltitoolbox.functions.Misc.tryIt
+import java.io.*
 
 class RootCopyTask(private val jobCode: Int, private val tempDir: String,
                    private val context: Context): AsyncTask<Any, Any, Any>() {
@@ -41,10 +40,11 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
 
         Build.SUPPORTED_ABIS[0].run {
             busyboxBinaryPath = if (this == "armeabi-v7a" || this == "arm64-v8a")
-                commonTools.unpackAssetToInternal("busybox", "busybox")
+                unpackAssetToInternal("busybox", "busybox")
             else if (this == "x86" || this == "x86_64")
-                commonTools.unpackAssetToInternal("busybox-x86", "busybox");
+                unpackAssetToInternal("busybox-x86", "busybox");
             else ""
+            busyboxBinaryPath.let { if (it != "") File(it).setExecutable(true) }
         }
     }
 
@@ -56,7 +56,7 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
                 return 1
             }
 
-            val scripFile = commonTools.unpackAssetToInternal("suScript.sh", "suScript.sh")
+            val scripFile = unpackAssetToInternal("suScript.sh", "suScript.sh")
 
             suProcess = Runtime.getRuntime().exec("su")
             suProcess?.let {
@@ -88,7 +88,7 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
                         line = line.trim()
 
                         if (line.startsWith("--- PID:"))
-                            commonTools.tryIt {
+                            tryIt {
                                 line?.run {
                                     SU_TASK_PID = substring(lastIndexOf(" ") + 1).toInt()
                                 }

@@ -40,6 +40,9 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_DEV_LINK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_LINK
 import balti.migrate.helper.utilities.ToolsNoContext
+import balti.module.baltitoolbox.functions.FileHandlers.unpackAsset
+import balti.module.baltitoolbox.functions.Misc.openWebLink
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.last_log_report.view.*
 import java.io.*
@@ -67,7 +70,7 @@ class MainActivityKotlin: AppCompatActivity() {
                             }
                         }
                 )
-                commonTools.tryIt { commonTools.LBM?.unregisterReceiver(this) }
+                tryIt { commonTools.LBM?.unregisterReceiver(this) }
                 finish()
             }
         }
@@ -113,7 +116,7 @@ class MainActivityKotlin: AppCompatActivity() {
                         finish()
                     }
                     .setPositiveButton(R.string.contact) { _, _ ->
-                        commonTools.openWebLink(TG_LINK)
+                        openWebLink(TG_LINK)
                     }
                     .setNeutralButton(R.string.use_email_instead) {_, _ ->
                         val email = Intent(Intent.ACTION_SENDTO).apply {
@@ -168,12 +171,12 @@ class MainActivityKotlin: AppCompatActivity() {
 
                 zipHelper.setOnClickListener {
                     extractTWRPUninstall(fCode1)
-                    commonTools.tryIt { ad.dismiss() }
+                    tryIt { ad.dismiss() }
                 }
 
                 zipHelperCache.setOnClickListener {
                     extractTWRPUninstall(fCode2)
-                    commonTools.tryIt { ad.dismiss() }
+                    tryIt { ad.dismiss() }
                 }
 
                 ad.show()
@@ -195,10 +198,10 @@ class MainActivityKotlin: AppCompatActivity() {
                 AlertDialog.Builder(this@MainActivityKotlin).apply {
                     setMessage(R.string.contact_desc)
                     setPositiveButton(R.string.contact_group) { _, _ ->
-                        commonTools.openWebLink(TG_LINK)
+                        openWebLink(TG_LINK)
                     }
                     setNegativeButton(R.string.contact_developer) { _, _ ->
-                        commonTools.openWebLink(TG_DEV_LINK)
+                        openWebLink(TG_DEV_LINK)
                     }
                     setNeutralButton(android.R.string.cancel, null)
                 }
@@ -316,14 +319,11 @@ class MainActivityKotlin: AppCompatActivity() {
         }
 
         fun work(moveFunction: (mtdFile: File) -> Unit) {
-
-            fileName.let {
-                commonTools.unpackAssetToInternal(fileName, fileName, false)
-                File(METADATA_HOLDER_DIR, it).run {
+            File(METADATA_HOLDER_DIR, fileName).run {
+                unpackAsset(fileName, this)
                     if (this.exists()) {
                         moveFunction(this)
                     } else Toast.makeText(this@MainActivityKotlin, "${getString(R.string.unpack_failed)}: ${this.absolutePath}", Toast.LENGTH_LONG).show()
-                }
             }
         }
 
@@ -401,8 +401,8 @@ class MainActivityKotlin: AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(endOnDisable) }
+        tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+        tryIt { commonTools.LBM?.unregisterReceiver(endOnDisable) }
     }
 
 }

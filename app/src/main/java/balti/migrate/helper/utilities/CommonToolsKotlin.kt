@@ -1,11 +1,9 @@
 package balti.migrate.helper.utilities
 
 import android.app.Activity
-import android.app.NotificationChannel
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -13,14 +11,21 @@ import android.provider.Telephony
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
+import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
+import balti.module.baltitoolbox.functions.Misc.openWebLink
+import balti.module.baltitoolbox.functions.Misc.playStoreLink
+import balti.module.baltitoolbox.functions.Misc.tryIt
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefString
 import kotlinx.android.synthetic.main.error_report_layout.view.*
-import java.io.*
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+import java.io.OutputStreamWriter
 
 class CommonToolsKotlin(val context: Context) {
 
@@ -234,7 +239,7 @@ class CommonToolsKotlin(val context: Context) {
         val MIGRATE_CACHE: String
             get() {
                 PREF_DEFAULT_MIGRATE_CACHE.let {default ->
-                    AppInstance.sharedPrefs.getString(PREF_MANUAL_CACHE, default).run {
+                    getPrefString(PREF_MANUAL_CACHE, default).run {
                         return this ?: default
                     }
                 }
@@ -244,7 +249,7 @@ class CommonToolsKotlin(val context: Context) {
         val METADATA_HOLDER_DIR: String
             get() {
                 PREF_DEFAULT_METADATA_HOLDER.let {default ->
-                    AppInstance.sharedPrefs.getString(PREF_MANUAL_METADATA_HOLDER, default).run {
+                    getPrefString(PREF_MANUAL_METADATA_HOLDER, default).run {
                         (this ?: default).let {
                             File(it).run { if (!exists()) mkdirs() }
                             return it
@@ -292,50 +297,6 @@ class CommonToolsKotlin(val context: Context) {
         if (context is Activity || context is Service)
             LBM = LocalBroadcastManager.getInstance(context)
     }
-
-    fun unpackAssetToInternal(assetFileName: String, targetFileName: String, toInternal: Boolean = true): String {
-
-        val assetManager = context.assets
-        val unpackFile = if (toInternal) File(context.filesDir, targetFileName)
-        else File(METADATA_HOLDER_DIR, targetFileName)
-
-        var read: Int
-        val buffer = ByteArray(4096)
-
-        return try {
-            val inputStream = assetManager.open(assetFileName)
-            val writer = FileOutputStream(unpackFile)
-            while (true) {
-                read = inputStream.read(buffer)
-                if (read > 0) writer.write(buffer, 0, read)
-                else break
-            }
-            writer.close()
-            unpackFile.setExecutable(true)
-            return unpackFile.absolutePath
-        } catch (e: IOException){
-            e.printStackTrace()
-            ""
-        }
-    }
-
-    fun getHumanReadableStorageSpace(space: Long): String {
-        var res = "KB"
-
-        var s = space.toDouble()
-
-        if (s > 1024) {
-            s /= 1024.0
-            res = "MB"
-        }
-        if (s > 1024) {
-            s /= 1024.0
-            res = "GB"
-        }
-
-        return String.format("%.2f", s) + " " + res
-    }
-
 
     fun reportLogs(isErrorLogMandatory: Boolean) {
 
@@ -529,16 +490,6 @@ class CommonToolsKotlin(val context: Context) {
                     .replace("\"", "\\\"")
                     .replace("\'", "\\\'")
 
-    fun isPackageInstalled(packageName: String): Boolean{
-        return try {
-            context.packageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-            true
-        }
-        catch (_: Exception){
-            false
-        }
-    }
-
     var deviceSpecifications: String =
             "CPU_ABI: " + Build.SUPPORTED_ABIS[0] + "\n" +
                     "Brand: " + Build.BRAND + "\n" +
@@ -549,88 +500,6 @@ class CommonToolsKotlin(val context: Context) {
                     "Board: " + Build.BOARD + "\n" +
                     "Hardware: " + Build.HARDWARE
         private set
-
-
-    fun openWebLink(url: String) {
-        if (url != "") {
-            context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(url)
-            })
-        }
-    }
-
-    fun playStoreLink(packageName: String){
-        openWebLink("market://details?id=$packageName")
-    }
-
-    fun makeNotificationChannel(channelId: String, channelDesc: CharSequence, importance: Int){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, channelDesc, importance)
-            channel.setSound(null, null)
-            AppInstance.notificationManager.createNotificationChannel(channel)
-        }
-    }
-
-
-
-    fun tryIt(f: () -> Unit, showError: Boolean = false, isCancelable: Boolean = true, title: String = "", printStackTrace : Boolean = true){
-        try {
-            f()
-        }
-        catch (e: Exception){
-            if (showError)
-            {
-                showErrorDialog(e.message.toString(), title, isCancelable)
-                if (printStackTrace) e.printStackTrace()
-            }
-            else if (printStackTrace) e.printStackTrace()
-        }
-    }
-
-    fun tryIt(f: () -> Unit, title: String = "", printStackTrace : Boolean = true){
-        tryIt(f, false, true, title, printStackTrace)
-    }
-
-    fun tryIt(f: () -> Unit){
-        tryIt(f, "", false)
-    }
-
-    fun showErrorDialog(message: String, title: String = "", isCancelable: Boolean = true, closeFunc: (() -> Unit)? = null){
-        try {
-            AlertDialog.Builder(context)
-                    .setIcon(R.drawable.ic_error)
-                    .setMessage(message).apply {
-
-                        if (isCancelable)
-                            setNegativeButton(R.string.close) {_, _ -> closeFunc?.invoke() }
-                        else {
-                            setCancelable(false)
-                            setNegativeButton(R.string.close) { _, _ ->
-                                closeFunc?.invoke()
-                                if (context is AppCompatActivity) {
-                                    (context as AppCompatActivity).finish()
-                                }
-                            }
-                        }
-
-                        if (title == "")
-                            setTitle(R.string.error_occurred)
-                        else setTitle(title)
-
-                    }
-                    .show()
-        } catch (e: Exception){
-            e.printStackTrace()
-            try {
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-            } catch (_: Exception){}
-        }
-    }
-
-    fun getPercentage(count: Int, total: Int): Int {
-        return if (total != 0) (count*100)/total
-        else 0
-    }
 
     fun doBackgroundTask(job: () -> Unit, postJob: () -> Unit){
         class Class : AsyncTask<Any, Any, Any>(){

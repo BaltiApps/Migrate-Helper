@@ -25,6 +25,7 @@ import balti.migrate.helper.utilities.StupidStartupServiceKotlin
 import balti.migrate.helper.utilities.UninstallServiceKotlin
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_OPERATION_RESTORE_SMS_PERMISSION
+import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
 import kotlinx.android.synthetic.main.post_restore_jobs.*
 
 class PostJobsActivity: Activity() {
@@ -60,7 +61,7 @@ class PostJobsActivity: Activity() {
         val defaultSmsAppPackage = if (commonTools.isAddonDefaultSmsApp())
             sharedPrefs.getString(PREF_DEFAULT_SMS_APP, "").let {
                 if (it == null || it == "" || it == packageName) "com.android.messaging"
-                else if (commonTools.isPackageInstalled(it)) it else "com.android.messaging"
+                else if (isPackageInstalled(it)) it else "com.android.messaging"
             }
         else {
             editor.putString(PREF_DEFAULT_SMS_APP, "").commit()

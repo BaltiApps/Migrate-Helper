@@ -29,6 +29,7 @@ import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_WAS_CANCELLED
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -115,7 +116,7 @@ class SettingsRestoreEngine(private val jobcode: Int,
         if (!alreadyFinished) {
 
             alreadyFinished = true
-            commonTools.tryIt { LBM.unregisterReceiver(addonResultsReceiver) }
+            tryIt { LBM.unregisterReceiver(addonResultsReceiver) }
 
             if (errors.size == 0) File("${settingsPacket.settingsFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
 

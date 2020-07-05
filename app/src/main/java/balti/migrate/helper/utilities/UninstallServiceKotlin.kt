@@ -24,6 +24,8 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_A
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.UNINSTALL_START_ID
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_PACKAGE_NAME
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
+import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
+import balti.module.baltitoolbox.functions.Misc.makeNotificationChannel
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 
@@ -36,7 +38,7 @@ class UninstallServiceKotlin: Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            commonTools.makeNotificationChannel(CHANNEL_UNINSTALLING, CHANNEL_UNINSTALLING, NotificationManager.IMPORTANCE_MIN)
+            makeNotificationChannel(CHANNEL_UNINSTALLING, CHANNEL_UNINSTALLING, NotificationManager.IMPORTANCE_MIN)
         }
 
         val uninstallNotif = NotificationCompat.Builder(this, CHANNEL_UNINSTALLING)
@@ -93,10 +95,10 @@ class UninstallServiceKotlin: Service() {
                     if (doUninstall) {
 
                         ADDON_SETTINGS_RECEIVER_PACKAGE_NAME.let {
-                            if (commonTools.isPackageInstalled(it)) write("pm uninstall $it\n")
+                            if (isPackageInstalled(it)) write("pm uninstall $it\n")
                         }
                         ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME.let {
-                            if (commonTools.isPackageInstalled(it)) write("pm uninstall $it\n")
+                            if (isPackageInstalled(it)) write("pm uninstall $it\n")
                         }
 
                         fun deletePackageFromSystem(apkDir: String){

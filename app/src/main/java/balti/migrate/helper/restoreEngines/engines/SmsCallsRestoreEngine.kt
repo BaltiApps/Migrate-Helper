@@ -36,6 +36,7 @@ import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_TITLE
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_CLASS
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import java.io.File
 
 class SmsCallsRestoreEngine(private val jobcode: Int,
@@ -155,7 +156,7 @@ class SmsCallsRestoreEngine(private val jobcode: Int,
         if (!alreadyFinished) {
 
             alreadyFinished = true
-            commonTools.tryIt { LBM.unregisterReceiver(addonResultsReceiver) }
+            tryIt { LBM.unregisterReceiver(addonResultsReceiver) }
 
             completeFileNames.forEach {
                 File(METADATA_HOLDER_DIR, "$it.$EXTRAS_MARKER").createNewFile()    // mark for cleaning

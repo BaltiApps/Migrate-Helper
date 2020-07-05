@@ -24,6 +24,10 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_STATUS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_FDROID
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_DATA
+import balti.module.baltitoolbox.functions.FileHandlers.unpackAssetToInternal
+import balti.module.baltitoolbox.functions.Misc.getPercentage
+import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import java.io.*
 
 class AppRestoreEngine(private val jobcode: Int,
@@ -46,9 +50,11 @@ class AppRestoreEngine(private val jobcode: Int,
 
     private val busyboxBinaryPath by lazy {
         val cpuAbi = Build.SUPPORTED_ABIS[0]
-        if (cpuAbi == "x86" || cpuAbi == "x86_64")
-            commonTools.unpackAssetToInternal("busybox-x86", "busybox")
-        else commonTools.unpackAssetToInternal("busybox", "busybox")
+        (if (cpuAbi == "x86" || cpuAbi == "x86_64")
+            unpackAssetToInternal("busybox-x86", "busybox")
+        else unpackAssetToInternal("busybox", "busybox")).apply {
+            File(this).setExecutable(true)
+        }
     }
 
     private fun addToActualErrors(err: String){
@@ -109,8 +115,11 @@ class AppRestoreEngine(private val jobcode: Int,
         resetBroadcast(true, engineContext.getString(R.string.making_scripts), EXTRA_PROGRESS_MAKING_SCRIPTS)
 
         try {
-            val installScriptPath = commonTools.unpackAssetToInternal("installScript.sh", "installScript.sh")
-            val restoreDataScriptPath = commonTools.unpackAssetToInternal("restoreDataScript.sh", "restoreDataScript.sh")
+            val installScriptPath = unpackAssetToInternal("installScript.sh", "installScript.sh")
+            val restoreDataScriptPath = unpackAssetToInternal("restoreDataScript.sh", "restoreDataScript.sh")
+
+            installScriptPath.let { if (it != "") File(it).setExecutable(true) }
+            restoreDataScriptPath.let { if (it != "") File(it).setExecutable(true) }
 
             scriptFile = File(engineContext.filesDir, FILE_RESTORE_SCRIPT)
             scriptFile?.let {
@@ -135,10 +144,10 @@ class AppRestoreEngine(private val jobcode: Int,
                         write("done\n")
                     }
 
-                    if (commonTools.isPackageInstalled(PACKAGE_NAME_PLAY_STORE))
+                    if (isPackageInstalled(PACKAGE_NAME_PLAY_STORE))
                         writeNext("am force-stop $PACKAGE_NAME_PLAY_STORE 2>/dev/null")
 
-                    if (commonTools.isPackageInstalled(PACKAGE_NAME_FDROID))
+                    if (isPackageInstalled(PACKAGE_NAME_FDROID))
                         writeNext("am force-stop $PACKAGE_NAME_FDROID 2>/dev/null")
 
                     for (appPacket in appPackets) {
@@ -235,7 +244,7 @@ class AppRestoreEngine(private val jobcode: Int,
                     }
 
                     if (output.startsWith("--- RESTORE PID:")){
-                        commonTools.tryIt {
+                        tryIt {
                             RESTORE_PID = output.substring(output.lastIndexOf(" ") + 1).toInt()
                         }
                     }
@@ -257,7 +266,7 @@ class AppRestoreEngine(private val jobcode: Int,
                         }
 
                         appName = line
-                        progress = commonTools.getPercentage(++c, appPackets.size)
+                        progress = getPercentage(++c, appPackets.size)
                         broadcastProgress(appName, "\n${appName}", true, progress)
                     }
                     else broadcastProgress(appName, line, false)
@@ -265,7 +274,7 @@ class AppRestoreEngine(private val jobcode: Int,
                     return@iterateBufferedReader line == "--- DONE! ---"
                 })
 
-                commonTools.tryIt { it.waitFor() }
+                tryIt { it.waitFor() }
 
                 iterateBufferedReader(errorStream, { errorLine ->
 

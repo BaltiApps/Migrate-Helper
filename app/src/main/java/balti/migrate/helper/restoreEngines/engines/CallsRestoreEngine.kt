@@ -23,6 +23,7 @@ import balti.migrate.helper.utilities.constants.CallsDBConstants.Companion.CALLS
 import balti.migrate.helper.utilities.constants.CallsDBConstants.Companion.CALLS_TABLE_NAME
 import balti.migrate.helper.utilities.constants.CallsDBConstants.Companion.CALLS_TYPE
 import balti.migrate.helper.utilities.constants.CallsDBConstants.Companion.CALLS_VOICEMAIL_URI
+import balti.module.baltitoolbox.functions.Misc.getPercentage
 import java.io.File
 
 class CallsRestoreEngine(private val jobcode: Int,
@@ -92,7 +93,7 @@ class CallsRestoreEngine(private val jobcode: Int,
                     it, uri, tableName, mirror, projection,
                     CALLS_NUMBER, ERROR_CALLS_RESTORE, {return@restoreTable RestoreServiceKotlin.cancelAll},
                     { progress, taskLog ->
-                        publishProgress(false, taskLog, commonTools.getPercentage(progress, maxCount))
+                        publishProgress(false, taskLog, getPercentage(progress, maxCount))
                     }
             ).apply {
                 if (this.size == 0) File("${currentPacket.callDBFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning

@@ -21,6 +21,7 @@ import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_OPERATION_TYPE
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_SMS_GRANTED
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
+import balti.module.baltitoolbox.functions.Misc.tryIt
 
 class CommunicatorAddon(val context: Context) {
 
@@ -37,7 +38,7 @@ class CommunicatorAddon(val context: Context) {
     private val smsCallsAddonReceiver by lazy {
         object : BroadcastReceiver(){
             override fun onReceive(context: Context?, intent: Intent?) { intent?.run {
-                commonTools.tryIt {
+                tryIt {
 
                     val requestCode = getIntExtra(ADDON_SMS_CALLS_EXTRA_MASTER_JOBCODE, 0).let {
                         if (it != 0) it
@@ -92,7 +93,7 @@ class CommunicatorAddon(val context: Context) {
     }
 
     private fun sendResult(requestCode: Int, result: Boolean){
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(smsCallsAddonReceiver) }
+        tryIt { commonTools.LBM?.unregisterReceiver(smsCallsAddonReceiver) }
         onPermissionAsked.onPermissionAsked(requestCode, result)
     }
 

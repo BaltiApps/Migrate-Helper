@@ -12,6 +12,7 @@ import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.IconTools
+import balti.module.baltitoolbox.functions.Misc.playStoreLink
 import kotlinx.android.synthetic.main.apps_not_installed_item.view.*
 import java.io.File
 
@@ -48,7 +49,7 @@ class AppsNotInstalledAdapter(private val context: Context, private val appsNotI
             iconTools.setIconFromIconString(viewHolder.appIcon, this)
         }
         viewHolder.installButton.setOnClickListener {
-            appItem.packageName?.let {commonTools.playStoreLink(it)}
+            appItem.packageName?.let {playStoreLink(it)}
         }
 
         return view!!

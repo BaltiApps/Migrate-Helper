@@ -53,6 +53,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EX
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LOAD_EXTRAS_ON_UI_THREAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import kotlinx.android.synthetic.main.app_search_layout.view.*
 import kotlinx.android.synthetic.main.app_selector_header.view.*
 import kotlinx.android.synthetic.main.extra_item.view.*
@@ -91,7 +92,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                             }
                         }
                 )
-                commonTools.tryIt { commonTools.LBM?.unregisterReceiver(this) }
+                tryIt { commonTools.LBM?.unregisterReceiver(this) }
                 finish()
             }
         }
@@ -148,7 +149,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                     text = getString(R.string.force_stop)
                     currentTask?.run {
                         if (this is RootCopyTask) {
-                            commonTools.tryIt { cancelTask() }
+                            tryIt { cancelTask() }
                         }
                     }
                     cancelLoading = true
@@ -329,12 +330,12 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
                         if (!sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false) && allExtras.isNotEmpty()) {
 
-                            commonTools.tryIt { app_list.removeHeaderView(extrasContainer) }
+                            tryIt { app_list.removeHeaderView(extrasContainer) }
                             app_list.addHeaderView(extrasContainer, null, false)
 
                             val extrasAllListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
                                 for (i in 0 until extrasContainer.restore_selector_extras_container.childCount) {
-                                    commonTools.tryIt {
+                                    tryIt {
                                         val item = extrasContainer.restore_selector_extras_container.getChildAt(i)
                                         item.findViewById<CheckBox>(R.id.extras_item_select).isChecked = isChecked
                                     }
@@ -361,7 +362,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                                     toggleMasterCheckbox(false)
                                 } else {
                                     for (i in 0 until extrasContainer.restore_selector_extras_container.childCount) {
-                                        commonTools.tryIt {
+                                        tryIt {
                                             val item = extrasContainer.restore_selector_extras_container.getChildAt(i)
                                             if (!item.findViewById<CheckBox>(R.id.extras_item_select).isChecked)
                                                 isAnyNotSelected = true
@@ -435,8 +436,8 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                 try {
 
                     if (appPackets.isNotEmpty()) {
-                        commonTools.tryIt {
-                            commonTools.tryIt { app_list.removeHeaderView(appBar) }
+                        tryIt {
+                            tryIt { app_list.removeHeaderView(appBar) }
                             app_list.addHeaderView(appBar, null, false)
                         }
                         adapter = AppRestoreAdapter(this, appBar.appAllSelect, appBar.dataAllSelect, appBar.permissionsAllSelect)
@@ -459,9 +460,9 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                     else -> showError(getString(R.string.code_error), getString(R.string.null_adapter))
                 }
 
-                commonTools.tryIt {
+                tryIt {
                     if (extrasContainer.restore_selector_extras_container.childCount == 0) {
-                        commonTools.tryIt { app_list.removeHeaderView(extrasContainer) }
+                        tryIt { app_list.removeHeaderView(extrasContainer) }
                         extrasContainer.visibility = View.GONE
                     }
                 }
@@ -598,8 +599,8 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
             if (cancelLoading) {
                 showError(getString(R.string.cancelled_loading), "")
-                commonTools.tryIt { Thread.sleep(DUMMY_WAIT_TIME) }
-                commonTools.tryIt { forceStopDialog.dismiss() }
+                tryIt { Thread.sleep(DUMMY_WAIT_TIME) }
+                tryIt { forceStopDialog.dismiss() }
                 finish()
             }
             else showError(getString(R.string.nothing_to_restore), getString(R.string.no_metadata_found))
@@ -608,8 +609,8 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
     override fun onDestroy() {
         cancelLoading = false
-        commonTools.tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
-        commonTools.tryIt { forceStopDialog.dismiss() }
+        tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+        tryIt { forceStopDialog.dismiss() }
         super.onDestroy()
     }
 

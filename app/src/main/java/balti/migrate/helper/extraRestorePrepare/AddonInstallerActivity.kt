@@ -29,6 +29,9 @@ import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_SU_GRANTED
 import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_PACKAGE_NAME
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
+import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
+import balti.module.baltitoolbox.functions.Misc.showErrorDialog
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import kotlinx.android.synthetic.main.install_addons.*
 
 class AddonInstallerActivity: Activity() {
@@ -52,7 +55,7 @@ class AddonInstallerActivity: Activity() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 intent?.run {
 
-                    commonTools.tryIt { requestSuDialog?.dismiss() }
+                    tryIt { requestSuDialog?.dismiss() }
 
                     if (!settingsSuCancelled) {
 
@@ -139,7 +142,7 @@ class AddonInstallerActivity: Activity() {
 
         doInstallSmsCalls = intent.getBooleanExtra(EXTRA_DO_INSTALL_SMS_CALLS_ADDON, false)
         doInstallSettings = intent.getBooleanExtra(EXTRA_DO_INSTALL_SETTINGS_ADDON, false)
-        commonTools.tryIt { smsCallsFilePaths.addAll(intent.getStringArrayListExtra(EXTRA_SMS_CALLS_ADDON_FILES)) }
+        tryIt { smsCallsFilePaths.addAll(intent.getStringArrayListExtra(EXTRA_SMS_CALLS_ADDON_FILES)) }
 
         setData()
 
@@ -153,11 +156,11 @@ class AddonInstallerActivity: Activity() {
 
             if (isAddonDialogNeeded()) {
 
-                if (doInstallSmsCalls && !commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
+                if (doInstallSmsCalls && !isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
                     addon_layout_smsCalls.visibility = View.VISIBLE
                 else addon_layout_smsCalls.visibility = View.GONE
 
-                if (doInstallSettings && !commonTools.isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME))
+                if (doInstallSettings && !isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME))
                     addon_layout_settings.visibility = View.VISIBLE
                 else addon_layout_settings.visibility = View.GONE
 
@@ -180,15 +183,15 @@ class AddonInstallerActivity: Activity() {
     }
 
     private fun isAddonDialogNeeded(): Boolean {
-        return (doInstallSmsCalls && !commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME)) ||
-                (doInstallSettings && !commonTools.isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME))
+        return (doInstallSmsCalls && !isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME)) ||
+                (doInstallSettings && !isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME))
     }
 
     private fun installSettings() {
 
         fun askSu() {
 
-            commonTools.tryIt {
+            tryIt {
                 requestSuDialog = AlertDialog.Builder(this).apply {
                     setView(View.inflate(this@AddonInstallerActivity, R.layout.install_addon_settings_su_request, null))
                     setNegativeButton(android.R.string.cancel) { _, _ ->
@@ -217,7 +220,7 @@ class AddonInstallerActivity: Activity() {
         toggleSettingsProcessing()
 
         // if settings addon installed, just ask for root
-        if (commonTools.isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME)) {
+        if (isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME)) {
 
             askSu()
 
@@ -233,10 +236,10 @@ class AddonInstallerActivity: Activity() {
                 if (error != "") {
 
                     // install failed
-                    commonTools.showErrorDialog(error, getString(R.string.error), true, closeFunc = {
+                    showErrorDialog(error, getString(R.string.error), this, onCloseClick = {
 
                         // if settings addon is not present, deny all settings restore, continue. Else ask for su
-                        if (!commonTools.isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME)) {
+                        if (!isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME)) {
                             toggleSettingsNotOk()
                         } else askSu()
 
@@ -256,13 +259,13 @@ class AddonInstallerActivity: Activity() {
 
         commonTools.doBackgroundTask({
             error = SmsCallsAddonInstall(this, smsCallsFilePaths,
-                    !commonTools.isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
+                    !isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
                     .installAddon()
         }, {
             if (error != "") {
 
                 // install failed
-                commonTools.showErrorDialog(error, getString(R.string.error), true, closeFunc = {
+                showErrorDialog(error, getString(R.string.error), this, onCloseClick = {
                     toggleSmsCallsNotOk()
                 })
             } else {

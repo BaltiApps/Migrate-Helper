@@ -2,6 +2,7 @@ package balti.migrate.helper.extraRestorePrepare.utils
 
 import android.content.Context
 import balti.migrate.helper.utilities.CommonToolsKotlin
+import balti.module.baltitoolbox.functions.FileHandlers.unpackAssetToInternal
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
@@ -18,7 +19,7 @@ abstract class AddonInstall(open val context: Context, private val apkAsset: Str
 
     protected fun start(): String {
         val commonTools = CommonToolsKotlin(context)
-        val path = commonTools.unpackAssetToInternal(apkAsset, apkAsset)
+        val path = unpackAssetToInternal(apkAsset, apkAsset)
         val error = StringBuffer("")
 
         Runtime.getRuntime().exec("su").let {
