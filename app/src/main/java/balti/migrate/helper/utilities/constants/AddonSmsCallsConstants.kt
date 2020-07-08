@@ -3,7 +3,7 @@ package balti.migrate.helper.utilities.constants
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
-import balti.migrate.helper.AppInstance
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefString
 
 class AddonSmsCallsConstants {
 
@@ -19,7 +19,7 @@ class AddonSmsCallsConstants {
         val ADDON_SMS_CALLS_WORKING_DIR : String
             get() {
                 ADDON_SMS_CALLS_DEFAULT_WORKING_DIR.let {default ->
-                    AppInstance.sharedPrefs.getString(PREF_MANUAL_SMS_CALLS_ADDON_CACHE, default).run {
+                    getPrefString(PREF_MANUAL_SMS_CALLS_ADDON_CACHE, default).run {
                         return this ?: default
                     }
                 }

@@ -10,7 +10,7 @@ import android.os.IBinder
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import balti.migrate.helper.AppInstance
-import balti.migrate.helper.AppInstance.Companion.sharedPrefs
+//import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.simpleActivities.MainActivityKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_UNINSTALLING
@@ -26,6 +26,8 @@ import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
 import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
 import balti.module.baltitoolbox.functions.Misc.makeNotificationChannel
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
+import balti.module.baltitoolbox.functions.SharedPrefs.putPrefBoolean
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 
@@ -124,7 +126,7 @@ class UninstallServiceKotlin: Service() {
 
                             // mount all as rw if app not removed
 
-                            if (sharedPrefs.getBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, false)) {
+                            if (getPrefBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, false)) {
 
                                 write("if [[ -e $apkDir ]]; then\n")
                                 write("    cat /proc/mounts | while read -r line || [[ -n \"\$line\" ]]; do\n")
@@ -173,9 +175,7 @@ class UninstallServiceKotlin: Service() {
 
     private fun disableApp() {
 
-        val editor = AppInstance.sharedPrefs.edit()
-        editor.putBoolean(CommonToolsKotlin.PREF_IS_DISABLED, true)
-        editor.commit()
+        putPrefBoolean(CommonToolsKotlin.PREF_IS_DISABLED, true, immediate = true)
 
         val packageManager = packageManager
         val componentName = ComponentName(this, MainActivityKotlin::class.java)

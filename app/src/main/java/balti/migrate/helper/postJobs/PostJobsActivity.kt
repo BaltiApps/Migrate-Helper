@@ -8,7 +8,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
@@ -26,12 +25,16 @@ import balti.migrate.helper.utilities.UninstallServiceKotlin
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_OPERATION_RESTORE_SMS_PERMISSION
 import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefString
+import balti.module.baltitoolbox.functions.SharedPrefs.putPrefBoolean
+import balti.module.baltitoolbox.functions.SharedPrefs.putPrefString
 import kotlinx.android.synthetic.main.post_restore_jobs.*
 
 class PostJobsActivity: Activity() {
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
-    private val editor by lazy { sharedPrefs.edit() }
+    //private val editor by lazy { sharedPrefs.edit() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,9 +50,9 @@ class PostJobsActivity: Activity() {
         }
 
         pj_remountAll.apply {
-            isChecked = sharedPrefs.getBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, false)
+            isChecked = getPrefBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, false)
             setOnCheckedChangeListener { _, isChecked ->
-                editor.putBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, isChecked).commit()
+                putPrefBoolean(PREF_REMOUNT_ALL_TO_UNINSTALL, isChecked, true)
             }
         }
 
@@ -59,12 +62,12 @@ class PostJobsActivity: Activity() {
     private fun step1() {
 
         val defaultSmsAppPackage = if (commonTools.isAddonDefaultSmsApp())
-            sharedPrefs.getString(PREF_DEFAULT_SMS_APP, "").let {
-                if (it == null || it == "" || it == packageName) "com.android.messaging"
+            getPrefString(PREF_DEFAULT_SMS_APP, "").let {
+                if (it == "" || it == packageName) "com.android.messaging"
                 else if (isPackageInstalled(it)) it else "com.android.messaging"
             }
         else {
-            editor.putString(PREF_DEFAULT_SMS_APP, "").commit()
+            putPrefString(PREF_DEFAULT_SMS_APP, "")
             ""
         }
 
@@ -133,7 +136,7 @@ class PostJobsActivity: Activity() {
         }
 
         // If restoration was cancelled, Do nothing
-        if (sharedPrefs.getBoolean(PREF_WAS_CANCELLED, false)) {
+        if (getPrefBoolean(PREF_WAS_CANCELLED, false)) {
             pj_doNothing.isChecked = true
         }
 
@@ -158,18 +161,14 @@ class PostJobsActivity: Activity() {
                 // close all activities if "Do nothing" is not selected
                 if (!pj_doNothing.isChecked) {
 
-                    editor.run {
+                    // disable the app if selected
+                    if (pj_disableRadio.isChecked) putPrefBoolean(PREF_TEMPORARY_DISABLE, true)
 
-                        // disable the app if selected
-                        if (pj_disableRadio.isChecked) putBoolean(PREF_TEMPORARY_DISABLE, true)
+                    // reset all data fed to this activity via sharedPreference
+                    putPrefString(PREF_DEFAULT_SMS_APP, "")
+                    putPrefBoolean(PREF_WAS_CANCELLED, false)
+                    putPrefBoolean(PREF_IS_WIFI_RESTORED, false)
 
-                        // reset all data fed to this activity via sharedPreference
-                        putString(PREF_DEFAULT_SMS_APP, "")
-                        putBoolean(PREF_WAS_CANCELLED, false)
-                        putBoolean(PREF_IS_WIFI_RESTORED, false)
-
-                        commit()
-                    }
                 }
                 finishAffinity()
                 commonTools.LBM?.sendBroadcast(Intent(ACTION_END_ALL))
@@ -178,6 +177,6 @@ class PostJobsActivity: Activity() {
     }
 
     private fun isWifiRestored(): Boolean{
-        return sharedPrefs.getBoolean(PREF_IS_WIFI_RESTORED, false)
+        return getPrefBoolean(PREF_IS_WIFI_RESTORED, false)
     }
 }

@@ -1,7 +1,6 @@
 package balti.migrate.helper.restoreEngines.engines
 
 import android.os.Build
-import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
 import balti.migrate.helper.restoreEngines.ParentRestoreClass
 import balti.migrate.helper.restoreEngines.RestoreServiceKotlin
@@ -13,6 +12,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IS_WIFI_RESTORED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_NAME
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_PATH
+import balti.module.baltitoolbox.functions.SharedPrefs.putPrefBoolean
 import java.io.*
 
 class WifiRestoreEngine(private val jobcode: Int,
@@ -67,7 +67,7 @@ class WifiRestoreEngine(private val jobcode: Int,
         if (errors.size == 0)
             File("${wifiPacket.wifiFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
 
-        AppInstance.sharedPrefs.edit().putBoolean(PREF_IS_WIFI_RESTORED, errors.isEmpty()).apply()
+        putPrefBoolean(PREF_IS_WIFI_RESTORED, errors.isEmpty())
 
         onRestoreComplete.onRestoreComplete(jobcode, errors.size == 0, errors)
     }

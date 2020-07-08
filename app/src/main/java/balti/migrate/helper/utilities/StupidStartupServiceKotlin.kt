@@ -8,7 +8,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
 import balti.migrate.helper.simpleActivities.MainActivityKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_INIT
@@ -16,6 +15,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PENDING_INIT_N
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PENDING_INIT_REQUEST_ID
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_TEMPORARY_DISABLE
 import balti.module.baltitoolbox.functions.Misc.makeNotificationChannel
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 
 class StupidStartupServiceKotlin: Service() {
 
@@ -36,7 +36,7 @@ class StupidStartupServiceKotlin: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        if (!AppInstance.sharedPrefs.getBoolean(PREF_TEMPORARY_DISABLE, false)) {
+        if (!getPrefBoolean(PREF_TEMPORARY_DISABLE, false)) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 makeNotificationChannel(CHANNEL_INIT, CHANNEL_INIT, NotificationManager.IMPORTANCE_HIGH)

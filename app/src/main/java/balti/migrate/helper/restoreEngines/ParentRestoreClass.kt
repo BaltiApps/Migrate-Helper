@@ -25,10 +25,7 @@ abstract class ParentRestoreClass(private val intentType: String): AsyncTask<Any
 
 
     val engineContext by lazy { serviceContext }
-    val sharedPreferences by lazy { AppInstance.sharedPrefs }
-
     val onRestoreComplete by lazy { engineContext as OnRestoreComplete }
-
     val commonTools by lazy { CommonToolsKotlin(engineContext) }
 
     private var lastProgress = 0

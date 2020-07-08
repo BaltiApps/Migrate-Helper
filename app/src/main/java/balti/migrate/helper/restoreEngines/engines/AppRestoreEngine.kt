@@ -28,6 +28,7 @@ import balti.module.baltitoolbox.functions.FileHandlers.unpackAssetToInternal
 import balti.module.baltitoolbox.functions.Misc.getPercentage
 import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
 import balti.module.baltitoolbox.functions.Misc.tryIt
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import java.io.*
 
 class AppRestoreEngine(private val jobcode: Int,
@@ -134,7 +135,7 @@ class AppRestoreEngine(private val jobcode: Int,
                     writeNext("cp ${it.absolutePath} ${INFO_HOLDER_DIR}/")
                     writeNext("echo \" \"")
 
-                    if (sharedPreferences.getBoolean(PREF_REMOUNT_DATA, false)) {
+                    if (getPrefBoolean(PREF_REMOUNT_DATA, false)) {
                         write("cat /proc/mounts | grep data | while read -r line || [[ -n \"\$line\" ]]; do\n")
                         write("    mp=\"\$(echo \$line | cut -d ' ' -f2)\"\n")
                         write("    md=\"\$(echo \$line | cut -d ' ' -f1)\"\n")

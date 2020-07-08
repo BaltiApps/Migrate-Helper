@@ -18,7 +18,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
 import balti.migrate.helper.postJobs.PostJobsActivity
 import balti.migrate.helper.preferences.MainPreferencesActivity
@@ -43,6 +42,8 @@ import balti.migrate.helper.utilities.ToolsNoContext
 import balti.module.baltitoolbox.functions.FileHandlers.unpackAsset
 import balti.module.baltitoolbox.functions.Misc.openWebLink
 import balti.module.baltitoolbox.functions.Misc.tryIt
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
+import balti.module.baltitoolbox.functions.SharedPrefs.putPrefBoolean
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.last_log_report.view.*
 import java.io.*
@@ -50,8 +51,8 @@ import java.io.*
 class MainActivityKotlin: AppCompatActivity() {
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
-    private val main by lazy { AppInstance.sharedPrefs }
-    private val editor by lazy { main.edit() }
+    //private val main by lazy { AppInstance.sharedPrefs }
+    //private val editor by lazy { main.edit() }
 
     private val fCode1 = 11
     private val fCode2 = 21
@@ -76,7 +77,7 @@ class MainActivityKotlin: AppCompatActivity() {
         }
     }
 
-    private val endOnDisable by lazy {
+private val endOnDisable by lazy {
         object : BroadcastReceiver(){
             override fun onReceive(context: Context?, intent: Intent?) = finish()
         }
@@ -93,14 +94,13 @@ class MainActivityKotlin: AppCompatActivity() {
         File(INFO_HOLDER_DIR).mkdirs()
 
         if (cpuAbi == "armeabi-v7a" || cpuAbi == "arm64-v8a" || cpuAbi == "x86" || cpuAbi == "x86_64") {
-            if (Build.VERSION.SDK_INT > LAST_SUPPORTED_ANDROID_API && !main.getBoolean(PREF_ANDROID_VERSION_WARNING, false)) {
+            if (Build.VERSION.SDK_INT > LAST_SUPPORTED_ANDROID_API && !getPrefBoolean(PREF_ANDROID_VERSION_WARNING, false)) {
                 AlertDialog.Builder(this)
                         .setTitle(R.string.too_fast)
                         .setMessage(R.string.too_fast_desc)
                         .setPositiveButton(android.R.string.ok, null)
                         .setNegativeButton(R.string.dont_show_again) { _, _ ->
-                            editor.putBoolean(PREF_ANDROID_VERSION_WARNING, true)
-                            editor.commit()
+                            putPrefBoolean(PREF_ANDROID_VERSION_WARNING, true)
                         }
                         .show()
             }

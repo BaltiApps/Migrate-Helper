@@ -15,7 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import balti.migrate.helper.AppInstance
-import balti.migrate.helper.AppInstance.Companion.sharedPrefs
+//import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.postJobs.PostJobsActivity
 import balti.migrate.helper.restoreEngines.engines.AppRestoreEngine
@@ -49,6 +49,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_TRACK_RES
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import balti.migrate.helper.utilities.IconTools
 import balti.module.baltitoolbox.functions.Misc.tryIt
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import kotlinx.android.synthetic.main.restore_progress_layout.*
 import java.io.BufferedWriter
 import java.io.File
@@ -346,7 +347,7 @@ class ProgressShowActivity: AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (sharedPrefs.getBoolean(PREF_TRACK_RESTORE_FINISHED, true) && AppInstance.isFinished) {
+        if (getPrefBoolean(PREF_TRACK_RESTORE_FINISHED, true) && AppInstance.isFinished) {
             if (!intent.hasExtra(EXTRA_PROGRESS_TYPE) || intent.getStringExtra(EXTRA_PROGRESS_TYPE) != EXTRA_PROGRESS_TYPE_FINISHED) {
                 startActivity(Intent(this, MainActivityKotlin::class.java))
                 finish()

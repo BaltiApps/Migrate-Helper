@@ -20,7 +20,7 @@ import balti.migrate.helper.AppInstance.Companion.appPackets
 import balti.migrate.helper.AppInstance.Companion.callsDataPackets
 import balti.migrate.helper.AppInstance.Companion.contactDataPackets
 import balti.migrate.helper.AppInstance.Companion.settingsPacket
-import balti.migrate.helper.AppInstance.Companion.sharedPrefs
+//import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.AppInstance.Companion.smsDataPackets
 import balti.migrate.helper.AppInstance.Companion.wifiPacket
 import balti.migrate.helper.R
@@ -54,6 +54,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_RE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LOAD_EXTRAS_ON_UI_THREAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import balti.module.baltitoolbox.functions.Misc.tryIt
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import kotlinx.android.synthetic.main.app_search_layout.view.*
 import kotlinx.android.synthetic.main.app_selector_header.view.*
 import kotlinx.android.synthetic.main.extra_item.view.*
@@ -230,7 +231,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                 else {
                     if (!jobSuccess) {
                         addErrors()
-                        if (sharedPrefs.getBoolean(PREF_IGNORE_READ_ERRORS, false))
+                        if (getPrefBoolean(PREF_IGNORE_READ_ERRORS, false))
                             doJob(nextJob)
                         else displayAllData()
                     } else {
@@ -251,7 +252,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
                 JOBCODE_GET_APP_JSON ->
                     handleResults(
-                            if (!sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false)) JOBCODE_GET_CONTACTS
+                            if (!getPrefBoolean(PREF_IGNORE_EXTRAS, false)) JOBCODE_GET_CONTACTS
                             else JOBCODE_END_ALL) {
                         appPackets.clear()
                         appPackets.addAll(jobResult as ArrayList<AppPacketsKotlin>)
@@ -302,7 +303,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             onBackPressed()
         }
 
-        if (!sharedPrefs.getBoolean(PREF_IGNORE_READ_ERRORS, false) && allErrors.isNotEmpty()){
+        if (!getPrefBoolean(PREF_IGNORE_READ_ERRORS, false) && allErrors.isNotEmpty()){
             showError(getString(R.string.code_error), allErrors)
             return
         }
@@ -328,7 +329,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
                     try {
 
-                        if (!sharedPrefs.getBoolean(PREF_IGNORE_EXTRAS, false) && allExtras.isNotEmpty()) {
+                        if (!getPrefBoolean(PREF_IGNORE_EXTRAS, false) && allExtras.isNotEmpty()) {
 
                             tryIt { app_list.removeHeaderView(extrasContainer) }
                             app_list.addHeaderView(extrasContainer, null, false)
@@ -421,7 +422,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
                 }
 
-                if (sharedPrefs.getBoolean(PREF_LOAD_EXTRAS_ON_UI_THREAD, false)) {
+                if (getPrefBoolean(PREF_LOAD_EXTRAS_ON_UI_THREAD, false)) {
                     runOnUiThread { load() }
                     triedUiThread = true
                 }

@@ -13,7 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import balti.migrate.helper.AppInstance.Companion.appPackets
-import balti.migrate.helper.AppInstance.Companion.sharedPrefs
+//import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin
@@ -29,6 +29,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PROPERTY_PERMI
 import balti.migrate.helper.utilities.IconTools
 import balti.module.baltitoolbox.functions.GetResources.getStringFromRes
 import balti.module.baltitoolbox.functions.Misc.getHumanReadableStorageSpace
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import kotlinx.android.synthetic.main.app_info.view.*
 import kotlinx.android.synthetic.main.app_item.view.*
 import java.io.File
@@ -42,9 +43,9 @@ class AppRestoreAdapter(val context: Context,
     private var dataAllChangeFromScanning = false
     private var permissionAllChangeFromScanning = false
     private var externalDataSetChanged = true
-    private val iconTools by lazy { IconTools(sharedPrefs.getBoolean(PREF_DO_LOAD_MULTIPLE_ICON_IN_LIST, false)) }
-    private val doLoadIcons = sharedPrefs.getBoolean(PREF_DO_LOAD_ICON_IN_LIST, true)
-    private val checkLowMemory = sharedPrefs.getBoolean(PREF_ICON_CHECK_LOW_MEMORY, true)
+    private val iconTools by lazy { IconTools(getPrefBoolean(PREF_DO_LOAD_MULTIPLE_ICON_IN_LIST, false)) }
+    private val doLoadIcons = getPrefBoolean(PREF_DO_LOAD_ICON_IN_LIST, true)
+    private val checkLowMemory = getPrefBoolean(PREF_ICON_CHECK_LOW_MEMORY, true)
 
     private val commonTools by lazy { CommonToolsKotlin(context) }
 

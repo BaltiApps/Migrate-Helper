@@ -8,7 +8,6 @@ import android.content.IntentFilter
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
-import balti.migrate.helper.AppInstance
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_DEFAULT_SMS_APP
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_ADDON_DELAY
@@ -22,6 +21,7 @@ import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_EXTRA_SMS_GRANTED
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
 import balti.module.baltitoolbox.functions.Misc.tryIt
+import balti.module.baltitoolbox.functions.SharedPrefs.putPrefString
 
 class CommunicatorAddon(val context: Context) {
 
@@ -64,7 +64,7 @@ class CommunicatorAddon(val context: Context) {
 
         if (commonTools.isAddonDefaultSmsApp()) sendResult(requestCode, true)
         else {
-            AppInstance.sharedPrefs.edit().putString(PREF_DEFAULT_SMS_APP, commonTools.getDefaultSmsApp()).apply()
+            putPrefString(PREF_DEFAULT_SMS_APP, commonTools.getDefaultSmsApp())
             smsCallsSend(ADDON_SMS_CALLS_EXTRA_OPERATION_GET_SMS_PERMISSION , requestCode)
         }
     }

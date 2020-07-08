@@ -21,7 +21,6 @@ import balti.migrate.helper.AppInstance.Companion.appPackets
 import balti.migrate.helper.AppInstance.Companion.callsDataPackets
 import balti.migrate.helper.AppInstance.Companion.contactDataPackets
 import balti.migrate.helper.AppInstance.Companion.settingsPacket
-import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.AppInstance.Companion.smsDataPackets
 import balti.migrate.helper.AppInstance.Companion.wifiPacket
 import balti.migrate.helper.R
@@ -61,6 +60,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_RESTORE_S
 import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
 import balti.module.baltitoolbox.functions.Misc.playStoreLink
 import balti.module.baltitoolbox.functions.Misc.tryIt
+import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import kotlinx.android.synthetic.main.contacts_dialog_view.view.*
 import kotlinx.android.synthetic.main.extra_prep_item.view.*
 import kotlinx.android.synthetic.main.extra_restore_prepare.*
@@ -509,7 +509,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                     tryIt { handler.removeCallbacks(runnable) }
                 }
 
-                if (sharedPrefs.getBoolean(PREF_RESTORE_START_ANIMATION, true)) {
+                if (getPrefBoolean(PREF_RESTORE_START_ANIMATION, true)) {
 
                     restore_countdown.visibility = View.VISIBLE
                     var c = 3

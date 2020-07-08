@@ -17,7 +17,6 @@ import balti.migrate.helper.AppInstance.Companion.appPackets
 import balti.migrate.helper.AppInstance.Companion.callsDataPackets
 import balti.migrate.helper.AppInstance.Companion.contactDataPackets
 import balti.migrate.helper.AppInstance.Companion.settingsPacket
-import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.AppInstance.Companion.smsDataPackets
 import balti.migrate.helper.AppInstance.Companion.wifiPacket
 import balti.migrate.helper.R
@@ -67,6 +66,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITIN
 import balti.migrate.helper.utilities.StupidStartupServiceKotlin
 import balti.module.baltitoolbox.functions.Misc.makeNotificationChannel
 import balti.module.baltitoolbox.functions.Misc.tryIt
+import balti.module.baltitoolbox.functions.SharedPrefs.putPrefBoolean
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -445,9 +445,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                 }.build()
         )
 
-        sharedPrefs.edit().apply {
-            putBoolean(PREF_WAS_CANCELLED, cancelAll)
-        }.commit()
+        putPrefBoolean(PREF_WAS_CANCELLED, cancelAll)
 
         appPackets.clear()
         contactDataPackets.clear()
