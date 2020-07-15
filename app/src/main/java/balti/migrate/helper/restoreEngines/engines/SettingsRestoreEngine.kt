@@ -1,67 +1,31 @@
 package balti.migrate.helper.restoreEngines.engines
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import balti.migrate.helper.R
 import balti.migrate.helper.restoreEngines.ParentRestoreClass
 import balti.migrate.helper.restoreEngines.RestoreServiceKotlin
-import balti.migrate.helper.restoreEngines.utils.OnRestoreComplete
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_ADB
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_DPI
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_FONT_SCALE
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin.Companion.SETTINGS_TYPE_KEYBOARD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_GENERIC_SETTINGS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_SETTINGS_SCRIPT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_ADDON_DELAY
-import balti.migrate.helper.utilities.constants.AddonReceiverConstants.Companion.ACTION_ADDON_SETTINGS_BROADCAST
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_ERRORS
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_OPERATION_DO_START
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_ADB
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_DPI
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_WAS_CANCELLED
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_RESTORE_SETTINGS_SCRIPT
+import balti.module.baltitoolbox.functions.FileHandlers.getInternalFile
 import balti.module.baltitoolbox.functions.Misc.tryIt
-import java.io.BufferedReader
+import java.io.BufferedWriter
 import java.io.File
-import java.io.InputStreamReader
+import java.io.FileWriter
 
 class SettingsRestoreEngine(private val jobcode: Int,
                             private val settingsPacket: SettingsPacketKotlin): ParentRestoreClass("") {
 
-    private val errors by lazy { ArrayList<String>(0) }
     private val suProcess by lazy { Runtime.getRuntime().exec("su") }
-    private val LBM by lazy { LocalBroadcastManager.getInstance(engineContext) }
+    private val scriptFile by lazy { getInternalFile(FILE_RESTORE_SETTINGS_SCRIPT) }
+    private var PID = -999
 
-    private var handler : Handler? = null
-    private var runnable: Runnable? = null
-
-    private var exitWait = false
-    private var alreadyFinished = false
-
-    private val addonResultsReceiver by lazy {
-        object : BroadcastReceiver(){
-            override fun onReceive(context: Context?, intent: Intent?) {
-                intent?.let {
-                    it.getStringArrayListExtra(ADDON_SETTINGS_EXTRA_ERRORS)?.let {e ->
-                        errors.addAll(e)
-                    }
-                    if (it.getBooleanExtra(ADDON_SETTINGS_EXTRA_WAS_CANCELLED, false)) {
-                        broadcastProgress("", engineContext.getString(R.string.settings_cancelled), false)
-                    }
-                }
-                exitWait = true
-            }
-        }
-    }
+    private val allErrors by lazy { ArrayList<String>(0) }
 
     private fun restorePacket(){
         settingsPacket.let {
@@ -80,75 +44,85 @@ class SettingsRestoreEngine(private val jobcode: Int,
                     }
             }
 
-            Thread.sleep(TIMEOUT_ADDON_DELAY)
+            if (!RestoreServiceKotlin.cancelAll) BufferedWriter(FileWriter(scriptFile)).run {
 
-            engineContext.startActivity(AddonSettingsConstants.getSettingsIntent(Bundle().apply {
-                putBoolean(ADDON_SETTINGS_EXTRA_OPERATION_DO_START, true)
-                putInt(ADDON_SETTINGS_EXTRA_VALUE_DPI, dpiValue)
-                putInt(ADDON_SETTINGS_EXTRA_VALUE_ADB, adbValue)
-                putString(ADDON_SETTINGS_EXTRA_VALUE_KEYBOARD_TEXT, keyboardText)
-                putDouble(ADDON_SETTINGS_EXTRA_VALUE_FONT_SCALE, fontScale)
-            }))
-
-            runnable = Runnable {
-                handler?.run {
-                    if (exitWait || RestoreServiceKotlin.cancelAll) {
-                        removeCallbacks(runnable)
-                        finishJob()
-                    }
-                    else postDelayed(runnable, 500)
+                fun writeNext(line: String) {
+                    write("${line}\n")
                 }
+
+                writeNext("#!sbin/sh\n")
+                writeNext("echo \" \"")
+                writeNext("sleep 1s")
+                writeNext("echo \"--- RESTORE PID: $$\"")
+                writeNext("echo \" \"")
+
+                if (dpiValue > 0) writeNext("wm density $dpiValue")
+                if (adbValue >= 0) writeNext("settings put global adb_enabled $adbValue")
+                if (keyboardText != "") {
+                    writeNext("ime enable $keyboardText")
+                    writeNext("ime set $keyboardText")
+                }
+                if (fontScale > 0) writeNext("settings put system font_scale $fontScale")
+
+                writeNext("echo \" \"")
+                writeNext("echo \"--- DONE! ---\"")
+
+                close()
             }
 
-            handler = Handler(Looper.getMainLooper()).apply {
-                post(runnable)
+            scriptFile.setExecutable(true)
+
+            if (!RestoreServiceKotlin.cancelAll) suProcess.run {
+                val writer = outputStream.bufferedWriter()
+                val reader = inputStream.bufferedReader()
+                val errorReader = errorStream.bufferedReader()
+
+                writer.write("sh ${scriptFile.absolutePath}\n")
+                writer.write("exit\n")
+                writer.flush()
+
+                while (true) {
+                    if (RestoreServiceKotlin.cancelAll) commonTools.cancelTask(suProcess, PID)
+                    val line: String? = reader.readLine()
+                    if (line == null || line == "--- DONE! ---") {
+                        break
+                    }
+                    else if (line.startsWith("--- RESTORE PID:")) {
+                        tryIt {
+                            PID = line.substring(line.lastIndexOf(" ") + 1).trim().toInt()
+                        }
+                    }
+                    else broadcastProgress("", line, false)
+                }
+
+                while (true) {
+                    val line: String? = errorReader.readLine()
+                    if (line == null) break
+                    else {
+                        allErrors.add("$ERROR_SETTINGS_SCRIPT: $line")
+                    }
+                }
+
             }
         }
     }
 
-    init {
-        customPreExecuteFunction = {
-            LBM.registerReceiver(addonResultsReceiver, IntentFilter(ACTION_ADDON_SETTINGS_BROADCAST))
-        }
+    override fun postExecuteFunction() {
+        if (allErrors.size == 0)
+            File("${settingsPacket.settingsFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
+        onRestoreComplete.onRestoreComplete(jobcode, allErrors.size == 0, allErrors)
     }
-
-    private fun finishJob(){
-        if (!alreadyFinished) {
-
-            alreadyFinished = true
-            tryIt { LBM.unregisterReceiver(addonResultsReceiver) }
-
-            if (errors.size == 0) File("${settingsPacket.settingsFile.absolutePath}.$EXTRAS_MARKER").createNewFile()    // mark for cleaning
-
-            (engineContext as OnRestoreComplete).run {
-                onRestoreComplete(jobcode, errors.size == 0, errors)
-            }
-        }
-    }
-
-    override fun postExecuteFunction() {}
 
     override fun doInBackground(vararg params: Any?): Any {
 
-        alreadyFinished = false
         resetBroadcast(true, engineContext.getString(R.string.restoring_settings))
 
         try {
-
             restorePacket()
-
-            BufferedReader(InputStreamReader(suProcess.inputStream)).readLines().forEach {
-                broadcastProgress("", it, false)
-            }
-
-            BufferedReader(InputStreamReader(suProcess.errorStream)).readLines().forEach {
-                errors.add("$ERROR_GENERIC_SETTINGS: $it")
-            }
         }
         catch (e: Exception){
             e.printStackTrace()
-            errors.add("${ERROR_GENERIC_SETTINGS}: ${e.message}")
-            finishJob()
+            allErrors.add("${ERROR_GENERIC_SETTINGS}: ${e.message}")
         }
 
         return 0

@@ -53,6 +53,7 @@ class CommonToolsKotlin(val context: Context) {
         val FILE_ERRORLOG = "errorLog.txt"
         val FILE_DEVICE_INFO = "device_info.txt"
         val FILE_RESTORE_SCRIPT = "the_restore_script.sh"
+        val FILE_RESTORE_SETTINGS_SCRIPT = "settings_restore_script.sh"
         val FILE_PACKAGE_DATA = "package-data"
         val FILE_FILE_LIST = "fileList.txt"
         val FILE_RAW_LIST = "rawList.txt"
@@ -128,6 +129,7 @@ class CommonToolsKotlin(val context: Context) {
         val ERROR_APP_RESTORE_MESSAGE = "RUN_M"
         val ERROR_APP_RESTORE_SUPPRESSED = "RUN_SUPPRESSED"
         val ERROR_CLEANING_SUPPRESSED = "CLEANING_ERROR_SUPPRESSED"
+        val ERROR_SETTINGS_SCRIPT = "ERROR_SETTINGS_SCRIPT"
 
         val ERROR_RESTORE_SERVICE_ERROR = "RESTORE_SERVICE"
 
