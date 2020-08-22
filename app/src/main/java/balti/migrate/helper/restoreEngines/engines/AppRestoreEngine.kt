@@ -27,6 +27,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_D
 import balti.module.baltitoolbox.functions.FileHandlers.unpackAssetToInternal
 import balti.module.baltitoolbox.functions.Misc.getPercentage
 import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
+import balti.module.baltitoolbox.functions.Misc.iterateBufferedReader
 import balti.module.baltitoolbox.functions.Misc.tryIt
 import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import java.io.*
@@ -61,20 +62,6 @@ class AppRestoreEngine(private val jobcode: Int,
     private fun addToActualErrors(err: String){
         actualErrors.add(err)
         allErrors.add(err)
-    }
-
-    private fun iterateBufferedReader(reader: BufferedReader, loopFunction: (line: String) -> Boolean,
-                                      onCancelledFunction: (() -> Unit)? = null){
-        var doBreak = false
-        while (true){
-            val line : String? = reader.readLine()
-            if (line == null) break
-            else {
-                doBreak = loopFunction(line.trim())
-                if (doBreak) break
-            }
-        }
-        if (doBreak) onCancelledFunction?.invoke()
     }
 
     private fun isDangerousPermission(permission: String): Boolean {
