@@ -37,10 +37,8 @@ import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_ADDON_DO_ABORT
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_INSTALL_SETTINGS_ADDON
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_INSTALL_SMS_CALLS_ADDON
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SETTINGS_ADDON_OK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SMS_CALLS_ADDON_FILES
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SMS_CALLS_ADDON_OK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_LAUNCH_ADDON_INSTALLER
@@ -101,10 +99,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
     private var alreadyTriggered = false
 
     private var doInstallSmsCallsAddon = false
-    private var doInstallSettingsAddon = false
-
     private var addonSmsCallsSuccessful = false
-    private var addonSettingsSuccessful = false
 
     private val jobcodeOrder by lazy { arrayListOf(JOBCODE_PREP_APP, JOBCODE_PREP_KEYBOARD, JOBCODE_PREP_WIFI,
             JOBCODE_PREP_CONTACTS, JOBCODE_PREP_SMS, JOBCODE_PREP_CALLS, JOBCODE_PREP_DPI, JOBCODE_PREP_ADB,
@@ -195,9 +190,8 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
         }
 
         doInstallSmsCallsAddon = smsDataPackets.isNotEmpty() || callsDataPackets.isNotEmpty()
-        doInstallSettingsAddon = try { settingsPacket?.internalPackets?.isNotEmpty()!! } catch (_: Exception) {false}
 
-        if (doInstallSettingsAddon || doInstallSmsCallsAddon) installAddons()
+        if (doInstallSmsCallsAddon) installAddons()
         else doFallThroughJob(JOBCODE_PREP_APP)
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
@@ -207,7 +201,6 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
         startActivityForResult(Intent(this, AddonInstallerActivity::class.java).apply {
 
             putExtra(EXTRA_DO_INSTALL_SMS_CALLS_ADDON, doInstallSmsCallsAddon)
-            putExtra(EXTRA_DO_INSTALL_SETTINGS_ADDON, doInstallSettingsAddon)
 
             val filePaths = ArrayList<String>(0)
             for (p in callsDataPackets) { filePaths.add(p.callDBFile.absolutePath) }

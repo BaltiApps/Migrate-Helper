@@ -7,197 +7,102 @@
     android:id="@+id/master_addon_installer_layout"
     >
 
+
+    <TextView
+        android:id="@+id/settings_addon_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/confirm_install_addon"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/small_padding_width" />
+
+    <LinearLayout
+        android:id="@+id/addon_layout_smsCalls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/large_padding_width"
+        android:paddingBottom="@dimen/large_padding_width"
+        android:visibility="gone"
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sms_calls_addon"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sms_calls_addon_desc" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/addon_smsCalls_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_item_done"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/addon_smsCalls_not_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_item_cancel"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/addon_smsCalls_progressBar"
+                android:layout_width="@dimen/extra_small_icon_wh"
+                android:layout_height="@dimen/extra_small_icon_wh"
+                android:visibility="invisible" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/small_padding_width" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:gravity="end">
 
-        <TextView
+        <Button
+            android:id="@+id/addon_abort_button"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/confirm_install_addon"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/settings_addon_title"
-            />
+            android:backgroundTint="@color/grey_bg"
+            android:text="@string/abort"
+            android:textColor="@color/error_color" />
 
-        <Space
+        <Button
+            android:id="@+id/addon_install_button"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/small_padding_width"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="@dimen/large_padding_width"
-            android:paddingBottom="@dimen/large_padding_width"
-            android:id="@+id/addon_layout_smsCalls"
-            android:gravity="center_vertical"
-            android:visibility="gone"
-            >
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/sms_calls_addon"
-                    android:textStyle="bold"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/sms_calls_addon_desc"/>
-
-            </LinearLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                >
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_item_done"
-                    android:id="@+id/addon_smsCalls_ok"
-                    android:visibility="gone"
-                    />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_item_cancel"
-                    android:id="@+id/addon_smsCalls_not_ok"
-                    android:visibility="gone"
-                    />
-
-                <ProgressBar
-                    android:layout_width="@dimen/extra_small_icon_wh"
-                    android:layout_height="@dimen/extra_small_icon_wh"
-                    android:id="@+id/addon_smsCalls_progressBar"
-                    android:visibility="invisible"
-                    />
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="@dimen/large_padding_width"
-            android:paddingBottom="@dimen/large_padding_width"
-            android:id="@+id/addon_layout_settings"
-            android:gravity="center_vertical"
-            android:visibility="gone"
-            >
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_addon"
-                    android:textStyle="bold"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_addon_desc"/>
-
-            </LinearLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                >
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_item_done"
-                    android:id="@+id/addon_settings_ok"
-                    android:visibility="gone"
-                    />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_item_cancel"
-                    android:id="@+id/addon_settings_not_ok"
-                    android:visibility="gone"
-                    />
-
-                <ProgressBar
-                    android:layout_width="@dimen/extra_small_icon_wh"
-                    android:layout_height="@dimen/extra_small_icon_wh"
-                    android:id="@+id/addon_settings_progressBar"
-                    android:visibility="invisible"
-                    />
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/small_padding_width"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_height"
-                android:text="@string/info"
-                android:id="@+id/settings_addon_info"
-                android:backgroundTint="@color/grey_bg"
-                />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="@dimen/button_height"
-                android:orientation="horizontal"
-                android:layout_weight="1"
-                android:gravity="end"
-                >
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/abort"
-                    android:backgroundTint="@color/grey_bg"
-                    android:textColor="@color/error_color"
-                    android:id="@+id/addon_abort_button"
-                    />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/install"
-                    android:backgroundTint="@color/colorButtons"
-                    android:id="@+id/addon_install_button"
-                    />
-
-            </LinearLayout>
-
-        </LinearLayout>
+            android:backgroundTint="@color/colorButtons"
+            android:text="@string/install" />
 
     </LinearLayout>
 

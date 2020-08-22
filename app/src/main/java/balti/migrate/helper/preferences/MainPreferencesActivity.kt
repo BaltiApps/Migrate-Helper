@@ -73,8 +73,8 @@ class MainPreferencesActivity: PreferenceActivity() {
             }
         }
 
-        setValue(ignoreReadErrors, PREF_IGNORE_READ_ERRORS)
-        setValue(ignoreExtras, PREF_IGNORE_EXTRAS)
+        setValue(ignoreReadErrors, PREF_IGNORE_READ_ERRORS, false)
+        setValue(ignoreExtras, PREF_IGNORE_EXTRAS, false)
         setValue(restoreStartAnimation, PREF_RESTORE_START_ANIMATION, true)
         setValue(loadAppIconsInList, PREF_DO_LOAD_ICON_IN_LIST, true)
         setValue(remountData, PREF_REMOUNT_DATA, false)

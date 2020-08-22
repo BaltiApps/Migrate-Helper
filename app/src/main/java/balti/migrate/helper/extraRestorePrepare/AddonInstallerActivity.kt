@@ -10,24 +10,14 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import balti.migrate.helper.R
-import balti.migrate.helper.extraRestorePrepare.utils.SettingsAddonInstall
 import balti.migrate.helper.extraRestorePrepare.utils.SmsCallsAddonInstall
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_ADDON_DO_ABORT
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_INSTALL_SETTINGS_ADDON
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_DO_INSTALL_SMS_CALLS_ADDON
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SETTINGS_ADDON_OK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SMS_CALLS_ADDON_FILES
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SMS_CALLS_ADDON_OK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_ADDON_END
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_ADDON_INSTALL_SETTINGS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_ADDON_INSTALL_SMS_CALLS
-import balti.migrate.helper.utilities.constants.AddonReceiverConstants.Companion.ACTION_ADDON_SETTINGS_SU
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_OPERATION_DUMMY_SU
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_SU_ERROR
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_EXTRA_SU_GRANTED
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_PACKAGE_NAME
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
 import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
 import balti.module.baltitoolbox.functions.Misc.showErrorDialog
@@ -38,56 +28,10 @@ class AddonInstallerActivity: Activity() {
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
 
-    private var SETTINGS_ADDON_OK = false
     private var SMS_CALLS_ADDON_OK = false
     private var DO_ABORT = false
-
     private var doInstallSmsCalls = false
-    private var doInstallSettings = false
-    private var settingsSuCancelled = false
-
-    private var requestSuDialog: AlertDialog? = null
-
     private val smsCallsFilePaths by lazy { ArrayList<String>(0) }
-
-    private val settingsSuReceiver by lazy {
-        object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                intent?.run {
-
-                    tryIt { requestSuDialog?.dismiss() }
-
-                    if (!settingsSuCancelled) {
-
-                        if (this.getBooleanExtra(ADDON_SETTINGS_EXTRA_SU_GRANTED, false)) {
-
-                            toggleSettingsOk()
-
-                        } else {
-                            val err = intent.getStringExtra(ADDON_SETTINGS_EXTRA_SU_ERROR)
-
-                            AlertDialog.Builder(this@AddonInstallerActivity).apply {
-
-                                setTitle(R.string.grant_root_to_settings_addon)
-                                setMessage((if (err != null) err + "\n\n" else "") + getString(R.string.grant_root_to_settings_addon))
-                                setPositiveButton(R.string.abort) { _, _ ->
-                                    DO_ABORT = true
-                                    toggleSettingsNotOk()
-                                }
-                                setNegativeButton(R.string.skip_settings) { _, _ ->
-                                    toggleSettingsNotOk()
-                                }
-                                setCancelable(false)
-                            }
-                                    .show()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
 
     private fun toggleSmsCallsProcessing() {
         addon_smsCalls_ok.visibility = View.GONE
@@ -100,7 +44,7 @@ class AddonInstallerActivity: Activity() {
         addon_smsCalls_ok.visibility = View.VISIBLE
         addon_smsCalls_not_ok.visibility = View.GONE
         addon_smsCalls_progressBar.visibility = View.GONE
-        doFallThroughJob(JOBCODE_ADDON_INSTALL_SETTINGS)
+        doFallThroughJob(JOBCODE_ADDON_END)
     }
 
     private fun toggleSmsCallsNotOk() {
@@ -108,30 +52,6 @@ class AddonInstallerActivity: Activity() {
         addon_smsCalls_ok.visibility = View.GONE
         addon_smsCalls_not_ok.visibility = View.VISIBLE
         addon_smsCalls_progressBar.visibility = View.GONE
-        doFallThroughJob(JOBCODE_ADDON_INSTALL_SETTINGS)
-    }
-
-
-
-    private fun toggleSettingsProcessing() {
-        addon_settings_ok.visibility = View.GONE
-        addon_settings_not_ok.visibility = View.GONE
-        addon_settings_progressBar.visibility = View.VISIBLE
-    }
-
-    private fun toggleSettingsOk() {
-        SETTINGS_ADDON_OK = true
-        addon_settings_ok.visibility = View.VISIBLE
-        addon_settings_not_ok.visibility = View.GONE
-        addon_settings_progressBar.visibility = View.GONE
-        doFallThroughJob(JOBCODE_ADDON_END)
-    }
-
-    private fun toggleSettingsNotOk() {
-        SETTINGS_ADDON_OK = false
-        addon_settings_ok.visibility = View.GONE
-        addon_settings_not_ok.visibility = View.VISIBLE
-        addon_settings_progressBar.visibility = View.GONE
         doFallThroughJob(JOBCODE_ADDON_END)
     }
 
@@ -141,12 +61,11 @@ class AddonInstallerActivity: Activity() {
         setFinishOnTouchOutside(false)
 
         doInstallSmsCalls = intent.getBooleanExtra(EXTRA_DO_INSTALL_SMS_CALLS_ADDON, false)
-        doInstallSettings = intent.getBooleanExtra(EXTRA_DO_INSTALL_SETTINGS_ADDON, false)
         tryIt { smsCallsFilePaths.addAll(intent.getStringArrayListExtra(EXTRA_SMS_CALLS_ADDON_FILES)) }
 
         setData()
 
-        if (!doInstallSettings && !doInstallSmsCalls) {
+        if (!doInstallSmsCalls) {
             Toast.makeText(this, R.string.no_addon_to_install, Toast.LENGTH_SHORT).show()
             finish()
         }
@@ -159,10 +78,6 @@ class AddonInstallerActivity: Activity() {
                 if (doInstallSmsCalls && !isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
                     addon_layout_smsCalls.visibility = View.VISIBLE
                 else addon_layout_smsCalls.visibility = View.GONE
-
-                if (doInstallSettings && !isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME))
-                    addon_layout_settings.visibility = View.VISIBLE
-                else addon_layout_settings.visibility = View.GONE
 
                 addon_abort_button.setOnClickListener {
                     DO_ABORT = true
@@ -179,76 +94,10 @@ class AddonInstallerActivity: Activity() {
             }
         }
 
-        commonTools.LBM?.registerReceiver(settingsSuReceiver, IntentFilter(ACTION_ADDON_SETTINGS_SU))
     }
 
     private fun isAddonDialogNeeded(): Boolean {
-        return (doInstallSmsCalls && !isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME)) ||
-                (doInstallSettings && !isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME))
-    }
-
-    private fun installSettings() {
-
-        fun askSu() {
-
-            tryIt {
-                requestSuDialog = AlertDialog.Builder(this).apply {
-                    setView(View.inflate(this@AddonInstallerActivity, R.layout.install_addon_settings_su_request, null))
-                    setNegativeButton(android.R.string.cancel) { _, _ ->
-                        settingsSuCancelled = true
-                    }
-                    setNeutralButton(R.string.abort) { _, _ ->
-                        DO_ABORT = true
-                    }
-                    setCancelable(false)
-                }.create().apply {
-                    setOnDismissListener {
-                        if (DO_ABORT || settingsSuCancelled) {
-                            toggleSettingsNotOk()
-                        }
-                    }
-                }
-
-                requestSuDialog?.show()
-
-                startActivity(AddonSettingsConstants.getSettingsIntent(Bundle().apply {
-                    putBoolean(ADDON_SETTINGS_EXTRA_OPERATION_DUMMY_SU, true)
-                }))
-            }
-        }
-
-        toggleSettingsProcessing()
-
-        // if settings addon installed, just ask for root
-        if (isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME)) {
-
-            askSu()
-
-        } else {
-
-            // else, start installation
-
-            var error = ""
-
-            commonTools.doBackgroundTask({
-                error = SettingsAddonInstall(this).installAddon()
-            }, {
-                if (error != "") {
-
-                    // install failed
-                    showErrorDialog(error, getString(R.string.error), this, onCloseClick = {
-
-                        // if settings addon is not present, deny all settings restore, continue. Else ask for su
-                        if (!isPackageInstalled(ADDON_SETTINGS_RECEIVER_PACKAGE_NAME)) {
-                            toggleSettingsNotOk()
-                        } else askSu()
-
-                    })
-                } else {
-                    askSu()     // install success. ask for su permission from addon
-                }
-            })
-        }
+        return (doInstallSmsCalls && !isPackageInstalled(ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME))
     }
 
     private fun installSmsCalls() {
@@ -276,15 +125,10 @@ class AddonInstallerActivity: Activity() {
 
     private fun setData(){
 
-        SETTINGS_ADDON_OK = SETTINGS_ADDON_OK && !settingsSuCancelled
-
         setResult(
-                if((SETTINGS_ADDON_OK || !doInstallSettings) &&
-                        (SMS_CALLS_ADDON_OK || !doInstallSmsCalls) &&
-                        !DO_ABORT)
+                if((SMS_CALLS_ADDON_OK || !doInstallSmsCalls) && !DO_ABORT)
                     RESULT_OK else RESULT_CANCELED,
                 Intent().apply {
-                    putExtra(EXTRA_SETTINGS_ADDON_OK, SETTINGS_ADDON_OK)
                     putExtra(EXTRA_SMS_CALLS_ADDON_OK, SMS_CALLS_ADDON_OK)
                     putExtra(EXTRA_ADDON_DO_ABORT, DO_ABORT)
                 }
@@ -314,16 +158,10 @@ class AddonInstallerActivity: Activity() {
         }
 
         doJob(JOBCODE_ADDON_INSTALL_SMS_CALLS, { installSmsCalls() }, doInstallSmsCalls)
-        doJob(JOBCODE_ADDON_INSTALL_SETTINGS, { installSettings() }, doInstallSettings)
         doJob(JOBCODE_ADDON_END, { finishThis() }, true)
     }
 
     override fun onBackPressed() {
         Toast.makeText(this, R.string.press_abort_to_cancel, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        commonTools.LBM?.unregisterReceiver(settingsSuReceiver)
     }
 }
