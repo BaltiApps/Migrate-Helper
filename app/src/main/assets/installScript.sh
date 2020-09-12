@@ -14,7 +14,7 @@ if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} || -e ${MIGRATE_CACHE}/${base_apk_name
 
     full_apk_dir=""    ## support version 1.2
 
-    if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]     ## support version 1.2
+    if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then     ## support version 1.2
         full_apk_dir=${MIGRATE_CACHE}/${apk_dir_name}
     else
         full_apk_dir=${MIGRATE_CACHE}
@@ -81,7 +81,7 @@ if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} || -e ${MIGRATE_CACHE}/${base_apk_name
 
     if [[ -n "$(pm list packages ${package_name})" ]]; then
         echo "Clearing apks"
-        if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]     ## support version 1.2
+        if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then     ## support version 1.2
             rm -rf "$full_apk_dir"
         else
             rm -f $base_apk_name
