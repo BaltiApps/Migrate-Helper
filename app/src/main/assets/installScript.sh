@@ -10,11 +10,17 @@ installer_name=$5
 METADATA_HOLDER=$6
 app_name=$7
 
-if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
+if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} || -e ${MIGRATE_CACHE}/${base_apk_name} ]]; then
 
-    full_apk_dir=${MIGRATE_CACHE}/${apk_dir_name}
+    full_apk_dir=""    ## support version 1.2
 
-    chmod 777 "$full_apk_dir"
+    if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]     ## support version 1.2
+        full_apk_dir=${MIGRATE_CACHE}/${apk_dir_name}
+    else
+        full_apk_dir=${MIGRATE_CACHE}
+    fi
+
+    #chmod -R 777 "$MIGRATE_CACHE"
     cd ${full_apk_dir}
 
     # store package verification state
@@ -75,7 +81,11 @@ if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]; then
 
     if [[ -n "$(pm list packages ${package_name})" ]]; then
         echo "Clearing apks"
-        rm -rf "$full_apk_dir"
+        if [[ -e ${MIGRATE_CACHE}/${apk_dir_name} ]]     ## support version 1.2
+            rm -rf "$full_apk_dir"
+        else
+            rm -f $base_apk_name
+        fi
         echo "ok" > ${METADATA_HOLDER}/${package_name}.app.marker
     fi
 

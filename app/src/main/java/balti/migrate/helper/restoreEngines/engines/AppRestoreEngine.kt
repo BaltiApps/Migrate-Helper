@@ -120,6 +120,7 @@ class AppRestoreEngine(private val jobcode: Int,
                     writeNext("sleep 1s")
                     writeNext("echo \"--- RESTORE PID: $$\"")
                     writeNext("cp ${it.absolutePath} ${INFO_HOLDER_DIR}/")
+                    writeNext("chmod -R 777 \"$MIGRATE_CACHE\"")
                     writeNext("echo \" \"")
 
                     if (getPrefBoolean(PREF_REMOUNT_DATA, false)) {
