@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import balti.migrate.helper.restoreSelectorActivity.containers.*
+import balti.module.baltitoolbox.ToolboxHQ
 
 class AppInstance: Application() {
 
@@ -24,6 +25,7 @@ class AppInstance: Application() {
     override fun onCreate() {
         super.onCreate()
         appContext = this
+        ToolboxHQ.init(this)
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
 }

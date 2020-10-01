@@ -597,7 +597,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                 when {
                     resultCode == Activity.RESULT_OK -> {
                         addonSmsCallsSuccessful = true
-                        addonSettingsSuccessful = true
+                        //addonSettingsSuccessful = true
                         doFallThroughJob(JOBCODE_PREP_APP)
                     }
                     data != null -> {
@@ -608,7 +608,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
                             }
                             else {
                                 addonSmsCallsSuccessful = getBooleanExtra(EXTRA_SMS_CALLS_ADDON_OK, false)
-                                addonSettingsSuccessful = getBooleanExtra(EXTRA_SETTINGS_ADDON_OK, false)
+                                //addonSettingsSuccessful = getBooleanExtra(EXTRA_SETTINGS_ADDON_OK, false)
                                 doFallThroughJob(JOBCODE_PREP_APP)
                             }
                         }

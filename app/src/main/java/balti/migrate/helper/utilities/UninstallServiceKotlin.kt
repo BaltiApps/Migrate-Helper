@@ -22,7 +22,6 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_ALL_TO_UNINSTALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.UNINSTALL_START_ID
-import balti.migrate.helper.utilities.constants.AddonSettingsConstants.Companion.ADDON_SETTINGS_RECEIVER_PACKAGE_NAME
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
 import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
 import balti.module.baltitoolbox.functions.Misc.makeNotificationChannel
@@ -96,9 +95,6 @@ class UninstallServiceKotlin: Service() {
 
                     if (doUninstall) {
 
-                        ADDON_SETTINGS_RECEIVER_PACKAGE_NAME.let {
-                            if (isPackageInstalled(it)) write("pm uninstall $it\n")
-                        }
                         ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME.let {
                             if (isPackageInstalled(it)) write("pm uninstall $it\n")
                         }
