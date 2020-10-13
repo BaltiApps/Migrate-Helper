@@ -257,6 +257,7 @@ private val endOnDisable by lazy {
 
         /*Add increasing versions here*/
 
+        allVersions.append("\n" + getString(R.string.version_4_0_alpha) + "\n" + getString(R.string.version_4_0_alpha_content) + "\n")
         allVersions.append("\n" + getString(R.string.version_3_1_1) + "\n" + getString(R.string.version_3_1_1_content) + "\n")
         allVersions.append("\n" + getString(R.string.version_3_1) + "\n" + getString(R.string.version_3_1_content) + "\n")
 

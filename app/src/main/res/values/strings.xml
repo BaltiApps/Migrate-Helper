@@ -19,7 +19,7 @@
     <!--please also update LAST_SUPPORTED_ANDROID_API in CommonToolsKotlin.kt-->
 
     <string name="app_name">Migrate helper</string>
-    <string name="current_version_name">3.1.1_release</string>
+    <string name="current_version_name">4.0_alpha</string>
 
     <!--changelog-->
     <string name="changelog">Changelog</string>
@@ -35,6 +35,12 @@
     <string name="version_3_1_1">Version 3.1.1</string>
     <string name="version_3_1_1_content">
         \u2022 Fix to apps with symbols\n
+    </string>
+    <string name="version_4_0_alpha">Version 4.0 alpha</string>
+    <string name="version_4_0_alpha_content">
+        \u2022 Initial compatibility attempt with Android 11\n
+        \u2022 Remove settings addon\n
+        \u2022 Many under the hood changes\n
     </string>
 
     <!--activity_main.xml-->
@@ -70,7 +76,7 @@
 
     <!--MainActivity.java-->
     <string name="too_fast">Whoa, too fast!!</string>
-    <string name="too_fast_desc">The app has not been explicitly tested on Android version above 10.\n\nPlease submit your feedback on whether the app works or not.</string>
+    <string name="too_fast_desc">The app has not been explicitly tested on Android version above 11.\n\nPlease submit your feedback on whether the app works or not.</string>
     <string name="dont_show_again">Don\'t show again</string>
     <string name="apps_will_be_closed">Apps will be closed</string>
     <string name="do_not_use_desc">Apps will be closed while restoring. Please do not use the device to avoid random crashes.
