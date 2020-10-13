@@ -139,20 +139,27 @@ class AppRestoreEngine(private val jobcode: Int,
                     if (isPackageInstalled(PACKAGE_NAME_FDROID))
                         writeNext("am force-stop $PACKAGE_NAME_FDROID 2>/dev/null")
 
-                    fun toggleVerification(field: String, disable: Boolean){
-                        writeNext("if [[ -n \${verification_state} && \${verification_state} != \"null\" && \${verification_state} != \"0\" ]]; then")
-                        writeNext("    settings put global $field ${if (disable) "0" else "\$verification_state"}")
+                    fun toggleInit(field: String){
+                        writeNext("verification_state=\"\$(settings get global $field)\"")
+                        writeNext("default_enable_state=\$verification_state")
+                        writeNext("if [[ \${verification_state} == \"null\" ]]; then")
+                        writeNext("   default_enable_state=1")
                         writeNext("fi")
                     }
 
+                    fun toggleVerification(field: String, disable: Boolean){
+                        //writeNext("if [[ -n \${verification_state} && \${verification_state} != \"null\" && \${verification_state} != \"0\" ]]; then")
+                        writeNext("settings put global $field ${if (disable) "0" else "\$default_enable_state"}")
+                    }
+
                     if (Build.VERSION.SDK_INT <= 29){
-                        writeNext("verification_state=\"\$(settings get global package_verifier_enable)\"")
+                        toggleInit("package_verifier_enable")
                         toggleVerification("package_verifier_enable", true)
                     }
                     else {
                         // Android 11
                         writeNext("echo \"Disabling Verify apps on USB (A11+)\"")
-                        writeNext("verification_state=\"\$(settings get global verifier_verify_adb_installs)\"")
+                        toggleInit("verifier_verify_adb_installs")
                         toggleVerification("verifier_verify_adb_installs", true)
                     }
 
