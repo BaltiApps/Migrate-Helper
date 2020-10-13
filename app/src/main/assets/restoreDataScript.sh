@@ -8,6 +8,7 @@ package_name=$3
 notification_fix=$4
 METADATA_HOLDER=$5
 MIGRATE_CACHE=$6
+API=$7
 
 dataDir=$(dumpsys package ${package_name} | grep dataDir | head -n 1 | cut -d '=' -f2)
 app_uid=$(dumpsys package ${package_name} | grep userId= | head -n 1 | cut -d '=' -f2 | cut -d ' ' -f1)
@@ -46,6 +47,11 @@ else
             chmod 755 ${dataDir}
             chown ${app_uid}:${app_uid} -Rf ${dataDir}
             restorecon -RF ${dataDir} 2>/dev/null
+
+            if [[ $API -ge 29 ]]; then
+                echo "A11+ fixing context"
+                chcon -Rh u:object_r:app_data_file:s0 ${dataDir}
+            fi
 
             # notification fix added in v3.0
             if [[ "${notification_fix}" == "true" ]]; then

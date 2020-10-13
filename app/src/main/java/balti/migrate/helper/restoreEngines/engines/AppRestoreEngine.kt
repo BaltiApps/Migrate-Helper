@@ -139,6 +139,23 @@ class AppRestoreEngine(private val jobcode: Int,
                     if (isPackageInstalled(PACKAGE_NAME_FDROID))
                         writeNext("am force-stop $PACKAGE_NAME_FDROID 2>/dev/null")
 
+                    fun toggleVerification(field: String, disable: Boolean){
+                        writeNext("if [[ -n \${verification_state} && \${verification_state} != \"null\" && \${verification_state} != \"0\" ]]; then")
+                        writeNext("    settings put global $field ${if (disable) "0" else "\$verification_state"}")
+                        writeNext("fi")
+                    }
+
+                    if (Build.VERSION.SDK_INT <= 29){
+                        writeNext("verification_state=\"\$(settings get global package_verifier_enable)\"")
+                        toggleVerification("package_verifier_enable", true)
+                    }
+                    else {
+                        // Android 11
+                        writeNext("echo \"Disabling Verify apps on USB (A11+)\"")
+                        writeNext("verification_state=\"\$(settings get global verifier_verify_adb_installs)\"")
+                        toggleVerification("verifier_verify_adb_installs", true)
+                    }
+
                     for (appPacket in appPackets) {
 
                         if (RestoreServiceKotlin.cancelAll) break
@@ -161,10 +178,10 @@ class AppRestoreEngine(private val jobcode: Int,
                                 isContactAppPresent = true
 
                             if (isApp)
-                                writeNext("sh $installScriptPath $MIGRATE_CACHE ${appPacket.packageName}.app ${appPacket.apkName} ${appPacket.packageName} ${appPacket.installerName} $METADATA_HOLDER_DIR $correctedName")
+                                writeNext("sh $installScriptPath $MIGRATE_CACHE ${appPacket.packageName}.app ${appPacket.apkName} ${appPacket.packageName} ${appPacket.installerName} $METADATA_HOLDER_DIR $correctedName ${Build.VERSION.SDK_INT}")
 
                             if (isData)
-                                writeNext("sh $restoreDataScriptPath $busyboxBinaryPath ${appPacket.dataName} ${appPacket.packageName} $doNotificationFix $METADATA_HOLDER_DIR $MIGRATE_CACHE")
+                                writeNext("sh $restoreDataScriptPath $busyboxBinaryPath ${appPacket.dataName} ${appPacket.packageName} $doNotificationFix $METADATA_HOLDER_DIR $MIGRATE_CACHE ${Build.VERSION.SDK_INT}")
 
                             if (isPermission) {
                                 BufferedReader(FileReader(permFile)).readLines().forEach { it1 ->
@@ -182,6 +199,13 @@ class AppRestoreEngine(private val jobcode: Int,
                         }
                     }
 
+                    if (Build.VERSION.SDK_INT <= 29){
+                        toggleVerification("package_verifier_enable", false)
+                    }
+                    else {
+                        // Android 11
+                        toggleVerification("verifier_verify_adb_installs", false)
+                    }
                     //writeNext("mv -f $MIGRATE_CACHE/$FILE_PACKAGE_DATA* ${engineContext.externalCacheDir}/ 2>/dev/null")
                     //writeNext("cp $MIGRATE_CACHE/$FILE_FILE_LIST* ${engineContext.externalCacheDir}/ 2>/dev/null")
 
