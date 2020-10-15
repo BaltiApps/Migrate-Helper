@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import balti.migrate.helper.AppInstance
+import balti.migrate.helper.AppInstance.Companion.failedAppInstalls
 //import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.postJobs.PostJobsActivity
@@ -190,6 +191,7 @@ class ProgressShowActivity: AppCompatActivity() {
                         errors.forEach {
                             errorLogTextView.append("$it\n")
                         }
+                        if (failedAppInstalls.isNotEmpty()) retryButton.visibility = View.VISIBLE
                     }
 
                     if (errors.size != 0 || handlingIntent.getBooleanExtra(EXTRA_IS_CANCELLED, false)) {
@@ -325,6 +327,10 @@ class ProgressShowActivity: AppCompatActivity() {
         reportLogButton.apply {
             visibility = View.GONE
             setOnClickListener { commonTools.reportLogs(true) }
+        }
+
+        retryButton.apply {
+            visibility = View.GONE
         }
 
         progressLogTextView.apply {

@@ -124,6 +124,7 @@
     <string name="abort">Abort!</string>
     <string name="minimize">Minimize</string>
     <string name="report">Report</string>
+    <string name="retry">Retry</string>
     <string name="minimizing_may_decrease_speed">Minimizing this screen may decrease restore speed!</string>
 
     <!--RootRestoreTask.java-->
