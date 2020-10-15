@@ -49,7 +49,7 @@
             android:screenOrientation="portrait"
             />
 
-        <activity android:name=".simpleActivities.ProgressShowActivity"
+        <activity android:name=".progressShow.ProgressShowActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             />

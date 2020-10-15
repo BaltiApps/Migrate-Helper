@@ -27,12 +27,12 @@ import balti.migrate.helper.R
 import balti.migrate.helper.extraRestorePrepare.utils.AppsNotInstalledViewManager
 import balti.migrate.helper.extraRestorePrepare.utils.CommunicatorAddon
 import balti.migrate.helper.extraRestorePrepare.utils.OnPermissionAsked
+import balti.migrate.helper.progressShow.ProgressShowActivity
 import balti.migrate.helper.restoreEngines.RestoreServiceKotlin
 import balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migrate.helper.restoreSelectorActivity.containers.GetterMarker
 import balti.migrate.helper.restoreSelectorActivity.containers.SettingsPacketKotlin
-import balti.migrate.helper.simpleActivities.ProgressShowActivity
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME

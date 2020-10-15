@@ -6,9 +6,9 @@ import android.os.AsyncTask
 import androidx.core.app.NotificationCompat
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
+import balti.migrate.helper.progressShow.ProgressShowActivity
 import balti.migrate.helper.restoreEngines.RestoreServiceKotlin.Companion.serviceContext
 import balti.migrate.helper.restoreEngines.utils.OnRestoreComplete
-import balti.migrate.helper.simpleActivities.ProgressShowActivity
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_ABORT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS

@@ -1,4 +1,4 @@
-package balti.migrate.helper.simpleActivities
+package balti.migrate.helper.progressShow
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -20,6 +20,7 @@ import balti.migrate.helper.AppInstance.Companion.failedAppInstalls
 import balti.migrate.helper.R
 import balti.migrate.helper.postJobs.PostJobsActivity
 import balti.migrate.helper.restoreEngines.engines.AppRestoreEngine
+import balti.migrate.helper.simpleActivities.MainActivityKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_RESTORE_DATA
