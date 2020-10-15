@@ -291,6 +291,10 @@ class AppRestoreEngine(private val jobcode: Int,
                     }
                     else broadcastProgress(appName, line, false)
 
+                    if (line.startsWith("Failure [")){
+                        addToActualErrors("$ERROR_APP_RESTORE_MESSAGE :$appName: $line")
+                    }
+
                     return@iterateBufferedReader line == "--- DONE! ---"
                 })
 
