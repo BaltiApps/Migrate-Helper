@@ -73,6 +73,7 @@ class CommonToolsKotlin(val context: Context) {
         val ACTION_RESTORE_SERVICE_STARTED = "restore service started"
         val ACTION_END_ALL = "helper_end_all"
 
+        val EXTRA_APPEND_LOG = "append_log"
         val EXTRA_PROGRESS_TYPE = "type"
         val EXTRA_PROGRESS_TYPE_SMS = "sms_progress"
         val EXTRA_PROGRESS_TYPE_CALLS = "calls_progress"
@@ -128,10 +129,11 @@ class CommonToolsKotlin(val context: Context) {
         val ERROR_APP_RESTORE_SUPPRESSED = "RUN_SUPPRESSED"
         val ERROR_CLEANING_SUPPRESSED = "CLEANING_ERROR_SUPPRESSED"
         val ERROR_SETTINGS_SCRIPT = "ERROR_SETTINGS_SCRIPT"
+        val ERROR_APP_INSTALL_FAILED_SUPPRESSED = "INSTALL_FAILED"
 
         val ERROR_RESTORE_SERVICE_ERROR = "RESTORE_SERVICE"
 
-        val ALL_SUPPRESSED_ERRORS = arrayOf(ERROR_APP_RESTORE_SUPPRESSED, ERROR_CLEANING_SUPPRESSED)
+        val ALL_SUPPRESSED_ERRORS = arrayOf(ERROR_APP_RESTORE_SUPPRESSED, ERROR_CLEANING_SUPPRESSED, ERROR_APP_INSTALL_FAILED_SUPPRESSED)
 
         val DUMMY_WAIT_TIME = 100L
         val DUMMY_WAIT_TIME_LONGER = 500L

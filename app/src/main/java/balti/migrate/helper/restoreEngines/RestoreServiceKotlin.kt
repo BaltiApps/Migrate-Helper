@@ -35,6 +35,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTOR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_END
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_RUNNING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_RESTORE_SERVICE_ERROR
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_APPEND_LOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_IS_CANCELLED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
@@ -240,17 +241,6 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .build()
 
-        tryIt {
-
-            File(INFO_HOLDER_DIR).run {
-                deleteRecursively()
-                mkdirs()
-
-                progressWriter = BufferedWriter(FileWriter(File(this, FILE_PROGRESSLOG)))
-                errorWriter = BufferedWriter(FileWriter(File(this, FILE_ERRORLOG)))
-            }
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             makeNotificationChannel(CHANNEL_RESTORE_RUNNING, CHANNEL_RESTORE_RUNNING, NotificationManager.IMPORTANCE_LOW)
             makeNotificationChannel(CHANNEL_RESTORE_END, CHANNEL_RESTORE_END, NotificationManager.IMPORTANCE_HIGH)
@@ -271,6 +261,17 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         intent?.run {
             try {
                 if (!isBackupInitiated) {
+
+                    tryIt {
+                        val appendLogs = intent.getBooleanExtra(EXTRA_APPEND_LOG, false)
+                        File(INFO_HOLDER_DIR).run {
+                            if (!appendLogs) deleteRecursively()
+                            mkdirs()
+
+                            progressWriter = BufferedWriter(FileWriter(File(this, FILE_PROGRESSLOG), appendLogs))
+                            errorWriter = BufferedWriter(FileWriter(File(this, FILE_ERRORLOG), appendLogs))
+                        }
+                    }
 
                     notificationFix = intent.getBooleanExtra(EXTRA_NOTIFICATION_FIX, false)
 
