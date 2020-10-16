@@ -3,6 +3,7 @@ package balti.migrate.helper.progressShow
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.AppInstance.Companion.appPackets
@@ -15,6 +16,7 @@ import balti.migrate.helper.restoreSelectorActivity.containers.AppPacketsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_APPEND_LOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_NOTIFICATION_FIX
 import balti.module.baltitoolbox.functions.Misc
+import kotlinx.android.synthetic.main.apps_not_installed_layout.view.*
 
 class RetryTransparentActivity: AppCompatActivity() {
 
@@ -52,8 +54,16 @@ class RetryTransparentActivity: AppCompatActivity() {
 
         AppsNotInstalledViewManager(notInstalled, this).run {
 
+            val view = this.getView()
+            view.apps_not_installed_header.apply {
+                setText(R.string.please_install_these)
+                setTextAppearance(this@RetryTransparentActivity, android.R.style.TextAppearance_Medium)
+                setPadding(10, 10, 10, 0)
+            }
+            view.apps_not_installed_footer.visibility = View.GONE
+
             val ad = AlertDialog.Builder(this@RetryTransparentActivity)
-                    .setView(this.getView())
+                    .setView(view)
                     .setPositiveButton(R.string.continue_) { _, _ ->
                         val c = getSuccessfullyInstalledApps()
                         if (c == failedAppInstalls.size) {

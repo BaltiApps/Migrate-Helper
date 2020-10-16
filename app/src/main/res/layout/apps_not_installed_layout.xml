@@ -17,6 +17,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:id="@+id/apps_not_installed_header"
             android:text="@string/apps_not_installed_title"
             />
 
@@ -52,6 +53,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/apps_not_installed_footer"
         android:text="@string/apps_not_installed_desc"
         />
 

@@ -270,6 +270,10 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
                             progressWriter = BufferedWriter(FileWriter(File(this, FILE_PROGRESSLOG), appendLogs))
                             errorWriter = BufferedWriter(FileWriter(File(this, FILE_ERRORLOG), appendLogs))
+                            if (appendLogs) {
+                                progressWriter?.write("\nAppending...\n")
+                                errorWriter?.write("\nAppending...\n")
+                            }
                         }
                     }
 

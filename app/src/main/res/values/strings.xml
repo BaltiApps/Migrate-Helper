@@ -392,6 +392,7 @@
     <string name="manual_metadata_holder">Specify path to metadata holder</string>
 
     <!--RetryTransparentActivity.kt-->
+    <string name="please_install_these">Please install these apps manually</string>
     <string name="failed_apps_not_yet_installed">Failed apps not yet installed yet!</string>
     <string name="failed_apps_not_yet_installed_desc">If you are installing over Google Play Store, please wait for some time for all apps to get installed.</string>
     <string name="installed">Installed :</string>
