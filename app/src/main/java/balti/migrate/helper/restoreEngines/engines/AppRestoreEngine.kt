@@ -162,7 +162,7 @@ class AppRestoreEngine(private val jobcode: Int,
                         // Android 11
                         writeNext("echo \"Disabling Verify apps on USB (A11+)\"")
                         toggleInit("verifier_verify_adb_installs")
-                        //toggleVerification("verifier_verify_adb_installs", true)
+                        toggleVerification("verifier_verify_adb_installs", true)
                     }
 
                     for (appPacket in appPackets) {
