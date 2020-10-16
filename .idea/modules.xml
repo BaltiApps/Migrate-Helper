@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MigrateHelper.iml" filepath="$PROJECT_DIR$/MigrateHelper.iml" group="MigrateHelper" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MigrateHelper-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MigrateHelper-app.iml" group="MigrateHelper/app" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/StudioProjects-MigrateHelper.iml" filepath="$PROJECT_DIR$/.idea/modules/StudioProjects-MigrateHelper.iml" group="MigrateHelper" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="MigrateHelper/app" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/106021749/baltitoolbox.iml" filepath="$PROJECT_DIR$/.idea/modules/106021749/baltitoolbox.iml" group="MigrateHelper/baltitoolbox" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MigrateHelper.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MigrateHelper.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/106021749/MigrateHelper.baltitoolbox.iml" filepath="$PROJECT_DIR$/.idea/modules/106021749/MigrateHelper.baltitoolbox.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/StudioProjects.MigrateHelper.iml" filepath="$PROJECT_DIR$/.idea/modules/StudioProjects.MigrateHelper.iml" />
     </modules>
   </component>
 </project>
