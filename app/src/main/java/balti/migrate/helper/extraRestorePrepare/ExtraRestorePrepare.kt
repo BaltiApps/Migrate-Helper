@@ -332,7 +332,7 @@ class ExtraRestorePrepare: AppCompatActivity(), OnPermissionAsked {
 
                         val ad = AlertDialog.Builder(this@ExtraRestorePrepare)
                                 .setView(this.getView())
-                                .setPositiveButton(R.string.continue_) {_, _ ->
+                                .setPositiveButton(R.string.skip_these) { _, _ ->
                                     appPackets.clear()
                                     appPackets.addAll(appsInstalled)
                                     proceed(DONE, "${getString(R.string.number_of_selected_apps)}: ${appPackets.size}")

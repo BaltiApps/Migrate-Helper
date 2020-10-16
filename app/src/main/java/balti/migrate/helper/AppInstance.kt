@@ -20,6 +20,8 @@ class AppInstance: Application() {
         var settingsPacket: SettingsPacketKotlin? = null
         var wifiPacket: WifiPacketKotlin? = null
 
+        var notificationFixGlobal = true
+
         var isFinished = false
     }
 

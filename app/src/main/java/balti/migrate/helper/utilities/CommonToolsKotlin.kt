@@ -178,6 +178,8 @@ class CommonToolsKotlin(val context: Context) {
         val JOBCODE_ADDON_INSTALL_SMS_CALLS = 433
         val JOBCODE_ADDON_END = 432
 
+        val JOBCODE_RETRY_APP_INSTALLS = 291
+
         val TIMEOUT_WAITING_TO_CANCEL_TASK = 500L
         val TIMEOUT_WAITING_TO_KILL = 3000L
 

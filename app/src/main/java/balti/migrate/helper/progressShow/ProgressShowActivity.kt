@@ -1,5 +1,6 @@
 package balti.migrate.helper.progressShow
 
+//import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -16,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import balti.migrate.helper.AppInstance
 import balti.migrate.helper.AppInstance.Companion.failedAppInstalls
-//import balti.migrate.helper.AppInstance.Companion.sharedPrefs
 import balti.migrate.helper.R
 import balti.migrate.helper.postJobs.PostJobsActivity
 import balti.migrate.helper.restoreEngines.engines.AppRestoreEngine
@@ -46,11 +46,11 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SUBTASK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_TASKLOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_TITLE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_TOTAL_TIME
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RETRY_APP_INSTALLS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_TRACK_RESTORE_FINISHED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import balti.migrate.helper.utilities.IconTools
-import balti.module.baltitoolbox.functions.Misc.activityStart
 import balti.module.baltitoolbox.functions.Misc.tryIt
 import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import kotlinx.android.synthetic.main.restore_progress_layout.*
@@ -333,7 +333,11 @@ class ProgressShowActivity: AppCompatActivity() {
 
         retryButton.apply {
             visibility = View.GONE
-            setOnClickListener { activityStart(this@ProgressShowActivity, RetryTransparentActivity::class.java) }
+            setOnClickListener {
+                startActivityForResult(
+                        Intent(this@ProgressShowActivity, RetryTransparentActivity::class.java), JOBCODE_RETRY_APP_INSTALLS
+                )
+            }
         }
 
         progressLogTextView.apply {
@@ -362,6 +366,12 @@ class ProgressShowActivity: AppCompatActivity() {
                 finish()
             }
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == JOBCODE_RETRY_APP_INSTALLS)
+            if (resultCode == RESULT_OK) recreate()
     }
 
     override fun onDestroy() {

@@ -267,7 +267,7 @@
 
     <!--ExtraRestorePrepare.kt-->
     <string name="skip_apps">Tümünü atla</string>
-    <string name="continue_">Bunları atla</string>
+    <string name="skip_these">Bunları atla</string>
     <string name="refresh">Yenile</string>
     <string name="keyboard_not_present">Klavye uygulaması mevcut değil</string>
     <string name="keyboard_not_present_desc">Klavye uygulaması yüklü değil ve geri yükleme işleminde mevcut değil. Uygulamayı Play Store\'dan veya başka bir yerden yükleyebilirsiniz.</string>

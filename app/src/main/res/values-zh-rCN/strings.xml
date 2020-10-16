@@ -267,7 +267,7 @@
 
     <!--ExtraRestorePrepare.kt-->
     <string name="skip_apps">全部跳过</string>
-    <string name="continue_">跳过这些</string>
+    <string name="skip_these">跳过这些</string>
     <string name="refresh">刷新</string>
     <string name="keyboard_not_present">键盘应用不可用</string>
     <string name="keyboard_not_present_desc">键盘应用未安装，并且也不在备份文件中。您可以从 Play 商店或其他地方安装该应用。</string>

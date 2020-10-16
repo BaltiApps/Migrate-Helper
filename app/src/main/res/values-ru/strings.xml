@@ -268,7 +268,7 @@
 
     <!--ExtraRestorePrepare.kt-->
     <string name="skip_apps">Пропустить все</string>
-    <string name="continue_">Пропустить только эти</string>
+    <string name="skip_these">Пропустить только эти</string>
     <string name="refresh">Обновить</string>
     <string name="keyboard_not_present">Приложение клавиатуры недоступно</string>
     <string name="keyboard_not_present_desc">Приложение клавиатуры не установлено и не присутствует в списке для восстановления. Вы можете установить приложение из Play Маркета или другого места.</string>

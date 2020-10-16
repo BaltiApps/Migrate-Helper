@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.AppInstance.Companion.appPackets
 import balti.migrate.helper.AppInstance.Companion.callsDataPackets
 import balti.migrate.helper.AppInstance.Companion.contactDataPackets
+import balti.migrate.helper.AppInstance.Companion.notificationFixGlobal
 import balti.migrate.helper.AppInstance.Companion.settingsPacket
 import balti.migrate.helper.AppInstance.Companion.smsDataPackets
 import balti.migrate.helper.AppInstance.Companion.wifiPacket
@@ -156,6 +157,10 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                     cancelLoading = true
                 }
             }
+        }
+
+        notification_check_toggle.setOnCheckedChangeListener { _, isChecked ->
+            notificationFixGlobal = isChecked
         }
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
@@ -583,7 +588,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                                     .setPositiveButton(R.string.goAhead) { _, _ ->
                                         startActivity(
                                                 Intent(this@RestoreSelectorKotlin, ExtraRestorePrepare::class.java)
-                                                        .putExtra(EXTRA_NOTIFICATION_FIX, notification_check_toggle.isChecked)
+                                                        .putExtra(EXTRA_NOTIFICATION_FIX, notificationFixGlobal)
                                         )
                                         finish()
                                     }
