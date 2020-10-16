@@ -40,6 +40,7 @@
     <string name="version_4_0_alpha_content">
         \u2022 Initial compatibility attempt with Android 11\n
         \u2022 Remove settings addon\n
+        \u2022 For failed APKs, add option to retry app data restore after installing from Play Store.\n
         \u2022 Many under the hood changes\n
     </string>
 
