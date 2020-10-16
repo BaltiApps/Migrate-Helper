@@ -74,6 +74,11 @@
             android:theme="@style/AppTheme.Dialog"
             />
 
+        <activity android:name=".progressShow.RetryTransparentActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Dialog"
+            />
+
         <receiver android:name=".utilities.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" android:priority="999"/>

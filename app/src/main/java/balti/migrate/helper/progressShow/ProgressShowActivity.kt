@@ -50,6 +50,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_TRACK_RESTORE_FINISHED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import balti.migrate.helper.utilities.IconTools
+import balti.module.baltitoolbox.functions.Misc.activityStart
 import balti.module.baltitoolbox.functions.Misc.tryIt
 import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import kotlinx.android.synthetic.main.restore_progress_layout.*
@@ -332,6 +333,7 @@ class ProgressShowActivity: AppCompatActivity() {
 
         retryButton.apply {
             visibility = View.GONE
+            setOnClickListener { activityStart(this@ProgressShowActivity, RetryTransparentActivity::class.java) }
         }
 
         progressLogTextView.apply {
