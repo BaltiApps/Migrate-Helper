@@ -1,10 +1,12 @@
 package balti.migrate.helper.restoreSelectorActivity
 
 //import balti.migrate.helper.AppInstance.Companion.sharedPrefs
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
@@ -17,6 +19,7 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import balti.migrate.helper.AppInstance.Companion.appPackets
 import balti.migrate.helper.AppInstance.Companion.callsDataPackets
 import balti.migrate.helper.AppInstance.Companion.contactDataPackets
@@ -64,6 +67,7 @@ import kotlinx.android.synthetic.main.extra_item.view.*
 import kotlinx.android.synthetic.main.extras_picker.view.*
 import kotlinx.android.synthetic.main.restore_selector.*
 import java.io.BufferedWriter
+import java.io.File
 import java.io.OutputStreamWriter
 
 class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
@@ -78,6 +82,8 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
     private val extrasContainer by lazy { layoutInflater.inflate(R.layout.extras_picker, app_list, false) }
     private val appBar by lazy { layoutInflater.inflate(R.layout.app_selector_header, app_list, false) }
+
+    private var storageRequestCode = 157
 
     private var currentTask : AsyncTask<Any, Any, Any>? = null
 
@@ -262,7 +268,23 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                     if (cancelLoading) displayAllData()
                     else if (!jobSuccess)
                         showError(getString(R.string.are_you_rooted), "${getString(R.string.are_you_rooted_desc)}\n\n$jobResult".trim())
-                    else doJob(JOBCODE_GET_APP_JSON)
+                    else {
+                        // check if allowed to read
+                        val isOk = try {
+                            File(METADATA_HOLDER_DIR).listFiles()
+                                    .let {if (it == null) throw (Exception("manual exception null list"))}
+                            true
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            Toast.makeText(this, e.message.toString(), Toast.LENGTH_SHORT).show()
+                            false
+                        }
+                        if (isOk) doJob(JOBCODE_GET_APP_JSON)
+                        else {
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE), storageRequestCode)
+                        }
+                    }
                 }
 
                 JOBCODE_GET_APP_JSON ->
@@ -620,6 +642,19 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
                 finish()
             }
             else showError(getString(R.string.nothing_to_restore), getString(R.string.no_metadata_found))
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == storageRequestCode){
+            if (grantResults.size == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED)
+                doJob(JOBCODE_GET_APP_JSON)
+            else {
+                showError(getString(R.string.permission_denied), getString(R.string.storage_perm_needed))
+                Toast.makeText(this, R.string.storage_perm_needed, Toast.LENGTH_SHORT).show()
+            }
+
         }
     }
 
