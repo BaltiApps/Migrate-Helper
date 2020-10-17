@@ -113,6 +113,20 @@
 
             </ScrollView>
 
+            <Button
+                android:id="@+id/installMigrateFlasher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/large_padding_width"
+                android:backgroundTint="@color/colorButtons"
+                android:text="@string/migrateFlasher"
+                android:textColor="@android:color/white"
+                android:drawableStart="@drawable/ic_download"
+                android:visibility="gone"
+                >
+
+            </Button>
+
             <Space
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/large_padding_width"/>

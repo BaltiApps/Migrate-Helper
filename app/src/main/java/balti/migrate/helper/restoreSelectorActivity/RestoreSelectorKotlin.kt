@@ -50,10 +50,12 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_GET_WI
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_ROOT_COPY
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_MIGRATE_FLASHER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LOAD_EXTRAS_ON_UI_THREAD
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
+import balti.module.baltitoolbox.functions.Misc
 import balti.module.baltitoolbox.functions.Misc.tryIt
 import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import kotlinx.android.synthetic.main.app_search_layout.view.*
@@ -163,6 +165,10 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             notificationFixGlobal = isChecked
         }
 
+        installMigrateFlasher.setOnClickListener {
+            Misc.playStoreLink(PACKAGE_MIGRATE_FLASHER)
+        }
+
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
         commonTools.LBM?.sendBroadcast(Intent(ACTION_REQUEST_RESTORE_DATA))
 
@@ -173,6 +179,10 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
         waiting_layout.visibility = View.VISIBLE
         app_list.visibility = View.GONE
+
+        if (mainMessage == getString(R.string.nothing_to_restore))
+            installMigrateFlasher.visibility = View.VISIBLE
+        else installMigrateFlasher.visibility = View.GONE
 
         just_a_progress.visibility = View.INVISIBLE
         restore_selector_error_icon.visibility = View.VISIBLE

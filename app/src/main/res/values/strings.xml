@@ -155,13 +155,14 @@
     <string name="everything">Everything selected!</string>
     <string name="reading_metadata">Reading metadata…</string>
     <string name="initMessageShort">This can take up to 3 minutes.\n\nIn case you have waited more than 5 minutes\nClick CANCEL\nOpen Magisk app\nClose the Magisk app\nOpen this app and retry restoring</string>
+    <string name="migrateFlasher">Migrate Flasher</string>
     <string name="are_you_rooted">Are you rooted?</string>
     <string name="are_you_rooted_desc">Make sure to grant root. Root with Magisk if needed.</string>
     <string name="code_error">Code error!</string>
     <string name="selecting_all">Selecting everything</string>
     <string name="starting_restore">Starting restore</string>
     <string name="nothing_to_restore">Nothing to restore</string>
-    <string name="no_metadata_found">No metadata found\nFlash a Migrate package first</string>
+    <string name="no_metadata_found">No metadata found\nFlash a Migrate package first.\n\nYou can flash via TWRP\nor using Migrate Flasher app</string>
     <string name="null_adapter">Null adapter</string>
     <string name="restore_contacts_dialog_header">Restore contacts</string>
     <string name="proceed">Proceed</string>

@@ -290,6 +290,8 @@ class CommonToolsKotlin(val context: Context) {
                 "org.thunderdog.challegram",       // Telegram X
                 "org.telegram.plus"                // Plus messenger
         )
+
+        val PACKAGE_MIGRATE_FLASHER = "balti.migrate.flasher"
     }
 
     var LBM : LocalBroadcastManager? = null
