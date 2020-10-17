@@ -6,19 +6,16 @@ import android.widget.TextView
 import balti.migrate.helper.R
 import balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migrate.helper.restoreSelectorActivity.containers.SmsPacketKotlin
+import balti.migrate.helper.restoreSelectorActivity.utils.GetterType
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.DUMMY_WAIT_TIME
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_SMS_GET_TRY_CATCH
-import java.io.FileFilter
 
 class GetSmsPackets(jobCode: Int,
                     metadataHolderPath: String,
                     context: Context,
                     progressBar: ProgressBar,
-                    waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context, progressBar, waitingText, R.string.getting_sms) {
-
-    override var fileFilter = FileFilter {
-        it.name.endsWith(".sms.db")
-    }
+                    waitingText: TextView): ParentGetter(jobCode, metadataHolderPath, context,
+        progressBar, waitingText, R.string.getting_sms, GetterType.GETTER_TYPE_SMS) {
 
     override fun doInBackground(vararg params: Any?): Any {
         try {

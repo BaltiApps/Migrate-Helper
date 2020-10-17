@@ -6,8 +6,12 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import balti.migrate.helper.R
+import balti.migrate.helper.restoreSelectorActivity.utils.GetterType
 import balti.migrate.helper.restoreSelectorActivity.utils.OnReadComplete
+import balti.migrate.helper.utilities.CommonToolsKotlin
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.BACKUP_NAME_SETTINGS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_PRE_EXECUTE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_NAME
 import balti.migrate.helper.utilities.ViewOperations
 import java.io.File
 import java.io.FileFilter
@@ -17,9 +21,9 @@ abstract class ParentGetter(private val jobCode: Int,
                             private val context: Context,
                             private val progressBar: ProgressBar,
                             private val waitingText: TextView,
-                            private val initWaitingTextResId: Int): AsyncTask<Any, Any, Any>() {
+                            private val initWaitingTextResId: Int,
+                            private val getterType: GetterType): AsyncTask<Any, Any, Any>() {
 
-    abstract var fileFilter: FileFilter
     private val vOp by lazy { ViewOperations(context) }
 
     private val onReadComplete by lazy { context as OnReadComplete }
@@ -34,6 +38,18 @@ abstract class ParentGetter(private val jobCode: Int,
 
         try {
             vOp.textSet(waitingText, initWaitingTextResId)
+
+            val fileFilter =
+                    FileFilter {
+                        when (getterType) {
+                            GetterType.GETTER_TYPE_APPS -> it.name.endsWith(".json") && it.name != CommonToolsKotlin.BACKUP_NAME_SETTINGS
+                            GetterType.GETTER_TYPE_CALLS -> it.name.endsWith(".calls.db")
+                            GetterType.GETTER_TYPE_CONTACTS -> it.name.endsWith(".vcf")
+                            GetterType.GETTER_TYPE_SETTINGS -> it.name == BACKUP_NAME_SETTINGS
+                            GetterType.GETTER_TYPE_SMS -> it.name.endsWith(".sms.db")
+                            GetterType.GETTER_TYPE_WIFI -> it.name == WIFI_FILE_NAME
+                        }
+                    }
 
             files = if (directory.isDirectory) {
                 directory.listFiles(fileFilter)
