@@ -351,6 +351,10 @@
     <string name="cancelled_loading">Cancelled loading</string>
     <string name="cancelled">Cancelled</string>
 
+    <!--EmergencyAppInstall.kt-->
+    <string name="installing_apps">Installing apps</string>
+    <string name="installs_done">Installs done.</string>
+
     <!--app_search_layout.xml-->
     <string name="enter_app_name">App/package name</string>
     <string name="no_apps">No apps available\nwith the given search!</string>

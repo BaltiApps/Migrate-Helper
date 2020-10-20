@@ -2,6 +2,7 @@ package balti.migrate.helper.emergencyRestore
 
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
@@ -14,10 +15,14 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class EmergencyRestoreService: Service() {
+    companion object {
+        lateinit var emergencyServiceContext: Context
+    }
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
+        emergencyServiceContext = this
 
         val loadingNotification = NotificationCompat.Builder(this, CHANNEL_EMERGENCY_RESTORE_RUNNING)
                 .setContentTitle(getString(R.string.loading))

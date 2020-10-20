@@ -76,6 +76,10 @@ class CommonToolsKotlin(val context: Context) {
         val ACTION_RESTORE_SERVICE_STARTED = "restore service started"
         val ACTION_END_ALL = "helper_end_all"
 
+        //emergency
+        val ACTION_EM_PROGRESS = "emergency_progress"
+        val ACTION_EM_ERRORS = "emergency_errors"
+
         val EXTRA_APPEND_LOG = "append_log"
         val EXTRA_PROGRESS_TYPE = "type"
         val EXTRA_PROGRESS_TYPE_SMS = "sms_progress"
@@ -107,6 +111,12 @@ class CommonToolsKotlin(val context: Context) {
 
         val EXTRA_DO_INSTALL_SMS_CALLS_ADDON = "install_addon_smsCalls"
         val EXTRA_SMS_CALLS_ADDON_FILES = "sms_calls_addon_files"
+
+        //emergency
+        val EXTRA_EM_TITLE = "emergency_title"
+        val EXTRA_EM_SUBTASK = "emergency_subtask"
+        val EXTRA_EM_LOG = "emergency_log"
+        val EXTRA_EM_ERRORS = "emergency_errors"
 
         val ERROR_PRE_EXECUTE = "PARENT_PRE_EXECUTE"
 
