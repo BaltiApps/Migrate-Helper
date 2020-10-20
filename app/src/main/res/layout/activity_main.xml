@@ -80,13 +80,26 @@
 
                 <Space
                     android:layout_width="wrap_content"
+                    android:layout_height="@dimen/large_padding_width" />
+
+                <Button
+                    android:id="@+id/emergency_restore"
+                    android:layout_width="300dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/rectangle_big_button"
+                    android:text="@string/emergency_restore"
+                    android:backgroundTint="@color/dark_red"
+                    />
+
+                <Space
+                    android:layout_width="wrap_content"
                     android:layout_height="@dimen/xlarge_padding_width" />
 
                 <Button
                     android:id="@+id/uninstall_from_system"
                     android:layout_width="300dp"
-                    android:layout_height="60dp"
-                    android:background="@drawable/uninstall_button"
+                    android:layout_height="50dp"
+                    android:background="@drawable/rectangle_big_button"
                     android:text="@string/uninstall_or_finalize"
                     />
 

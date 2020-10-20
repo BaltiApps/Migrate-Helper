@@ -46,8 +46,10 @@ class CommonToolsKotlin(val context: Context) {
         val NOTIFICATION_ID_ONGOING = 229
         val NOTIFICATION_ID_FINISHED = 230
         val NOTIFICATION_ID_CANCELLING = 231
+        val NOTIFICATION_ID_ONGOING_EM = 329
 
         val FILE_MAIN_PREF = "main"
+        val FILE_EMERGENCY_SCRIPT_MAIN = "emergency_script_main.sh"
 
         val FILE_PROGRESSLOG = "progressLog.txt"
         val FILE_ERRORLOG = "errorLog.txt"
@@ -65,6 +67,7 @@ class CommonToolsKotlin(val context: Context) {
         val CHANNEL_RESTORE_RUNNING = "Restore running notification"
         val CHANNEL_RESTORE_ABORTING = "Aborting restore"
         val CHANNEL_UNINSTALLING = "Uninstalling helper"
+        val CHANNEL_EMERGENCY_RESTORE_RUNNING = "Emergency restore running notification"
 
         val ACTION_RESTORE_PROGRESS = "Helper restore restore_progress_layout broadcast"
         val ACTION_RESTORE_ABORT = "Helper abort broadcast"

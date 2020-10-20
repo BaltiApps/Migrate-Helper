@@ -7,5 +7,6 @@
     <color name="colorButtons">#00695c</color>
     <color name="grey_bg">#424242</color>
     <color name="error_color">#C62828</color>
+    <color name="dark_red">#750505</color>
     <color name="deactivated_text_color">#666666</color>
 </resources>

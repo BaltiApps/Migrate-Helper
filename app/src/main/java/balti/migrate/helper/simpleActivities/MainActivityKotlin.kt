@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import balti.migrate.helper.R
+import balti.migrate.helper.emergencyRestore.EmergencyRestoreProgressShow
 import balti.migrate.helper.postJobs.PostJobsActivity
 import balti.migrate.helper.preferences.MainPreferencesActivity
 import balti.migrate.helper.progressShow.ProgressShowActivity
@@ -41,6 +42,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_DEV_LINK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_LINK
 import balti.migrate.helper.utilities.ToolsNoContext
 import balti.module.baltitoolbox.functions.FileHandlers.unpackAsset
+import balti.module.baltitoolbox.functions.Misc.activityStart
 import balti.module.baltitoolbox.functions.Misc.openWebLink
 import balti.module.baltitoolbox.functions.Misc.tryIt
 import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
@@ -78,7 +80,7 @@ class MainActivityKotlin: AppCompatActivity() {
         }
     }
 
-private val endOnDisable by lazy {
+    private val endOnDisable by lazy {
         object : BroadcastReceiver(){
             override fun onReceive(context: Context?, intent: Intent?) = finish()
         }
@@ -223,6 +225,16 @@ private val endOnDisable by lazy {
                 }
                 show()
             }
+        }
+
+        emergency_restore.setOnClickListener {
+            AlertDialog.Builder(this)
+                    .setMessage(R.string.emergency_restore_desc)
+                    .setPositiveButton(R.string.proceed) { _, _ ->
+                        activityStart(this, EmergencyRestoreProgressShow::class.java)
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
         }
 
         close_button.setOnClickListener { finish() }
