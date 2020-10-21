@@ -17,6 +17,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_LOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_SUBTASK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_TITLE
 import balti.module.baltitoolbox.functions.Misc.serviceStart
+import balti.module.baltitoolbox.functions.Misc.tryIt
 import kotlinx.android.synthetic.main.restore_progress_layout.*
 
 class EmergencyRestoreProgressShow: AppCompatActivity() {
@@ -71,7 +72,7 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        commonTools.LBM?.unregisterReceiver(progressReceiver)
-        commonTools.LBM?.unregisterReceiver(errorReceiver)
+        tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
+        tryIt { commonTools.LBM?.unregisterReceiver(errorReceiver) }
     }
 }

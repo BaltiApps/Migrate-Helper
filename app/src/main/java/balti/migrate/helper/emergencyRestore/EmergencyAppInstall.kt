@@ -6,6 +6,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.module.baltitoolbox.functions.FileHandlers
 import balti.module.baltitoolbox.functions.GetResources.getStringFromRes
+import balti.module.baltitoolbox.functions.Misc
 
 class EmergencyAppInstall() : ParentCoroutineTask() {
 
@@ -20,13 +21,13 @@ class EmergencyAppInstall() : ParentCoroutineTask() {
     }
 
     override suspend fun doInBackground(arg: Any?): Any? {
-        runScript()
+        val listNotInstalled = runScript()
         sleepTask(1000)
-        return null
+        return listNotInstalled
     }
 
 
-    private fun runScript(){
+    private fun runScript(): ArrayList<String> {
         writeNext("cd $MIGRATE_CACHE")
         // ls -1p | grep / | grep -E "\.app/$"
         writeNext("ls -1p | grep / | grep -E \"\\.app/\$\"")
@@ -42,9 +43,12 @@ class EmergencyAppInstall() : ParentCoroutineTask() {
             writeNext("settings put global package_verifier_enable 0")
         else writeNext("settings put global verifier_verify_adb_installs 0")
 
+        val packageList = ArrayList<String>(0)
+
         for (app in apps) {
             val packageName = app.substring(0, app.length - 5)
-            sendProgress(title, packageName, "")
+            packageList.add(packageName)
+            sendProgress(title, packageName, "\n\n$packageName\n\n")
             writeNext("sh $installScriptPath $MIGRATE_CACHE $packageName.app $packageName.apk $packageName NULL $METADATA_HOLDER_DIR $packageName ${Build.VERSION.SDK_INT}")
             flushShell()
             getOutput().let {
@@ -54,10 +58,10 @@ class EmergencyAppInstall() : ParentCoroutineTask() {
             }
         }
 
-        sendProgress(getStringFromRes(R.string.installs_done), "", "")
-
+        if (apps.isNotEmpty()) sendProgress(getStringFromRes(R.string.installs_done), "", "")
+        closeShell()
         sendErrors(getAllErrors())
 
-        closeShell()
+        return ArrayList(packageList.filter { pkg -> !Misc.isPackageInstalled(pkg) })
     }
 }

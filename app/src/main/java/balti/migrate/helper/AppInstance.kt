@@ -13,6 +13,8 @@ class AppInstance: Application() {
         lateinit var notificationManager: NotificationManager
 
         val failedAppInstalls by lazy { ArrayList<AppPacketsKotlin>(0) }
+        val emFailedAppInstalls by lazy { ArrayList<String>(0) }
+
         val appPackets by lazy { ArrayList<AppPacketsKotlin>(0) }
         val contactDataPackets by lazy { ArrayList<ContactsPacketKotlin>(0) }
         val smsDataPackets by lazy { ArrayList<SmsPacketKotlin>(0) }
