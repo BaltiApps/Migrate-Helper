@@ -353,7 +353,13 @@
 
     <!--EmergencyAppInstall.kt-->
     <string name="installing_apps">Installing apps</string>
+    <string name="installing_apk_for_package">Installing APKs for package</string>
     <string name="installs_done">Installs done.</string>
+
+    <!--EmergencyAppData.kt-->
+    <string name="restoring_app_data">Restoring app data</string>
+    <string name="restoring_data_for_package">Restoring data for package</string>
+    <string name="restore_app_data_done">Restore app data done.</string>
 
     <!--app_search_layout.xml-->
     <string name="enter_app_name">App/package name</string>

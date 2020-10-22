@@ -7,6 +7,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.module.baltitoolbox.functions.FileHandlers
 import balti.module.baltitoolbox.functions.GetResources.getStringFromRes
 import balti.module.baltitoolbox.functions.Misc
+import java.io.File
 
 class EmergencyAppInstall() : ParentCoroutineTask() {
 
@@ -34,6 +35,7 @@ class EmergencyAppInstall() : ParentCoroutineTask() {
         flushShell()
         val apps = getOutput()
         val installScriptPath = FileHandlers.unpackAssetToInternal("installScript.sh", "installScript.sh")
+        installScriptPath.let { if (it != "") File(it).setExecutable(true) }
 
         writeNext("echo \"--- RESTORE PID: $$\"")
         writeNext("chmod -R 777 \"${MIGRATE_CACHE}\"")
@@ -48,7 +50,7 @@ class EmergencyAppInstall() : ParentCoroutineTask() {
         for (app in apps) {
             val packageName = app.substring(0, app.length - 5)
             packageList.add(packageName)
-            sendProgress(title, packageName, "\n\n$packageName\n\n")
+            sendProgress(title, packageName, "\n\n${getStringFromRes(R.string.installing_apk_for_package)}:\n$packageName\n\n")
             writeNext("sh $installScriptPath $MIGRATE_CACHE $packageName.app $packageName.apk $packageName NULL $METADATA_HOLDER_DIR $packageName ${Build.VERSION.SDK_INT}")
             flushShell()
             getOutput().let {

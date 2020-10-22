@@ -10,7 +10,9 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import balti.migrate.helper.AppInstance
 import balti.migrate.helper.AppInstance.Companion.emFailedAppInstalls
+import balti.migrate.helper.AppInstance.Companion.emFailedCombined
 import balti.migrate.helper.R
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_ERRORS
@@ -43,6 +45,7 @@ class EmergencyRestoreService: Service() {
     private var errorWriter: BufferedWriter? = null
 
     private var lastTitle = ""
+    private var appendLogs = false
 
     private val loadingNotification by lazy {
         NotificationCompat.Builder(this, CHANNEL_EMERGENCY_RESTORE_RUNNING)
@@ -103,7 +106,7 @@ class EmergencyRestoreService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val appendLogs = intent?.getBooleanExtra(EXTRA_APPEND_LOG, false) ?: false
+        appendLogs = intent?.getBooleanExtra(EXTRA_APPEND_LOG, false) ?: false
         File(CommonToolsKotlin.INFO_HOLDER_DIR).run {
             if (!appendLogs) deleteRecursively()
             mkdirs()
@@ -123,7 +126,31 @@ class EmergencyRestoreService: Service() {
 
     private fun startRestore(){
         MainScope().launch {
-            emFailedAppInstalls.addAll(EmergencyAppInstall().executeWithResult() as ArrayList<String>)
+            val emFailedAppData by lazy { ArrayList<String>(0) }
+            if (!appendLogs) { // this means we are not in "retrying" state. this is first run.
+                emFailedAppInstalls.clear()
+                EmergencyAppInstall().executeWithResult().let {
+                    tryIt {
+                        emFailedAppInstalls.addAll(it as ArrayList<String>)
+                    }
+                }
+            }
+            EmergencyAppData().executeWithResult(AppInstance.notificationFixGlobal).let {
+                tryIt {
+                    emFailedAppData.addAll(it as ArrayList <String>)
+                }
+            }
+            if (appendLogs) {
+                emFailedAppInstalls.apply {
+                    val temp = this.filter { pkg -> !Misc.isPackageInstalled(pkg) }
+                    clear()
+                    addAll(temp)
+                }
+            }
+
+            emFailedCombined.clear()
+            emFailedCombined.addAll((emFailedAppInstalls + emFailedAppData).distinct())
+
             withContext(IO) {
                 errorWriter?.write("--- Migrate helper version ${getString(R.string.current_version_name)} ---\n")
                 progressWriter?.write("--- Migrate helper version ${getString(R.string.current_version_name)} ---\n")

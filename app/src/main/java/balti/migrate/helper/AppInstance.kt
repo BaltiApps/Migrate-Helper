@@ -14,6 +14,8 @@ class AppInstance: Application() {
 
         val failedAppInstalls by lazy { ArrayList<AppPacketsKotlin>(0) }
         val emFailedAppInstalls by lazy { ArrayList<String>(0) }
+        //val emFailedAppData by lazy { ArrayList<String>(0) }
+        val emFailedCombined by lazy { ArrayList<String>(0) }
 
         val appPackets by lazy { ArrayList<AppPacketsKotlin>(0) }
         val contactDataPackets by lazy { ArrayList<ContactsPacketKotlin>(0) }
