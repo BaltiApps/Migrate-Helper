@@ -7,6 +7,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_ERRO
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_LOG
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_SUBTASK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_TITLE
 import balti.module.baltitoolbox.functions.Misc
@@ -57,12 +58,13 @@ abstract class ParentCoroutineTask(): AsyncCoroutineTask() {
         return errors
     }
 
-    fun sendProgress(title: String, subtask: String, log: String){
+    fun sendProgress(title: String, subtask: String, log: String, progress: Int = -1){
         LocalBroadcastManager.getInstance(emergencyServiceContext).sendBroadcast(
                 Intent(ACTION_EM_PROGRESS).apply {
                     putExtra(EXTRA_EM_TITLE, title)
                     putExtra(EXTRA_EM_SUBTASK, subtask)
                     putExtra(EXTRA_EM_LOG, log)
+                    putExtra(EXTRA_EM_PROGRESS, progress)
                 }
         )
     }

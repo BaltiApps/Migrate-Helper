@@ -57,17 +57,19 @@ class EmergencyAppData() : ParentCoroutineTask() {
         for (tar in dataTars) {
             val packageName = tar.substring(0, tar.length - 7)
             packageList.add(packageName)
-            sendProgress(title, packageName, "\n\n${getStringFromRes(R.string.restoring_data_for_package)}:\n$packageName\n\n")
+            val index = dataTars.indexOf(tar)+1
+            val percent = Misc.getPercentage(index, dataTars.size)
+            sendProgress("$title [$index/${dataTars.size}]", packageName, "\n\n${getStringFromRes(R.string.restoring_data_for_package)}:\n$packageName\n\n", percent)
             writeNext("sh $restoreDataScriptPath $busyboxBinaryPath $tar $packageName $notificationFix $METADATA_HOLDER_DIR $MIGRATE_CACHE ${Build.VERSION.SDK_INT}")
             flushShell()
             getOutput().let {
                 var op = ""
                 it.forEach { op += "$it\n" }
-                sendProgress(title, packageName, op)
+                sendProgress(title, packageName, op, percent)
             }
         }
 
-        if (dataTars.isNotEmpty()) sendProgress(getStringFromRes(R.string.restore_app_data_done), "", "")
+        if (dataTars.isNotEmpty()) sendProgress(getStringFromRes(R.string.restore_app_data_done), "", "", 100)
         closeShell()
         sendErrors(getAllErrors())
 

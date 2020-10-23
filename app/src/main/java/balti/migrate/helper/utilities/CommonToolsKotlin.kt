@@ -42,11 +42,13 @@ class CommonToolsKotlin(val context: Context) {
 
         val PENDING_INTENT_REQUEST_ID = 914
         val PENDING_INTENT_RESTORE_ABORT_ID = 916
+        val PENDING_INTENT_REQUEST_ID_EM = 900
 
         val NOTIFICATION_ID_ONGOING = 229
         val NOTIFICATION_ID_FINISHED = 230
         val NOTIFICATION_ID_CANCELLING = 231
         val NOTIFICATION_ID_ONGOING_EM = 329
+        val NOTIFICATION_ID_FINISHED_EM = 330
 
         val FILE_MAIN_PREF = "main"
         val FILE_EMERGENCY_SCRIPT_MAIN = "emergency_script_main.sh"
@@ -68,6 +70,7 @@ class CommonToolsKotlin(val context: Context) {
         val CHANNEL_RESTORE_ABORTING = "Aborting restore"
         val CHANNEL_UNINSTALLING = "Uninstalling helper"
         val CHANNEL_EMERGENCY_RESTORE_RUNNING = "Emergency restore running notification"
+        val CHANNEL_EMERGENCY_RESTORE_END = "Emergency restore finished notification"
 
         val ACTION_RESTORE_PROGRESS = "Helper restore restore_progress_layout broadcast"
         val ACTION_RESTORE_ABORT = "Helper abort broadcast"
@@ -116,6 +119,7 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_EM_TITLE = "emergency_title"
         val EXTRA_EM_SUBTASK = "emergency_subtask"
         val EXTRA_EM_LOG = "emergency_log"
+        val EXTRA_EM_PROGRESS = "emergency_progress"
         val EXTRA_EM_ERRORS = "emergency_errors"
 
         val ERROR_PRE_EXECUTE = "PARENT_PRE_EXECUTE"

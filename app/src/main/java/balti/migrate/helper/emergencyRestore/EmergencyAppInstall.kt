@@ -50,17 +50,19 @@ class EmergencyAppInstall() : ParentCoroutineTask() {
         for (app in apps) {
             val packageName = app.substring(0, app.length - 5)
             packageList.add(packageName)
-            sendProgress(title, packageName, "\n\n${getStringFromRes(R.string.installing_apk_for_package)}:\n$packageName\n\n")
+            val index = apps.indexOf(app)+1
+            val percent = Misc.getPercentage(index, apps.size)
+            sendProgress("$title [$index/${apps.size}]", packageName, "\n\n${getStringFromRes(R.string.installing_apk_for_package)}:\n$packageName\n\n", percent)
             writeNext("sh $installScriptPath $MIGRATE_CACHE $packageName.app $packageName.apk $packageName NULL $METADATA_HOLDER_DIR $packageName ${Build.VERSION.SDK_INT}")
             flushShell()
             getOutput().let {
                 var op = ""
                 it.forEach { op += "$it\n" }
-                sendProgress(title, packageName, op)
+                sendProgress(title, packageName, op, percent)
             }
         }
 
-        if (apps.isNotEmpty()) sendProgress(getStringFromRes(R.string.installs_done), "", "")
+        if (apps.isNotEmpty()) sendProgress(getStringFromRes(R.string.installs_done), "", "", 100)
         closeShell()
         sendErrors(getAllErrors())
 
