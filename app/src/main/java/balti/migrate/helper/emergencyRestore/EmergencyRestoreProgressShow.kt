@@ -14,6 +14,7 @@ import balti.migrate.helper.R
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_PROGRESS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_EMERGENCY_DATA
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_FINISHED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_LOG
@@ -134,14 +135,15 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
         }
         app_icon.setImageResource(R.drawable.ic_app)
 
-        if (!EmergencyRestoreService.wasStarted && !intent.hasExtra(EXTRA_EM_TITLE))
-            serviceStart(this, EmergencyRestoreService::class.java)
-
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_EM_PROGRESS))
         commonTools.LBM?.registerReceiver(errorReceiver, IntentFilter(ACTION_EM_ERRORS))
 
         handleProgress(intent)
         handleErrors(intent)
+
+        if (!EmergencyRestoreService.wasStarted && !intent.hasExtra(EXTRA_EM_TITLE))
+            serviceStart(this, EmergencyRestoreService::class.java)
+        else commonTools.LBM?.sendBroadcast(Intent(ACTION_REQUEST_EMERGENCY_DATA))
     }
 
     override fun onDestroy() {

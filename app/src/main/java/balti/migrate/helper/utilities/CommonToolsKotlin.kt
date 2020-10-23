@@ -84,6 +84,7 @@ class CommonToolsKotlin(val context: Context) {
         //emergency
         val ACTION_EM_PROGRESS = "emergency_progress"
         val ACTION_EM_ERRORS = "emergency_errors"
+        val ACTION_REQUEST_EMERGENCY_DATA = "get emergency data"
 
         val EXTRA_APPEND_LOG = "append_log"
         val EXTRA_PROGRESS_TYPE = "type"

@@ -20,6 +20,7 @@ import balti.migrate.helper.emergencyRestore.tasks.EmergencyAppInstall
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_PROGRESS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_EMERGENCY_DATA
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_EMERGENCY_RESTORE_END
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_EMERGENCY_RESTORE_RUNNING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_APPEND_LOG
@@ -57,6 +58,7 @@ class EmergencyRestoreService: Service() {
 
     private var lastTitle = ""
     private var appendLogs = false
+    private var progressIntent: Intent? = null
 
     private val loadingNotification by lazy {
         NotificationCompat.Builder(this, CHANNEL_EMERGENCY_RESTORE_RUNNING)
@@ -78,6 +80,7 @@ class EmergencyRestoreService: Service() {
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 intent?.run {
+                    progressIntent = Intent(ACTION_EM_PROGRESS).putExtras(this)
                     EXTRA_EM_TITLE.let {
                         if (hasExtra(it)) getStringExtra(it).trim().let { t ->
                             if (t != lastTitle) {
@@ -112,6 +115,14 @@ class EmergencyRestoreService: Service() {
         }
     }
 
+    private val requestProgressReceiver by lazy {
+        object : BroadcastReceiver(){
+            override fun onReceive(context: Context?, intent: Intent?) {
+                progressIntent?.let { commonTools.LBM?.sendBroadcast(it) }
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         emergencyServiceContext = this
@@ -123,6 +134,7 @@ class EmergencyRestoreService: Service() {
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_EM_PROGRESS))
         commonTools.LBM?.registerReceiver(errorReceiver, IntentFilter(ACTION_EM_ERRORS))
+        commonTools.LBM?.registerReceiver(requestProgressReceiver, IntentFilter(ACTION_REQUEST_EMERGENCY_DATA))
         startForeground(NOTIFICATION_ID_ONGOING_EM, loadingNotification.build())
     }
 
@@ -219,6 +231,7 @@ class EmergencyRestoreService: Service() {
         super.onDestroy()
         tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
         tryIt { commonTools.LBM?.unregisterReceiver(errorReceiver) }
+        tryIt { commonTools.LBM?.unregisterReceiver(requestProgressReceiver) }
         tryIt { progressWriter?.close() }
         tryIt { errorWriter?.close() }
         wasStarted = false
