@@ -13,6 +13,7 @@ class EmergencyAppInstall() : ParentCoroutineTask() {
 
     private val shell by lazy { Runtime.getRuntime().exec("su") }
     private val title by lazy { getStringFromRes(R.string.installing_apps) }
+    private val errors by lazy { ArrayList<String>(0) }
 
     override val suShell: Process = shell
 
@@ -57,14 +58,17 @@ class EmergencyAppInstall() : ParentCoroutineTask() {
             flushShell()
             getOutput().let {
                 var op = ""
-                it.forEach { op += "$it\n" }
+                it.forEach {
+                    op += "$it\n"
+                    if (it.startsWith("ERROR::") || it.startsWith("FAILURE")) errors.add("$packageName: $it")
+                }
                 sendProgress(title, packageName, op, percent)
             }
         }
 
         if (apps.isNotEmpty()) sendProgress(getStringFromRes(R.string.installs_done), "", "", 100)
         closeShell()
-        sendErrors(getAllErrors())
+        sendErrors(errors.apply { addAll(getAllErrors()) })
 
         return ArrayList(packageList.filter { pkg -> !Misc.isPackageInstalled(pkg) })
     }
