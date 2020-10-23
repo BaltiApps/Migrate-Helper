@@ -81,13 +81,15 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
         lateinit var serviceContext: Context
         private set
 
+        var isBackupInitiated = false
+        private set
+
         var cancelAll = false
         private set
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    private var isBackupInitiated = false
     private val commonTools by lazy { CommonToolsKotlin(this) }
 
     private var progressWriter: BufferedWriter? = null
@@ -468,6 +470,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
 
     override fun onDestroy() {
         super.onDestroy()
+        isBackupInitiated = false
         tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
         tryIt { commonTools.LBM?.unregisterReceiver(cancelReceiver) }
         tryIt { commonTools.LBM?.unregisterReceiver(requestProgressReceiver) }

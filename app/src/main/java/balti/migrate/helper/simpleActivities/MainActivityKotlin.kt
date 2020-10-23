@@ -20,9 +20,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import balti.migrate.helper.R
 import balti.migrate.helper.emergencyRestore.EmergencyRestoreProgressShow
+import balti.migrate.helper.emergencyRestore.EmergencyRestoreService
 import balti.migrate.helper.postJobs.PostJobsActivity
 import balti.migrate.helper.preferences.MainPreferencesActivity
 import balti.migrate.helper.progressShow.ProgressShowActivity
+import balti.migrate.helper.restoreEngines.RestoreServiceKotlin
 import balti.migrate.helper.restoreSelectorActivity.RestoreSelectorKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_END_ALL
@@ -42,7 +44,6 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_DEV_LINK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_LINK
 import balti.migrate.helper.utilities.ToolsNoContext
 import balti.module.baltitoolbox.functions.FileHandlers.unpackAsset
-import balti.module.baltitoolbox.functions.Misc.activityStart
 import balti.module.baltitoolbox.functions.Misc.openWebLink
 import balti.module.baltitoolbox.functions.Misc.tryIt
 import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
@@ -139,7 +140,9 @@ class MainActivityKotlin: AppCompatActivity() {
         }
 
         restoreButton.setOnClickListener {
-            startActivity(Intent(this, RestoreSelectorKotlin::class.java))
+            if (!EmergencyRestoreService.wasStarted)
+                startActivity(Intent(this, RestoreSelectorKotlin::class.java))
+            else Toast.makeText(this, R.string.emergency_restore_running, Toast.LENGTH_SHORT).show()
         }
 
         uninstall_from_system.setOnClickListener {
@@ -228,13 +231,20 @@ class MainActivityKotlin: AppCompatActivity() {
         }
 
         emergency_restore.setOnClickListener {
-            AlertDialog.Builder(this)
-                    .setMessage(R.string.emergency_restore_desc)
-                    .setPositiveButton(R.string.proceed) { _, _ ->
-                        activityStart(this, EmergencyRestoreProgressShow::class.java)
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
+            if (!RestoreServiceKotlin.isBackupInitiated) {
+                val startIntent = Intent(this, EmergencyRestoreProgressShow::class.java)
+                if (EmergencyRestoreService.wasStarted) startActivity(startIntent)
+                else {
+                    AlertDialog.Builder(this)
+                            .setMessage(R.string.emergency_restore_desc)
+                            .setPositiveButton(R.string.proceed) { _, _ ->
+                                startActivity(startIntent)
+                            }
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show()
+                }
+            }
+            else Toast.makeText(this, R.string.restore_already_running, Toast.LENGTH_SHORT).show()
         }
 
         close_button.setOnClickListener { finish() }

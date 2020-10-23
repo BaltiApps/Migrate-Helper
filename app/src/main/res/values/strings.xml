@@ -101,6 +101,8 @@
     <string name="select_telegram">Open Telegram and select the Migrate group</string>
     <string name="contact">Contact via Telegram</string>
     <string name="default_sms_app_must_be_changed">Default SMS app must be changed before uninstalling this helper app.</string>
+    <string name="emergency_restore_running">Emergency restore is running. Please Force Stop this app if necessary.</string>
+    <string name="restore_already_running">Restore is already running. Please Force Stop this app if necessary.</string>
 
     <!--ProgressActivity.java-->
     <string name="please_wait">Please wait</string>
