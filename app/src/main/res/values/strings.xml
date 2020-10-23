@@ -65,8 +65,11 @@
     <string name="contact_desc">Our Telegram group has many members, you will get quicker help on the group. In case your issue is not resolved, kindly contact developer.</string>
     <string name="contact_developer">Contact developer</string>
     <string name="contact_group">Message on group</string>
-    <string name="emergency_restore_desc">Emergency restore attempts to recover as much data as possible without reading metadata files.\n
-        You will not be able to select which apps to restore! Kindly use only if normal restore does not work for you.</string>
+    <string name="emergency_restore_desc">Emergency restore attempts to recover as much app data as possible without reading metadata files.\n\n
+        1. Only app restores are supported for now.\n
+        2. All apps will be attempted to be restored. Selection not possible.\n
+        3. Force close app to abort restore.\n
+    </string>
 
     <!--last_log_report.xml-->
     <string name="seeProgressLog">See Progress log</string>
