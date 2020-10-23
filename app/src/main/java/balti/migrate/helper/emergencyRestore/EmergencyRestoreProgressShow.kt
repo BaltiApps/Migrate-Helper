@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.R
 import balti.migrate.helper.utilities.CommonToolsKotlin
@@ -27,6 +28,8 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
 
+    private var forceStopDialog: AlertDialog? = null
+
     private fun handleProgress(intent: Intent?){
         intent?.run {
             EXTRA_EM_TITLE.let { if (hasExtra(it)) progressTask.text = getStringExtra(it) }
@@ -43,11 +46,17 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
                 }
             }
             if (getBooleanExtra(EXTRA_EM_FINISHED, false)) {
+
+                tryIt { forceStopDialog?.dismiss() }
+
                 progressActionButton.apply {
                     text = getString(R.string.finish)
                     visibility = View.VISIBLE
                     setOnClickListener { finish() }
                 }
+
+                progressAbortButton.visibility = View.GONE
+
                 if (errorLogTextView.text.isNotBlank()) {
                     reportLogButton.apply {
                         visibility = View.GONE
@@ -100,7 +109,17 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
             text = getString(R.string.force_stop)
             visibility = View.VISIBLE
             setOnClickListener {
-                commonTools.forceStopSelf()
+
+                forceStopDialog = AlertDialog.Builder(this@EmergencyRestoreProgressShow).apply {
+
+                    this.setTitle(getString(R.string.force_stop_alert_title))
+                    setPositiveButton(R.string.kill_app) { _, _ ->
+                        commonTools.forceStopSelf()
+                    }
+                    setNegativeButton(android.R.string.cancel, null)
+                }.create()
+
+                forceStopDialog?.show()
             }
         }
         reportLogButton.apply {
@@ -129,5 +148,6 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
         super.onDestroy()
         tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) }
         tryIt { commonTools.LBM?.unregisterReceiver(errorReceiver) }
+        tryIt { forceStopDialog?.dismiss() }
     }
 }
