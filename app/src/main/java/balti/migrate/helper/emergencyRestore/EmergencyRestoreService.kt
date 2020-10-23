@@ -22,6 +22,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_EMERGE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_EMERGENCY_RESTORE_RUNNING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_APPEND_LOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_ERRORS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_FINISHED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_LOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_SUBTASK
@@ -189,6 +190,7 @@ class EmergencyRestoreService: Service() {
                 putExtra(EXTRA_EM_SUBTASK, "")
                 putExtra(EXTRA_EM_LOG, "\n\n$title")
                 putExtra(EXTRA_EM_PROGRESS, 100)
+                putExtra(EXTRA_EM_FINISHED, true)
             }
             tryIt { commonTools.LBM?.unregisterReceiver(progressReceiver) } // needed to avoid double notification
             LocalBroadcastManager.getInstance(emergencyServiceContext).sendBroadcast(finishIntent)

@@ -7,12 +7,14 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.R
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_ERRORS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_FINISHED
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_LOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_SUBTASK
@@ -38,6 +40,18 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
                 } else {
                     progressBar.isIndeterminate = true
                     progressPercent.text = "<-->"
+                }
+            }
+            if (getBooleanExtra(EXTRA_EM_FINISHED, false)) {
+                progressActionButton.apply {
+                    text = getString(R.string.finish)
+                    visibility = View.VISIBLE
+                    setOnClickListener { finish() }
+                }
+                if (errorLogTextView.text.isNotBlank()) {
+                    reportLogButton.apply {
+                        visibility = View.GONE
+                    }
                 }
             }
         }
@@ -81,6 +95,24 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
             movementMethod = ScrollingMovementMethod()
         }
 
+        progressActionButton.visibility = View.GONE
+        progressAbortButton.apply {
+            text = getString(R.string.force_stop)
+            visibility = View.VISIBLE
+            setOnClickListener {
+                commonTools.forceStopSelf()
+            }
+        }
+        reportLogButton.apply {
+            visibility = View.GONE
+            setOnClickListener { commonTools.reportLogs(true) }
+        }
+        retryButton.apply {
+            visibility = View.GONE
+            setOnClickListener {
+
+            }
+        }
         app_icon.setImageResource(R.drawable.ic_app)
 
         if (!EmergencyRestoreService.wasStarted && !intent.hasExtra(EXTRA_EM_TITLE))

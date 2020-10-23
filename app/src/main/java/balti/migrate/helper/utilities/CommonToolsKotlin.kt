@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
+import android.os.Handler
 import android.provider.Telephony
 import android.view.View
 import android.widget.Toast
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import balti.migrate.helper.AppInstance
+import balti.migrate.helper.AppInstance.Companion.appContext
 import balti.migrate.helper.R
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
 import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
@@ -121,6 +123,7 @@ class CommonToolsKotlin(val context: Context) {
         val EXTRA_EM_LOG = "emergency_log"
         val EXTRA_EM_PROGRESS = "emergency_progress"
         val EXTRA_EM_ERRORS = "emergency_errors"
+        val EXTRA_EM_FINISHED = "emergency_restore_finished"
 
         val ERROR_PRE_EXECUTE = "PARENT_PRE_EXECUTE"
 
@@ -566,6 +569,21 @@ class CommonToolsKotlin(val context: Context) {
             tryIt { killProcess.waitFor() }
             tryIt { suProcess?.waitFor() }
         }
+    }
 
+    fun forceStopSelf(){
+        Runtime.getRuntime().exec("su").apply {
+            BufferedWriter(OutputStreamWriter(this.outputStream)).run {
+                this.write("am force-stop ${appContext.packageName}\n")
+                this.write("exit\n")
+                this.flush()
+            }
+        }
+
+        val handler = Handler()
+        handler.postDelayed({
+            Toast.makeText(appContext, R.string.killing_programmatically, Toast.LENGTH_SHORT).show()
+            android.os.Process.killProcess(android.os.Process.myPid())
+        }, TIMEOUT_WAITING_TO_KILL)
     }
 }

@@ -11,7 +11,6 @@ import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -49,14 +48,11 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_TOTAL_TI
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RETRY_APP_INSTALLS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_TRACK_RESTORE_FINISHED
-import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import balti.migrate.helper.utilities.IconTools
 import balti.module.baltitoolbox.functions.Misc.tryIt
 import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import kotlinx.android.synthetic.main.restore_progress_layout.*
-import java.io.BufferedWriter
 import java.io.File
-import java.io.OutputStreamWriter
 
 class ProgressShowActivity: AppCompatActivity() {
 
@@ -284,20 +280,7 @@ class ProgressShowActivity: AppCompatActivity() {
                         this.setMessage(getString(R.string.force_stop_alert_desc))
 
                         setPositiveButton(R.string.kill_app) { _, _ ->
-
-                            Runtime.getRuntime().exec("su").apply {
-                                BufferedWriter(OutputStreamWriter(this.outputStream)).run {
-                                    this.write("am force-stop $packageName\n")
-                                    this.write("exit\n")
-                                    this.flush()
-                                }
-                            }
-
-                            val handler = Handler()
-                            handler.postDelayed({
-                                Toast.makeText(this@ProgressShowActivity, R.string.killing_programmatically, Toast.LENGTH_SHORT).show()
-                                android.os.Process.killProcess(android.os.Process.myPid())
-                            }, TIMEOUT_WAITING_TO_KILL)
+                            commonTools.forceStopSelf()
                         }
 
                         setNegativeButton(R.string.wait_to_cancel, null)
