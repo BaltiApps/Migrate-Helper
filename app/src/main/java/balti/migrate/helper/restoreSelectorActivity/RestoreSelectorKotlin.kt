@@ -28,6 +28,8 @@ import balti.migrate.helper.AppInstance.Companion.settingsPacket
 import balti.migrate.helper.AppInstance.Companion.smsDataPackets
 import balti.migrate.helper.AppInstance.Companion.wifiPacket
 import balti.migrate.helper.R
+import balti.migrate.helper.emergencyRestore.EmergencyRestoreProgressShow
+import balti.migrate.helper.emergencyRestore.EmergencyRestoreService
 import balti.migrate.helper.extraRestorePrepare.ExtraRestorePrepare
 import balti.migrate.helper.progressShow.ProgressShowActivity
 import balti.migrate.helper.restoreSelectorActivity.containers.*
@@ -63,6 +65,7 @@ import balti.module.baltitoolbox.functions.Misc.tryIt
 import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import kotlinx.android.synthetic.main.app_search_layout.view.*
 import kotlinx.android.synthetic.main.app_selector_header.view.*
+import kotlinx.android.synthetic.main.emergency_restore_dialog.view.*
 import kotlinx.android.synthetic.main.extra_item.view.*
 import kotlinx.android.synthetic.main.extras_picker.view.*
 import kotlinx.android.synthetic.main.restore_selector.*
@@ -167,12 +170,42 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
             }
         }
 
-        notification_check_toggle.setOnCheckedChangeListener { _, isChecked ->
-            notificationFixGlobal = isChecked
+        notification_check_toggle.apply {
+            isChecked = notificationFixGlobal
+            setOnCheckedChangeListener { _, isChecked ->
+                notificationFixGlobal = isChecked
+            }
         }
 
-        installMigrateFlasher.setOnClickListener {
-            Misc.playStoreLink(PACKAGE_MIGRATE_FLASHER)
+        installMigrateFlasher.apply {
+            visibility = View.GONE
+            setOnClickListener {
+                Misc.playStoreLink(PACKAGE_MIGRATE_FLASHER)
+            }
+        }
+
+        emergency_restore_code_error.apply {
+            visibility = View.GONE
+            setOnClickListener {
+                val startIntent = Intent(this@RestoreSelectorKotlin, EmergencyRestoreProgressShow::class.java)
+                if (EmergencyRestoreService.wasStarted) startActivity(startIntent)
+                else {
+                    val view = View.inflate(this@RestoreSelectorKotlin, R.layout.emergency_restore_dialog, null)
+                    view.emergency_restore_notification_fix.apply {
+                        isChecked = notificationFixGlobal
+                        setOnCheckedChangeListener { _, isChecked ->
+                            notificationFixGlobal = isChecked
+                        }
+                    }
+                    AlertDialog.Builder(this@RestoreSelectorKotlin)
+                            .setView(view)
+                            .setPositiveButton(R.string.proceed) { _, _ ->
+                                startActivity(startIntent)
+                            }
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show()
+                }
+            }
         }
 
         commonTools.LBM?.registerReceiver(progressReceiver, IntentFilter(ACTION_RESTORE_PROGRESS))
@@ -189,6 +222,10 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
         if (mainMessage == getString(R.string.nothing_to_restore))
             installMigrateFlasher.visibility = View.VISIBLE
         else installMigrateFlasher.visibility = View.GONE
+
+        if (mainMessage == getString(R.string.code_error))
+            emergency_restore_code_error.visibility = View.VISIBLE
+        else emergency_restore_code_error.visibility = View.GONE
 
         just_a_progress.visibility = View.INVISIBLE
         restore_selector_error_icon.visibility = View.VISIBLE

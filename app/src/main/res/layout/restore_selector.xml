@@ -2,8 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/app_list_bg"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".restoreSelectorActivity.RestoreSelectorKotlin">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -124,7 +126,18 @@
                 android:drawableStart="@drawable/ic_download"
                 android:visibility="gone"
                 >
+            </Button>
 
+            <Button
+                android:id="@+id/emergency_restore_code_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/large_padding_width"
+                android:backgroundTint="@color/dark_red"
+                android:text="@string/emergency_restore"
+                android:textColor="@android:color/white"
+                android:visibility="gone"
+                >
             </Button>
 
             <Space
