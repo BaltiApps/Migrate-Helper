@@ -104,7 +104,7 @@ class UninstallServiceKotlin: Service() {
                             write("if [[ -e $apkDir ]]; then\n")
                             write("    mount -o rw,remount /system\n")
                             write("    mount -o rw,remount ${apkDir}\n")
-                            write("    rm -rf ${applicationInfo.dataDir} $apkDir\n")
+                            write("    rm -rf $apkDir\n")
                             write("fi\n")
 
                             // go advanced if not removed
