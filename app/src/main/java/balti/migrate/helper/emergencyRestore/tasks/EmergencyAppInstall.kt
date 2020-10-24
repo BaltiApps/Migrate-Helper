@@ -66,6 +66,11 @@ class EmergencyAppInstall() : ParentCoroutineTask() {
             }
         }
 
+        if (Build.VERSION.SDK_INT <= 29)
+            writeNext("settings put global package_verifier_enable 1")
+        else writeNext("settings put global verifier_verify_adb_installs 1")
+        flushShell()
+
         if (apps.isNotEmpty()) sendProgress(getStringFromRes(R.string.installs_done), "", "", 100)
         closeShell()
         sendErrors(errors.apply { addAll(getAllErrors()) })
