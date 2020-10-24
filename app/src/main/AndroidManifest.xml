@@ -83,6 +83,11 @@
             android:screenOrientation="portrait"
             />
 
+        <activity android:name=".emergencyRestore.utils.RetryEmergencyMissingPackages"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Dialog"
+            />
+
         <receiver android:name=".utilities.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" android:priority="999"/>

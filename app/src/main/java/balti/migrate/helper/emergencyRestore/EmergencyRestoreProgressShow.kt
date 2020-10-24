@@ -10,7 +10,9 @@ import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import balti.migrate.helper.AppInstance.Companion.emFailedCombined
 import balti.migrate.helper.R
+import balti.migrate.helper.emergencyRestore.utils.RetryEmergencyMissingPackages
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_PROGRESS
@@ -21,6 +23,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_LOG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_SUBTASK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_TITLE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RETRY_APP_INSTALLS
 import balti.module.baltitoolbox.functions.Misc.serviceStart
 import balti.module.baltitoolbox.functions.Misc.tryIt
 import kotlinx.android.synthetic.main.restore_progress_layout.*
@@ -28,7 +31,6 @@ import kotlinx.android.synthetic.main.restore_progress_layout.*
 class EmergencyRestoreProgressShow: AppCompatActivity() {
 
     private val commonTools by lazy { CommonToolsKotlin(this) }
-
     private var forceStopDialog: AlertDialog? = null
 
     private fun handleProgress(intent: Intent?){
@@ -63,6 +65,8 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
                         visibility = View.GONE
                     }
                 }
+
+                if (emFailedCombined.isNotEmpty()) retryButton.visibility = View.VISIBLE
             }
         }
     }
@@ -130,7 +134,10 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
         retryButton.apply {
             visibility = View.GONE
             setOnClickListener {
-
+                startActivityForResult(
+                        Intent(this@EmergencyRestoreProgressShow, RetryEmergencyMissingPackages::class.java),
+                        JOBCODE_RETRY_APP_INSTALLS
+                )
             }
         }
         app_icon.setImageResource(R.drawable.ic_app)
@@ -144,6 +151,12 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
         if (!EmergencyRestoreService.wasStarted && !intent.hasExtra(EXTRA_EM_TITLE))
             serviceStart(this, EmergencyRestoreService::class.java)
         else commonTools.LBM?.sendBroadcast(Intent(ACTION_REQUEST_EMERGENCY_DATA))
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == JOBCODE_RETRY_APP_INSTALLS)
+            if (resultCode == RESULT_OK) recreate()
     }
 
     override fun onDestroy() {
