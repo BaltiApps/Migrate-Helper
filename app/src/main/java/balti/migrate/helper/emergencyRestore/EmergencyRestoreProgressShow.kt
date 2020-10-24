@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.AppInstance.Companion.emFailedCombined
@@ -98,6 +99,8 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.restore_progress_layout)
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         progressLogTextView.apply {
             gravity = Gravity.BOTTOM
