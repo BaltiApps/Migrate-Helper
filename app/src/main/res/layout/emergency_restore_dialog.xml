@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/xlarge_padding_width"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/emergency_restore_desc"/>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/large_padding_width"/>
+
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_notification_fix"
+        android:id="@+id/emergency_restore_notification_fix"/>
+
+</LinearLayout>

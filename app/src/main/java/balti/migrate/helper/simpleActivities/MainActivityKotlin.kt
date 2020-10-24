@@ -18,6 +18,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import balti.migrate.helper.AppInstance
 import balti.migrate.helper.R
 import balti.migrate.helper.emergencyRestore.EmergencyRestoreProgressShow
 import balti.migrate.helper.emergencyRestore.EmergencyRestoreService
@@ -49,6 +50,7 @@ import balti.module.baltitoolbox.functions.Misc.tryIt
 import balti.module.baltitoolbox.functions.SharedPrefs.getPrefBoolean
 import balti.module.baltitoolbox.functions.SharedPrefs.putPrefBoolean
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.emergency_restore_dialog.view.*
 import kotlinx.android.synthetic.main.last_log_report.view.*
 import java.io.*
 
@@ -235,8 +237,15 @@ class MainActivityKotlin: AppCompatActivity() {
                 val startIntent = Intent(this, EmergencyRestoreProgressShow::class.java)
                 if (EmergencyRestoreService.wasStarted) startActivity(startIntent)
                 else {
+                    val view = View.inflate(this, R.layout.emergency_restore_dialog, null)
+                    view.emergency_restore_notification_fix.apply {
+                        isChecked = AppInstance.notificationFixGlobal
+                        setOnCheckedChangeListener { _, isChecked ->
+                            AppInstance.notificationFixGlobal = isChecked
+                        }
+                    }
                     AlertDialog.Builder(this)
-                            .setMessage(R.string.emergency_restore_desc)
+                            .setView(view)
                             .setPositiveButton(R.string.proceed) { _, _ ->
                                 startActivity(startIntent)
                             }

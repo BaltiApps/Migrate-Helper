@@ -66,7 +66,7 @@
     <string name="contact_developer">Contact developer</string>
     <string name="contact_group">Message on group</string>
     <string name="emergency_restore_desc">Emergency restore attempts to recover as much app data as possible without reading metadata files.\n\n
-        1. Only app restores are supported for now.\n
+        1. Only <b>APP</b> restores are supported for now.\n
         2. All apps will be attempted to be restored. Selection not possible.\n
         3. Force close app to abort restore.\n
     </string>
