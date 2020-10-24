@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.TextViewCompat.setTextAppearance
 import balti.migrate.helper.AppInstance.Companion.appPackets
 import balti.migrate.helper.AppInstance.Companion.failedAppInstalls
 import balti.migrate.helper.AppInstance.Companion.notificationFixGlobal
@@ -51,52 +52,54 @@ class RetryTransparentActivity: AppCompatActivity() {
                 if (!Misc.isPackageInstalled(it1)) notInstalled.add(packet)
             }
         }
+        if (notInstalled.isEmpty()) proceedToRestore()
+        else {
+            AppsNotInstalledViewManager(notInstalled, this).run {
 
-        AppsNotInstalledViewManager(notInstalled, this).run {
+                val view = this.getView()
+                view.apps_not_installed_header.apply {
+                    setText(R.string.please_install_these)
+                    setTextAppearance(this, android.R.style.TextAppearance_Medium)
+                    setPadding(10, 10, 10, 0)
+                }
+                view.apps_not_installed_footer.visibility = View.GONE
 
-            val view = this.getView()
-            view.apps_not_installed_header.apply {
-                setText(R.string.please_install_these)
-                setTextAppearance(this@RetryTransparentActivity, android.R.style.TextAppearance_Medium)
-                setPadding(10, 10, 10, 0)
-            }
-            view.apps_not_installed_footer.visibility = View.GONE
-
-            val ad = AlertDialog.Builder(this@RetryTransparentActivity)
-                    .setView(view)
-                    .setPositiveButton(R.string.continue_) { _, _ ->
-                        val c = getSuccessfullyInstalledApps()
-                        if (c == failedAppInstalls.size) {
-                            proceedToRestore()
+                val ad = AlertDialog.Builder(this@RetryTransparentActivity)
+                        .setView(view)
+                        .setPositiveButton(R.string.continue_) { _, _ ->
+                            val c = getSuccessfullyInstalledApps()
+                            if (c == failedAppInstalls.size) {
+                                proceedToRestore()
+                            } else {
+                                AlertDialog.Builder(this@RetryTransparentActivity)
+                                        .setTitle(R.string.failed_apps_not_yet_installed)
+                                        .setMessage(getString(R.string.failed_apps_not_yet_installed_desc) + "\n\n" +
+                                                getString(R.string.installed) + " " + c + "\n" +
+                                                getString(R.string.total_to_be_installed) + " " + failedAppInstalls.size
+                                        )
+                                        .setNegativeButton(R.string.continue_anyway) { _, _ ->
+                                            proceedToRestore()
+                                        }
+                                        .setPositiveButton(R.string.wait) { _, _ ->
+                                            showDialog()
+                                        }
+                                        .setCancelable(false)
+                                        .show()
+                            }
                         }
-                        else {
-                            AlertDialog.Builder(this@RetryTransparentActivity)
-                                    .setTitle(R.string.failed_apps_not_yet_installed)
-                                    .setMessage(getString(R.string.failed_apps_not_yet_installed_desc) + "\n\n" +
-                                            getString(R.string.installed) + " " + c + "\n" +
-                                            getString(R.string.total_to_be_installed) + " " + failedAppInstalls.size
-                                    )
-                                    .setNegativeButton(R.string.continue_anyway) { _, _ ->
-                                        proceedToRestore()
-                                    }
-                                    .setPositiveButton(R.string.wait) {_, _ ->
-                                        showDialog()
-                                    }
-                                    .show()
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            finish()
                         }
-                    }
-                    .setNegativeButton(android.R.string.cancel) { _, _ ->
-                        finish()
-                    }
-                    .setCancelable(false)
-                    .create()
-            ad.show()
+                        .setCancelable(false)
+                        .create()
+                ad.show()
 
-            getRefreshButton().setOnClickListener {
-                Misc.tryIt {
-                    ad.dismiss()
-                    if (getSuccessfullyInstalledApps() == failedAppInstalls.size) proceedToRestore()
-                    else showDialog()
+                getRefreshButton().setOnClickListener {
+                    Misc.tryIt {
+                        ad.dismiss()
+                        if (getSuccessfullyInstalledApps() == failedAppInstalls.size) proceedToRestore()
+                        else showDialog()
+                    }
                 }
             }
         }
