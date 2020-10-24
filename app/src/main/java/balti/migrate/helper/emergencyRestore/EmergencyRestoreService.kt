@@ -49,7 +49,9 @@ import java.io.FileWriter
 class EmergencyRestoreService: Service() {
     companion object {
         lateinit var emergencyServiceContext: Context
+        private set
         var wasStarted = false
+        private set
     }
     override fun onBind(intent: Intent?): IBinder? = null
 
