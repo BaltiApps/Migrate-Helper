@@ -25,9 +25,15 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_PROGR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_SUBTASK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_TITLE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RETRY_APP_INSTALLS
+import balti.module.baltitoolbox.functions.Misc
+import balti.module.baltitoolbox.functions.Misc.iterateBufferedReader
 import balti.module.baltitoolbox.functions.Misc.serviceStart
 import balti.module.baltitoolbox.functions.Misc.tryIt
 import kotlinx.android.synthetic.main.restore_progress_layout.*
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 class EmergencyRestoreProgressShow: AppCompatActivity() {
 
@@ -151,8 +157,39 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
         handleProgress(intent)
         handleErrors(intent)
 
-        if (!EmergencyRestoreService.wasStarted && !intent.hasExtra(EXTRA_EM_TITLE))
-            serviceStart(this, EmergencyRestoreService::class.java)
+        if (!EmergencyRestoreService.wasStarted && !intent.hasExtra(EXTRA_EM_TITLE)) {
+            // check if su shell is working and start service
+            var suError = ""
+            Misc.doBackgroundTask({
+                try {
+                    val shell = Runtime.getRuntime().exec("su")
+                    val writer = BufferedWriter(OutputStreamWriter(shell.outputStream))
+                    writer.write("exit\n")
+                    writer.flush()
+                    val errorReader = BufferedReader(InputStreamReader(shell.errorStream))
+                    iterateBufferedReader(errorReader, {
+                        suError += "$it\n"
+                        return@iterateBufferedReader false
+                    })
+                }
+                catch (e: Exception){
+                    suError = e.message.toString()
+                }
+            }, {
+                if (suError.isBlank())
+                    serviceStart(this, EmergencyRestoreService::class.java)
+                else {
+                    AlertDialog.Builder(this)
+                            .setTitle(R.string.are_you_rooted)
+                            .setMessage(suError)
+                            .setPositiveButton(R.string.close) {_, _ ->
+                                finish()
+                            }
+                            .setCancelable(false)
+                            .show()
+                }
+            })
+        }
         else commonTools.LBM?.sendBroadcast(Intent(ACTION_REQUEST_EMERGENCY_DATA))
     }
 
