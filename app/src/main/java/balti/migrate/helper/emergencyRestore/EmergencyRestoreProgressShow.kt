@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import balti.migrate.helper.AppInstance.Companion.emFailedCombined
 import balti.migrate.helper.R
 import balti.migrate.helper.emergencyRestore.utils.RetryEmergencyMissingPackages
+import balti.migrate.helper.postJobs.PostJobsActivity
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_PROGRESS
@@ -26,6 +27,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_SUBTA
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_TITLE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RETRY_APP_INSTALLS
 import balti.module.baltitoolbox.functions.Misc
+import balti.module.baltitoolbox.functions.Misc.activityStart
 import balti.module.baltitoolbox.functions.Misc.iterateBufferedReader
 import balti.module.baltitoolbox.functions.Misc.serviceStart
 import balti.module.baltitoolbox.functions.Misc.tryIt
@@ -62,7 +64,9 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
                 progressActionButton.apply {
                     text = getString(R.string.finish)
                     visibility = View.VISIBLE
-                    setOnClickListener { finish() }
+                    setOnClickListener {
+                        activityStart(this@EmergencyRestoreProgressShow, PostJobsActivity::class.java)
+                    }
                 }
 
                 progressAbortButton.visibility = View.GONE

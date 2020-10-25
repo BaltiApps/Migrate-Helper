@@ -35,6 +35,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_I
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.NOTIFICATION_ID_ONGOING_EM
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PENDING_INTENT_REQUEST_ID_EM
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.THIS_VERSION
+import balti.migrate.helper.utilities.StupidStartupServiceKotlin
 import balti.module.baltitoolbox.functions.GetResources.getStringFromRes
 import balti.module.baltitoolbox.functions.Misc
 import balti.module.baltitoolbox.functions.Misc.tryIt
@@ -168,6 +169,10 @@ class EmergencyRestoreService: Service() {
     private fun startRestore(){
         MainScope().launch {
             val emFailedAppData by lazy { ArrayList<String>(0) }
+            tryIt {
+                stopService(Intent(this@EmergencyRestoreService, StupidStartupServiceKotlin::class.java))
+            }
+
             if (!appendLogs) { // this means we are not in "retrying" state. this is first run.
                 emFailedAppInstalls.clear()
                 EmergencyAppInstall().executeWithResult().let {
