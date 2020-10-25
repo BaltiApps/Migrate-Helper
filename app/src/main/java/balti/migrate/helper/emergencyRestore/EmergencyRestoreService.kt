@@ -17,6 +17,7 @@ import balti.migrate.helper.AppInstance.Companion.emFailedCombined
 import balti.migrate.helper.R
 import balti.migrate.helper.emergencyRestore.tasks.EmergencyAppData
 import balti.migrate.helper.emergencyRestore.tasks.EmergencyAppInstall
+import balti.migrate.helper.emergencyRestore.tasks.EmergencyJsonCleaner
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_PROGRESS
@@ -180,6 +181,8 @@ class EmergencyRestoreService: Service() {
                     emFailedAppData.addAll(it as ArrayList <String>)
                 }
             }
+
+            EmergencyJsonCleaner().executeWithResult()
 
             delay(1000)
 
