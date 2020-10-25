@@ -366,6 +366,9 @@
     <string name="restoring_data_for_package">Restoring data for package</string>
     <string name="restore_app_data_done">Restore app data done.</string>
 
+    <!--EmergencyJsonCleaner.kt-->
+    <string name="cleaning_metadata">Cleaning metadata</string>
+
     <!--app_search_layout.xml-->
     <string name="enter_app_name">App/package name</string>
     <string name="no_apps">No apps available\nwith the given search!</string>
