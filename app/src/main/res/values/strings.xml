@@ -20,7 +20,7 @@
     <!--please also update LAST_SUPPORTED_ANDROID_API in CommonToolsKotlin.kt-->
 
     <string name="app_name">Migrate helper</string>
-    <string name="current_version_name">4.0_alpha</string>
+    <string name="current_version_name">4.0</string>
 
     <!--changelog-->
     <string name="changelog">Changelog</string>
@@ -37,8 +37,8 @@
     <string name="version_3_1_1_content">
         \u2022 Fix to apps with symbols\n
     </string>
-    <string name="version_4_0_alpha">Version 4.0 alpha</string>
-    <string name="version_4_0_alpha_content">
+    <string name="version_4_0">Version 4.0</string>
+    <string name="version_4_0_content">
         \u2022 Initial compatibility attempt with Android 11\n
         \u2022 Remove settings addon\n
         \u2022 Link to Migrate Flasher if no metadata found\n
