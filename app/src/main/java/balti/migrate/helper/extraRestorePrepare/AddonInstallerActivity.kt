@@ -61,7 +61,8 @@ class AddonInstallerActivity: Activity() {
         setFinishOnTouchOutside(false)
 
         doInstallSmsCalls = intent.getBooleanExtra(EXTRA_DO_INSTALL_SMS_CALLS_ADDON, false)
-        tryIt { smsCallsFilePaths.addAll(intent.getStringArrayListExtra(EXTRA_SMS_CALLS_ADDON_FILES)) }
+        tryIt { intent.getStringArrayListExtra(EXTRA_SMS_CALLS_ADDON_FILES)
+            ?.let { smsCallsFilePaths.addAll(it) } }
 
         setData()
 

@@ -190,7 +190,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                 if (type in arrayOf(EXTRA_PROGRESS_TYPE_SMS, EXTRA_PROGRESS_TYPE_CALLS))
                     return
 
-                intent.getStringExtra(EXTRA_TITLE).trim().run {
+                intent.getStringExtra(EXTRA_TITLE)?.trim()?.run {
                     if (this != lastTitle) {
                         progressWriter?.write("\n$this\n")
                         lastTitle = this
@@ -198,7 +198,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                 }
 
                 if (intent.hasExtra(EXTRA_TASKLOG)){
-                    intent.getStringExtra(EXTRA_TASKLOG).run {
+                    intent.getStringExtra(EXTRA_TASKLOG)?.run {
                         if (this != lastLog) {
                             progressWriter?.write("$this\n")
                             lastLog = this

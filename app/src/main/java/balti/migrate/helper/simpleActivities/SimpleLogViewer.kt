@@ -49,7 +49,7 @@ class SimpleLogViewer: AppCompatActivity() {
 
                     if (!it.hasExtra(SIMPLE_LOG_VIEWER_FILEPATH))
                         err += getString(R.string.no_filepath) + "\n"
-                    else filePath = it.getStringExtra(SIMPLE_LOG_VIEWER_FILEPATH)
+                    else filePath = it.getStringExtra(SIMPLE_LOG_VIEWER_FILEPATH).toString()
                 }
 
                 err = err.trim()

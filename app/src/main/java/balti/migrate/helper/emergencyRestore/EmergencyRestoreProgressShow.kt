@@ -92,7 +92,7 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
 
     private fun handleErrors(intent: Intent?){
         intent?.run {
-            EXTRA_EM_ERRORS.let { if (hasExtra(it)) getStringArrayListExtra(it).forEach {
+            EXTRA_EM_ERRORS.let { if (hasExtra(it)) getStringArrayListExtra(it)?.forEach {
                 errorLogTextView.append("$it\n")
             } }
         }

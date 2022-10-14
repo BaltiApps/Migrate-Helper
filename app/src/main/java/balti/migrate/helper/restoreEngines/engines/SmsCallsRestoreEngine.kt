@@ -119,7 +119,7 @@ class SmsCallsRestoreEngine(private val jobcode: Int,
             handler?.run {
 
                 if (exitWait || CANCELLED_MAX_COUNT == 0) {
-                    removeCallbacks(runnable)
+                    runnable?.let { removeCallbacks(it) }
                     finishJob()
                 }
                 else {
@@ -136,13 +136,13 @@ class SmsCallsRestoreEngine(private val jobcode: Int,
                         CANCELLED_MAX_COUNT--
                     }
 
-                    postDelayed(runnable, 500)
+                    runnable?.let { postDelayed(it, 500) }
                 }
             }
         }
 
         handler = Handler(Looper.getMainLooper()).apply {
-            post(runnable)
+            post(runnable!!)
         }
     }
 

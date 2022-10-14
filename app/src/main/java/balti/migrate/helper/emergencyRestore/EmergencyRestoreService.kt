@@ -86,8 +86,8 @@ class EmergencyRestoreService: Service() {
                 intent?.run {
                     progressIntent = Intent(ACTION_EM_PROGRESS).putExtras(this)
                     EXTRA_EM_TITLE.let {
-                        if (hasExtra(it)) getStringExtra(it).trim().let { t ->
-                            if (t != lastTitle) {
+                        if (hasExtra(it)) getStringExtra(it)?.trim().let { t ->
+                            if (t != lastTitle && t != null) {
                                 lastTitle = t
                                 loadingNotification.setContentTitle(t)
                                 notificationManager.notify(NOTIFICATION_ID_ONGOING_EM, loadingNotification.build())
@@ -108,8 +108,8 @@ class EmergencyRestoreService: Service() {
                     EXTRA_EM_ERRORS.let {
                         if (hasExtra(it)) {
                             getStringArrayListExtra(it).apply {
-                                errorList.addAll(this)
-                            }.forEach {
+                                this?.let { it1 -> errorList.addAll(it1) }
+                            }?.forEach {
                                 errorWriter?.write("$it\n")
                             }
                         }

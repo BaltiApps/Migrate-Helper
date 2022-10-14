@@ -147,7 +147,7 @@ class ProgressShowActivity: AppCompatActivity() {
             }
 
             if (handlingIntent.hasExtra(EXTRA_TITLE)) {
-                handlingIntent.getStringExtra(EXTRA_TITLE).trim().run {
+                handlingIntent.getStringExtra(EXTRA_TITLE)?.trim()?.run {
                     if (this != lastTitle && this != ""){
                         progressTask.text = this
                         progressLogTextView.append("\n$this\n")
@@ -160,7 +160,7 @@ class ProgressShowActivity: AppCompatActivity() {
                 subTask.text = handlingIntent.getStringExtra(EXTRA_SUBTASK)
 
             if (handlingIntent.hasExtra(EXTRA_TASKLOG)){
-                handlingIntent.getStringExtra(EXTRA_TASKLOG).run {
+                handlingIntent.getStringExtra(EXTRA_TASKLOG)?.run {
                     if (this != lastLog && this != ""){
                         progressLogTextView.append("$this\n")
                         lastLog = this
@@ -181,7 +181,8 @@ class ProgressShowActivity: AppCompatActivity() {
                     closeWarning.visibility = View.GONE
 
                     if (handlingIntent.hasExtra(EXTRA_ERRORS))
-                        errors.addAll(handlingIntent.getStringArrayListExtra(EXTRA_ERRORS))
+                        handlingIntent.getStringArrayListExtra(EXTRA_ERRORS)
+                            ?.let { errors.addAll(it) }
 
                     if (errors.size > 0) {
                         reportLogButton.visibility = View.VISIBLE
@@ -213,7 +214,7 @@ class ProgressShowActivity: AppCompatActivity() {
                     }
                 }
 
-                setImageIcon(handlingIntent, type)
+                type?.let { setImageIcon(handlingIntent, it) }
             }
         }
     }
