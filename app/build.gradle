@@ -1,15 +1,17 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+}
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
     defaultConfig {
         applicationId "balti.migrate.helper"
         minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 40
-        versionName "4.0 [gemini]"
+        targetSdkVersion 30
+        versionCode 50
+        versionName "5.0 [apollo]"
     }
     buildTypes {
         release {
@@ -17,12 +19,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation fileTree(dir: 'libs', include: ['*.aar'])
