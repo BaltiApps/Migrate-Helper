@@ -289,6 +289,7 @@ class MainActivityKotlin: AppCompatActivity() {
 
         /*Add increasing versions here*/
 
+        allVersions.append("\n" + getString(R.string.version_5_0) + "\n" + getString(R.string.version_5_0_content) + "\n")
         allVersions.append("\n" + getString(R.string.version_4_0) + "\n" + getString(R.string.version_4_0_content) + "\n")
         allVersions.append("\n" + getString(R.string.version_3_1_1) + "\n" + getString(R.string.version_3_1_1_content) + "\n")
         allVersions.append("\n" + getString(R.string.version_3_1) + "\n" + getString(R.string.version_3_1_content) + "\n")
