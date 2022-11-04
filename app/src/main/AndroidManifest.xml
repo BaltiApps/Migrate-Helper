@@ -31,6 +31,7 @@
         tools:ignore="GoogleAppIndexingWarning,LockedOrientationActivity">
 
         <activity android:name=".simpleActivities.MainActivityKotlin"
+            android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -88,7 +89,8 @@
             android:theme="@style/AppTheme.Dialog"
             />
 
-        <receiver android:name=".utilities.BootCompletedReceiver">
+        <receiver android:name=".utilities.BootCompletedReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" android:priority="999"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
@@ -115,7 +117,8 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
-        <receiver android:name=".utilities.AddonReceiver">
+        <receiver android:name=".utilities.AddonReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="balti.migrate.helper.RECEIVER"/>
             </intent-filter>
