@@ -13,6 +13,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_RAW_LIST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_TEMP_DIR
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SU_INIT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_NAME
 import balti.migrate.helper.utilities.ViewOperations
 import balti.module.baltitoolbox.functions.FileHandlers.unpackAssetToInternal
@@ -58,7 +59,7 @@ class RootCopyTask(private val jobCode: Int, private val tempDir: String,
 
             val scripFile = unpackAssetToInternal("suScript.sh", "suScript.sh")
 
-            suProcess = Runtime.getRuntime().exec("su")
+            suProcess = Runtime.getRuntime().exec(SU_INIT)
             suProcess?.let {
 
                 masterSuProcess = it

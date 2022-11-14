@@ -21,6 +21,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SCAN_SYS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_ALL_TO_UNINSTALL
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SU_INIT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.UNINSTALL_START_ID
 import balti.migrate.helper.utilities.constants.AddonSmsCallsConstants.Companion.ADDON_SMS_CALLS_RECEIVER_PACKAGE_NAME
 import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
@@ -81,7 +82,7 @@ class UninstallServiceKotlin: Service() {
                 it.substring(0, it.lastIndexOf('/'))
             }
 
-            val fullProcess = Runtime.getRuntime().exec("su")
+            val fullProcess = Runtime.getRuntime().exec(SU_INIT)
             BufferedWriter(OutputStreamWriter(fullProcess.outputStream)).run {
 
                 if (doUninstall || doRemoveCache || doScanSystemMod) {

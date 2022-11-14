@@ -41,6 +41,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_ANDROID_VERSION_WARNING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_FILEPATH
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SIMPLE_LOG_VIEWER_HEAD
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SU_INIT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_DEV_LINK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TG_LINK
 import balti.migrate.helper.utilities.ToolsNoContext
@@ -378,7 +379,7 @@ class MainActivityKotlin: AppCompatActivity() {
                             try {
                                 val destination = File(DIR_TWRP_UNINSTALL, source.name).absolutePath
 
-                                val suProcess = Runtime.getRuntime().exec("su")
+                                val suProcess = Runtime.getRuntime().exec(SU_INIT)
 
                                 suProcess?.let {
                                     BufferedWriter(OutputStreamWriter(it.outputStream)).run {

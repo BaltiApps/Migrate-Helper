@@ -12,6 +12,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_CLEANING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SU_INIT
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileFilter
@@ -68,7 +69,7 @@ class CleanerEngine(private val jobcode: Int,
                 f.delete()
             }
 
-            Runtime.getRuntime().exec("su").run {
+            Runtime.getRuntime().exec(SU_INIT).run {
                 val writer = BufferedWriter(OutputStreamWriter(outputStream))
                 removableFilesList.forEach {
                     writer.write("rm $MIGRATE_CACHE/$it 2>/dev/null\n")

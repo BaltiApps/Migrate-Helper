@@ -4,6 +4,7 @@ import android.os.Build
 import balti.migrate.helper.R
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.METADATA_HOLDER_DIR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_CACHE
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SU_INIT
 import balti.module.baltitoolbox.functions.FileHandlers
 import balti.module.baltitoolbox.functions.GetResources.getStringFromRes
 import balti.module.baltitoolbox.functions.Misc
@@ -11,7 +12,7 @@ import java.io.File
 
 class EmergencyAppInstall() : ParentCoroutineTask() {
 
-    private val shell by lazy { Runtime.getRuntime().exec("su") }
+    private val shell by lazy { Runtime.getRuntime().exec(SU_INIT) }
     private val title by lazy { getStringFromRes(R.string.installing_apps) }
     private val errors by lazy { ArrayList<String>(0) }
 

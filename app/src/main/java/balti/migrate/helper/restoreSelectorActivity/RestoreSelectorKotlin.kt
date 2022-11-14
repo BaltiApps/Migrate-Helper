@@ -59,6 +59,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_MIGRAT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_EXTRAS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IGNORE_READ_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_LOAD_EXTRAS_ON_UI_THREAD
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SU_INIT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.TIMEOUT_WAITING_TO_KILL
 import balti.module.baltitoolbox.functions.Misc
 import balti.module.baltitoolbox.functions.Misc.tryIt
@@ -136,7 +137,7 @@ class RestoreSelectorKotlin: AppCompatActivity(), OnReadComplete {
 
                         setPositiveButton(R.string.kill_app) { _, _ ->
 
-                            Runtime.getRuntime().exec("su").apply {
+                            Runtime.getRuntime().exec(SU_INIT).apply {
                                 BufferedWriter(OutputStreamWriter(this.outputStream)).run {
                                     this.write("am force-stop $packageName\n")
                                     this.write("exit\n")

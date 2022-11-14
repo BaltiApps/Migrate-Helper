@@ -10,6 +10,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_WIFI
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE_WIFI
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_IS_WIFI_RESTORED
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SU_INIT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_NAME
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.WIFI_FILE_PATH
 import balti.module.baltitoolbox.functions.SharedPrefs.putPrefBoolean
@@ -19,7 +20,7 @@ class WifiRestoreEngine(private val jobcode: Int,
                         private val wifiPacket: WifiPacketKotlin): ParentRestoreClass(EXTRA_PROGRESS_TYPE_WIFI) {
 
     private val errors by lazy { ArrayList<String>(0) }
-    private val suProcess by lazy { Runtime.getRuntime().exec("su") }
+    private val suProcess by lazy { Runtime.getRuntime().exec(SU_INIT) }
     private val suWriter by lazy { BufferedWriter(OutputStreamWriter(suProcess.outputStream)) }
 
     private fun restoreWifi(){

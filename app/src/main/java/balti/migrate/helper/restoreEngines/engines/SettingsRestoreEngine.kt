@@ -12,6 +12,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_GENERIC_
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ERROR_SETTINGS_SCRIPT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRAS_MARKER
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.FILE_RESTORE_SETTINGS_SCRIPT
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SU_INIT
 import balti.module.baltitoolbox.functions.FileHandlers.getInternalFile
 import balti.module.baltitoolbox.functions.Misc.tryIt
 import java.io.BufferedWriter
@@ -21,7 +22,7 @@ import java.io.FileWriter
 class SettingsRestoreEngine(private val jobcode: Int,
                             private val settingsPacket: SettingsPacketKotlin): ParentRestoreClass("") {
 
-    private val suProcess by lazy { Runtime.getRuntime().exec("su") }
+    private val suProcess by lazy { Runtime.getRuntime().exec(SU_INIT) }
     private val scriptFile by lazy { getInternalFile(FILE_RESTORE_SETTINGS_SCRIPT) }
     private var PID = -999
 

@@ -26,6 +26,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_PROGR
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_SUBTASK
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_EM_TITLE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.JOBCODE_RETRY_APP_INSTALLS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SU_INIT
 import balti.module.baltitoolbox.functions.Misc
 import balti.module.baltitoolbox.functions.Misc.activityStart
 import balti.module.baltitoolbox.functions.Misc.iterateBufferedReader
@@ -166,7 +167,7 @@ class EmergencyRestoreProgressShow: AppCompatActivity() {
             var suError = ""
             Misc.doBackgroundTask({
                 try {
-                    val shell = Runtime.getRuntime().exec("su")
+                    val shell = Runtime.getRuntime().exec(SU_INIT)
                     val writer = BufferedWriter(OutputStreamWriter(shell.outputStream))
                     writer.write("exit\n")
                     writer.flush()

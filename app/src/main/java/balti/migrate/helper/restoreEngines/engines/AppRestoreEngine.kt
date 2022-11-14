@@ -26,6 +26,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.MIGRATE_STATUS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_FDROID
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PACKAGE_NAME_PLAY_STORE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.PREF_REMOUNT_DATA
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.SU_INIT
 import balti.module.baltitoolbox.functions.FileHandlers.unpackAssetToInternal
 import balti.module.baltitoolbox.functions.Misc.getPercentage
 import balti.module.baltitoolbox.functions.Misc.isPackageInstalled
@@ -244,7 +245,7 @@ class AppRestoreEngine(private val jobcode: Int,
 
             resetBroadcast(false, engineContext.getString(R.string.restoring_apps), EXTRA_PROGRESS_APP_RESTORE)
 
-            suProcess = Runtime.getRuntime().exec("su")
+            suProcess = Runtime.getRuntime().exec(SU_INIT)
             suProcess?.let {
                 val suInputStream = BufferedWriter(OutputStreamWriter(it.outputStream))
                 val outputStream = BufferedReader(InputStreamReader(it.inputStream))
@@ -346,7 +347,7 @@ class AppRestoreEngine(private val jobcode: Int,
                 resetBroadcast(true, engineContext.getString(R.string.waiting_for_contacts), EXTRA_PROGRESS_WAITING_FOR_VCF)
                 broadcastProgress("", engineContext.getString(R.string.waiting_for_contacts_desc), false)
 
-                Runtime.getRuntime().exec("su").let {
+                Runtime.getRuntime().exec(SU_INIT).let {
                     val writer = BufferedWriter(OutputStreamWriter(it.outputStream))
                     val reader = BufferedReader(InputStreamReader(it.inputStream))
 

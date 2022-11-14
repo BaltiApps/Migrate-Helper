@@ -265,6 +265,10 @@ class CommonToolsKotlin(val context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE
             else 0
 
+        val IS_API_A11 : Boolean by lazy { Build.VERSION.SDK_INT >= Build.VERSION_CODES.R }
+
+        val SU_INIT = if (IS_API_A11) "su --mount-master" else "su"
+
         val MIGRATE_CACHE: String
             get() {
                 PREF_DEFAULT_MIGRATE_CACHE.let {default ->
@@ -558,7 +562,7 @@ class CommonToolsKotlin(val context: Context) {
     fun cancelTask(suProcess: Process?, vararg pids: Int) {
 
         tryIt {
-            val killProcess = Runtime.getRuntime().exec("su")
+            val killProcess = Runtime.getRuntime().exec(SU_INIT)
 
             val writer = BufferedWriter(OutputStreamWriter(killProcess.outputStream))
             fun killId(pid: Int) {
@@ -578,7 +582,7 @@ class CommonToolsKotlin(val context: Context) {
     }
 
     fun forceStopSelf(){
-        Runtime.getRuntime().exec("su").apply {
+        Runtime.getRuntime().exec(SU_INIT).apply {
             BufferedWriter(OutputStreamWriter(this.outputStream)).run {
                 this.write("am force-stop ${appContext.packageName}\n")
                 this.write("exit\n")
