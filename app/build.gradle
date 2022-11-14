@@ -10,8 +10,8 @@ android {
         applicationId "balti.migrate.helper"
         minSdkVersion 21
         targetSdkVersion 32
-        versionCode 50
-        versionName "5.0 [apollo]"
+        versionCode 51
+        versionName "5.0.1 [apollo]"
     }
     buildTypes {
         release {
