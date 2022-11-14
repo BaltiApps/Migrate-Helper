@@ -22,6 +22,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_ERRORS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_EM_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST_EMERGENCY_DATA
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ANDROID_S_PENDING_INTENT_FLAG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_EMERGENCY_RESTORE_END
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_EMERGENCY_RESTORE_RUNNING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_APPEND_LOG
@@ -70,7 +71,7 @@ class EmergencyRestoreService: Service() {
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentIntent(PendingIntent.getActivity(this, PENDING_INTENT_REQUEST_ID_EM,
                         Intent(this, EmergencyRestoreProgressShow::class.java),
-                        PendingIntent.FLAG_UPDATE_CURRENT)
+                        PendingIntent.FLAG_UPDATE_CURRENT or ANDROID_S_PENDING_INTENT_FLAG)
                 )
     }
 
@@ -227,7 +228,7 @@ class EmergencyRestoreService: Service() {
                         putExtras(finishIntent)
                         putStringArrayListExtra(EXTRA_EM_ERRORS, errorList)
                     },
-                    PendingIntent.FLAG_UPDATE_CURRENT))
+                    PendingIntent.FLAG_UPDATE_CURRENT or ANDROID_S_PENDING_INTENT_FLAG))
             }.run {
                 notificationManager.cancelAll()
                 notificationManager.notify(NOTIFICATION_ID_FINISHED_EM, this.build())

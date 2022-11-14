@@ -12,6 +12,7 @@ import balti.migrate.helper.restoreEngines.utils.OnRestoreComplete
 import balti.migrate.helper.utilities.CommonToolsKotlin
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_ABORT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ANDROID_S_PENDING_INTENT_FLAG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_PERCENTAGE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_PROGRESS_TYPE
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.EXTRA_SUBTASK
@@ -37,13 +38,18 @@ abstract class ParentRestoreClass(private val intentType: String): AsyncTask<Any
 
     private val onGoingNotification by lazy {
         NotificationCompat.Builder(engineContext, CommonToolsKotlin.CHANNEL_RESTORE_RUNNING)
-                .setContentTitle(engineContext.getString(R.string.loading))
-                .setSmallIcon(R.drawable.ic_notification_icon)
-                .addAction(
-                        NotificationCompat.Action(0, serviceContext.getString(android.R.string.cancel),
-                                PendingIntent.getBroadcast(serviceContext, PENDING_INTENT_RESTORE_ABORT_ID,
-                                        Intent(ACTION_RESTORE_ABORT), PendingIntent.FLAG_CANCEL_CURRENT))
+            .setContentTitle(engineContext.getString(R.string.loading))
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .addAction(
+                NotificationCompat.Action(
+                    0, serviceContext.getString(android.R.string.cancel),
+                    PendingIntent.getBroadcast(
+                        serviceContext, PENDING_INTENT_RESTORE_ABORT_ID,
+                        Intent(ACTION_RESTORE_ABORT),
+                        PendingIntent.FLAG_CANCEL_CURRENT or ANDROID_S_PENDING_INTENT_FLAG
+                    )
                 )
+            )
     }
 
     private val activityIntent by lazy { Intent(serviceContext, ProgressShowActivity::class.java) }
@@ -60,7 +66,7 @@ abstract class ParentRestoreClass(private val intentType: String): AsyncTask<Any
                     setContentIntent(
                             PendingIntent.getActivity(serviceContext, PENDING_INTENT_REQUEST_ID,
                                     activityIntent.putExtras(actualBroadcast),
-                                    PendingIntent.FLAG_UPDATE_CURRENT)
+                                    PendingIntent.FLAG_UPDATE_CURRENT or ANDROID_S_PENDING_INTENT_FLAG)
                     )
                 }
                 AppInstance.notificationManager.notify(NOTIFICATION_ID_ONGOING, onGoingNotification.build())

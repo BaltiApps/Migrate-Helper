@@ -31,6 +31,7 @@ import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_REQUEST
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_ABORT
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ACTION_RESTORE_PROGRESS
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ALL_SUPPRESSED_ERRORS
+import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.ANDROID_S_PENDING_INTENT_FLAG
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_ABORTING
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_END
 import balti.migrate.helper.utilities.CommonToolsKotlin.Companion.CHANNEL_RESTORE_RUNNING
@@ -447,7 +448,7 @@ class RestoreServiceKotlin: Service(), OnRestoreComplete {
                         setContentIntent(
                                 PendingIntent.getActivity(serviceContext, PENDING_INTENT_REQUEST_ID,
                                         Intent(this@RestoreServiceKotlin, ProgressShowActivity::class.java).putExtras(returnIntent),
-                                        PendingIntent.FLAG_UPDATE_CURRENT))
+                                        PendingIntent.FLAG_UPDATE_CURRENT or ANDROID_S_PENDING_INTENT_FLAG))
 
                 }.build()
         )

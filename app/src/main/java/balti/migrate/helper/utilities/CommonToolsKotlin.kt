@@ -1,6 +1,7 @@
 package balti.migrate.helper.utilities
 
 import android.app.Activity
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -259,6 +260,10 @@ class CommonToolsKotlin(val context: Context) {
         val HELPER_STATUS = "HELPER_STATUS"
 
         val UNINSTALL_START_ID = 234
+
+        val ANDROID_S_PENDING_INTENT_FLAG =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE
+            else 0
 
         val MIGRATE_CACHE: String
             get() {
